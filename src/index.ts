@@ -1,7 +1,7 @@
 // Tokens and stuff.
 import { Client } from 'discord.io'
 import { token } from '../config.json'
-import { handleGunfight, handleAccept, handleAnswers } from './gunfight'
+import { handleGunfight, handleAccept } from './gunfight'
 
 // Create a client to connect to Discord API Gateway.
 const client = new Client({
@@ -63,5 +63,5 @@ client.on('message', async (user, userID, channelID, message, event) => {
   // Accept gunfight.
   else if (command.startsWith('/accept')) handleAccept(db, mention, sendResponse)
   // Handle answers to gunfight.
-  else if (command in ['fire', 'water', 'gun', 'dot']) handleAnswers()
+  else if (command in ['fire', 'water', 'gun', 'dot']) return
 })

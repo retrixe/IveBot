@@ -47,8 +47,3 @@ export function handleAccept (db: DB, mention: string, sendResponse: Function) {
     Math.floor(Math.random() * 20000 + 1000)
   )
 }
-
-// Handle a possible response.
-export function handleAccept() {
-  return
-}
