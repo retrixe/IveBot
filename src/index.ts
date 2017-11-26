@@ -12,7 +12,7 @@ const client = new Client({
 // On connecting..
 client.on('ready', () => {
   console.log('Connected to Discord.')
-  client.sendMessage({ to: '361577668677861399', message: `True hacking is done in Swift u_u` })
+  client.sendMessage({ to: '361577668677861399', message: `` })
 })
 
 // Disconnection from Discord will trigger the following.
