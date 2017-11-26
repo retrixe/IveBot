@@ -1,0 +1,27 @@
+{
+  "name": "ivebot",
+  "version": "1.0.0-alpha.0",
+  "description": "The bot that created the iPhone X.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "ava",
+    "lint": "tslint .",
+    "start": "node lib/index.js",
+    "build": "tsc",
+    "dev": "nodemon -D src/index.ts"
+  },
+  "author": "Ibrahim Ansari <ansari.ibrahim1@gmail.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "discord.io": "^2.5.3"
+  },
+  "devDependencies": {
+    "ava": "^0.23.0",
+    "nodemon": "^1.12.1",
+    "ts-node": "^3.3.0",
+    "tslint": "^5.8.0",
+    "tslint-config-standard": "^7.0.0",
+    "tslint-eslint-rules": "^4.1.1",
+    "typescript": "^2.6.1"
+  }
+}
