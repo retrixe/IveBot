@@ -5,9 +5,9 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "ava",
-    "lint": "tslint .",
+    "lint": "eslint . --ext .ts && tsc --noEmit --skipLibCheck",
     "start": "node lib/index.js",
-    "build": "tsc",
+    "build": "tsc --skipLibCheck",
     "dev": "nodemon -D src/index.ts"
   },
   "author": "Ibrahim Ansari <ansari.ibrahim1@gmail.com>",
@@ -18,11 +18,23 @@
   "devDependencies": {
     "@types/node": "^8.0.53",
     "ava": "^0.23.0",
+    "eslint": "^4.12.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "eslint-plugin-typescript": "^0.8.1",
+    "husky": "^0.15.0-beta.13",
     "nodemon": "^1.12.1",
     "ts-node": "^3.3.0",
-    "tslint": "^5.8.0",
-    "tslint-config-standard": "^7.0.0",
-    "tslint-eslint-rules": "^4.1.1",
-    "typescript": "^2.6.1"
+    "typescript": "^2.6.1",
+    "typescript-eslint-parser": "^9.0.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint",
+      "pre-push": "npm run lint"
+    }
   }
 }

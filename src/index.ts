@@ -21,14 +21,14 @@ client.on('disconnect', (errMsg, code) => console.log('Error:\n', errMsg, code))
 // Create a database to handle certain stuff.
 const db: {
   gunfight: Array<{
-    challenged: string,
-    challenger: string,
-    accepted: boolean,
-    randomWord: string
+  challenged: string,
+  challenger: string,
+  accepted: boolean,
+  randomWord: string
   }>
-} = {
-  gunfight: []
-}
+  } = {
+    gunfight: []
+  }
 
 // When client recieves a message, it will callback.
 client.on('message', async (user, userID, channelID, message, event) => {
@@ -37,6 +37,7 @@ client.on('message', async (user, userID, channelID, message, event) => {
   const command = message.toLocaleLowerCase()
   // Mention the user with this variable.
   const mention = (() => {
+    // eslint-disable-next-line typescript/no-explicit-any
     const user: any = client.servers[client.channels[channelID].guild_id].members[userID]
     if (user.nick === null) return `<@${userID}>`
     return `<@!${userID}>`
@@ -63,5 +64,5 @@ client.on('message', async (user, userID, channelID, message, event) => {
   // Accept gunfight.
   else if (command.startsWith('/accept')) handleAccept(db, mention, sendResponse)
   // Handle answers to gunfight.
-  else if (command in ['fire', 'water', 'gun', 'dot']) return
+  // else if (command in ['fire', 'water', 'gun', 'dot']) return
 })

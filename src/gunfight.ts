@@ -1,12 +1,12 @@
 // Our DB's shape.
-type DB = {
+type DB = { /* eslint-disable no-undef */
   gunfight: Array<{
     challenged: string,
     challenger: string,
     accepted: boolean,
     randomWord: string
   }>
-}
+} /* eslint-enable no-undef */
 
 // Gunfight handler.
 export function handleGunfight (command: string, mention: string, sendResponse: Function, db: DB) {
