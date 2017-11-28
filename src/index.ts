@@ -30,8 +30,16 @@ const db: {
     gunfight: []
   }
 
+// Test pilots.
+const testPilots = [
+  '305053306835697674', // voldemort#6931
+  '295324726312566784', // Dot#8711
+  '338924758173351937', // Astelon#7869
+  '305280873476128768' // VR#5448
+]
+
 // When client recieves a message, it will callback.
-client.on('message', async (user, userID, channelID, message, event) => {
+client.on('message', (user, userID, channelID, message, event) => {
   // Helper variables and functions.
   // Convert message to lowercase to ensure it works.
   const command = message.toLocaleLowerCase()
@@ -59,8 +67,19 @@ client.on('message', async (user, userID, channelID, message, event) => {
   } else if (command.startsWith('is dot a good boy')) sendResponse('Shame on you. He\'s undefined.')
   else if (command.startsWith('iphone x')) sendResponse(`You don't deserve it. 😎`)
 
-  // Gunfight.
-  else if (command.startsWith('/gunfight')) handleGunfight(command, mention, sendResponse, db)
+  // Request something.
+  else if (command.startsWith('/request') && testPilots.find((thing) => thing === userID)) {
+    client.createDMChannel('305053306835697674')
+    client.sendMessage({
+      to: '305053306835697674',
+      message: `${mention}: ${message}`
+    })
+    sendResponse(`${mention}, what a pathetic idea. It has been DMed to the main developer and will be read shortly.
+You may recieve a response soon, and you can keep track here:
+<https://github.com/retrixe/IveBot/projects/1>`)
+
+    // Gunfight.
+  } else if (command.startsWith('/gunfight')) handleGunfight(command, mention, sendResponse, db)
   // Accept gunfight.
   else if (command.startsWith('/accept')) handleAccept(db, mention, sendResponse)
   // Handle answers to gunfight.

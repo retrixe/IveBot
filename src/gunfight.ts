@@ -28,6 +28,7 @@ export function handleGunfight (command: string, mention: string, sendResponse: 
 
 // Accept a gunfight request.
 export function handleAccept (db: DB, mention: string, sendResponse: Function) {
+  console.log(db)
   // Find the gunfight, if exists.
   const gunfightToAccept = db.gunfight.find((gunfight) => (
     gunfight.challenged === mention && !gunfight.accepted
@@ -39,7 +40,7 @@ export function handleAccept (db: DB, mention: string, sendResponse: Function) {
   db.gunfight[indexOfGunfight].accepted = true
   db.gunfight[indexOfGunfight].randomWord = words[Math.floor(Math.random() * words.length)]
   sendResponse(`Within 20 seconds, you will be asked to say a random word.`)
-  // Let's wait for 30s and call a random word.
+  // Let's wait for random amount under 20s and call a random word.
   setTimeout(
     () => {
       sendResponse('Say `' + db.gunfight[indexOfGunfight].randomWord + '`!')

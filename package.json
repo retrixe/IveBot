@@ -8,12 +8,13 @@
     "lint": "eslint . --ext .ts && tsc --noEmit --skipLibCheck",
     "start": "node lib/index.js",
     "build": "tsc --skipLibCheck",
+    "watch": "tsc --skipLibCheck -w",
     "dev": "nodemon -D src/index.ts"
   },
   "author": "Ibrahim Ansari <ansari.ibrahim1@gmail.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "discord.io": "^2.5.3"
+    "discord.io": "izy521/discord.io"
   },
   "devDependencies": {
     "@types/node": "^8.0.53",

@@ -1046,6 +1046,14 @@ discord.io@^2.5.3:
     tweetnacl "^0.14.0"
     ws "^1.1.0"
 
+discord.io@izy521/discord.io:
+  version "2.5.3"
+  resolved "https://codeload.github.com/izy521/discord.io/tar.gz/a65e165c8cbdfc64a69d98e7bc6e25f490469086"
+  dependencies:
+    cjopus "^0.0.4"
+    tweetnacl "^0.14.0"
+    ws "^1.1.0"
+
 doctrine@1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/doctrine/-/doctrine-1.5.0.tgz#379dce730f6166f76cefa4e6707a159b02c5a6fa"
