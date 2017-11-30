@@ -1,0 +1,19 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.options": {
+    "extensions": [
+      ".js",
+      ".ts",
+      ".jsx",
+      ".tsx"
+    ]
+  },
+  "eslint.enable": true,
+  "tslint.enable": false
+}

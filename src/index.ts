@@ -44,12 +44,7 @@ client.on('message', (user, userID, channelID, message, event) => {
   // Convert message to lowercase to ensure it works.
   const command = message.toLocaleLowerCase()
   // Mention the user with this variable.
-  const mention = (() => {
-    // eslint-disable-next-line typescript/no-explicit-any
-    const user: any = client.servers[client.channels[channelID].guild_id].members[userID]
-    if (user.nick === null) return `<@${userID}>`
-    return `<@!${userID}>`
-  })()
+  const mention = `<@${userID}>`
   // Helper command to send message to same channel.
   const sendResponse = (message: string) => client.sendMessage({ to: channelID, message })
 
@@ -58,14 +53,18 @@ client.on('message', (user, userID, channelID, message, event) => {
   if (command.startsWith('/help') || command.startsWith('/halp')) {
     sendResponse(`
     **Jony Ive can do many commands.**
-    The most innovative halp and help command.
-    /gunfight - For that good ol' fight bro.
+    \`/halp\` and \`/help\` - The most innovative halp and help command.
+    \`/gunfight\` - For that good ol' fight bro. Helper command is \`/accept\`.
+    \`/choose\` - Choose between multiple options.
+**Commands available to test pilots.**
+    \`/request\` - Request a specific feature or command.
 **There are some easter egg auto responses.**
     `)
 
     // Auto responses and easter eggs.
   } else if (command.startsWith('is dot a good boy')) sendResponse('Shame on you. He\'s undefined.')
   else if (command.startsWith('iphone x')) sendResponse(`You don't deserve it. 😎`)
+  else if (command.startsWith('triggered')) sendResponse('Ah, pathetic people again.')
 
   // Request something.
   else if (command.startsWith('/request') && testPilots.find((thing) => thing === userID)) {
@@ -79,9 +78,9 @@ You may recieve a response soon, and you can keep track here:
 <https://github.com/retrixe/IveBot/projects/1>`)
 
     // Gunfight.
-  } else if (command.startsWith('/gunfight')) handleGunfight(command, mention, sendResponse, db)
+  } else if (command.startsWith('/gunfight')) handleGunfight(command, userID, sendResponse, db)
   // Accept gunfight.
-  else if (command.startsWith('/accept')) handleAccept(db, mention, sendResponse)
+  else if (command.startsWith('/accept')) handleAccept(db, userID, sendResponse)
   // Handle answers to gunfight.
   // else if (command in ['fire', 'water', 'gun', 'dot']) return
 })
