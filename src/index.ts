@@ -1,6 +1,8 @@
 // Tokens and stuff.
 import { Client } from 'discord.io'
 import { token } from '../config.json'
+// Commands.
+import { handleRequest, handleChoose } from './utilities'
 import { handleGunfight, handleAccept } from './gunfight'
 
 // Create a client to connect to Discord API Gateway.
@@ -43,8 +45,6 @@ client.on('message', (user, userID, channelID, message, event) => {
   // Helper variables and functions.
   // Convert message to lowercase to ensure it works.
   const command = message.toLocaleLowerCase()
-  // Mention the user with this variable.
-  const mention = `<@${userID}>`
   // Helper command to send message to same channel.
   const sendResponse = (message: string) => client.sendMessage({ to: channelID, message })
 
@@ -56,6 +56,7 @@ client.on('message', (user, userID, channelID, message, event) => {
     \`/halp\` and \`/help\` - The most innovative halp and help command.
     \`/gunfight\` - For that good ol' fight bro. Helper command is \`/accept\`.
     \`/choose\` - Choose between multiple options.
+
 **Commands available to test pilots.**
     \`/request\` - Request a specific feature or command.
 **There are some easter egg auto responses.**
@@ -67,20 +68,13 @@ client.on('message', (user, userID, channelID, message, event) => {
   else if (command.startsWith('triggered')) sendResponse('Ah, pathetic people again.')
 
   // Request something.
-  else if (command.startsWith('/request') && testPilots.find((thing) => thing === userID)) {
-    client.createDMChannel('305053306835697674')
-    client.sendMessage({
-      to: '305053306835697674',
-      message: `${mention}: ${message}`
-    })
-    sendResponse(`${mention}, what a pathetic idea. It has been DMed to the main developer and will be read shortly.
-You may recieve a response soon, and you can keep track here:
-<https://github.com/retrixe/IveBot/projects/1>`)
-
-    // Gunfight.
-  } else if (command.startsWith('/gunfight')) handleGunfight(command, userID, sendResponse, db)
+  else if (command.startsWith('/request') && testPilots.find((thing) => thing === userID)) handleRequest(client, userID, sendResponse, message)
+  // Gunfight.
+  else if (command.startsWith('/gunfight')) handleGunfight(command, userID, sendResponse, db)
   // Accept gunfight.
   else if (command.startsWith('/accept')) handleAccept(db, userID, sendResponse)
   // Handle answers to gunfight.
   // else if (command in ['fire', 'water', 'gun', 'dot']) return
+  // Choose.
+  else if (command.startsWith('/choose')) handleChoose(message, sendResponse)
 })
