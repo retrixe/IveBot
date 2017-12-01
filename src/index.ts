@@ -53,12 +53,13 @@ client.on('message', (user, userID, channelID, message, event) => {
   if (command.startsWith('/help') || command.startsWith('/halp')) {
     sendResponse(`
     **Jony Ive can do many commands.**
-    \`/halp\` and \`/help\` - The most innovative halp and help command.
-    \`/gunfight\` - For that good ol' fight bro. Helper command is \`/accept\`.
+    \`/halp\` and \`/help\` - The most innovative help.
+    \`/gunfight\` - For that good ol' fight bro.
     \`/choose\` - Choose between multiple options.
+    \`/reverse\` - Reverse a sentence.
 
 **Commands available to test pilots.**
-    \`/request\` - Request a specific feature or command.
+    \`/request\` - Request a specific feature.
 **There are some easter egg auto responses.**
     `)
 
@@ -77,4 +78,8 @@ client.on('message', (user, userID, channelID, message, event) => {
   // else if (command in ['fire', 'water', 'gun', 'dot']) return
   // Choose.
   else if (command.startsWith('/choose')) handleChoose(message, sendResponse)
+  // Reverse.
+  else if (command.startsWith('/reverse')) {
+    sendResponse(message.substring(9, message.length).split('').reverse().join(''))
+  }
 })
