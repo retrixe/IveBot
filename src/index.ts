@@ -2,7 +2,8 @@
 import { Client } from 'discord.io'
 import { token } from '../config.json'
 // Commands.
-import { handleRequest, handleChoose } from './utilities'
+import { handleRequest } from './utilities'
+import { handleChoose, handleReverse, handle8Ball, handleRepeat } from './games'
 import { handleGunfight, handleAccept } from './gunfight'
 
 // Create a client to connect to Discord API Gateway.
@@ -14,7 +15,7 @@ const client = new Client({
 // On connecting..
 client.on('ready', () => {
   console.log('Connected to Discord.')
-  client.sendMessage({ to: '361577668677861399', message: `` })
+  client.sendMessage({ to: '361577668677861399', message: ``, typing: true })
 })
 
 // Disconnection from Discord will trigger the following.
@@ -54,9 +55,13 @@ client.on('message', (user, userID, channelID, message, event) => {
     sendResponse(`
     **Jony Ive can do many commands.**
     \`/halp\` and \`/help\` - The most innovative help.
+
+**Games.**
     \`/gunfight\` - For that good ol' fight bro.
     \`/choose\` - Choose between multiple options.
     \`/reverse\` - Reverse a sentence.
+    \`/8ball\` - Answers to questions.
+    \`/repeat\` - Repeat a string.
 
 **Commands available to test pilots.**
     \`/request\` - Request a specific feature.
@@ -79,7 +84,9 @@ client.on('message', (user, userID, channelID, message, event) => {
   // Choose.
   else if (command.startsWith('/choose')) handleChoose(message, sendResponse)
   // Reverse.
-  else if (command.startsWith('/reverse')) {
-    sendResponse(message.substring(9, message.length).split('').reverse().join(''))
-  }
+  else if (command.startsWith('/reverse')) handleReverse(message, sendResponse)
+  // 8ball.
+  else if (command.startsWith('/8ball')) handle8Ball(message, sendResponse)
+  // 8ball.
+  else if (command.startsWith('/repeat')) handleRepeat(message, sendResponse)
 })
