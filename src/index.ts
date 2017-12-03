@@ -2,9 +2,9 @@
 import { Client } from 'discord.io'
 import { token } from '../config.json'
 // Commands.
-import { handleRequest } from './utilities'
-import { handleChoose, handleReverse, handle8Ball, handleRepeat } from './games'
-import { handleGunfight, handleAccept } from './gunfight'
+import { handleRequest } from './commands/utilities'
+import { handleChoose, handleReverse, handle8Ball, handleRepeat } from './commands/games'
+import { handleGunfight, handleAccept } from './commands/gunfight'
 
 // Create a client to connect to Discord API Gateway.
 const client = new Client({
@@ -72,6 +72,7 @@ client.on('message', (user, userID, channelID, message, event) => {
   } else if (command.startsWith('is dot a good boy')) sendResponse('Shame on you. He\'s undefined.')
   else if (command.startsWith('iphone x')) sendResponse(`You don't deserve it. 😎`)
   else if (command.startsWith('triggered')) sendResponse('Ah, pathetic people again.')
+  else if (command.startsWith('ayy')) sendResponse('lmao')
 
   // Request something.
   else if (command.startsWith('/request') && testPilots.find((thing) => thing === userID)) handleRequest(client, userID, sendResponse, message)
