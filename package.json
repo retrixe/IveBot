@@ -14,7 +14,7 @@
   "author": "Ibrahim Ansari <ansari.ibrahim1@gmail.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "discord.io": "izy521/discord.io"
+    "discord.io": "woor/discord.io#gateway_v6"
   },
   "devDependencies": {
     "@types/node": "^8.0.53",

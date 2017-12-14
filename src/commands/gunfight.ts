@@ -4,12 +4,13 @@ type DB = { /* eslint-disable no-undef */
     challenged: string,
     challenger: string,
     accepted: boolean,
-    randomWord: string
+    randomWord: string,
+    channelID: string
   }>
 } /* eslint-enable no-undef */
 
 // Gunfight handler.
-export function handleGunfight (command: string, userID: string, sendResponse: Function, db: DB) {
+export function handleGunfight (command: string, userID: string, sendResponse: Function, db: DB, channelID: string) {
   // Get challenged mention and ID.
   const challenged = command.split(' ')[1]
   const challengedID = challenged.substring(2, challenged.length - 1).split('!').join('')
@@ -29,28 +30,32 @@ export function handleGunfight (command: string, userID: string, sendResponse: F
     accepted: false,
     challenged: challengedID,
     challenger: userID,
-    randomWord: ''
+    randomWord: '',
+    channelID
   })
   sendResponse(`${challenged}, say /accept to accept the challenge.`)
   // The following will delete the gunfight if unaccepted within 30 seconds.
   setTimeout(() => {
     // Find the gunfight we pushed.
     const gunfightPushed = db.gunfight.find((gunfight) => gunfight.challenged === challengedID)
-    // If its accepted, do nothing.
-    if (gunfightPushed.accepted) return
     // Remove the object and send a response.
+    if (!gunfightPushed.accepted) sendResponse(`<@${userID}>, your challenge to ${challenged} has been cancelled.`)
     db.gunfight.splice(db.gunfight.indexOf(gunfightPushed), 1)
-    sendResponse(`<@${userID}>, your challenge to ${challenged} has been cancelled.`)
   }, 30000)
 }
 
 // Accept a gunfight request.
-export function handleAccept (db: DB, userID: string, sendResponse: Function) {
+export function handleAccept (db: DB, userID: string, sendResponse: Function, channelID: string) {
   // Find the gunfight, if exists.
   const gunfightToAccept = db.gunfight.find((gunfight) => (
     gunfight.challenged === userID && !gunfight.accepted
   ))
   if (gunfightToAccept === undefined) return // Insert checks.
+  // Accept in same channelID.
+  if (gunfightToAccept.channelID !== channelID) {
+    sendResponse('Please accept any challenges in the same channel.')
+    return
+  }
   // Accept the challenge.
   const indexOfGunfight = db.gunfight.indexOf(gunfightToAccept)
   const words = ['fire', 'water', 'gun', 'dot']
@@ -61,7 +66,6 @@ export function handleAccept (db: DB, userID: string, sendResponse: Function) {
   setTimeout(
     () => {
       sendResponse('Say `' + db.gunfight[indexOfGunfight].randomWord + '`!')
-      db.gunfight.splice(indexOfGunfight, 1)
     },
     Math.floor(Math.random() * 20000 + 1000)
   )

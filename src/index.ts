@@ -27,7 +27,8 @@ const db: {
   challenged: string,
   challenger: string,
   accepted: boolean,
-  randomWord: string
+  randomWord: string,
+  channelID: string
   }>
   } = {
     gunfight: []
@@ -77,9 +78,9 @@ client.on('message', (user, userID, channelID, message, event) => {
   // Request something.
   else if (command.startsWith('/request') && testPilots.find((thing) => thing === userID)) handleRequest(client, userID, sendResponse, message)
   // Gunfight.
-  else if (command.startsWith('/gunfight')) handleGunfight(command, userID, sendResponse, db)
+  else if (command.startsWith('/gunfight')) handleGunfight(command, userID, sendResponse, db, channelID)
   // Accept gunfight.
-  else if (command.startsWith('/accept')) handleAccept(db, userID, sendResponse)
+  else if (command.startsWith('/accept')) handleAccept(db, userID, sendResponse, channelID)
   // Handle answers to gunfight.
   // else if (command in ['fire', 'water', 'gun', 'dot']) return
   // Choose.

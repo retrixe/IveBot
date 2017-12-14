@@ -1038,17 +1038,17 @@ diff@^3.1.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/diff/-/diff-3.4.0.tgz#b1d85507daf3964828de54b37d0d73ba67dda56c"
 
-discord.io@^2.5.3:
+discord.io@izy521/discord.io:
   version "2.5.3"
-  resolved "https://registry.yarnpkg.com/discord.io/-/discord.io-2.5.3.tgz#a2db9daa4057831a58ecca75efb940b7799d435f"
+  resolved "https://codeload.github.com/izy521/discord.io/tar.gz/a65e165c8cbdfc64a69d98e7bc6e25f490469086"
   dependencies:
     cjopus "^0.0.4"
     tweetnacl "^0.14.0"
     ws "^1.1.0"
 
-discord.io@izy521/discord.io:
+discord.io@woor/discord.io#gateway_v6:
   version "2.5.3"
-  resolved "https://codeload.github.com/izy521/discord.io/tar.gz/a65e165c8cbdfc64a69d98e7bc6e25f490469086"
+  resolved "https://codeload.github.com/woor/discord.io/tar.gz/8d3bfd521f57c070ae996694178b1287b19f9283"
   dependencies:
     cjopus "^0.0.4"
     tweetnacl "^0.14.0"
