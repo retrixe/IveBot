@@ -1,9 +1,22 @@
 # IveBot
 
-The bot that created the iPhone X.
+The bot that created the iPhone X. It's strictly private. You may run it locally,  but it's not a useful bot to others and tailored for a specific need.
 
 **Requires Node.js 8.5.0 or higher.**
 
-[Add it to your server?](https://discordapp.com/api/oauth2/authorize?client_id=383591525944262656&permissions=3402816&scope=bot)
+It's planned to have some nifty commands like /assistant which directly communicates with the Google Assistant gRPC API. You heard that, Google Assistant in a Discord bot.
 
-It's private :>
+<hr />
+<details><summary>Commands</summary>
+
+<br />
+
+`/help`
+`/gunfight`
+`/choose`
+`/reverse`
+`/8ball`
+`/repeat`
+`/request`
+</details>
+<hr />
