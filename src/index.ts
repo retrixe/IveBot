@@ -84,6 +84,6 @@ client.on('message', (user, userID, channelID, message, event) => {
   else if (command.startsWith('/reverse')) handleReverse(message, sendResponse)
   // 8ball.
   else if (command.startsWith('/8ball')) handle8Ball(message, sendResponse)
-  // 8ball.
+  // Repeat.
   else if (command.startsWith('/repeat')) handleRepeat(message, sendResponse)
 })

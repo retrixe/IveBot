@@ -14,6 +14,13 @@ export function handleGunfight (command: string, userID: string, sendResponse: F
   // Get challenged mention and ID.
   const challenged = command.split(' ')[1]
   const challengedID = challenged.substring(2, challenged.length - 1).split('!').join('')
+  // Is it a channel?
+  for (let x = 0; x < challenged.split('').length; x++) {
+    if (challenged.split('')[x] === '#') {
+      sendResponse('You cannot challenge channels.')
+      return
+    }
+  }
   // Confirm an argument was passed.
   if (challenged === undefined || isNaN(+challengedID)) {
     sendResponse('Please specify a user to challenge >_>')
