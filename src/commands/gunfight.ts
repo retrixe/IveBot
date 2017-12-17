@@ -25,6 +25,13 @@ export function handleGunfight (command: string, userID: string, sendResponse: F
     sendResponse('Aw, how sweet. But I don\'t play with pathetic fools who try to fool me :>')
     return
   }
+  // Do not challenge someone already in a gunfight.
+  // Possible gunfights.
+  const possibleGunfight = db.gunfight.find((gunfight) => gunfight.challenged === challengedID)
+  if (possibleGunfight) {
+    sendResponse('This user is already in a fight!')
+    return
+  }
   // Push to database.
   db.gunfight.push({
     accepted: false,
@@ -54,6 +61,11 @@ export function handleAccept (db: DB, userID: string, sendResponse: Function, ch
   // Accept in same channelID.
   if (gunfightToAccept.channelID !== channelID) {
     sendResponse('Please accept any challenges in the same channel.')
+    return
+  }
+  // Accept only if person is not in another gunfight.
+  if (db.gunfight.find((gunfight) => (gunfight.challenged === userID)) !== gunfightToAccept) {
+    sendResponse('You are already in a gunfight!')
     return
   }
   // Accept the challenge.

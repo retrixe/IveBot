@@ -1,6 +1,7 @@
 // Tokens and stuff.
 import { Client } from 'discord.io'
-import { token } from '../config.json'
+import 'json5/lib/require'
+import { token, testPilots } from '../config.json5'
 // Commands.
 import { handleRequest } from './commands/utilities'
 import { handleChoose, handleReverse, handle8Ball, handleRepeat } from './commands/games'
@@ -34,14 +35,6 @@ const db: {
     gunfight: []
   }
 
-// Test pilots.
-const testPilots = [
-  '305053306835697674', // voldemort#6931
-  '295324726312566784', // Dot#8711
-  '338924758173351937', // Astelon#7869
-  '305280873476128768' // VR#5448
-]
-
 // When client recieves a message, it will callback.
 client.on('message', (user, userID, channelID, message, event) => {
   // Helper variables and functions.
@@ -49,6 +42,8 @@ client.on('message', (user, userID, channelID, message, event) => {
   const command = message.toLocaleLowerCase()
   // Helper command to send message to same channel.
   const sendResponse = (message: string) => client.sendMessage({ to: channelID, message })
+  // Is the person a test pilot.
+  const testPilot: string = testPilots.find((user: string) => user === userID)
 
   // Commands from on forth.
   // Help command.
@@ -76,7 +71,7 @@ client.on('message', (user, userID, channelID, message, event) => {
   else if (command.startsWith('ayy')) sendResponse('lmao')
 
   // Request something.
-  else if (command.startsWith('/request') && testPilots.find((thing) => thing === userID)) handleRequest(client, userID, sendResponse, message)
+  else if (command.startsWith('/request') && testPilot) handleRequest(client, userID, sendResponse, message)
   // Gunfight.
   else if (command.startsWith('/gunfight')) handleGunfight(command, userID, sendResponse, db, channelID)
   // Accept gunfight.

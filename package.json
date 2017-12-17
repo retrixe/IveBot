@@ -9,12 +9,13 @@
     "start": "node lib/index.js",
     "build": "tsc --skipLibCheck",
     "watch": "tsc --skipLibCheck -w",
-    "dev": "nodemon -D src/index.ts"
+    "dev": "nodemon -D --inspect=9229 src/index.ts"
   },
   "author": "Ibrahim Ansari <ansari.ibrahim1@gmail.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "discord.io": "woor/discord.io#gateway_v6"
+    "discord.io": "woor/discord.io#gateway_v6",
+    "json5": "^0.5.1"
   },
   "devDependencies": {
     "@types/node": "^8.0.53",
