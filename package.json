@@ -14,8 +14,10 @@
   "author": "Ibrahim Ansari <ansari.ibrahim1@gmail.com>",
   "license": "Apache-2.0",
   "dependencies": {
+    "@types/node-fetch": "^1.6.7",
     "discord.io": "woor/discord.io#gateway_v6",
-    "json5": "^0.5.1"
+    "json5": "^0.5.1",
+    "node-fetch": "2.0.0-alpha.9"
   },
   "devDependencies": {
     "@types/node": "^8.0.53",

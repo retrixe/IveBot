@@ -4,7 +4,13 @@ import 'json5/lib/require'
 import { token, testPilots } from '../config.json5'
 // Commands.
 import { handleRequest } from './commands/utilities'
-import { handleChoose, handleReverse, handle8Ball, handleRepeat } from './commands/games'
+import {
+  handleChoose,
+  handleReverse,
+  handle8Ball,
+  handleRepeat,
+  handleUrban
+} from './commands/games'
 import { handleGunfight, handleAccept } from './commands/gunfight'
 
 // Create a client to connect to Discord API Gateway.
@@ -66,6 +72,7 @@ client.on('message', (user, userID, channelID, message, event) => {
     \`/reverse\` - Reverse a sentence.
     \`/8ball\` - Answers to questions.
     \`/repeat\` - Repeat a string.
+    \`/urban\` - Get the Urban Dictionary definition for anything.
 
 **Commands available to test pilots.**
     \`/request\` - Request a specific feature.
@@ -94,4 +101,6 @@ client.on('message', (user, userID, channelID, message, event) => {
   else if (command.startsWith('/8ball')) handle8Ball(message, sendResponse)
   // Repeat.
   else if (command.startsWith('/repeat')) handleRepeat(message, sendResponse)
+  // Urban.
+  else if (command.startsWith('/urban')) handleUrban(message, sendResponse)
 })

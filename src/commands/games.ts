@@ -1,3 +1,5 @@
+import fetch from 'node-fetch'
+
 export function handleChoose (message: string, sendResponse: Function) {
   // Is it used correctly?
   if (message.split('|').length === 1) {
@@ -48,4 +50,14 @@ export function handleRepeat (message: string, sendResponse: Function) {
     generatedMessage += message.substring(8 + args[1].length + 1)
   }
   sendResponse(generatedMessage)
+}
+
+export function handleUrban (message: string, sendResponse: Function) {
+  const splitMessage = message.split(' ')
+  splitMessage.splice(0, 1)
+  const term = splitMessage.join(' ')
+  // Fetch the definition.
+  fetch(`http://api.urbandictionary.com/v0/define?term=${term}`)
+    .then(res => res.json())
+    .then(json => sendResponse(`\`\`\`${json.list[0].definition.trimLeft().trimRight()}\`\`\``))
 }
