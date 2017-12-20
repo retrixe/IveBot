@@ -17,7 +17,14 @@ const client = new Client({
 client.on('ready', () => {
   console.log('Connected to Discord.')
   client.sendMessage({ to: '361577668677861399', message: ``, typing: true })
-  client.setPresence({ game: { type: 1, name: 'BF4 (5k) on iMac Pro.' }, idle_since: null })
+  client.setPresence({
+    game: {
+      type: 1,
+      name: 'BF4 (5k) on iMac Pro.',
+      url: 'https://twitch.com/sorrybutyoudontdeservewatchingthisgameunlessyouhaveamacipadoriphone'
+    },
+    idle_since: null
+  })
 })
 
 // Disconnection from Discord will trigger the following.
