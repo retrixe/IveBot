@@ -26,8 +26,8 @@ client.on('ready', () => {
   client.setPresence({
     game: {
       type: 1,
-      name: 'BF4 (5k) on iMac Pro.',
-      url: 'https://twitch.com/sorrybutyoudontdeservewatchingthisgameunlessyouhaveamacipadoriphone'
+      name: 'DXMD (5k) on iMac Pro.',
+      url: 'https://twitch.tv/sorrybutyoudontdeservewatchingthisgameunlessyouhaveamacipadoriphone'
     },
     idle_since: null
   })

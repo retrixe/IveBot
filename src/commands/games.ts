@@ -59,5 +59,11 @@ export function handleUrban (message: string, sendResponse: Function) {
   // Fetch the definition.
   fetch(`http://api.urbandictionary.com/v0/define?term=${term}`)
     .then(res => res.json())
-    .then(json => sendResponse(`\`\`\`${json.list[0].definition.trimLeft().trimRight()}\`\`\``))
+    .then(json => {
+      try {
+        sendResponse(`\`\`\`${json.list[0].definition.trimLeft().trimRight()}\`\`\``)
+      } catch (err) {
+        sendResponse('No definition was found.')
+      }
+    })
 }
