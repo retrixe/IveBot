@@ -3,14 +3,14 @@ import { Client } from 'discord.io'
 import 'json5/lib/require'
 import { token, testPilots } from '../config.json5'
 // Commands.
-import { handleRequest } from './commands/utilities'
+import { handleRequest, handleSay } from './commands/utilities'
 import {
   handleChoose,
   handleReverse,
   handle8Ball,
-  handleRepeat,
-  handleUrban
+  handleRepeat
 } from './commands/games'
+import { handleUrban, handleCat, handleDog } from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
 
 // Create a client to connect to Discord API Gateway.
@@ -63,20 +63,26 @@ client.on('message', (user, userID, channelID, message, event) => {
   // Help command.
   if (command.startsWith('/help') || command.startsWith('/halp')) {
     sendResponse(`
-    **Jony Ive can do many commands.**
+    **Jony Ive can do many commands 📡**
     \`/halp\` and \`/help\` - The most innovative help.
 
 **Games.**
     \`/gunfight\` - For that good ol' fight bro.
     \`/choose\` - Choose between multiple options.
     \`/reverse\` - Reverse a sentence.
-    \`/8ball\` - Answers to questions.
+    \`/8ball\` - Random answers to random questions.
     \`/repeat\` - Repeat a string.
-    \`/urban\` - Get the Urban Dictionary definition for anything.
 
-**Commands available to test pilots.**
-    \`/request\` - Request a specific feature.
+**Random searches.**
+    \`/urban\` - Get an Urban Dictionary definition ;)
+    \`/cat\` and \`/dog\` - Random cats and dogs from <https://random.cat> and <https://random.dog>
+
+**Utilities.**
+    TP \`/request\` - Request a specific feature.
+    \`/say\` - Say something, even in another channel.
+
 **There are some easter egg auto responses.**
+**Commands with TP are test pilot only.**
     `)
 
     // Auto responses and easter eggs.
@@ -103,4 +109,10 @@ client.on('message', (user, userID, channelID, message, event) => {
   else if (command.startsWith('/repeat')) handleRepeat(message, sendResponse)
   // Urban.
   else if (command.startsWith('/urban')) handleUrban(message, sendResponse)
+  // Cats.
+  else if (command.startsWith('/cat')) handleCat(message, sendResponse)
+  // Dogs.
+  else if (command.startsWith('/dog')) handleDog(message, sendResponse)
+  // Say.
+  else if (command.startsWith('/say')) handleSay(message, sendResponse, client, event)
 })
