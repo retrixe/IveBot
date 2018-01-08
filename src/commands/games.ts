@@ -1,15 +1,17 @@
+import { getArguments } from '../imports/tools'
+
 export function handleChoose (message: string, sendResponse: Function) {
   // Is it used correctly?
   if (message.split('|').length === 1) {
     sendResponse('Correct usage: /choose item1|item2|...')
     return
   }
-  const choices = message.substring(8, message.length).split('|')
+  const choices = getArguments(message).split('|')
   sendResponse(`I choose: ${choices[Math.floor(Math.random() * choices.length)]}`)
 }
 
 export function handleReverse (message: string, sendResponse: Function) {
-  sendResponse(message.substring(9, message.length).split('').reverse().join(''))
+  sendResponse(getArguments(message).split('').reverse().join(''))
 }
 
 export function handle8Ball (message: string, sendResponse: Function) {
@@ -37,8 +39,8 @@ export function handleRepeat (message: string, sendResponse: Function) {
   if (args.length <= 2 || isNaN(+args[1])) {
     sendResponse('Correct usage: /repeat <no of repeats> <words to repeat>')
     return
-    // Prevent repeated message from exceeding 500 characters.
-  } else if (+args[1] * message.substring(8 + args[1].length + 1).length >= 1001) {
+    // Prevent repeated message from exceeding 5000 characters.
+  } else if (+args[1] * message.substring(8 + args[1].length + 1).length >= 5001) {
     sendResponse('To prevent spam, your excessive message has not been repeated.')
     return
   }

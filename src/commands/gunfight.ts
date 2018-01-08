@@ -1,3 +1,6 @@
+// Import some tools.
+import { getIdFromMention } from '../imports/tools'
+
 // Our DB's shape.
 type DB = { /* eslint-disable no-undef */
   gunfight: Array<{
@@ -13,7 +16,7 @@ type DB = { /* eslint-disable no-undef */
 export function handleGunfight (command: string, userID: string, sendResponse: Function, db: DB, channelID: string) {
   // Get challenged mention and ID.
   const challenged = command.split(' ')[1]
-  const challengedID = challenged.substring(2, challenged.length - 1).split('!').join('')
+  const challengedID = getIdFromMention(challenged)
   // Is it a channel?
   for (let x = 0; x < challenged.split('').length; x++) {
     if (challenged.split('')[x] === '#') {

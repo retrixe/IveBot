@@ -1,3 +1,5 @@
+import { getArguments, getIdFromMention } from '../imports/tools'
+
 type client = {
   /* eslint-disable no-undef */
   createDMChannel: Function,
@@ -13,7 +15,7 @@ export function handleRequest (client: client, userID: string, sendResponse: Fun
   client.createDMChannel('305053306835697674')
   client.sendMessage({
     to: '305053306835697674',
-    message: `<@${userID}>: ${message}`
+    message: `<@${userID}>: ${getArguments(message)}`
   })
   sendResponse(`<@${userID}>, what a pathetic idea. It has been DMed to the main developer and will be read shortly.
 You may recieve a response soon, and you can keep track here:
@@ -23,16 +25,12 @@ You may recieve a response soon, and you can keep track here:
 export function handleSay (message: string, sendResponse: Function, client: client, event: event) {
   // Delete the message.
   client.deleteMessage({ channelID: event.d.channel_id, messageID: event.d.id })
-  // Remove the command and get only the words to say.
-  const splitMessage = message.split(' ')
-  splitMessage.splice(0, 1)
   // Should it be sent to another channel?
-  const possibleChannel = splitMessage[0].substring(2, splitMessage[0].length - 1)
+  const possibleChannel = getIdFromMention(getArguments(message).split(' ')[0])
   if (possibleChannel in client.channels) {
-    splitMessage.splice(0, 1)
-    client.sendMessage({ to: possibleChannel, message: splitMessage.join(' ') })
+    client.sendMessage({ to: possibleChannel, message: getArguments(getArguments(message)) })
     return
   }
   // Send the message all over again.
-  sendResponse(splitMessage.join(' '))
+  sendResponse(getArguments(message))
 }

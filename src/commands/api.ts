@@ -1,15 +1,12 @@
 import fetch from 'node-fetch'
+import { getArguments } from '../imports/tools'
 
 export function handleUrban (message: string, sendResponse: Function) {
-  // Split the message.
-  const splitMessage = message.split(' ')
-  // Remove the command and get only the term.
-  splitMessage.splice(0, 1)
-  const term = splitMessage.join(' ')
   // Fetch the definition.
-  fetch(`http://api.urbandictionary.com/v0/define?term=${term}`)
+  fetch(`http://api.urbandictionary.com/v0/define?term=${getArguments(message)}`)
   // Convert to JSON.
     .then(res => res.json())
+    .catch(err => sendResponse(`Something went wrong 👾 Error: ${err}`))
   // If there is a definition, it will be sent successfully.
     .then(json => {
       try {
