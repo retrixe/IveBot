@@ -2,6 +2,7 @@
 import { Client } from 'discord.io'
 import 'json5/lib/require'
 import { token, testPilots } from '../config.json5'
+import { version } from '../package.json'
 // Commands.
 import { handleRequest, handleSay } from './commands/utilities'
 import {
@@ -115,4 +116,16 @@ client.on('message', (user, userID, channelID, message, event) => {
   else if (command.startsWith('/dog')) handleDog(message, sendResponse)
   // Say.
   else if (command.startsWith('/say')) handleSay(message, sendResponse, client, event)
+  // Version and about.
+  else if (command.startsWith('/version')) sendResponse(`IveBot ${version}`)
+  else if (command.startsWith('/about')) {
+    sendResponse(`IveBot ${version}
+IveBot is a Discord bot written with discord.io and care.
+Unlike most other dumb bots, IveBot was not written with discord.js and has 0% copied code.
+Built with community feedback mainly, IveBot does a lot of random stuff and fun.
+IveBot 2.0 is planned to be built complete with music, administrative commands and a web dashboard.
+For information on what IveBot can do, type **/help** or **/halp**.
+The source code can be found here: <https://github.com/retrixe/IveBot>
+For noobs, this bot is licensed and protected by law. Copy code and I will sue you for a KitKat.`)
+  }
 })
