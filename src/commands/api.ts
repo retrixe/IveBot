@@ -27,9 +27,15 @@ export function handleCat (message: string, sendResponse: Function) {
 }
 
 export function handleDog (message: string, sendResponse: Function) {
-  // Fetch a cat.
-  fetch(`http://random.dog/woof.json`)
+  if (typeof getArguments(message).split(' ')[0] === 'string') {
+    fetch(`http://dog.ceo/api/breed/${getArguments(message).split(' ')[0]}/images/random`)
+      .then(res => res.json())
+      .catch(err => sendResponse(`Something went wrong 👾 Error: ${err}`))
+      .then(json => sendResponse(json.message))
+  }
+  // Fetch a dog.
+  fetch(`http://dog.ceo/api/breeds/image/random`)
     .then(res => res.json())
     .catch(err => sendResponse(`Something went wrong 👾 Error: ${err}`))
-    .then(json => sendResponse(json.url))
+    .then(json => sendResponse(json.message))
 }

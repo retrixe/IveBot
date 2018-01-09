@@ -3,6 +3,7 @@ import { Client } from 'discord.io'
 import 'json5/lib/require'
 import { token, testPilots } from '../config.json5'
 import { version } from '../package.json'
+import * as ms from 'ms'
 // Commands.
 import { handleRequest, handleSay } from './commands/utilities'
 import {
@@ -14,6 +15,8 @@ import {
 import { handleUrban, handleCat, handleDog } from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
 
+let onlineSince: number = 0
+
 // Create a client to connect to Discord API Gateway.
 const client = new Client({
   token,
@@ -22,6 +25,7 @@ const client = new Client({
 
 // On connecting..
 client.on('ready', () => {
+  onlineSince = Math.abs(new Date().getTime())
   console.log('Connected to Discord.')
   client.sendMessage({ to: '361577668677861399', message: ``, typing: true })
   client.setPresence({
@@ -56,7 +60,9 @@ client.on('message', (user, userID, channelID, message, event) => {
   // Convert message to lowercase to ensure it works.
   const command = message.toLocaleLowerCase()
   // Helper command to send message to same channel.
-  const sendResponse = (message: string) => client.sendMessage({ to: channelID, message })
+  const sendResponse = (m: string, cb?: (error: {}, response: any) => void) => client.sendMessage({
+    to: channelID, message: m
+  }, cb)
   // Is the person a test pilot.
   const testPilot: string = testPilots.find((user: string) => user === userID)
 
@@ -76,11 +82,12 @@ client.on('message', (user, userID, channelID, message, event) => {
 
 **Random searches.**
     \`/urban\` - Get an Urban Dictionary definition ;)
-    \`/cat\` and \`/dog\` - Random cats and dogs from <https://random.cat> and <https://random.dog>
+    \`/cat\` and \`/dog\` - Random cats and dogs from <https://random.cat> and <https://dog.ceo>
 
 **Utilities.**
     TP \`/request\` - Request a specific feature.
     \`/say\` - Say something, even in another channel.
+    \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
 
 **There are some easter egg auto responses.**
 **Commands with TP are test pilot only.**
@@ -117,9 +124,9 @@ client.on('message', (user, userID, channelID, message, event) => {
   // Say.
   else if (command.startsWith('/say')) handleSay(message, sendResponse, client, event)
   // Version and about.
-  else if (command.startsWith('/version')) sendResponse(`IveBot ${version}`)
+  else if (command.startsWith('/version')) sendResponse(`**IveBot ${version}**`)
   else if (command.startsWith('/about')) {
-    sendResponse(`IveBot ${version}
+    sendResponse(`**IveBot ${version}**
 IveBot is a Discord bot written with discord.io and care.
 Unlike most other dumb bots, IveBot was not written with discord.js and has 0% copied code.
 Built with community feedback mainly, IveBot does a lot of random stuff and fun.
@@ -127,5 +134,23 @@ IveBot 2.0 is planned to be built complete with music, administrative commands a
 For information on what IveBot can do, type **/help** or **/halp**.
 The source code can be found here: <https://github.com/retrixe/IveBot>
 For noobs, this bot is licensed and protected by law. Copy code and I will sue you for a KitKat.`)
-  }
+  } else if (command.startsWith('/ping')) {
+    // Get current time.
+    const startTime = new Date().getTime()
+    // Then send a message.
+    sendResponse('Ping?', (err, { id }) => {
+      // Latency (unrealistic, this can be negative or positive)
+      const fl = startTime - new Date().getTime()
+      // Divide latency by 2 to get more realistic latency and get absolute value (positive)
+      const l = Math.abs(fl) / 2
+      // Get latency.
+      const e = l < 200 ? `latency of **${l}ms** 🚅🔃` : `latency of **${l}ms** 🔃`
+      if (err) sendResponse('IveBot has experienced an internal error.')
+      client.editMessage({
+        channelID,
+        messageID: id,
+        message: `Aha! IveBot ${version} is connected to your server with a ${e}`
+      })
+    })
+  } else if (command.startsWith('/uptime')) sendResponse(ms(Math.abs(new Date().getTime()) - onlineSince, { long: true }))
 })

@@ -23,7 +23,7 @@ It's planned to have some nifty commands like /assistant which directly communic
 - `/urban`
 - `/cat` and `/dog`
 - `/say`
-- `/version` and `/about`
+- `/version`, `/ping` and `/about`
 
 </details>
 <hr />

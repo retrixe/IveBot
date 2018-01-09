@@ -16,6 +16,7 @@
   "dependencies": {
     "discord.io": "woor/discord.io#gateway_v6",
     "json5": "^0.5.1",
+    "ms": "^2.1.1",
     "node-fetch": "2.0.0-alpha.9"
   },
   "devDependencies": {
