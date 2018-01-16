@@ -40,7 +40,7 @@ export function handleRepeat (message: string, sendResponse: Function) {
     sendResponse('Correct usage: /repeat <no of repeats> <words to repeat>')
     return
     // Prevent repeated message from exceeding 5000 characters.
-  } else if (+args[1] * message.substring(8 + args[1].length + 1).length >= 5001) {
+  } else if (+args[1] * message.substring(8 + args[1].length + 1).length >= 2001) {
     sendResponse('To prevent spam, your excessive message has not been repeated.')
     return
   }
