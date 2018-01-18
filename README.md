@@ -18,6 +18,8 @@ It's planned to have some nifty commands like /assistant which directly communic
 - `/choose`
 - `/reverse`
 - `/8ball`
+- `/robohash`
+- `/zalgo`
 - `/repeat` for test pilots
 - `/request`
 - `/urban`

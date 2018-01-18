@@ -72,23 +72,21 @@ client.on('message', (user, userID, channelID, message, event) => {
     sendResponse(`
     **Jony Ive can do many commands 📡**
     \`/halp\` and \`/help\` - The most innovative help.
-
 **Games.**
     \`/gunfight\` - For that good ol' fight bro.
     \`/choose\` - Choose between multiple options.
     \`/reverse\` - Reverse a sentence.
     \`/8ball\` - Random answers to random questions.
     \`/repeat\` - Repeat a string.
-
 **Random searches.**
     \`/urban\` - Get an Urban Dictionary definition ;)
     \`/cat\` and \`/dog\` - Random cats and dogs from <https://random.cat> and <https://dog.ceo>
-
+    \`/robohash\` - Take some text, make it a robot/monster/head/cat.
+    \`/zalgo\` - The zalgo demon's handwriting.
 **Utilities.**
     TP \`/request\` - Request a specific feature.
     \`/say\` - Say something, even in another channel.
     \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
-
 **There are some easter egg auto responses.**
 **Commands with TP are test pilot only.**
     `)
