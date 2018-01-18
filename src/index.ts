@@ -12,7 +12,7 @@ import {
   handle8Ball,
   handleRepeat
 } from './commands/games'
-import { handleUrban, handleCat, handleDog } from './commands/api'
+import { handleUrban, handleCat, handleDog, handleZalgo, handleRobohash } from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
 
 let onlineSince: number = 0
@@ -119,6 +119,10 @@ client.on('message', (user, userID, channelID, message, event) => {
   else if (command.startsWith('/cat')) handleCat(message, sendResponse)
   // Dogs.
   else if (command.startsWith('/dog')) handleDog(message, sendResponse)
+  // Zalgo.
+  else if (command.startsWith('/zalgo')) handleZalgo(message, sendResponse)
+  // Robohash.
+  else if (command.startsWith('/robohash')) handleRobohash(message, sendResponse)
   // Say.
   else if (command.startsWith('/say')) handleSay(message, sendResponse, client, event)
   // Version and about.
