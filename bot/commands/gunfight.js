@@ -1,3 +1,4 @@
+// @flow
 // Import some tools.
 import { getIdFromMention } from '../imports/tools'
 

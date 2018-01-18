@@ -1,3 +1,4 @@
+// @flow
 import { getArguments, getIdFromMention } from '../imports/tools'
 
 type client = {

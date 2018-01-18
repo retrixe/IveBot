@@ -1,6 +1,3 @@
 {
-  "ignore": ["lib/*"],
-  "execMap": {
-    "ts": "ts-node"
-  }
+  "ignore": ["lib", ".next", "pages", "node_modules", ".git"]
 }

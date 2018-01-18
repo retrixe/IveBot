@@ -1,7 +1,7 @@
+// @flow
 // Tokens and stuff.
-import { Client } from 'discord.io'
 import 'json5/lib/require'
-import { token, testPilots } from '../config.json5'
+import { testPilots } from '../config.json5'
 import { version } from '../package.json'
 import * as ms from 'ms'
 // Commands.
@@ -15,47 +15,14 @@ import {
 import { handleUrban, handleCat, handleDog, handleZalgo, handleRobohash } from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
 
-let onlineSince: number = 0
-
-// Create a client to connect to Discord API Gateway.
-const client = new Client({
-  token,
-  autorun: true
-})
-
-// On connecting..
-client.on('ready', () => {
-  onlineSince = Math.abs(new Date().getTime())
-  console.log('Connected to Discord.')
-  client.sendMessage({ to: '361577668677861399', message: ``, typing: true })
-  client.setPresence({
-    game: {
-      type: 1,
-      name: 'DXMD (5k) on iMac Pro.',
-      url: 'https://twitch.tv/sorrybutyoudontdeservewatchingthisgameunlessyouhaveamacipadoriphone'
-    },
-    idle_since: null
-  })
-})
-
-// Disconnection from Discord will trigger the following.
-client.on('disconnect', (errMsg, code) => console.log('Error:\n', errMsg, code))
-
-// Create a database to handle certain stuff.
-const db: {
-  gunfight: Array<{
-  challenged: string,
-  challenger: string,
-  accepted: boolean,
-  randomWord: string,
-  channelID: string
-  }>
-  } = {
-    gunfight: []
-  }
-
 // When client recieves a message, it will callback.
-client.on('message', (user, userID, channelID, message, event) => {
+export default (client: Object, tempDB: Object, onlineSince: number) => (
+  user: string,
+  userID: string,
+  channelID: string,
+  message: string,
+  event: Object
+) => {
   // Helper variables and functions.
   // Convert message to lowercase to ensure it works.
   const command = message.toLocaleLowerCase()
@@ -72,23 +39,21 @@ client.on('message', (user, userID, channelID, message, event) => {
     sendResponse(`
     **Jony Ive can do many commands 📡**
     \`/halp\` and \`/help\` - The most innovative help.
-
 **Games.**
     \`/gunfight\` - For that good ol' fight bro.
     \`/choose\` - Choose between multiple options.
     \`/reverse\` - Reverse a sentence.
     \`/8ball\` - Random answers to random questions.
     \`/repeat\` - Repeat a string.
-
 **Random searches.**
     \`/urban\` - Get an Urban Dictionary definition ;)
     \`/cat\` and \`/dog\` - Random cats and dogs from <https://random.cat> and <https://dog.ceo>
-
+    \`/robohash\` - Take some text, make it a robot/monster/head/cat.
+    \`/zalgo\` - The zalgo demon's handwriting.
 **Utilities.**
     TP \`/request\` - Request a specific feature.
     \`/say\` - Say something, even in another channel.
     \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
-
 **There are some easter egg auto responses.**
 **Commands with TP are test pilot only.**
     `)
@@ -102,9 +67,9 @@ client.on('message', (user, userID, channelID, message, event) => {
   // Request something.
   else if (command.startsWith('/request') && testPilot) handleRequest(client, userID, sendResponse, message)
   // Gunfight.
-  else if (command.startsWith('/gunfight')) handleGunfight(command, userID, sendResponse, db, channelID)
+  else if (command.startsWith('/gunfight')) handleGunfight(command, userID, sendResponse, tempDB, channelID)
   // Accept gunfight.
-  else if (command.startsWith('/accept')) handleAccept(db, userID, sendResponse, channelID)
+  else if (command.startsWith('/accept')) handleAccept(tempDB, userID, sendResponse, channelID)
   // Handle answers to gunfight.
   // else if (command in ['fire', 'water', 'gun', 'dot']) return
   // Choose.
@@ -157,4 +122,4 @@ For noobs, this bot is licensed and protected by law. Copy code and I will sue y
       })
     })
   } else if (command.startsWith('/uptime')) sendResponse(ms(Math.abs(new Date().getTime()) - onlineSince, { long: true }))
-})
+}

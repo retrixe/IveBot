@@ -1,41 +1,54 @@
 {
   "name": "ivebot",
-  "version": "1.4.0",
+  "version": "2.0.0-alpha.0",
   "description": "The bot that created the iPhone X.",
   "main": "lib/index.js",
   "scripts": {
     "test": "ava",
-    "lint": "eslint . --ext .ts && tsc --noEmit --skipLibCheck",
-    "start": "node lib/index.js",
-    "build": "tsc --skipLibCheck",
-    "watch": "tsc --skipLibCheck -w",
-    "dev": "nodemon -D src/index.ts"
+    "lint": "eslint . --ext .ts && flow check",
+    "start": "node --experimental-modules server/index.mjs --production",
+    "build": "next build && babel bot --out-dir lib --source-maps",
+    "dev": "nodemon --experimental-modules server/index.mjs"
   },
   "author": "Ibrahim Ansari <ansari.ibrahim1@gmail.com>",
   "license": "Apache-2.0",
+  "engines": {
+    "node": ">=8.5.0"
+  },
   "dependencies": {
+    "apollo-client": "^2.2.0",
+    "apollo-server-express": "^1.3.2",
     "discord.io": "woor/discord.io#gateway_v6",
+    "express": "^4.16.2",
+    "graphql": "^0.12.3",
+    "isomorphic-unfetch": "^2.0.0",
     "json5": "^0.5.1",
+    "material-ui": "^1.0.0-beta.29",
     "ms": "^2.1.1",
-    "node-fetch": "2.0.0-alpha.9"
+    "next": "^4.2.3",
+    "react": "^16.2.0",
+    "react-apollo": "^2.0.4",
+    "react-dom": "^16.2.0"
   },
   "devDependencies": {
-    "@types/json5": "^0.0.29",
     "@types/node": "^8.0.53",
-    "@types/node-fetch": "^1.6.7",
     "ava": "^0.23.0",
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.2.1",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-register": "^6.26.0",
     "eslint": "^4.12.0",
     "eslint-config-standard": "^10.2.1",
+    "eslint-config-standard-react": "^5.0.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-react": "^7.5.1",
     "eslint-plugin-standard": "^3.0.1",
-    "eslint-plugin-typescript": "^0.8.1",
+    "flow-bin": "^0.63.1",
     "husky": "^0.15.0-beta.13",
-    "nodemon": "^1.12.1",
-    "ts-node": "^3.3.0",
-    "typescript": "^2.6.1",
-    "typescript-eslint-parser": "^9.0.0"
+    "nodemon": "^1.12.1"
   },
   "husky": {
     "hooks": {

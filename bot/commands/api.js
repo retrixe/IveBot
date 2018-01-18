@@ -1,4 +1,5 @@
-import fetch from 'node-fetch'
+// @flow
+import fetch from 'isomorphic-unfetch'
 import { getArguments } from '../imports/tools'
 
 export function handleUrban (message: string, sendResponse: Function) {

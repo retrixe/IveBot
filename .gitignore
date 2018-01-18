@@ -1,5 +1,8 @@
+# Configuration
 config.json5
+# Built files.
 lib/
+.next/
 
 # Logs
 logs
