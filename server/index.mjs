@@ -21,8 +21,8 @@ const handle = app.getRequestHandler()
 app.prepare().then(() => {
   const server = express()
   // Add Apollo Server.
-  // server.use('/graphql', bodyParser.json(), apollo.graphqlExpress({ schema }))
-  // server.use('/graphiql', apollo.graphiqlExpress({ endpointURL: '/graphql' }))
+  server.use('/graphql', bodyParser.json(), apollo.graphqlExpress({ schema }))
+  server.use('/graphiql', apollo.graphiqlExpress({ endpointURL: '/graphql' }))
 
   // On recieving GET on other endpoints, handle with Next.js.
   server.get('*', (req, res) => handle(req, res))

@@ -1,5 +1,6 @@
 # Configuration
 config.json5
+database.json
 # Built files.
 lib/
 .next/

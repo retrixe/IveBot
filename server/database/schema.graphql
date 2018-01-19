@@ -1,0 +1,31 @@
+# A Card is the basic description and resources to be associated with a project.
+type Card {
+  # id is used for identifying a Card.
+  id: Int!
+  # title is used to give a title to the project we describe.
+  title: String!
+  # description describes the project.
+  description: String!
+  # image is an array of the image link, its alt and in some cases, height.
+  image: [String]
+  # controls are a list of buttons which can be added to a Card UI.
+  controls: [Button]!
+}
+
+# A button.
+type Button {
+  # id is used for identifying a Card.
+  id: Int!
+  # title is the label of the button.
+  title: String!
+  # link is where the button will redirect you.
+  link: String!
+  # is it an internal link?
+  internalLink: Boolean
+}
+
+# Enable queries.
+type Query {
+  # We need to have allCards to query for every Card in the database.
+  allCards: [Card]
+}
