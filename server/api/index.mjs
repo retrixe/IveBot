@@ -1,26 +1,26 @@
 // Our Apollo server currently lies here.
 // Get our tools to make a schema and import types.
-const { makeExecutableSchema } = require('graphql-tools')
-const { readFileSync } = require('fs')
-const { join } = require('path')
+import graphql from 'graphql-tools'
+import fs from 'fs'
+import path from 'path'
 
 // Get our database.
-const db = require('../database')
+import db from '../database'
 
 // Get our schema.
-const typeDefs = readFileSync(join(process.cwd(), 'database', 'schema.graphql'), {
+const typeDefs = fs.readFileSync(path.join(process.cwd(), 'database', 'schema.graphql'), {
   encoding: 'utf8'
 })
 
 // Set up resolvers.
 const resolvers = {
   Query: {
-    allCards: () => CardsDB
+    allCards: () => db
   }
 }
 
 // Create and export a schema.
-module.exports = makeExecutableSchema({
+module.exports = graphql.makeExecutableSchema({
   typeDefs,
   resolvers
 })

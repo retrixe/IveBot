@@ -1,11 +1,12 @@
 // Import the bot. Yes, it's a module.
-import bot from './bot-connect'
+import bot from './bot-connect' // eslint-disable-line no-unused-vars
 // Import express and next.
 import next from 'next'
 import express from 'express'
-// Import Apollo Servyer.
+// Import Apollo Server.
 import bodyParser from 'body-parser'
 import apollo from 'apollo-server-express'
+import schema from './api'
 
 // If production is explicitly specified via flag..
 if (process.argv[2] === '--production') process.env.NODE_ENV = 'production'

@@ -4,7 +4,7 @@ module.exports = {
     node: true,
     browser: true
   },
-  extends: ["plugin:react/recommended", "standard-react"],
+  extends: ["plugin:react/recommended", "standard", "standard-react"],
   parser: "babel-eslint",
   plugins: ["react"]
 }
