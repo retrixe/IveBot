@@ -8,7 +8,7 @@ import path from 'path'
 import db from '../database'
 
 // Get our schema.
-const typeDefs = fs.readFileSync(path.join(process.cwd(), 'database', 'schema.graphql'), {
+const typeDefs = fs.readFileSync(path.join(process.cwd(), 'server', 'database', 'schema.graphql'), {
   encoding: 'utf8'
 })
 
@@ -20,7 +20,7 @@ const resolvers = {
 }
 
 // Create and export a schema.
-module.exports = graphql.makeExecutableSchema({
+export default graphql.makeExecutableSchema({
   typeDefs,
   resolvers
 })

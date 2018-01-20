@@ -14,6 +14,7 @@ import {
 } from './commands/games'
 import { handleUrban, handleCat, handleDog, handleZalgo, handleRobohash } from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
+import checkUserForPermission from './imports/permissions'
 
 // When client recieves a message, it will callback.
 export default (client: Object, tempDB: Object, onlineSince: number) => (
