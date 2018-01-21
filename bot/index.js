@@ -3,7 +3,7 @@
 import 'json5/lib/require'
 import { testPilots } from '../config.json5'
 import { version } from '../package.json'
-import * as ms from 'ms'
+import ms from 'ms'
 // Commands.
 import { handleRequest, handleSay } from './commands/utilities'
 import {
@@ -14,7 +14,7 @@ import {
 } from './commands/games'
 import { handleUrban, handleCat, handleDog, handleZalgo, handleRobohash } from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
-import checkUserForPermission from './imports/permissions'
+import { handleKick, handleBan, handleUnban } from './commands/admin'
 
 // When client recieves a message, it will callback.
 export default (client: Object, tempDB: Object, onlineSince: number) => (
@@ -55,6 +55,7 @@ export default (client: Object, tempDB: Object, onlineSince: number) => (
     TP \`/request\` - Request a specific feature.
     \`/say\` - Say something, even in another channel.
     \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
+    \`/ban\`, \`/unban\` and \`/kick\` - Self-explanatory.
 **There are some easter egg auto responses.**
 **Commands with TP are test pilot only.**
     `)
@@ -93,6 +94,12 @@ export default (client: Object, tempDB: Object, onlineSince: number) => (
   else if (command.startsWith('/robohash')) handleRobohash(message, sendResponse)
   // Say.
   else if (command.startsWith('/say')) handleSay(message, sendResponse, client, event)
+  // Ban.
+  else if (command.startsWith('/ban')) handleBan(client, event, sendResponse, message)
+  // Unban.
+  else if (command.startsWith('/unban')) handleUnban(client, event, sendResponse, message)
+  // Kick.
+  else if (command.startsWith('/kick')) handleKick(client, event, sendResponse, message)
   // Version and about.
   else if (command.startsWith('/version')) sendResponse(`**IveBot ${version}**`)
   else if (command.startsWith('/about')) {

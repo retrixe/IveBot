@@ -4,7 +4,7 @@ require('json5/lib/require')
 const { token } = require('../config.json5')
 
 // Online since?
-let onlineSince = 0
+let onlineSince = Math.abs(new Date().getTime())
 
 // Require the bot, built ot unbuilt.
 let botCallback
@@ -23,7 +23,6 @@ const client = new Client({
 
 // On connecting..
 client.on('ready', () => {
-  onlineSince = Math.abs(new Date().getTime())
   console.log('Connected to Discord.')
   client.sendMessage({ to: '361577668677861399', message: ``, typing: true })
   client.setPresence({
