@@ -55,5 +55,8 @@
     "hooks": {
       "pre-commit": "npm run lint"
     }
+  },
+  "now": {
+    "files": ["config.json5"]
   }
 }
