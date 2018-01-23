@@ -2,7 +2,7 @@
   "name": "ivebot",
   "version": "2.0.0-canary.0",
   "description": "The bot that created the iPhone X.",
-  "main": "lib/index.js",
+  "main": "server/index.mjs",
   "scripts": {
     "test": "ava",
     "lint": "eslint . --ext .ts && flow check",

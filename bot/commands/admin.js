@@ -40,7 +40,7 @@ export function handleBan (client: client, event: event, sendResponse: Function,
     serverID: client.channels[event.d.channel_id].guild_id,
     userID
   }, (err) => {
-    if (err) {
+    if (err.statusMessage === 'FORBIDDEN') {
       sendResponse('I can\'t ban that person.')
       banned = false
       return
@@ -49,13 +49,15 @@ export function handleBan (client: client, event: event, sendResponse: Function,
     sendResponse(`**${user.username}#${user.discriminator}** has been banned. **rip.**`)
   })
   // DM the poor user.
-  if (!banned) return
-  if (getArguments(getArguments(message)).trim()) {
-    client.sendMessage({
-      to: userID,
-      message: `You have been banned from ${serverName} for ${getArguments(getArguments(message))}.`
-    })
-  } else client.sendMessage({ to: userID, message: `You have been banned from ${serverName}.` })
+  setTimeout(() => {
+    if (!banned) return
+    if (getArguments(getArguments(message)).trim()) {
+      client.sendMessage({
+        to: userID,
+        message: `You have been banned from ${serverName} for ${getArguments(getArguments(message))}.`
+      })
+    } else client.sendMessage({ to: userID, message: `You have been banned from ${serverName}.` })
+  }, 1000)
 }
 
 // Kick!
@@ -75,7 +77,7 @@ export function handleKick (client: client, event: event, sendResponse: Function
     serverID: client.channels[event.d.channel_id].guild_id,
     userID
   }, (err) => {
-    if (err) {
+    if (err.statusMessage === 'FORBIDDEN') {
       sendResponse('I can\'t kick that person.')
       kicked = false
       return
@@ -84,13 +86,15 @@ export function handleKick (client: client, event: event, sendResponse: Function
     sendResponse(`**${user.username}#${user.discriminator}** has been kicked. **rip.**`)
   })
   // DM the poor user.
-  if (!kicked) return
-  if (getArguments(getArguments(message)).trim()) {
-    client.sendMessage({
-      to: userID,
-      message: `You have been kicked from ${serverName} for ${getArguments(getArguments(message))}.`
-    })
-  } else client.sendMessage({ to: userID, message: `You have been kicked from ${serverName}.` })
+  setTimeout(() => {
+    if (!kicked) return
+    if (getArguments(getArguments(message)).trim()) {
+      client.sendMessage({
+        to: userID,
+        message: `You have been kicked from ${serverName} for ${getArguments(getArguments(message))}.`
+      })
+    } else client.sendMessage({ to: userID, message: `You have been kicked from ${serverName}.` })
+  }, 1000)
 }
 
 // Unban. Aw..

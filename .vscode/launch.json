@@ -5,10 +5,32 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Next: Chrome",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceRoot}"
+    },
+    {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
-      "program": "${workspaceFolder}/lib/index.js"
+      "name": "Next: Node",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/nodemon",
+      "runtimeArgs": [
+        "--inspect",
+        "--experimental-modules"
+      ],
+      "port": 9229,
+      "console": "integratedTerminal"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Next: Full",
+      "configurations": [
+        "Next: Node",
+        "Next: Chrome"
+      ]
     }
   ]
 }
