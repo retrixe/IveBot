@@ -14,7 +14,7 @@ import {
 } from './commands/games'
 import { handleUrban, handleCat, handleDog, handleZalgo, handleRobohash } from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
-import { handleKick, handleBan, handleUnban } from './commands/admin'
+import { handleKick, handleBan, handleUnban, handleMute, handleUnmute } from './commands/admin'
 
 // When client recieves a message, it will callback.
 export default (client: Object, tempDB: Object, onlineSince: number) => (
@@ -55,7 +55,7 @@ export default (client: Object, tempDB: Object, onlineSince: number) => (
     TP \`/request\` - Request a specific feature.
     \`/say\` - Say something, even in another channel.
     \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
-    \`/ban\`, \`/unban\` and \`/kick\` - Self-explanatory.
+    \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\` - Self-explanatory.
 **There are some easter egg auto responses.**
 **Commands with TP are test pilot only.**
     `)
@@ -100,6 +100,10 @@ export default (client: Object, tempDB: Object, onlineSince: number) => (
   else if (command.startsWith('/unban')) handleUnban(client, event, sendResponse, message)
   // Kick.
   else if (command.startsWith('/kick')) handleKick(client, event, sendResponse, message)
+  // Mute.
+  else if (command.startsWith('/mute')) handleMute(client, event, sendResponse, message)
+  // Unmute.
+  else if (command.startsWith('/unmute')) handleUnmute(client, event, sendResponse, message)
   // Version and about.
   else if (command.startsWith('/version')) sendResponse(`**IveBot ${version}**`)
   else if (command.startsWith('/about')) {
