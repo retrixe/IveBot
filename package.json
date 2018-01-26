@@ -57,6 +57,9 @@
     }
   },
   "now": {
-    "files": ["config.json5"]
+    "files": ["config.json5", "bot", "pages", "server", "yarn.lock", ".babelrc"],
+    "env": {
+      "HUSKY_SKIP_INSTALL": "true"
+    }
   }
 }
