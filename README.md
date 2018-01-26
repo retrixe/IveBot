@@ -42,3 +42,25 @@ Make a file named `config.json5` in the top-level directory. It should be someth
 ```
 
 You can use comments in JSON5.
+
+### Deploying to Now
+
+Deploying to Now is simple. It requires a Now account.
+
+Run the following commands:
+
+```bash
+yarn remove husky
+# Or if you use npm
+npm un husky
+# Then deploy and scale.
+now
+now scale <IveBot deployment URL> 1
+# Then bring back husky.
+git clean -df
+git checkout -- .
+yarn
+# If you use npm.
+npm i
+# The IveBot alias is already taken! No option there.
+```
