@@ -36,7 +36,7 @@ export function handleCat (message: string, sendResponse: Function) {
 }
 
 export function handleDog (message: string, sendResponse: Function) {
-  if (typeof getArguments(message).split(' ')[0] === 'string') {
+  if (getArguments(message).split(' ')[0].trim()) {
     fetch(`http://dog.ceo/api/breed/${getArguments(message).split(' ')[0]}/images/random`)
       .then(res => res.json())
       .catch(err => sendResponse(`Something went wrong 👾 Error: ${err}`))

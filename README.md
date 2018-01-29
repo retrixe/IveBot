@@ -50,6 +50,7 @@ Deploying to Now is simple. It requires a Now account.
 Run the following commands:
 
 ```bash
+# BEFORE DOING THIS, MAKE SURE YOU HAVE PUSHED ALL CHANGES.
 yarn remove husky
 # Or if you use npm
 npm un husky
