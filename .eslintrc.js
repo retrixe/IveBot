@@ -5,6 +5,15 @@ module.exports = {
     browser: true
   },
   extends: ["plugin:react/recommended", "standard", "standard-react"],
+  plugins: ["react", "graphql"],
   parser: "babel-eslint",
-  plugins: ["react"]
+  rules: {
+    'graphql/template-strings': ['error', {
+      env: 'apollo',
+      schemaString: require('fs').readFileSync(
+        require('path').resolve(__dirname, 'server/schema.graphql'),
+        { encoding: 'utf8' }
+      )
+    }]
+  }
 }

@@ -1,0 +1,32 @@
+# A warn in Discord.
+type WarningDiscord {
+  # ID of the warned.
+  warnedId: String!
+  # ID of the warner.
+  warnerId: String!
+  # Reason for the warn.
+  reason: String
+  # Number since epoch for date.
+  date: Int!
+}
+
+# Enable queries.
+type Query {
+  # We need to have allWarns to query for every warns in the database.
+  allWarnsOfUser(userId: String!): [WarningDiscord!]!
+}
+
+# Enable mutations.
+type Mutation {
+  # Add a warn.
+  warn(warnedId: String!, warnerId: String!, reason: String!): WarningDiscord!
+  # Clear warns.
+  clearWarns(userId: String!): [WarningDiscord]!
+  # Remove a specific warn.
+  removeWarn(userId: String!, id: String!): WarningDiscord!
+}
+
+schema {
+  mutation: Mutation
+  query: Query
+}

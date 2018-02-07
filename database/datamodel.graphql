@@ -1,0 +1,11 @@
+# A warn in Discord.
+type WarningDiscord {
+  # ID of the warned.
+  warnedId: String!
+  # ID of the warner.
+  warnerId: String!
+  # Reason for the warn.
+  reason: String
+  # Number since epoch for date.
+  date: Int!
+}

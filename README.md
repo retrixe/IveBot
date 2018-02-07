@@ -30,6 +30,23 @@ It's planned to have some nifty commands like /assistant which directly communic
 </details>
 <hr />
 
+
+## Self hosting information
+
+You will need to install Yarn (or npm), run `yarn`/`npm i` from the CLI in the bot directory and then configure the project by creating a file `.env` which should have the following contents in the root directory.
+
+```bash
+PRISMA_STAGE=<dev/stable/something else depending on which stage you wish to deploy the database to>
+PRISMA_CLUSTER=<this is in database/prisma.yml when running `prisma init ivebot` in another directory>
+PRISMA_SECRET=<this can be anything but used for authentication>
+```
+
+Then run `yarn prisma deploy`/`npm run prisma deploy` from the CLI to deploy the database.
+
+Once done, proceed with configuration.
+
+To start the bot, you need to run `yarn dev`/`npm run dev` if in development mode, or `yarn build`/`npm run build` to build the bot followed by `yarn start`/`npm start` to start the bot in production (no live reload, verbose logging or playground).
+
 ## Configuration
 
 Make a file named `config.json5` in the top-level directory. It should be something like this:
@@ -42,26 +59,3 @@ Make a file named `config.json5` in the top-level directory. It should be someth
 ```
 
 You can use comments in JSON5.
-
-### Deploying to Now
-
-Deploying to Now is simple. It requires a Now account.
-
-Run the following commands:
-
-```bash
-# BEFORE DOING THIS, MAKE SURE YOU HAVE PUSHED ALL CHANGES.
-yarn remove husky
-# Or if you use npm
-npm un husky
-# Then deploy and scale.
-now
-now scale <IveBot deployment URL> 1
-# Then bring back husky.
-git clean -df
-git checkout -- .
-yarn
-# If you use npm.
-npm i
-# The IveBot alias is already taken! No option there.
-```

@@ -1,12 +1,7 @@
 // Tokens and stuff.
 const { Client } = require('discord.io')
 require('json5/lib/require')
-let token
-try {
-  token = require('../config.json5').token
-} catch (e) {
-  token = process.env.TOKEN
-}
+const token = require('../config.json5').token
 
 // Online since?
 let onlineSince = Math.abs(new Date().getTime())
