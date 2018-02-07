@@ -20,12 +20,13 @@ It's planned to have some nifty commands like /assistant which directly communic
 - `/8ball`
 - `/robohash`
 - `/zalgo`
-- `/repeat` for test pilots
-- `/request`
+- `/repeat`
+- `/request` for test pilots
 - `/urban`
 - `/cat` and `/dog`
 - `/say`
 - `/version`, `/ping` and `/about`
+- `/ban`, `/unban`, `/kick`, `/mute` and `/unmute`
 
 </details>
 <hr />

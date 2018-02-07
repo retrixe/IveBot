@@ -1,8 +1,16 @@
-// @flow
-// Define client.
-type client = {
-  servers: {}
-}
+// Get types.
+type client = { /* eslint-disable no-undef */
+  servers: {
+    [index: string]: {
+      name: string,
+      roles: { [index: string]: { [index: string]: {} } },
+      members: { [index: string]: { roles: Array<string> } }
+    }
+  },
+  users: {
+    [index: string]: { userID: string, username: string, discriminator: string }
+  },
+} /* eslint-enable no-undef */
 
 // Export function.
 export default function checkUserForPermission (

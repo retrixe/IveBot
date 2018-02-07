@@ -1,16 +1,6 @@
-// @flow
 import { getArguments, getIdFromMention } from '../imports/tools'
-
-type client = {
-  /* eslint-disable no-undef */
-  createDMChannel: Function,
-  sendMessage: Function,
-  deleteMessage: Function,
-  channels: Object
-  /* eslint-enable no-undef */
-}
-
-type event = { d: { id: string, channel_id: string } } // eslint-disable-line no-undef,camelcase
+// Get types.
+import { client, event } from '../imports/types'
 
 export function handleRequest (client: client, userID: string, sendResponse: Function, message: string) {
   client.createDMChannel('305053306835697674')

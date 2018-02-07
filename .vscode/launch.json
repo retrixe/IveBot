@@ -18,7 +18,6 @@
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/nodemon",
       "runtimeArgs": [
         "--inspect",
-        "--experimental-modules"
       ],
       "port": 9229,
       "console": "integratedTerminal"

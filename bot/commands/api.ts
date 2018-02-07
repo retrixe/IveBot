@@ -1,4 +1,3 @@
-// @flow
 import fetch from 'isomorphic-unfetch'
 import { getArguments } from '../imports/tools'
 
@@ -6,10 +5,10 @@ export function handleUrban (message: string, sendResponse: Function) {
   // Fetch the definition.
   fetch(`http://api.urbandictionary.com/v0/define?term=${getArguments(message)}`)
   // Convert to JSON.
-    .then(res => res.json())
-    .catch(err => sendResponse(`Something went wrong 👾 Error: ${err}`))
+    .then((res: { json: Function }) => res.json())
+    .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
   // If there is a definition, it will be sent successfully.
-    .then(json => {
+    .then((json: { list: Array<{ definition: string }> }) => {
       try {
         sendResponse(`\`\`\`${json.list[0].definition.trimLeft().trimRight()}\`\`\``)
         // Else, there will be an exception thrown.
@@ -22,31 +21,31 @@ export function handleUrban (message: string, sendResponse: Function) {
 export function handleZalgo (message: string, sendResponse: Function) {
   // Fetch a zalgo.
   fetch(`http://zalgo.io/api?text=${getArguments(message)}`)
-    .then(res => res.text())
-    .catch(err => sendResponse(`Something went wrong 👾 Error: ${err}`))
-    .then(text => sendResponse(text))
+    .then((res: { text: Function }) => res.text())
+    .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
+    .then((text: string) => sendResponse(text))
 }
 
 export function handleCat (message: string, sendResponse: Function) {
   // Fetch a cat.
   fetch(`http://random.cat/meow`)
-    .then(res => res.json())
-    .catch(err => sendResponse(`Something went wrong 👾 Error: ${err}`))
-    .then(json => sendResponse(json.file))
+    .then((res: { json: Function }) => res.json())
+    .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
+    .then((json: { file: string }) => sendResponse(json.file))
 }
 
 export function handleDog (message: string, sendResponse: Function) {
   if (getArguments(message).split(' ')[0].trim()) {
     fetch(`http://dog.ceo/api/breed/${getArguments(message).split(' ')[0]}/images/random`)
-      .then(res => res.json())
-      .catch(err => sendResponse(`Something went wrong 👾 Error: ${err}`))
-      .then(json => sendResponse(json.message))
+      .then((res: { json: Function }) => res.json())
+      .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
+      .then((json: { message: string }) => sendResponse(json.message))
   }
   // Fetch a dog.
   fetch(`http://dog.ceo/api/breeds/image/random`)
-    .then(res => res.json())
-    .catch(err => sendResponse(`Something went wrong 👾 Error: ${err}`))
-    .then(json => sendResponse(json.message))
+    .then((res: { json: Function }) => res.json())
+    .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
+    .then((json: { message: string }) => sendResponse(json.message))
 }
 
 export function handleRobohash (message: string, sendResponse: Function) {

@@ -1,17 +1,6 @@
-// @flow
 // Import some tools.
 import { getIdFromMention } from '../imports/tools'
-
-// Our DB's shape.
-type DB = { /* eslint-disable no-undef */
-  gunfight: Array<{
-    challenged: string,
-    challenger: string,
-    accepted: boolean,
-    randomWord: string,
-    channelID: string
-  }>
-} /* eslint-enable no-undef */
+import { DB } from '../imports/types'
 
 // Gunfight handler.
 export function handleGunfight (command: string, userID: string, sendResponse: Function, db: DB, channelID: string) {

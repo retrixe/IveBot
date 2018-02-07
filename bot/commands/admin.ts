@@ -1,32 +1,8 @@
-// @flow
 import { getArguments, getIdFromMention } from '../imports/tools'
 import checkUserForPermission from '../imports/permissions'
 import ms from 'ms'
-
-// Flow our types.
-type client = {
-  channels: {},
-  servers: {},
-  users: {},
-  sendMessage: Function,
-  ban: Function,
-  kick: Function,
-  unban: Function,
-  createRole: Function,
-  editRole: Function,
-  addToRole: Function,
-  removeFromRole: Function
-}
-type event = {
-  d: {
-    channel_id: string,
-    author: {
-      id: string,
-      username: string,
-      discriminator: string
-    }
-  }
-}
+// Get types.
+import { client, event, roleType } from '../imports/types'
 
 // Ban!
 export function handleBan (client: client, event: event, sendResponse: Function, message: string) {
@@ -44,7 +20,7 @@ export function handleBan (client: client, event: event, sendResponse: Function,
   client.ban({
     serverID: client.channels[event.d.channel_id].guild_id,
     userID
-  }, (err) => {
+  }, (err: { statusMessage: string }) => {
     if (err.statusMessage === 'FORBIDDEN') {
       sendResponse('I can\'t ban that person.')
       banned = false
@@ -81,7 +57,7 @@ export function handleKick (client: client, event: event, sendResponse: Function
   client.kick({
     serverID: client.channels[event.d.channel_id].guild_id,
     userID
-  }, (err) => {
+  }, (err: { statusMessage: string }) => {
     if (err.statusMessage === 'FORBIDDEN') {
       sendResponse('I can\'t kick that person.')
       kicked = false
@@ -116,7 +92,7 @@ export function handleUnban (client: client, event: event, sendResponse: Functio
   client.unban({
     serverID: client.channels[event.d.channel_id].guild_id,
     userID
-  }, (err) => {
+  }, (err: { statusMessage: string }) => {
     if (err) {
       sendResponse('Cannot unban that person.')
       return
@@ -138,7 +114,7 @@ export function handleMute (client: client, event: event, sendResponse: Function
   // Find a Muted role.
   const roles = client.servers[client.channels[event.d.channel_id].guild_id].roles
   // Sorry for the any.. but no other way :|
-  let role: any = Object.values(roles).find((role) => role.name === 'Muted' || role.name === 'MutedNub')
+  let role = Object.values(roles).find((role) => role.name === 'Muted' || role.name === 'MutedNub')
   // Check for appropriate permissions.
   let r = false
   // Edit permissions of role if needed.
@@ -148,18 +124,20 @@ export function handleMute (client: client, event: event, sendResponse: Function
       roleID: role.id,
       name: 'Muted',
       permissions: { TEXT_SEND_MESSAGES: false, VOICE_SPEAK: false }
-    }, (err) => {
+    }, (err: { statusMessage: string }) => {
       if (err) { sendResponse('I could not add proper permissions to the Muted role.'); r = true }
     })
     if (r) return
     // Mute person.
-    client.addToRole({ serverID: client.channels[event.d.channel_id].guild_id, roleID: role.id, userID }, (err) => {
+    client.addToRole({ serverID: client.channels[event.d.channel_id].guild_id, roleID: role.id, userID }, (err: {}) => {
       if (err) sendResponse('Could not mute that person.')
       else { sendResponse('Muted.') }
     })
     // If no role, make a Muted role.
   } else if (!role) {
-    client.createRole(client.channels[event.d.channel_id].guild_id, (err, res) => {
+    client.createRole(client.channels[event.d.channel_id].guild_id, (
+      err: { statusMessage: string }, res: roleType
+    ) => {
       if (err) { sendResponse('I could not find a Muted role and cannot create a new one.'); r = true; return }
       role = res
       client.editRole({
@@ -171,13 +149,17 @@ export function handleMute (client: client, event: event, sendResponse: Function
     })
     if (r) return
     // Mute person.
-    client.addToRole({ serverID: client.channels[event.d.channel_id].guild_id, roleID: role.id, userID }, (err) => {
+    client.addToRole({ serverID: client.channels[event.d.channel_id].guild_id, roleID: role.id, userID }, (
+      err: { statusMessage: string }
+    ) => {
       if (err) sendResponse('Could not mute that person.')
       else { sendResponse('Muted.') }
     })
   } else {
     // Mute person.
-    client.addToRole({ serverID: client.channels[event.d.channel_id].guild_id, roleID: role.id, userID }, (err) => {
+    client.addToRole({ serverID: client.channels[event.d.channel_id].guild_id, roleID: role.id, userID }, (
+      err: { statusMessage: string }
+    ) => {
       if (err) sendResponse('Could not mute that person.')
       else { sendResponse('Muted.') }
     })

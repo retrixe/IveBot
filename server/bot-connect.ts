@@ -11,7 +11,6 @@ let botCallback
 try {
   botCallback = require('../lib/index').default
 } catch (e) {
-  require('babel-register')
   botCallback = require('../bot/index').default
 }
 

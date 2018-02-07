@@ -1,4 +1,3 @@
-// @flow
 export const getArguments = (message: string) => {
   const splitMessage = message.split(' ')
   splitMessage.splice(0, 1)

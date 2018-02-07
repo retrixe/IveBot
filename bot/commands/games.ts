@@ -1,4 +1,3 @@
-// @flow
 import { getArguments } from '../imports/tools'
 
 export function handleChoose (message: string, sendResponse: Function) {

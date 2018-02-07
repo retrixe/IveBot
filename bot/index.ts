@@ -1,4 +1,3 @@
-// @flow
 // Tokens and stuff.
 import 'json5/lib/require'
 import { testPilots } from '../config.json5'
@@ -16,19 +15,22 @@ import { handleUrban, handleCat, handleDog, handleZalgo, handleRobohash } from '
 import { handleGunfight, handleAccept } from './commands/gunfight'
 import { handleKick, handleBan, handleUnban, handleMute, handleUnmute } from './commands/admin'
 
+// We need types.
+import { client, event, DB } from './imports/types'
+
 // When client recieves a message, it will callback.
-export default (client: Object, tempDB: Object, onlineSince: number) => (
+export default (client: client, tempDB: DB, onlineSince: number) => (
   user: string,
   userID: string,
   channelID: string,
   message: string,
-  event: Object
+  event: event
 ) => {
   // Helper variables and functions.
   // Convert message to lowercase to ensure it works.
   const command = message.toLocaleLowerCase()
   // Helper command to send message to same channel.
-  const sendResponse = (m: string, cb?: (error: {}, response: any) => void) => client.sendMessage({
+  const sendResponse = (m: string, cb?: (error: {}, response: { id: string }) => void) => client.sendMessage({
     to: channelID, message: m
   }, cb)
   // Is the person a test pilot.
