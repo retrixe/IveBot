@@ -7,5 +7,5 @@ type WarningDiscord {
   # Reason for the warn.
   reason: String
   # Number since epoch for date.
-  date: Int!
+  date: String!
 }

@@ -14,6 +14,7 @@ You may recieve a response soon, and you can keep track here:
 }
 
 export function handleSay (message: string, sendResponse: Function, client: client, event: event) {
+  if (event.d.author.id !== '305053306835697674') return
   // Delete the message.
   client.deleteMessage({ channelID: event.d.channel_id, messageID: event.d.id })
   // Should it be sent to another channel?

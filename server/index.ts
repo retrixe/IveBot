@@ -5,10 +5,9 @@ import * as prisma from 'prisma-binding'
 // Import our resolvers.
 import resolvers from './resolvers'
 // Import the bot. Yes, it's a module.
-import bot from './bot-connect' // eslint-disable-line no-unused-vars
+const bot = require('./bot-connect') // eslint-disable-line no-unused-vars
 // Import environment variables from dotenv.
-import * as dotenv from 'dotenv'
-dotenv.config()
+require('dotenv').config()
 // Get Prisma from prisma and some more configuration.
 const Prisma = prisma.Prisma
 const PrismaDeployedCluster = process.env.PRISMA_CLUSTER.split('/')[0]

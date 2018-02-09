@@ -2,7 +2,7 @@ mutation {
   first: createWarningDiscord(data: {
     warnedId: "123",
     warnerId: "456",
-    date: 789,
+    date: "789",
     reason: "0"
   }) {
     id

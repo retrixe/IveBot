@@ -1,7 +1,7 @@
 // Tokens and stuff.
-const { Client } = require('discord.io')
-require('json5/lib/require')
-const token = require('../config.json5').token
+import { Client } from 'discord.io'
+import 'json5/lib/require'
+const { token } = require('../config.json5')
 
 // Online since?
 let onlineSince = Math.abs(new Date().getTime())
@@ -44,7 +44,7 @@ const tempDB = {gunfight: []}
 client.on('message', botCallback(client, tempDB, onlineSince))
 
 // Export some stuff for our server to use, you know.
-module.exports = {
+export default {
   tempDB,
   onlineSince,
   client

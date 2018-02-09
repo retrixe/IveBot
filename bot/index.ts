@@ -2,7 +2,7 @@
 import 'json5/lib/require'
 import { testPilots } from '../config.json5'
 import { version } from '../package.json'
-import ms from 'ms'
+import * as ms from 'ms'
 // Commands.
 import { handleRequest, handleSay } from './commands/utilities'
 import {
@@ -13,7 +13,9 @@ import {
 } from './commands/games'
 import { handleUrban, handleCat, handleDog, handleZalgo, handleRobohash } from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
-import { handleKick, handleBan, handleUnban, handleMute, handleUnmute } from './commands/admin'
+import {
+  handleKick, handleBan, handleUnban, handleMute, handleUnmute, handleWarn
+} from './commands/admin'
 
 // We need types.
 import { client, event, DB } from './imports/types'
@@ -26,6 +28,8 @@ export default (client: client, tempDB: DB, onlineSince: number) => (
   message: string,
   event: event
 ) => {
+  // Disable bots from responding.
+  if (client.users[userID].bot) return
   // Helper variables and functions.
   // Convert message to lowercase to ensure it works.
   const command = message.toLocaleLowerCase()
@@ -106,6 +110,8 @@ export default (client: client, tempDB: DB, onlineSince: number) => (
   else if (command.startsWith('/mute')) handleMute(client, event, sendResponse, message)
   // Unmute.
   else if (command.startsWith('/unmute')) handleUnmute(client, event, sendResponse, message)
+  // Warn.
+  else if (command.startsWith('/warn')) handleWarn(client, event, sendResponse, message)
   // Version and about.
   else if (command.startsWith('/version')) sendResponse(`**IveBot ${version}**`)
   else if (command.startsWith('/about')) {

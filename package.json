@@ -2,7 +2,7 @@
   "name": "ivebot",
   "version": "2.0.0-canary.0",
   "description": "The bot that created the iPhone X.",
-  "main": "server/index.mjs",
+  "main": "server/index.ts",
   "scripts": {
     "test": "ava",
     "lint": "eslint . --ext .ts,.tsx && tsc --noEmit && graphql-schema-linter server/schema.graphql",
@@ -36,7 +36,10 @@
     "typescript": "^2.7.1"
   },
   "devDependencies": {
+    "@types/material-ui": "^0.20.5",
+    "@types/next": "^2.4.7",
     "@types/node": "^8.0.53",
+    "@types/react": "^16.0.36",
     "ava": "^0.23.0",
     "eslint": "^4.17.0",
     "eslint-config-standard": "^10.2.1",
