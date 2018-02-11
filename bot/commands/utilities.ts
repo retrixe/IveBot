@@ -1,8 +1,13 @@
 import { getArguments, getIdFromMention } from '../imports/tools'
+import checkUserForPermission from '../imports/permissions'
 // Get types.
 import { client, event } from '../imports/types'
 
-export function handleRequest (client: client, userID: string, sendResponse: Function, message: string) {
+export function handleRequest (client: client, userID: string, sendResponse: Function, message: string, testPilot: string) {
+  if (!testPilot) {
+    sendResponse('You need to be a test pilot to use /request.')
+    return
+  }
   client.createDMChannel('305053306835697674')
   client.sendMessage({
     to: '305053306835697674',
@@ -13,8 +18,15 @@ You may recieve a response soon, and you can keep track here:
 <https://github.com/retrixe/IveBot/projects/1>`)
 }
 
-export function handleSay (message: string, sendResponse: Function, client: client, event: event) {
-  if (event.d.author.id !== '305053306835697674') return
+export function handleSay (message: string, sendResponse: Function, client: client, event: event, testPilot: string) {
+  // Check for enough permissions.
+  let check = false
+  if (checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'TEXT_MANAGE_MESSAGES')) check = true
+  else if (testPilot) check = true
+  if (!check) {
+    sendResponse('You cannot fool me. You do not have enough permissions.')
+    return
+  }
   // Delete the message.
   client.deleteMessage({ channelID: event.d.channel_id, messageID: event.d.id })
   // Should it be sent to another channel?

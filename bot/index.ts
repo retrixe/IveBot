@@ -73,7 +73,7 @@ export default (client: client, tempDB: DB, onlineSince: number) => (
   else if (command.startsWith('ayy')) sendResponse('lmao')
 
   // Request something.
-  else if (command.startsWith('/request') && testPilot) handleRequest(client, userID, sendResponse, message)
+  else if (command.startsWith('/request') && testPilot) handleRequest(client, userID, sendResponse, message, testPilot)
   // Gunfight.
   else if (command.startsWith('/gunfight')) handleGunfight(command, userID, sendResponse, tempDB, channelID)
   // Accept gunfight.
@@ -99,7 +99,7 @@ export default (client: client, tempDB: DB, onlineSince: number) => (
   // Robohash.
   else if (command.startsWith('/robohash')) handleRobohash(message, sendResponse)
   // Say.
-  else if (command.startsWith('/say')) handleSay(message, sendResponse, client, event)
+  else if (command.startsWith('/say')) handleSay(message, sendResponse, client, event, testPilot)
   // Ban.
   else if (command.startsWith('/ban')) handleBan(client, event, sendResponse, message)
   // Unban.

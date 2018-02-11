@@ -12,6 +12,13 @@ export function handleBan (client: client, event: event, sendResponse: Function,
     sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
     return
   }
+  // Check for valid user.
+  // eslint-disable-next-line no-unused-vars
+  const a = client.users[getIdFromMention(getArguments(message).split(' ')[0])]
+  if (!a) {
+    sendResponse('Please specify a valid user.')
+    return
+  }
   // Get information about user.
   const userID = getIdFromMention(getArguments(message).split(' ')[0])
   const user = client.users[userID]
@@ -47,6 +54,13 @@ export function handleKick (client: client, event: event, sendResponse: Function
   // Check user for permissions.
   if (!checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'GENERAL_KICK_MEMBERS')) {
     sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
+    return
+  }
+  // Check for valid user.
+  // eslint-disable-next-line no-unused-vars
+  const a = client.users[getIdFromMention(getArguments(message).split(' ')[0])]
+  if (!a) {
+    sendResponse('Please specify a valid user.')
     return
   }
   // Get information about user.
@@ -184,6 +198,14 @@ export function handleUnmute (client: client, event: event, sendResponse: Functi
     sendResponse('You can\'t unmute people.')
     return
   }
+  // Check for valid user.
+  // eslint-disable-next-line no-unused-vars
+  const a = client.users[getIdFromMention(getArguments(message).split(' ')[0])]
+  if (!a) {
+    sendResponse('Please specify a valid user.')
+    return
+  }
+
   // userID.
   const userID = getIdFromMention(getArguments(message).split(' ')[0])
   // All roles of user and server.
@@ -210,7 +232,18 @@ export function handleWarn (client: client, event: event, sendResponse: Function
   if (!checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'TEXT_MANAGE_MESSAGES')) {
     sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
     return
+  } else if (getArguments(message).split(' ').length < 2) {
+    sendResponse('Correct usage: /warn <user> <reason>')
+    return
   }
+  // Check for valid user.
+  // eslint-disable-next-line no-unused-vars
+  const a = client.users[getIdFromMention(getArguments(message).split(' ')[0])]
+  if (!a) {
+    sendResponse('Please specify a valid user.')
+    return
+  }
+
   // userID and server name.
   const serverName = client.servers[client.channels[event.d.channel_id].guild_id].name
   const userID = getIdFromMention(getArguments(message).split(' ')[0])
