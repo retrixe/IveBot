@@ -73,7 +73,7 @@ export default (client: client, tempDB: DB, onlineSince: number) => (
   else if (command.startsWith('ayy')) sendResponse('lmao')
 
   // Request something.
-  else if (command.startsWith('/request') && testPilot) handleRequest(client, userID, sendResponse, message, testPilot)
+  else if (command.startsWith('/request') && testPilot) handleRequest(client, userID, sendResponse, message)
   // Gunfight.
   else if (command.startsWith('/gunfight')) handleGunfight(command, userID, sendResponse, tempDB, channelID)
   // Accept gunfight.

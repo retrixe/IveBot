@@ -3,11 +3,7 @@ import checkUserForPermission from '../imports/permissions'
 // Get types.
 import { client, event } from '../imports/types'
 
-export function handleRequest (client: client, userID: string, sendResponse: Function, message: string, testPilot: string) {
-  if (!testPilot) {
-    sendResponse('You need to be a test pilot to use /request.')
-    return
-  }
+export function handleRequest (client: client, userID: string, sendResponse: Function, message: string) {
   client.createDMChannel('305053306835697674')
   client.sendMessage({
     to: '305053306835697674',
