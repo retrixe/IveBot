@@ -73,7 +73,7 @@ export function handleKick (client: client, event: event, sendResponse: Function
     serverID: client.channels[event.d.channel_id].guild_id,
     userID
   }, (err: { statusMessage: string }) => {
-    if (err.statusMessage === 'FORBIDDEN') {
+    if (err) {
       sendResponse('I can\'t kick that person.')
       kicked = false
       return
