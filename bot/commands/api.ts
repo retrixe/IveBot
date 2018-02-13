@@ -1,5 +1,8 @@
 import * as fetch from 'isomorphic-unfetch'
 import { getArguments } from '../imports/tools'
+// Get the NASA API token.
+import 'json5/lib/require'
+const { NASAtoken } = require('../../config.json5')
 
 export function handleUrban (message: string, sendResponse: Function) {
   // Fetch the definition.
@@ -61,4 +64,13 @@ export function handleRobohash (message: string, sendResponse: Function) {
   else {
     sendResponse('Proper usage: /robohash <robot, monster, head, cat> <text to robohash>')
   }
+}
+
+export function handleApod (message: string, sendResponse: Function) {
+  // Fetch a cat.
+  fetch(`https://api.nasa.gov/planetary/apod?api_key=${NASAtoken}`)
+    .then((res: { json: Function }) => res.json())
+    .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
+    .then((json: { url: string, title: string, explanation: string }
+    ) => sendResponse(json.title + '\n' + json.url + '\n' + json.explanation))
 }

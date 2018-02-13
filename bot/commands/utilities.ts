@@ -34,3 +34,8 @@ export function handleSay (message: string, sendResponse: Function, client: clie
   // Send the message all over again.
   sendResponse(getArguments(message))
 }
+
+export function handleAvatar (message: string, sendResponse: Function, client: client) {
+  const userID = getIdFromMention(getArguments(message).split(' ')[0])
+  sendResponse(`https://cdn.discordapp.com/avatars/${userID}/${client.users[userID].avatar}.png`)
+}

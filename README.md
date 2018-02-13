@@ -55,7 +55,8 @@ Make a file named `config.json5` in the top-level directory. It should be someth
 ```json
 {
   "token": "<insert token here>",
-  "testPilots": ["array of people who can use test pilot commands via user ID"]
+  "testPilots": ["array of people who can use test pilot commands via user ID"],
+  "NASAtoken": "<to enable /astronomy-picture-of-the-day or /apod>"
 }
 ```
 

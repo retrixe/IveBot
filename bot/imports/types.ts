@@ -13,7 +13,7 @@ export type client = {
     }
   },
   users: {
-    [index: string]: { userID: string, username: string, discriminator: string, bot: boolean }
+    [index: string]: { userID: string, username: string, discriminator: string, bot: boolean, avatar: string }
   },
   sendMessage: Function,
   ban: Function,
