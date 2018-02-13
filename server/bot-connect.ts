@@ -35,7 +35,10 @@ client.on('ready', () => {
 })
 
 // Disconnection from Discord will trigger the following.
-client.on('disconnect', (errMsg, code) => console.log('Error:\n', errMsg, code))
+client.on('disconnect', (errMsg, code) => {
+  console.log('Error:\n', errMsg, code)
+  throw new Error('Error:\n' + ' ' + errMsg + ' ' + code)
+})
 
 // Create a database to handle certain stuff.
 const tempDB = {gunfight: []}
