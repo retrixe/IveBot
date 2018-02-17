@@ -43,6 +43,13 @@ export function handleRepeat (message: string, sendResponse: Function) {
   } else if (+args[1] * message.substring(8 + args[1].length + 1).length >= 2001) {
     sendResponse('To prevent spam, your excessive message has not been repeated.')
     return
+  } else if (
+    getArguments(getArguments(message)) === '_' ||
+    getArguments(getArguments(message)) === '*' ||
+    getArguments(getArguments(message)) === '~'
+  ) {
+    sendResponse('This is known to lag users and is disabled.')
+    return
   }
   // Generate the repeated string.
   let generatedMessage = ''

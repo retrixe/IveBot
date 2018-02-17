@@ -5,14 +5,16 @@ import { token, testPilots } from '../config.json5'
 import { version } from '../package.json'
 import * as ms from 'ms'
 // Commands.
-import { handleRequest, handleSay } from './commands/utilities'
+import { handleRequest, handleSay, handleAvatar } from './commands/utilities'
 import {
   handleChoose,
   handleReverse,
   handle8Ball,
   handleRepeat
 } from './commands/games'
-import { handleUrban, handleCat, handleDog, handleZalgo, handleRobohash } from './commands/api'
+import {
+  handleUrban, handleCat, handleDog, handleZalgo, handleRobohash, handleApod
+} from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
 
 let onlineSince: number = 0
@@ -83,9 +85,11 @@ client.on('message', (user, userID, channelID, message, event) => {
     \`/cat\` and \`/dog\` - Random cats and dogs from <https://random.cat> and <https://dog.ceo>
     \`/robohash\` - Take some text, make it a robot/monster/head/cat.
     \`/zalgo\` - The zalgo demon's handwriting.
+    \`/astronomy-picture-of-the-day\` or \`/apod\`
 **Utilities.**
     TP \`/request\` - Request a specific feature.
     \`/say\` - Say something, even in another channel.
+    \`/avatar\` - Avatar of a user.
     \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
 **There are some easter egg auto responses.**
 **Commands with TP are test pilot only.**
@@ -123,8 +127,13 @@ client.on('message', (user, userID, channelID, message, event) => {
   else if (command.startsWith('/zalgo')) handleZalgo(message, sendResponse)
   // Robohash.
   else if (command.startsWith('/robohash')) handleRobohash(message, sendResponse)
-  // Say.
-  else if (command.startsWith('/say')) handleSay(message, sendResponse, client, event)
+  // Astronomy picture of the day.
+  else if (command.startsWith('/apod') || command.startsWith('/astronomy-picture-of-the-day')) {
+    handleApod(message, sendResponse)
+    // Say.
+  } else if (command.startsWith('/say')) handleSay(message, sendResponse, client, event)
+  // Avatar.
+  else if (command.startsWith('/avatar')) handleAvatar(message, sendResponse, client)
   // Version and about.
   else if (command.startsWith('/version')) sendResponse(`**IveBot ${version}**`)
   else if (command.startsWith('/about')) {
