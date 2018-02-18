@@ -24,9 +24,12 @@ It's planned to have some nifty commands like /assistant which directly communic
 - `/request` for test pilots
 - `/urban`
 - `/cat` and `/dog`
+- `/astronomy-picture-of-the-day` or `/apod`
 - `/say`
+- `/avatar`
 - `/version`, `/ping` and `/about`
 - `/ban`, `/unban`, `/kick`, `/mute` and `/unmute`
+- `/addrole` and `/removerole`
 
 </details>
 <hr />

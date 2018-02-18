@@ -15,7 +15,9 @@ export function handleAddrole (client: client, event: event, sendResponse: Funct
     client.addToRole({
       serverID: client.channels[event.d.channel_id].guild_id,
       userID: possibleUser,
-      roleID: Object.values(client.servers[this.serverID].roles).find(a => a.name === role)
+      roleID: Object.values(
+        client.servers[client.channels[event.d.channel_id].guild_id].roles
+      ).find(a => a.name === role).id
     }, (err: string) => {
       if (err) sendResponse('Could not add role to user. Did you specify a role?')
       else sendResponse(`Added role ${role} to <@${possibleUser}>.`)
@@ -26,7 +28,9 @@ export function handleAddrole (client: client, event: event, sendResponse: Funct
   client.addToRole({
     serverID: client.channels[event.d.channel_id].guild_id,
     userID: event.d.author.id,
-    roleID: Object.values(client.servers[this.serverID].roles).find(a => a.name === role)
+    roleID: Object.values(
+      client.servers[client.channels[event.d.channel_id].guild_id].roles
+    ).find(a => a.name === role).id
   }, (err: string) => {
     if (err) sendResponse('Could not add role to user. Did you specify a role?')
     else sendResponse(`Added you to role ${role}.`)
@@ -43,7 +47,9 @@ export function handleRemoverole (client: client, event: event, sendResponse: Fu
     client.removeFromRole({
       serverID: client.channels[event.d.channel_id].guild_id,
       userID: possibleUser,
-      roleID: Object.values(client.servers[this.serverID].roles).find(a => a.name === role)
+      roleID: Object.values(
+        client.servers[client.channels[event.d.channel_id].guild_id].roles
+      ).find(a => a.name === role).id
     }, (err: string) => {
       if (err) sendResponse('Could not remove role from user. Did you specify a role?')
       else sendResponse(`Removed role ${role} from <@${possibleUser}>.`)
@@ -54,7 +60,9 @@ export function handleRemoverole (client: client, event: event, sendResponse: Fu
   client.removeFromRole({
     serverID: client.channels[event.d.channel_id].guild_id,
     userID: event.d.author.id,
-    roleID: Object.values(client.servers[this.serverID].roles).find(a => a.name === role)
+    roleID: Object.values(
+      client.servers[client.channels[event.d.channel_id].guild_id].roles
+    ).find(a => a.name === role).id
   }, (err: string) => {
     if (err) sendResponse('Could not remove role from user. Did you specify a role?')
     else sendResponse(`Removed you from role ${role}.`)
