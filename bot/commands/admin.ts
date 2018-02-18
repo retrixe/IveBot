@@ -5,6 +5,62 @@ import { request } from 'graphql-request'
 // Get types.
 import { client, event, roleType } from '../imports/types'
 
+// Add role.
+export function handleAddrole (client: client, event: event, sendResponse: Function, message: string) {
+  // Check if add to another user.
+  const possibleUser = getIdFromMention(getArguments(message).split(' ')[0])
+  if (possibleUser in client.users) {
+    // Role name.
+    const role = getArguments(getArguments(message))
+    client.addToRole({
+      serverID: client.channels[event.d.channel_id].guild_id,
+      userID: possibleUser,
+      roleID: Object.values(client.servers[this.serverID].roles).find(a => a.name === role)
+    }, (err: string) => {
+      if (err) sendResponse('Could not add role to user. Did you specify a role?')
+      else sendResponse(`Added role ${role} to <@${possibleUser}>.`)
+    })
+    return
+  }
+  const role = getArguments(message)
+  client.addToRole({
+    serverID: client.channels[event.d.channel_id].guild_id,
+    userID: event.d.author.id,
+    roleID: Object.values(client.servers[this.serverID].roles).find(a => a.name === role)
+  }, (err: string) => {
+    if (err) sendResponse('Could not add role to user. Did you specify a role?')
+    else sendResponse(`Added you to role ${role}.`)
+  })
+}
+
+// Add role.
+export function handleRemoverole (client: client, event: event, sendResponse: Function, message: string) {
+  // Check if add to another user.
+  const possibleUser = getIdFromMention(getArguments(message).split(' ')[0])
+  if (possibleUser in client.users) {
+    // Role name.
+    const role = getArguments(getArguments(message))
+    client.removeFromRole({
+      serverID: client.channels[event.d.channel_id].guild_id,
+      userID: possibleUser,
+      roleID: Object.values(client.servers[this.serverID].roles).find(a => a.name === role)
+    }, (err: string) => {
+      if (err) sendResponse('Could not remove role from user. Did you specify a role?')
+      else sendResponse(`Removed role ${role} from <@${possibleUser}>.`)
+    })
+    return
+  }
+  const role = getArguments(message)
+  client.removeFromRole({
+    serverID: client.channels[event.d.channel_id].guild_id,
+    userID: event.d.author.id,
+    roleID: Object.values(client.servers[this.serverID].roles).find(a => a.name === role)
+  }, (err: string) => {
+    if (err) sendResponse('Could not remove role from user. Did you specify a role?')
+    else sendResponse(`Removed you from role ${role}.`)
+  })
+}
+
 // Ban!
 export function handleBan (client: client, event: event, sendResponse: Function, message: string) {
   // Check user for permissions.
@@ -109,7 +165,7 @@ export function handleUnban (client: client, event: event, sendResponse: Functio
     userID
   }, (err: { statusMessage: string }) => {
     if (err) {
-      sendResponse('Cannot unban that person.')
+      sendResponse('Cannot unban that person. Did you specify a user?')
       return
     }
     // Send response.
@@ -145,7 +201,7 @@ export function handleMute (client: client, event: event, sendResponse: Function
     if (r) return
     // Mute person.
     client.addToRole({ serverID: client.channels[event.d.channel_id].guild_id, roleID: role.id, userID }, (err: {}) => {
-      if (err) sendResponse('Could not mute that person.')
+      if (err) sendResponse('Could not mute that person. Did you specify a user?')
       else { sendResponse('Muted.') }
     })
     // If no role, make a Muted role.
@@ -167,7 +223,7 @@ export function handleMute (client: client, event: event, sendResponse: Function
     client.addToRole({ serverID: client.channels[event.d.channel_id].guild_id, roleID: role.id, userID }, (
       err: { statusMessage: string }
     ) => {
-      if (err) sendResponse('Could not mute that person.')
+      if (err) sendResponse('Could not mute that person. Did you specify a user?')
       else { sendResponse('Muted.') }
     })
   } else {
@@ -175,7 +231,7 @@ export function handleMute (client: client, event: event, sendResponse: Function
     client.addToRole({ serverID: client.channels[event.d.channel_id].guild_id, roleID: role.id, userID }, (
       err: { statusMessage: string }
     ) => {
-      if (err) sendResponse('Could not mute that person.')
+      if (err) sendResponse('Could not mute that person. Did you specify a user?')
       else { sendResponse('Muted.') }
     })
   }

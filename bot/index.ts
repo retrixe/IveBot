@@ -17,7 +17,7 @@ import {
 } from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
 import {
-  handleKick, handleBan, handleUnban, handleMute, handleUnmute, handleWarn
+  handleKick, handleBan, handleUnban, handleMute, handleUnmute, handleWarn, handleAddrole, handleRemoverole
 } from './commands/admin'
 
 // We need types.
@@ -66,7 +66,9 @@ export default (client: client, tempDB: DB, onlineSince: number) => (
     \`/say\` - Say something, even in another channel.
     \`/avatar\` - Avatar of a user.
     \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
-    \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\` - Self-explanatory.
+    \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
+    \`/addrole\` and \`/removerole\`
+
 **There are some easter egg auto responses.**
 **Commands with TP are test pilot only.**
     `)
@@ -122,6 +124,10 @@ export default (client: client, tempDB: DB, onlineSince: number) => (
   else if (command.startsWith('/unmute')) handleUnmute(client, event, sendResponse, message)
   // Warn.
   else if (command.startsWith('/warn')) handleWarn(client, event, sendResponse, message)
+  // Add role.
+  else if (command.startsWith('/addrole')) handleAddrole(client, event, sendResponse, message)
+  // Remove role.
+  else if (command.startsWith('/removerole')) handleRemoverole(client, event, sendResponse, message)
   // Version and about.
   else if (command.startsWith('/version')) sendResponse(`**IveBot ${version}**`)
   else if (command.startsWith('/about')) {
