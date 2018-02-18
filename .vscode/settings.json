@@ -14,5 +14,7 @@
       ]
     },
     "eslint.enable": true,
-    "tslint.enable": false
-}
+    "tslint.enable": false,
+    "eslint.packageManager": "yarn",
+    "eslint.autoFixOnSave": true
+  }

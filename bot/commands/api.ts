@@ -21,14 +21,6 @@ export function handleUrban (message: string, sendResponse: Function) {
     })
 }
 
-export function handleZalgo (message: string, sendResponse: Function) {
-  // Fetch a zalgo.
-  fetch(`http://zalgo.io/api?text=${getArguments(message)}`)
-    .then((res: { text: Function }) => res.text())
-    .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
-    .then((text: string) => sendResponse(text))
-}
-
 export function handleCat (message: string, sendResponse: Function) {
   // Fetch a cat.
   fetch(`http://random.cat/meow`)

@@ -9,10 +9,11 @@ import {
   handleChoose,
   handleReverse,
   handle8Ball,
-  handleRepeat
+  handleRepeat,
+  handleZalgo
 } from './commands/games'
 import {
-  handleUrban, handleCat, handleDog, handleZalgo, handleRobohash, handleApod
+  handleUrban, handleCat, handleDog, handleRobohash, handleApod
 } from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
 import {
