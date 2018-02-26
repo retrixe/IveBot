@@ -8,4 +8,14 @@ type WarningDiscord {
   reason: String
   # Number since epoch for date.
   date: String!
+  # Server ID.
+  serverId: String!
+}
+
+# Server specific settings.
+type ServerSetting {
+  # Server ID.
+  serverId: String!
+  # If add role is enabled for everyone.
+  addRoleForAll: Boolean
 }

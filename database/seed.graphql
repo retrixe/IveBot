@@ -3,7 +3,8 @@ mutation {
     warnedId: "123",
     warnerId: "456",
     date: "789",
-    reason: "0"
+    reason: "0",
+    serverId: "0"
   }) {
     id
   }

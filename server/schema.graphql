@@ -10,20 +10,34 @@ type WarningDiscord {
   date: String!
 }
 
+# Server specific settings.
+type ServerSetting {
+  # Server ID.
+  serverId: String!
+  # If add role is enabled for everyone.
+  addRoleForAll: Boolean
+}
+
 # Enable queries.
 type Query {
   # We need to have allWarns to query for every warns in the database.
-  allWarnsOfUser(userId: String!): [WarningDiscord!]!
+  allWarnsOfUser(userId: String!, serverId: String!): [WarningDiscord!]!
+  # Query server settings.
+  serverSettings(serverId: String!): ServerSetting!
 }
 
 # Enable mutations.
 type Mutation {
   # Add a warn.
-  warn(warnedId: String!, warnerId: String!, reason: String!): WarningDiscord!
+  warn(warnedId: String!, warnerId: String!, reason: String!, serverId: String!): WarningDiscord!
   # Clear warns.
-  clearWarns(userId: String!): [WarningDiscord]!
+  clearWarns(userId: String!, serverId: String!): [WarningDiscord]!
   # Remove a specific warn.
-  removeWarn(userId: String!, id: String!): WarningDiscord!
+  removeWarn(userId: String!, id: String!, serverId: String!): WarningDiscord!
+  # Edit server settings.
+  editServerSettings(serverId: String!, addRoleForAll: Boolean): ServerSetting!
+  # Init server settings.
+  initServerSettings(serverId: String!): ServerSetting!
 }
 
 schema {
