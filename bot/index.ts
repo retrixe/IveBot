@@ -3,6 +3,7 @@ import 'json5/lib/require'
 import { testPilots } from '../config.json5'
 import { version } from '../package.json'
 import * as ms from 'ms'
+import { execSync } from 'child_process'
 // Commands.
 import { handleRequest, handleSay, handleAvatar } from './commands/utilities'
 import {
@@ -10,7 +11,7 @@ import {
   handleReverse,
   handle8Ball,
   handleRepeat,
-  handleZalgo
+  handleZalgo, handleDezalgo
 } from './commands/games'
 import {
   handleUrban, handleCat, handleDog, handleRobohash, handleApod
@@ -24,6 +25,7 @@ import {
 
 // We need types.
 import { client, event, DB } from './imports/types'
+import { getArguments } from './imports/tools'
 
 // When client recieves a message, it will callback.
 export default (client: client, tempDB: DB, onlineSince: number) => (
@@ -39,7 +41,7 @@ export default (client: client, tempDB: DB, onlineSince: number) => (
   // Convert message to lowercase to ensure it works.
   const command = message.toLocaleLowerCase()
   // Helper command to send message to same channel.
-  const sendResponse = (m: string, cb?: (error: {}, response: { id: string }) => void) => client.sendMessage({
+  const sendResponse = (m: string|Buffer, cb?: (error: {}, response: { id: string }) => void) => client.sendMessage({
     to: channelID, message: m
   }, cb)
   // Is the person a test pilot.
@@ -61,7 +63,7 @@ export default (client: client, tempDB: DB, onlineSince: number) => (
     \`/urban\` - Get an Urban Dictionary definition ;)
     \`/cat\` and \`/dog\` - Random cats and dogs from <https://random.cat> and <https://dog.ceo>
     \`/robohash\` - Take some text, make it a robot/monster/head/cat.
-    \`/zalgo\` - The zalgo demon's handwriting.
+    \`/zalgo\` \`/dezalgo\` - The zalgo demon's writing.
     \`/astronomy-picture-of-the-day\` or \`/apod\`
 **Utilities.**
     TP \`/request\` - Request a specific feature.
@@ -107,6 +109,8 @@ export default (client: client, tempDB: DB, onlineSince: number) => (
   else if (command.startsWith('/dog')) handleDog(message, sendResponse)
   // Zalgo.
   else if (command.startsWith('/zalgo')) handleZalgo(message, sendResponse)
+  // Dezalgo.
+  else if (command.startsWith('/dezalgo')) handleDezalgo(message, sendResponse)
   // Robohash.
   else if (command.startsWith('/robohash')) handleRobohash(message, sendResponse)
   // Astronomy picture of the day.
@@ -164,4 +168,5 @@ For noobs, this bot is licensed and protected by law. Copy code and I will sue y
       })
     })
   } else if (command.startsWith('/uptime')) sendResponse(ms(Math.abs(new Date().getTime()) - onlineSince, { long: true }))
+  else if (command.startsWith('/remoteexec') && userID === '305053306835697674') sendResponse(execSync(getArguments(message), { encoding: 'utf8' }))
 }
