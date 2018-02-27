@@ -8,6 +8,9 @@ export default {
     }, info),
     serverSettings: (parent, { serverId }, ctx, info) => ctx.db.query.serverSettings({
       where: { serverId }
+    }, info),
+    allserverSettings: (parent, { serverId }, ctx, info) => ctx.db.query.serverSettings({
+      where: {}
     }, info)
   },
   Mutation: {
@@ -16,7 +19,7 @@ export default {
       info
     ),
     editServerSettings: (parent, { serverId, addRoleForAll }, ctx, info) => ctx.db.mutation.updateManyServerSettings(
-      { data: { addRoleForAll }, where: { serverId } },
+      { data: { addRoleForAll, serverId }, where: { serverId } },
       info
     ),
     initServerSettings: (parent, { serverId }, ctx, info) => ctx.db.mutation.createServerSetting(

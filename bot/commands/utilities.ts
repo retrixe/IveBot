@@ -1,5 +1,5 @@
 import { getArguments, getIdFromMention } from '../imports/tools'
-import checkUserForPermission from '../imports/permissions'
+import { checkUserForPermission } from '../imports/permissions'
 // Get types.
 import { client, event } from '../imports/types'
 

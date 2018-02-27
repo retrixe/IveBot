@@ -3,7 +3,7 @@ type client = { /* eslint-disable no-undef */
   servers: {
     [index: string]: {
       name: string,
-      roles: { [index: string]: { [index: string]: {} } },
+      roles: { [index: string]: { position: number, [index: string]: {} } },
       members: { [index: string]: { roles: Array<string> } }
     }
   },
@@ -13,7 +13,7 @@ type client = { /* eslint-disable no-undef */
 } /* eslint-enable no-undef */
 
 // Export function.
-export default function checkUserForPermission (
+export function checkUserForPermission (
   client: client, userID: string, serverID: string, perm: string
 ) {
   // Get roles of user.
@@ -29,4 +29,20 @@ export default function checkUserForPermission (
     if (rolesInServer[rolesOfUser[roleIndex]][perm]) userHasPermission = true
   }
   return userHasPermission
+}
+
+// Export function.
+export function checkRolePosition (client: client, userID: string, serverID: string) {
+  // Get roles of user.
+  const rolesOfUser = client.servers[serverID].members[userID].roles
+  // Get all roles in server.
+  const rolesInServer = client.servers[serverID].roles
+  // Iterate over roles.
+  let highestRolePosition = 0
+  for (let roleIndex in rolesOfUser) {
+    if (rolesInServer[rolesOfUser[roleIndex]].position > highestRolePosition) {
+      highestRolePosition = rolesInServer[rolesOfUser[roleIndex]].position
+    }
+  }
+  return highestRolePosition
 }

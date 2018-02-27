@@ -1,6 +1,6 @@
 // Flow our types.
 /* eslint-disable no-undef */
-export type roleType = { TEXT_SEND_MESSAGES: boolean, VOICE_SPEAK: boolean, name: string, id: string }
+export type roleType = { TEXT_SEND_MESSAGES: boolean, VOICE_SPEAK: boolean, name: string, id: string, position: number }
 export type client = {
   channels: {
     [index: string]: { guild_id: string } // eslint-disable-line camelcase

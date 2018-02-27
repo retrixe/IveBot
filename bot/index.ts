@@ -17,7 +17,9 @@ import {
 } from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
 import {
-  handleKick, handleBan, handleUnban, handleMute, handleUnmute, handleWarn, handleAddrole, handleRemoverole
+  handleKick, handleBan, handleUnban, handleMute, handleUnmute, handleWarn,
+  handleAddrole, handleRemoverole,
+  handleTogglepublicroles
 } from './commands/admin'
 
 // We need types.
@@ -66,11 +68,13 @@ export default (client: client, tempDB: DB, onlineSince: number) => (
     \`/say\` - Say something, even in another channel.
     \`/avatar\` - Avatar of a user.
     \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
-    \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
     \`/addrole\` and \`/removerole\`
+    AD \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
+    AD \`/togglepublicroles\` - Enable public roles.
 
 **There are some easter egg auto responses.**
 **Commands with TP are test pilot only.**
+**Commands with AD are admin/helper only.**
     `)
 
     // Auto responses and easter eggs.
@@ -128,6 +132,8 @@ export default (client: client, tempDB: DB, onlineSince: number) => (
   else if (command.startsWith('/addrole')) handleAddrole(client, event, sendResponse, message)
   // Remove role.
   else if (command.startsWith('/removerole')) handleRemoverole(client, event, sendResponse, message)
+  // Toggle public role system.
+  else if (command.startsWith('/togglepublicroles')) handleTogglepublicroles(client, event, sendResponse, message)
   // Version and about.
   else if (command.startsWith('/version')) sendResponse(`**IveBot ${version}**`)
   else if (command.startsWith('/about')) {

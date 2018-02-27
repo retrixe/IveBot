@@ -23,7 +23,9 @@ type Query {
   # We need to have allWarns to query for every warns in the database.
   allWarnsOfUser(userId: String!, serverId: String!): [WarningDiscord!]!
   # Query server settings.
-  serverSettings(serverId: String!): ServerSetting!
+  serverSettings(serverId: String!): [ServerSetting!]!
+  # All server settings
+  # allserverSettings(a: String): [ServerSetting!]!
 }
 
 # Enable mutations.
@@ -35,7 +37,7 @@ type Mutation {
   # Remove a specific warn.
   removeWarn(userId: String!, id: String!, serverId: String!): WarningDiscord!
   # Edit server settings.
-  editServerSettings(serverId: String!, addRoleForAll: Boolean): ServerSetting!
+  editServerSettings(serverId: String!, addRoleForAll: Boolean): [ServerSetting!]!
   # Init server settings.
   initServerSettings(serverId: String!): ServerSetting!
 }
