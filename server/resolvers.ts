@@ -8,9 +8,6 @@ export default {
     }, info),
     serverSettings: (parent, { serverId }, ctx, info) => ctx.db.query.serverSettings({
       where: { serverId }
-    }, info),
-    allserverSettings: (parent, { serverId }, ctx, info) => ctx.db.query.serverSettings({
-      where: {}
     }, info)
   },
   Mutation: {
