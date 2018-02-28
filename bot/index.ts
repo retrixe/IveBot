@@ -26,6 +26,7 @@ import {
 // We need types.
 import { client, event, DB } from './imports/types'
 import { getArguments } from './imports/tools'
+import help from './commands/help'
 
 // When client recieves a message, it will callback.
 export default (client: client, tempDB: DB, onlineSince: number) => (
@@ -49,38 +50,9 @@ export default (client: client, tempDB: DB, onlineSince: number) => (
 
   // Commands from on forth.
   // Help command.
-  if (command.startsWith('/help') || command.startsWith('/halp')) {
-    sendResponse(`
-    **Jony Ive can do many commands 📡**
-    \`/halp\` and \`/help\` - The most innovative help.
-**Games.**
-    \`/gunfight\` - For that good ol' fight bro.
-    \`/choose\` - Choose between multiple options.
-    \`/reverse\` - Reverse a sentence.
-    \`/8ball\` - Random answers to random questions.
-    \`/repeat\` - Repeat a string.
-**Random searches.**
-    \`/urban\` - Get an Urban Dictionary definition ;)
-    \`/cat\` and \`/dog\` - Random cats and dogs from <https://random.cat> and <https://dog.ceo>
-    \`/robohash\` - Take some text, make it a robot/monster/head/cat.
-    \`/zalgo\` \`/dezalgo\` - The zalgo demon's writing.
-    \`/astronomy-picture-of-the-day\` or \`/apod\`
-**Utilities.**
-    TP \`/request\` - Request a specific feature.
-    \`/say\` - Say something, even in another channel.
-    \`/avatar\` - Avatar of a user.
-    \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
-    \`/addrole\` and \`/removerole\`
-    AD \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
-    AD \`/togglepublicroles\` - Enable public roles.
-
-**There are some easter egg auto responses.**
-**Commands with TP are test pilot only.**
-**Commands with AD are admin/helper only.**
-    `)
-
-    // Auto responses and easter eggs.
-  } else if (command.startsWith('is dot a good boy')) sendResponse('Shame on you. He\'s undefined.')
+  if (command.startsWith('/help') || command.startsWith('/halp')) help(message, client, channelID, userID)
+  // Auto responses and easter eggs.
+  else if (command.startsWith('is dot a good boy')) sendResponse('Shame on you. He\'s undefined.')
   else if (command.startsWith('iphone x')) sendResponse(`You don't deserve it. 😎`)
   else if (command.startsWith('triggered')) sendResponse('Ah, pathetic people again.')
   else if (command.startsWith('ayy')) sendResponse('lmao')
