@@ -11,8 +11,8 @@ export default {
     }, info)
   },
   Mutation: {
-    warn: (parent, {warnedId, warnerId, reason}, ctx, info) => ctx.db.mutation.createWarningDiscord(
-      { data: { warnedId, warnerId, reason, date: new Date().toUTCString() } },
+    warn: (parent, {warnedId, warnerId, reason, serverId}, ctx, info) => ctx.db.mutation.createWarningDiscord(
+      { data: { warnedId, warnerId, reason, date: new Date().toUTCString(), serverId } },
       info
     ),
     editServerSettings: (parent, { serverId, addRoleForAll }, ctx, info) => ctx.db.mutation.updateManyServerSettings(

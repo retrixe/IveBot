@@ -413,6 +413,7 @@ mutation {
   }
 }
   `
+  console.log(mutation)
   // Tell the database via our API about this.
   let warned = true
   const port = parseInt(process.env.PORT, 10) || 3000 // If port variable has been set.
