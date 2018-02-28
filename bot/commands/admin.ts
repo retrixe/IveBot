@@ -405,9 +405,10 @@ export function handleWarn (client: client, event: event, sendResponse: Function
   // Reason.
   const reason = getArguments(getArguments(message))
   // Set up the mutation.
+  const serverID = client.channels[event.d.channel_id].guild_id
   const mutation = `
 mutation {
-  warn(warnedId: "${userID}", warnerId: "${event.d.author.id}", reason: "${reason}") {
+  warn(warnedId: "${userID}", warnerId: "${event.d.author.id}", reason: "${reason}", serverId: "${serverID}") {
     date
   }
 }
