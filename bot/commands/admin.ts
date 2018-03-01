@@ -212,7 +212,22 @@ export function handleBan (client: client, event: event, sendResponse: Function,
         to: userID,
         message: `You have been banned from ${serverName} for ${getArguments(getArguments(message))}.`
       })
-    } else client.sendMessage({ to: userID, message: `You have been banned from ${serverName}.` })
+      // WeChill
+      if (client.channels[event.d.channel_id].guild_id === '402423671551164416') {
+        client.sendMessage({ to: '402437089557217290',
+          message: `**${user.username}#${user.discriminator}** has been banned for **${getArguments(getArguments(message))}**.`
+        })
+      }
+    } else {
+      client.sendMessage({ to: userID, message: `You have been banned from ${serverName}.` })
+      // WeChill
+      if (client.channels[event.d.channel_id].guild_id === '402423671551164416') {
+        client.sendMessage({
+          to: '402437089557217290',
+          message: `**${user.username}#${user.discriminator}** has been banned for not staying chill >:L `
+        })
+      }
+    }
   }, 1000)
 }
 
@@ -258,7 +273,23 @@ export function handleKick (client: client, event: event, sendResponse: Function
         to: userID,
         message: `You have been kicked from ${serverName} for ${getArguments(getArguments(message))}.`
       })
-    } else client.sendMessage({ to: userID, message: `You have been kicked from ${serverName}.` })
+      // WeChill
+      if (client.channels[event.d.channel_id].guild_id === '402423671551164416') {
+        client.sendMessage({
+          to: '402437089557217290',
+          message: `**${user.username}#${user.discriminator}** has been kicked for **${getArguments(getArguments(message))}**.`
+        })
+      }
+    } else {
+      // WeChill
+      if (client.channels[event.d.channel_id].guild_id === '402423671551164416') {
+        client.sendMessage({
+          to: '402437089557217290',
+          message: `**${user.username}#${user.discriminator}** has been kicked for not staying chill >:L `
+        })
+      }
+      client.sendMessage({ to: userID, message: `You have been kicked from ${serverName}.` })
+    }
   }, 1000)
 }
 
