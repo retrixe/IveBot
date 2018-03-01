@@ -196,7 +196,7 @@ export function handleBan (client: client, event: event, sendResponse: Function,
     serverID: client.channels[event.d.channel_id].guild_id,
     userID
   }, (err: { statusMessage: string }) => {
-    if (err.statusMessage === 'FORBIDDEN') {
+    if (err) {
       sendResponse('I can\'t ban that person.')
       banned = false
       return
