@@ -15,6 +15,10 @@ export default {
       { data: { warnedId, warnerId, reason, date: new Date().toUTCString(), serverId } },
       info
     ),
+    clearWarns: (parent, { userId, serverId }, ctx, info) => ctx.db.mutation.deleteManyWarningDiscords(
+      { where: { userId, serverId } },
+      info
+    ),
     editServerSettings: (parent, { serverId, addRoleForAll }, ctx, info) => ctx.db.mutation.updateManyServerSettings(
       { data: { addRoleForAll, serverId }, where: { serverId } },
       info

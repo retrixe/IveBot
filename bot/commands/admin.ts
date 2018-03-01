@@ -1,4 +1,4 @@
-import { getArguments, getIdFromMention, getServerSettings } from '../imports/tools'
+import { getArguments, getIdFromMention } from '../imports/tools'
 import { checkUserForPermission, checkRolePosition } from '../imports/permissions'
 import * as ms from 'ms'
 import { request } from 'graphql-request'
@@ -6,13 +6,15 @@ import { request } from 'graphql-request'
 import { client, event, roleType } from '../imports/types'
 
 // Add role.
-export async function handleAddrole (client: client, event: event, sendResponse: Function, message: string) {
+export function handleAddrole (
+  client: client, event: event, sendResponse: Function, message: string,
+  serverSettings: { addRoleForAll: boolean }
+) {
   // Check for enough arguments.
   if (message.split(' ').length <= 1) return
   // Check for permissions.
   let allowed = false
   // Check user for permissions.
-  const serverSettings = await getServerSettings(client.channels[event.d.channel_id].guild_id)
   if (checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'GENERAL_MANAGE_ROLES')) allowed = true
   else if (serverSettings.addRoleForAll) allowed = true
   if (!allowed) {
@@ -20,7 +22,9 @@ export async function handleAddrole (client: client, event: event, sendResponse:
     return
   }
   // Check if add to another user.
-  const possibleUser = getIdFromMention(getArguments(message).split(' ')[0])
+  let possibleUser = getIdFromMention(getArguments(message).split(' ')[0])
+  const possibleUser2 = getArguments(message).split(' ')[0]
+  if (possibleUser2 in client.users) possibleUser = possibleUser2
   if (possibleUser in client.users) {
     // Role name.
     const role = getArguments(getArguments(message))
@@ -67,13 +71,15 @@ export async function handleAddrole (client: client, event: event, sendResponse:
 }
 
 // Remove role.
-export async function handleRemoverole (client: client, event: event, sendResponse: Function, message: string) {
+export function handleRemoverole (
+  client: client, event: event, sendResponse: Function, message: string,
+  serverSettings: { addRoleForAll: boolean }
+) {
   // Check for enough arguments.
   if (message.split(' ').length <= 1) return
   // Check for permissions.
   let allowed = false
   // Check user for permissions.
-  const serverSettings = await getServerSettings(client.channels[event.d.channel_id].guild_id)
   if (checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'GENERAL_MANAGE_ROLES')) allowed = true
   else if (serverSettings.addRoleForAll) allowed = true
   if (!allowed) {
@@ -82,7 +88,9 @@ export async function handleRemoverole (client: client, event: event, sendRespon
   }
   // Respect role order.
   // Check if add to another user.
-  const possibleUser = getIdFromMention(getArguments(message).split(' ')[0])
+  let possibleUser = getIdFromMention(getArguments(message).split(' ')[0])
+  const possibleUser2 = getArguments(message).split(' ')[0]
+  if (possibleUser2 in client.users) possibleUser = possibleUser2
   if (possibleUser in client.users) {
     // Role name.
     const role = getArguments(getArguments(message))
@@ -113,7 +121,10 @@ export async function handleRemoverole (client: client, event: event, sendRespon
 }
 
 // Toggle public role system.
-export async function handleTogglepublicroles (client: client, event: event, sendResponse: Function, message: string) {
+export async function handleTogglepublicroles (
+  client: client, event: event, sendResponse: Function, message: string,
+  serverSettings: { addRoleForAll: boolean }
+) {
   // Can person manage server?
   if (!checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'GENERAL_MANAGE_GUILD')) {
     sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
@@ -121,7 +132,6 @@ export async function handleTogglepublicroles (client: client, event: event, sen
   }
   // Query.
   const port = parseInt(process.env.PORT, 10) || 3000 // If port variable has been set.
-  const serverSettings = await getServerSettings(client.channels[event.d.channel_id].guild_id)
   // If no arguments..
   if (message.split(' ').length === 1) {
     // eslint-disable-next-line typescript/no-explicit-any
@@ -168,14 +178,16 @@ export function handleBan (client: client, event: event, sendResponse: Function,
     return
   }
   // Check for valid user.
+  let userID = getIdFromMention(getArguments(message).split(' ')[0])
+  const ifUserId = getArguments(message).split(' ')[0]
+  if (ifUserId in client.users) userID = ifUserId
   // eslint-disable-next-line no-unused-vars
-  const a = client.users[getIdFromMention(getArguments(message).split(' ')[0])]
+  const a = client.users[userID]
   if (!a) {
     sendResponse('Please specify a valid user.')
     return
   }
   // Get information about user.
-  const userID = getIdFromMention(getArguments(message).split(' ')[0])
   const user = client.users[userID]
   const serverName = client.servers[client.channels[event.d.channel_id].guild_id].name
   // and.. cut.
@@ -212,14 +224,16 @@ export function handleKick (client: client, event: event, sendResponse: Function
     return
   }
   // Check for valid user.
+  let userID = getIdFromMention(getArguments(message).split(' ')[0])
+  const ifUserId = getArguments(message).split(' ')[0]
+  if (ifUserId in client.users) userID = ifUserId
   // eslint-disable-next-line no-unused-vars
-  const a = client.users[getIdFromMention(getArguments(message).split(' ')[0])]
+  const a = client.users[userID]
   if (!a) {
     sendResponse('Please specify a valid user.')
     return
   }
   // Get information about user.
-  const userID = getIdFromMention(getArguments(message).split(' ')[0])
   const user = client.users[userID]
   const serverName = client.servers[client.channels[event.d.channel_id].guild_id].name
   // and.. cut.
@@ -256,7 +270,9 @@ export function handleUnban (client: client, event: event, sendResponse: Functio
     return
   }
   // Get information about user.
-  const userID = getIdFromMention(getArguments(message).split(' ')[0])
+  let userID = getIdFromMention(getArguments(message).split(' ')[0])
+  const ifUserId = getArguments(message).split(' ')[0]
+  if (ifUserId in client.users) userID = ifUserId
   const user = client.users[userID]
   // Unban the person.
   client.unban({
@@ -280,7 +296,9 @@ export function handleMute (client: client, event: event, sendResponse: Function
     return
   }
   // userID.
-  const userID = getIdFromMention(getArguments(message).split(' ')[0])
+  let userID = getIdFromMention(getArguments(message).split(' ')[0])
+  const ifUserId = getArguments(message).split(' ')[0]
+  if (ifUserId in client.users) userID = ifUserId
   // Find a Muted role.
   const roles = client.servers[client.channels[event.d.channel_id].guild_id].roles
   // Sorry for the any.. but no other way :|
@@ -354,15 +372,16 @@ export function handleUnmute (client: client, event: event, sendResponse: Functi
     return
   }
   // Check for valid user.
+  let userID = getIdFromMention(getArguments(message).split(' ')[0])
+  const ifUserId = getArguments(message).split(' ')[0]
+  if (ifUserId in client.users) userID = ifUserId
   // eslint-disable-next-line no-unused-vars
-  const a = client.users[getIdFromMention(getArguments(message).split(' ')[0])]
+  const a = client.users[userID]
   if (!a) {
     sendResponse('Please specify a valid user.')
     return
   }
 
-  // userID.
-  const userID = getIdFromMention(getArguments(message).split(' ')[0])
   // All roles of user and server.
   const roles = client.servers[client.channels[event.d.channel_id].guild_id].members[userID].roles
   const rolesOfServer = client.servers[client.channels[event.d.channel_id].guild_id].roles
@@ -392,8 +411,11 @@ export function handleWarn (client: client, event: event, sendResponse: Function
     return
   }
   // Check for valid user.
+  let userID = getIdFromMention(getArguments(message).split(' ')[0])
+  const ifUserId = getArguments(message).split(' ')[0]
+  if (ifUserId in client.users) userID = ifUserId
   // eslint-disable-next-line no-unused-vars
-  const a = client.users[getIdFromMention(getArguments(message).split(' ')[0])]
+  const a = client.users[userID]
   if (!a) {
     sendResponse('Please specify a valid user.')
     return
@@ -401,7 +423,6 @@ export function handleWarn (client: client, event: event, sendResponse: Function
 
   // userID and server name.
   const serverName = client.servers[client.channels[event.d.channel_id].guild_id].name
-  const userID = getIdFromMention(getArguments(message).split(' ')[0])
   // Reason.
   const reason = getArguments(getArguments(message))
   // Set up the mutation.
@@ -429,7 +450,7 @@ mutation {
         message: `You have been warned in ${serverName} for: ${reason}.`
       })
       const user = client.users[userID]
-      sendResponse(`**${user.username}#${user.discriminator}** has been warned. **sorry.**`)
+      sendResponse(`**${user.username}#${user.discriminator}** has been warned. **lol.**`)
     }
   }, 1000)
 }

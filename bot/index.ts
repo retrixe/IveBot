@@ -25,11 +25,11 @@ import {
 
 // We need types.
 import { client, event, DB } from './imports/types'
-import { getArguments } from './imports/tools'
+import { getArguments, getServerSettings } from './imports/tools'
 import help from './commands/help'
 
 // When client recieves a message, it will callback.
-export default (client: client, tempDB: DB, onlineSince: number) => (
+export default (client: client, tempDB: DB, onlineSince: number) => async (
   user: string,
   userID: string,
   channelID: string,
@@ -104,12 +104,6 @@ export default (client: client, tempDB: DB, onlineSince: number) => (
   else if (command.startsWith('/unmute')) handleUnmute(client, event, sendResponse, message)
   // Warn.
   else if (command.startsWith('/warn')) handleWarn(client, event, sendResponse, message)
-  // Add role.
-  else if (command.startsWith('/addrole')) handleAddrole(client, event, sendResponse, message)
-  // Remove role.
-  else if (command.startsWith('/removerole')) handleRemoverole(client, event, sendResponse, message)
-  // Toggle public role system.
-  else if (command.startsWith('/togglepublicroles')) handleTogglepublicroles(client, event, sendResponse, message)
   // Version and about.
   else if (command.startsWith('/version')) sendResponse(`**IveBot ${version}**`)
   else if (command.startsWith('/about')) {
@@ -141,4 +135,18 @@ For noobs, this bot is licensed and protected by law. Copy code and I will sue y
     })
   } else if (command.startsWith('/uptime')) sendResponse(ms(Math.abs(new Date().getTime()) - onlineSince, { long: true }))
   else if (command.startsWith('/remoteexec') && userID === '305053306835697674') sendResponse(execSync(getArguments(message), { encoding: 'utf8' }))
+  // Certain commands rely on server settings. I hope we can await for them.
+  // Add role.
+  else if (command.startsWith('/addrole')) {
+    const serverSettings = await getServerSettings(client.channels[event.d.channel_id].guild_id)
+    handleAddrole(client, event, sendResponse, message, serverSettings)
+    // Remove role.
+  } else if (command.startsWith('/removerole')) {
+    const serverSettings = await getServerSettings(client.channels[event.d.channel_id].guild_id)
+    handleRemoverole(client, event, sendResponse, message, serverSettings)
+    // Toggle public role system.
+  } else if (command.startsWith('/togglepublicroles')) {
+    const serverSettings = await getServerSettings(client.channels[event.d.channel_id].guild_id)
+    handleTogglepublicroles(client, event, sendResponse, message, serverSettings)
+  }
 }
