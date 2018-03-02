@@ -46,6 +46,29 @@ const tempDB = {gunfight: []}
 // When client recieves a message, it will callback.
 client.on('message', botCallback(client, tempDB, onlineSince))
 
+// WeChill specific configuration.
+client.on('guildMemberAdd', (member, event) => {
+  if (member.guild_id === '402423671551164416') {
+    client.sendMessage({
+      to: '402437089557217290',
+      message: `Yoyo <@${member.id}> welcome to WeChill, stay chill.`
+    })
+    client.addToRole({
+      serverID: member.guild_id,
+      userID: member.id,
+      roleID: '402429353096642561'
+    })
+  }
+})
+client.on('guildMemberRemove', (member, event) => {
+  if (member.guild_id === '402423671551164416') {
+    client.sendMessage({
+      to: '402437089557217290',
+      message: `Well ${event.d.user.username}#${event.d.user.discriminator} left us.`
+    })
+  }
+})
+
 // Export some stuff for our server to use, you know.
 export default {
   tempDB,

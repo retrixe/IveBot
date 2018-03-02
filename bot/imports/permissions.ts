@@ -8,7 +8,7 @@ type client = { /* eslint-disable no-undef */
     }
   },
   users: {
-    [index: string]: { userID: string, username: string, discriminator: string }
+    [index: string]: { id: string, username: string, discriminator: string }
   },
 } /* eslint-enable no-undef */
 

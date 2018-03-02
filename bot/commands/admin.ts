@@ -25,6 +25,9 @@ export function handleAddrole (
   let possibleUser = getIdFromMention(getArguments(message).split(' ')[0])
   const possibleUser2 = getArguments(message).split(' ')[0]
   if (possibleUser2 in client.users) possibleUser = possibleUser2
+  else if (
+    Object.values(client.users).find(a => a.username.toLocaleLowerCase() === possibleUser2.toLocaleLowerCase())
+  ) possibleUser = Object.values(client.users).find(a => a.username.toLocaleLowerCase() === possibleUser2.toLocaleLowerCase()).id
   if (possibleUser in client.users) {
     // Role name.
     const role = getArguments(getArguments(message))
@@ -91,6 +94,9 @@ export function handleRemoverole (
   let possibleUser = getIdFromMention(getArguments(message).split(' ')[0])
   const possibleUser2 = getArguments(message).split(' ')[0]
   if (possibleUser2 in client.users) possibleUser = possibleUser2
+  else if (
+    Object.values(client.users).find(a => a.username.toLocaleLowerCase() === possibleUser2.toLocaleLowerCase())
+  ) possibleUser = Object.values(client.users).find(a => a.username.toLocaleLowerCase() === possibleUser2.toLocaleLowerCase()).id
   if (possibleUser in client.users) {
     // Role name.
     const role = getArguments(getArguments(message))
@@ -181,6 +187,9 @@ export function handleBan (client: client, event: event, sendResponse: Function,
   let userID = getIdFromMention(getArguments(message).split(' ')[0])
   const ifUserId = getArguments(message).split(' ')[0]
   if (ifUserId in client.users) userID = ifUserId
+  else if (
+    Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase())
+  ) userID = Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase()).id
   // eslint-disable-next-line no-unused-vars
   const a = client.users[userID]
   if (!a) {
@@ -242,6 +251,9 @@ export function handleKick (client: client, event: event, sendResponse: Function
   let userID = getIdFromMention(getArguments(message).split(' ')[0])
   const ifUserId = getArguments(message).split(' ')[0]
   if (ifUserId in client.users) userID = ifUserId
+  else if (
+    Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase())
+  ) userID = Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase()).id
   // eslint-disable-next-line no-unused-vars
   const a = client.users[userID]
   if (!a) {
@@ -304,6 +316,9 @@ export function handleUnban (client: client, event: event, sendResponse: Functio
   let userID = getIdFromMention(getArguments(message).split(' ')[0])
   const ifUserId = getArguments(message).split(' ')[0]
   if (ifUserId in client.users) userID = ifUserId
+  else if (
+    Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase())
+  ) userID = Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase()).id
   const user = client.users[userID]
   // Unban the person.
   client.unban({
@@ -330,6 +345,9 @@ export function handleMute (client: client, event: event, sendResponse: Function
   let userID = getIdFromMention(getArguments(message).split(' ')[0])
   const ifUserId = getArguments(message).split(' ')[0]
   if (ifUserId in client.users) userID = ifUserId
+  else if (
+    Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase())
+  ) userID = Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase()).id
   // Find a Muted role.
   const roles = client.servers[client.channels[event.d.channel_id].guild_id].roles
   // Sorry for the any.. but no other way :|
@@ -406,6 +424,9 @@ export function handleUnmute (client: client, event: event, sendResponse: Functi
   let userID = getIdFromMention(getArguments(message).split(' ')[0])
   const ifUserId = getArguments(message).split(' ')[0]
   if (ifUserId in client.users) userID = ifUserId
+  else if (
+    Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase())
+  ) userID = Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase()).id
   // eslint-disable-next-line no-unused-vars
   const a = client.users[userID]
   if (!a) {
@@ -445,6 +466,9 @@ export function handleWarn (client: client, event: event, sendResponse: Function
   let userID = getIdFromMention(getArguments(message).split(' ')[0])
   const ifUserId = getArguments(message).split(' ')[0]
   if (ifUserId in client.users) userID = ifUserId
+  else if (
+    Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase())
+  ) userID = Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase()).id
   // eslint-disable-next-line no-unused-vars
   const a = client.users[userID]
   if (!a) {
