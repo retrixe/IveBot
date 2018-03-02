@@ -1,5 +1,6 @@
 import * as fetch from 'isomorphic-unfetch'
 import { getArguments } from '../imports/tools'
+import * as moment from 'moment'
 // Get the NASA API token.
 import 'json5/lib/require'
 const { NASAtoken } = require('../../config.json5')
@@ -59,10 +60,27 @@ export function handleRobohash (message: string, sendResponse: Function) {
 }
 
 export function handleApod (message: string, sendResponse: Function) {
-  // Fetch a cat.
+  // Check for date.
+  const arrayOfDates = [
+    moment.ISO_8601, moment.RFC_2822, 'Do M YYYY', 'Do MM YYYY', 'Do MMM YYYY',
+    'Do MMMM YYYY', 'D M YYYY', 'D MM YYYY', 'D MMM YYYY', 'D MMMM YYYY'
+  ]
+  if (moment(getArguments(message), arrayOfDates).isValid()) {
+    const date = moment(getArguments(message), arrayOfDates).format('YYYY-MM-DD')
+    // Fetch a picture.
+    fetch(`https://api.nasa.gov/planetary/apod?api_key=${NASAtoken}&date=${date}`)
+      .then((res: { json: Function }) => res.json())
+      .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
+      .then((json: { url: string, title: string, explanation: string }
+      ) => sendResponse(json.title + '\n' + json.url + '\n' + json.explanation))
+    return
+  } else if (getArguments(message)) {
+    sendResponse('Invalid date. Sending today\'s APOD. ')
+  }
+  // Fetch a picture.
   fetch(`https://api.nasa.gov/planetary/apod?api_key=${NASAtoken}`)
     .then((res: { json: Function }) => res.json())
     .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
-    .then((json: { url: string, title: string, explanation: string }
-    ) => sendResponse(json.title + '\n' + json.url + '\n' + json.explanation))
+    .then((json: { hdurl: string, title: string, explanation: string }
+    ) => sendResponse(json.title + '\n' + json.hdurl + '\n' + json.explanation))
 }
