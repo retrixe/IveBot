@@ -5,12 +5,12 @@ import { version } from '../package.json'
 import * as ms from 'ms'
 import { execSync } from 'child_process'
 // Commands.
-import { handleRequest, handleSay, handleAvatar } from './commands/utilities'
+import { handleRequest, handleSay, handleEditLastSay, handleAvatar } from './commands/utilities'
 import {
   handleChoose,
   handleReverse,
   handle8Ball,
-  handleRepeat,
+  handleRepeat, handleRandom,
   handleZalgo, handleDezalgo
 } from './commands/games'
 import {
@@ -22,6 +22,7 @@ import {
   handleAddrole, handleRemoverole,
   handleTogglepublicroles
 } from './commands/admin'
+import { handleJoin } from './commands/music'
 
 // We need types.
 import { client, event, DB } from './imports/types'
@@ -58,40 +59,48 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
   else if (command.startsWith('ayy')) sendResponse('lmao')
 
   // Request something.
-  else if (command.startsWith('/request') && testPilot) handleRequest(client, userID, sendResponse, message)
+  else if ((command.startsWith('/request') || command.startsWith('/req')) && testPilot) handleRequest(client, userID, sendResponse, message)
   // Gunfight.
-  else if (command.startsWith('/gunfight')) handleGunfight(command, userID, sendResponse, tempDB, channelID)
+  else if (command.startsWith('/gunfight') || command.startsWith('/gfi')) handleGunfight(command, userID, sendResponse, tempDB, channelID)
   // Accept gunfight.
   else if (command.startsWith('/accept')) handleAccept(tempDB, userID, sendResponse, channelID)
   // Handle answers to gunfight.
   // else if (command in ['fire', 'water', 'gun', 'dot']) return
   // Choose.
-  else if (command.startsWith('/choose')) handleChoose(message, sendResponse)
+  else if (command.startsWith('/choose') || command.startsWith('/cho')) handleChoose(message, sendResponse)
+  // Random.
+  else if (command.startsWith('/random') || command.startsWith('/rand')) handleRandom(message, sendResponse)
   // Reverse.
-  else if (command.startsWith('/reverse')) handleReverse(message, sendResponse)
+  else if (command.startsWith('/reverse') || command.startsWith('/rev')) handleReverse(message, sendResponse)
   // 8ball.
   else if (command.startsWith('/8ball')) handle8Ball(message, sendResponse)
   // Repeat.
-  else if (command.startsWith('/repeat')) handleRepeat(message, sendResponse)
+  else if (command.startsWith('/repeat') || command.startsWith('/rep')) handleRepeat(message, sendResponse)
   // Urban.
-  else if (command.startsWith('/urban')) handleUrban(message, sendResponse)
+  else if (command.startsWith('/urban') || command.startsWith('/urb')) handleUrban(message, sendResponse)
   // Cats.
   else if (command.startsWith('/cat')) handleCat(message, sendResponse)
   // Dogs.
   else if (command.startsWith('/dog')) handleDog(message, sendResponse)
   // Zalgo.
-  else if (command.startsWith('/zalgo')) handleZalgo(message, sendResponse)
+  else if (command.startsWith('/zalgo') || command.startsWith('/zgo')) handleZalgo(message, sendResponse)
   // Dezalgo.
-  else if (command.startsWith('/dezalgo')) handleDezalgo(message, sendResponse)
+  else if (command.startsWith('/dezalgo') || command.startsWith('/dzgo')) handleDezalgo(message, sendResponse)
   // Robohash.
-  else if (command.startsWith('/robohash')) handleRobohash(message, sendResponse)
+  else if (
+    command.startsWith('/robohash') || command.startsWith('/robo') || command.startsWith('/rh')
+  ) handleRobohash(message, sendResponse)
   // Astronomy picture of the day.
   else if (command.startsWith('/apod') || command.startsWith('/astronomy-picture-of-the-day')) {
     handleApod(message, sendResponse)
   // Say.
-  } else if (command.startsWith('/say')) handleSay(message, sendResponse, client, event, testPilot)
+  } else if (command.startsWith('/say')) handleSay(message, sendResponse, client, event, testPilot, tempDB)
+  // Edit last say.
+  else if (
+    command.startsWith('/editLastSay') || command.startsWith('/els')
+  ) handleEditLastSay(message, sendResponse, client, event, testPilot, tempDB)
   // Avatar.
-  else if (command.startsWith('/avatar')) handleAvatar(message, sendResponse, client)
+  else if (command.startsWith('/avatar') || command.startsWith('/av')) handleAvatar(message, sendResponse, client)
   // Ban.
   else if (command.startsWith('/ban')) handleBan(client, event, sendResponse, message)
   // Unban.
@@ -104,6 +113,8 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
   else if (command.startsWith('/unmute')) handleUnmute(client, event, sendResponse, message)
   // Warn.
   else if (command.startsWith('/warn')) handleWarn(client, event, sendResponse, message)
+  // Music.
+  else if (command.startsWith('/join')) handleJoin(sendResponse, client, userID, channelID)
   // Version and about.
   else if (command.startsWith('/version')) sendResponse(`**IveBot ${version}**`)
   else if (command.startsWith('/about')) {
@@ -137,11 +148,11 @@ For noobs, this bot is licensed and protected by law. Copy code and I will sue y
   else if (command.startsWith('/remoteexec') && userID === '305053306835697674') sendResponse(execSync(getArguments(message), { encoding: 'utf8' }))
   // Certain commands rely on server settings. I hope we can await for them.
   // Add role.
-  else if (command.startsWith('/addrole')) {
+  else if (command.startsWith('/addrole') || command.startsWith('/ar')) {
     const serverSettings = await getServerSettings(client.channels[event.d.channel_id].guild_id)
     handleAddrole(client, event, sendResponse, message, serverSettings)
     // Remove role.
-  } else if (command.startsWith('/removerole')) {
+  } else if (command.startsWith('/removerole') || command.startsWith('/rr')) {
     const serverSettings = await getServerSettings(client.channels[event.d.channel_id].guild_id)
     handleRemoverole(client, event, sendResponse, message, serverSettings)
     // Toggle public role system.

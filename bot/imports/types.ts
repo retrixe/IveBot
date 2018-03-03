@@ -9,7 +9,8 @@ export type client = {
     [index: string]: {
       name: string,
       roles: { [index: string]: roleType },
-      members: { [index: string]: { roles: Array<string> } }
+      // eslint-disable-next-line camelcase
+      members: { [index: string]: { roles: Array<string>, voice_channel_id: boolean } }
     }
   },
   users: {
@@ -25,7 +26,8 @@ export type client = {
   removeFromRole: Function,
   createDMChannel: Function,
   deleteMessage: Function,
-  editMessage: Function
+  editMessage: Function,
+  joinVoiceChannel: Function
 }
 export type event = {
   d: {
@@ -45,6 +47,10 @@ export type DB = {
     accepted: boolean,
     randomWord: string,
     channelID: string
-  }>
+  }>,
+  say: {
+    // Channels.
+    [index: string]: string
+  }
 }
 /* eslint-enable no-undef */

@@ -1,7 +1,7 @@
 import { getArguments, getIdFromMention } from '../imports/tools'
 import { checkUserForPermission } from '../imports/permissions'
 // Get types.
-import { client, event } from '../imports/types'
+import { client, event, DB } from '../imports/types'
 
 export function handleRequest (client: client, userID: string, sendResponse: Function, message: string) {
   client.createDMChannel('305053306835697674')
@@ -14,7 +14,7 @@ You may recieve a response soon, and you can keep track here:
 <https://github.com/retrixe/IveBot/projects/1>`)
 }
 
-export function handleSay (message: string, sendResponse: Function, client: client, event: event, testPilot: string) {
+export function handleSay (message: string, sendResponse: Function, client: client, event: event, testPilot: string, db: DB) {
   // Check for enough permissions.
   let check = false
   if (checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'TEXT_MANAGE_MESSAGES')) check = true
@@ -28,11 +28,42 @@ export function handleSay (message: string, sendResponse: Function, client: clie
   // Should it be sent to another channel?
   const possibleChannel = getIdFromMention(getArguments(message).split(' ')[0])
   if (possibleChannel in client.channels) {
-    client.sendMessage({ to: possibleChannel, message: getArguments(getArguments(message)) })
+    client.sendMessage({ to: possibleChannel, message: getArguments(getArguments(message)) }, (err: string, { id }: { id: string }) => {
+      if (err) sendResponse('There was an error processing your request.')
+      else db.say[possibleChannel] = id
+    })
     return
   }
   // Send the message all over again.
-  sendResponse(getArguments(message))
+  sendResponse(getArguments(message), (err: string, { id }: { id: string }) => {
+    if (err) sendResponse('There was an error processing your request.')
+    else db.say[event.d.channel_id] = id
+  })
+}
+
+export function handleEditLastSay (message: string, sendResponse: Function, client: client, event: event, testPilot: string, db: DB) {
+  // Check for enough permissions.
+  let check = false
+  if (checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'TEXT_MANAGE_MESSAGES')) check = true
+  else if (testPilot) check = true
+  if (!check) {
+    sendResponse('You cannot fool me. You do not have enough permissions.')
+    return
+  }
+  // Delete the message.
+  client.deleteMessage({ channelID: event.d.channel_id, messageID: event.d.id })
+  // Should it be edited in another channel?
+  const possibleChannel = getIdFromMention(getArguments(message).split(' ')[0])
+  if (possibleChannel in client.channels) {
+    client.editMessage({
+      message: getArguments(getArguments(message)), channelID: possibleChannel, messageID: db.say[possibleChannel]
+    }, (err: string) => { if (err) sendResponse('Nothing to edit.') })
+    return
+  }
+  // Send the message all over again.
+  client.editMessage({
+    message: getArguments(message), channelID: event.d.channel_id, messageID: db.say[event.d.channel_id]
+  }, (err: string) => { if (err) sendResponse('Nothing to edit.') })
 }
 
 export function handleAvatar (message: string, sendResponse: Function, client: client) {
