@@ -33,24 +33,32 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
 **There are some easter egg auto responses.**
 **Commands with TP are test pilot only.**`
 
-const generateDocs = (commandUsage: string, description: string, example: string, aliases?: string) => {
-  if (aliases) {
+const createHelpObject = (commandUsage: string, description: string, example: string, aliases?: string) => {
+  return {
+    commandUsage,
+    aliases,
+    description,
+    example
+  }
+}
+const b = createHelpObject // Short hand.
+const generateDocs = (a: { commandUsage: string, description: string, example: string, aliases?: string }) => {
+  if (a.aliases) {
     return `
-**Usage:** ${commandUsage}
-**Aliases:** ${aliases}
-**Description:** ${description}
-**Example:** ${example}
+**Usage:** ${a.commandUsage}
+**Aliases:** ${a.aliases}
+**Description:** ${a.description}
+**Example:** ${a.example}
 Arguments in () are optional :P
     `
   }
   return `
-**Usage:** ${commandUsage}
-**Description:** ${description}
-**Example:** ${example}
+**Usage:** ${a.commandUsage}
+**Description:** ${a.description}
+**Example:** ${a.example}
 Arguments in () are optional :P
   `
 }
-const b = generateDocs // Short hand.
 
 const commandDocs: { [index: string]: any } = {
   'help': b('/help (command name)', 'The most innovative halp.', '/help zalgo', '/halp'),
@@ -100,8 +108,15 @@ const commandDocs: { [index: string]: any } = {
 }
 
 export default function help (message: string, client: client, c: string, u: string) {
-  if (getArguments(message).trim() in commandDocs) {
-    client.sendMessage({ to: c, message: commandDocs[getArguments(message).trim()] })
+  if (getArguments(message).trim().split('/').join('') in commandDocs) {
+    client.sendMessage({
+      to: c, message: generateDocs(commandDocs[getArguments(message).trim().split('/').join('')])
+    })
+    return
+  } else if (getArguments(message)) {
+    client.sendMessage({
+      to: c, message: 'Incorrect parameters. Run /help for general help.'
+    })
     return
   }
   client.createDMChannel(u)
@@ -115,5 +130,5 @@ export default function help (message: string, client: client, c: string, u: str
     },
     to: u
   })
-  client.sendMessage({ to: c, message: 'nob, help has been direct messaged to you ✅' })
+  client.sendMessage({ to: c, message: 'newbie, help has been direct messaged to you ✅' })
 }

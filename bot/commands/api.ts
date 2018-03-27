@@ -24,7 +24,7 @@ export function handleUrban (message: string, sendResponse: Function) {
 
 export function handleCat (message: string, sendResponse: Function) {
   // Fetch a cat.
-  fetch(`http://random.cat/meow`)
+  fetch(`http://aws.random.cat/meow`)
     .then((res: { json: Function }) => res.json())
     .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
     .then((json: { file: string }) => sendResponse(json.file))

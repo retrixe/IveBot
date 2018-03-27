@@ -50,6 +50,47 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
   const testPilot: string = testPilots.find((user: string) => user === userID)
 
   // Commands from on forth.
+  // This object represents all commands that accept only (message, sendResponse) as args.
+  const commandMaps: {[index: string]: Function} = {
+    // Choose.
+    '/choose': handleChoose,
+    '/cho': handleChoose,
+    // Random.
+    '/random': handleRandom,
+    '/rand': handleRandom,
+    // Reverse.
+    '/reverse': handleReverse,
+    '/rev': handleReverse,
+    // 8ball.
+    '/8ball': handle8Ball,
+    // Repeat.
+    '/repeat': handleRepeat,
+    '/rep': handleRepeat,
+    // Urban.
+    '/urban': handleUrban,
+    '/urb': handleUrban,
+    // Cat.
+    '/cat': handleCat,
+    // Dog.
+    '/dog': handleDog,
+    // Zalgo.
+    '/zalgo': handleZalgo,
+    '/zgo': handleZalgo,
+    // Dezalgo.
+    '/dezalgo': handleDezalgo,
+    '/dzgo': handleDezalgo,
+    // Robohash.
+    '/robohash': handleRobohash,
+    '/robo': handleRobohash,
+    '/rh': handleRobohash,
+    // Astronomy picture of the day.
+    '/astronomy-picture-of-the-day': handleApod,
+    '/apod': handleApod
+  }
+  // Check for the above commands.
+  for (let i = 0; i < Object.keys(commandMaps).length; i++) {
+    if (command.startsWith(Object.keys(commandMaps)[i])) commandMaps[Object.keys(commandMaps)[i]](message, sendResponse)
+  }
   // Help command.
   if (command.startsWith('/help') || command.startsWith('/halp')) help(message, client, channelID, userID)
   // Auto responses and easter eggs.
@@ -57,7 +98,7 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
   else if (command.startsWith('iphone x')) sendResponse(`You don't deserve it. 😎`)
   else if (command.startsWith('triggered')) sendResponse('Ah, pathetic people again.')
   else if (command.startsWith('ayy')) sendResponse('lmao')
-
+  else if (command.startsWith('shawarma')) sendResponse('http://www.recipetineats.com/wp-content/uploads/2014/12/Chicken-Shawarma_4.jpg')
   // Request something.
   else if ((command.startsWith('/request') || command.startsWith('/req')) && testPilot) handleRequest(client, userID, sendResponse, message)
   // Gunfight.
@@ -66,35 +107,8 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
   else if (command.startsWith('/accept')) handleAccept(tempDB, userID, sendResponse, channelID)
   // Handle answers to gunfight.
   // else if (command in ['fire', 'water', 'gun', 'dot']) return
-  // Choose.
-  else if (command.startsWith('/choose') || command.startsWith('/cho')) handleChoose(message, sendResponse)
-  // Random.
-  else if (command.startsWith('/random') || command.startsWith('/rand')) handleRandom(message, sendResponse)
-  // Reverse.
-  else if (command.startsWith('/reverse') || command.startsWith('/rev')) handleReverse(message, sendResponse)
-  // 8ball.
-  else if (command.startsWith('/8ball')) handle8Ball(message, sendResponse)
-  // Repeat.
-  else if (command.startsWith('/repeat') || command.startsWith('/rep')) handleRepeat(message, sendResponse)
-  // Urban.
-  else if (command.startsWith('/urban') || command.startsWith('/urb')) handleUrban(message, sendResponse)
-  // Cats.
-  else if (command.startsWith('/cat')) handleCat(message, sendResponse)
-  // Dogs.
-  else if (command.startsWith('/dog')) handleDog(message, sendResponse)
-  // Zalgo.
-  else if (command.startsWith('/zalgo') || command.startsWith('/zgo')) handleZalgo(message, sendResponse)
-  // Dezalgo.
-  else if (command.startsWith('/dezalgo') || command.startsWith('/dzgo')) handleDezalgo(message, sendResponse)
-  // Robohash.
-  else if (
-    command.startsWith('/robohash') || command.startsWith('/robo') || command.startsWith('/rh')
-  ) handleRobohash(message, sendResponse)
-  // Astronomy picture of the day.
-  else if (command.startsWith('/apod') || command.startsWith('/astronomy-picture-of-the-day')) {
-    handleApod(message, sendResponse)
   // Say.
-  } else if (command.startsWith('/say')) handleSay(message, sendResponse, client, event, testPilot, tempDB)
+  else if (command.startsWith('/say')) handleSay(message, sendResponse, client, event, testPilot, tempDB)
   // Edit last say.
   else if (
     command.startsWith('/editLastSay') || command.startsWith('/els')
