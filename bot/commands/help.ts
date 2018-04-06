@@ -95,7 +95,7 @@ const commandDocs: { [index: string]: any } = {
     'Add role to yourself/user. Usually Manager/Mod only unless togglepublicroles is on.', '/addrole @voldemort#6931 Helper', '/ar'),
   'removerole': b('/removerole (user) <role>',
     'Remove role from yourself/user. Usually Manager/Mod only unless togglepublicroles is on.', '/removerole @voldemort#6931 Helper', '/rr'),
-  'ban': b('/ban <user by ID/username/mention> (reason)', 'Ban someone.', '/ban voldemort you is suck'),
+  'ban': b('/ban <user by ID/username/mention> (reason)', 'Ban someone.', '/ban voldemort you is suck', '/banana'),
   'unban': b('/unban <user by ID/username/mention> (reason)', 'Unban someone.', '/unban voldemort wrong person'),
   'kick': b('/kick <user by ID/username/mention> (reason)', 'Kick someone.', '/kick voldemort you is suck'),
   'mute': b('/mute <user by ID/username/mention> (time limit) (reason)', 'Mute someone. Compatible with Dyno.', '/mute voldemort 1h bored'),
