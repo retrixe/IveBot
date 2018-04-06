@@ -14,7 +14,17 @@ export function handleUrban (message: string, sendResponse: Function) {
   // If there is a definition, it will be sent successfully.
     .then((json: { list: Array<{ definition: string }> }) => {
       try {
-        sendResponse(`\`\`\`${json.list[0].definition.trimLeft().trimRight()}\`\`\``)
+        let response = json.list[0].definition.trim()
+        if (response.length > 1900) {
+          const splitRes = response.split('')
+          response = ''
+          for (let i = 0; i < 595; i += 1) response += splitRes[i]
+          response += '[...]'
+        }
+        sendResponse(`
+        **🍸 Definition of ${getArguments(message)}:**
+        \`\`\`${response}\`\`\`
+        `)
         // Else, there will be an exception thrown.
       } catch (err) {
         sendResponse('No definition was found.')
@@ -36,12 +46,13 @@ export function handleDog (message: string, sendResponse: Function) {
       .then((res: { json: Function }) => res.json())
       .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
       .then((json: { message: string }) => sendResponse(json.message))
+  } else {
+    // Fetch a dog.
+    fetch(`http://dog.ceo/api/breeds/image/random`)
+      .then((res: { json: Function }) => res.json())
+      .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
+      .then((json: { message: string }) => sendResponse(json.message))
   }
-  // Fetch a dog.
-  fetch(`http://dog.ceo/api/breeds/image/random`)
-    .then((res: { json: Function }) => res.json())
-    .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
-    .then((json: { message: string }) => sendResponse(json.message))
 }
 
 export function handleRobohash (message: string, sendResponse: Function) {

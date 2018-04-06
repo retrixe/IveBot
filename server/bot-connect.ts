@@ -37,7 +37,9 @@ client.on('ready', () => {
 // Disconnection from Discord will trigger the following.
 client.on('disconnect', (errMsg, code) => {
   console.log('Error:\n', errMsg, code)
-  throw new Error('Error:\n' + ' ' + errMsg + ' ' + code)
+  const dev = process.env.NODE_ENV !== 'production'
+  if (!dev) throw new Error('Error:\n' + ' ' + errMsg + ' ' + code)
+  else client.connect()
 })
 
 // Create a database to handle certain stuff.

@@ -66,7 +66,8 @@ export function handleEditLastSay (message: string, sendResponse: Function, clie
   }, (err: string) => { if (err) sendResponse('Nothing to edit.') })
 }
 
-export function handleAvatar (message: string, sendResponse: Function, client: client) {
-  const userID = getIdFromMention(getArguments(message).split(' ')[0])
-  sendResponse(`https://cdn.discordapp.com/avatars/${userID}/${client.users[userID].avatar}.png`)
+export function handleAvatar (message: string, sendResponse: Function, client: client, userID: string) {
+  let user: string = getIdFromMention(getArguments(message).split(' ')[0])
+  if (!client.users[user].avatar) user = userID
+  sendResponse(`https://cdn.discordapp.com/avatars/${user}/${client.users[user].avatar}.png?size=2048`)
 }

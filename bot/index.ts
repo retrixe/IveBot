@@ -101,7 +101,7 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
     // Edit.
     // '/edit': () => client.editMessage({ message })
     // Avatar.
-    '/avatar': () => handleAvatar(message, sendResponse, client),
+    '/avatar': () => handleAvatar(message, sendResponse, client, userID),
     '/av': this['/avatar'],
     // Administrative commands.
     '/ban': () => handleBan(client, event, sendResponse, message),
