@@ -59,19 +59,5 @@
     "hooks": {
       "pre-commit": "npm run lint"
     }
-  },
-  "now": {
-    "files": [
-      "config.json5",
-      "bot",
-      "pages",
-      "server",
-      "yarn.lock",
-      "tsconfig.json",
-      "next.config.js"
-    ],
-    "env": {
-      "HUSKY_SKIP_INSTALL": "true"
-    }
   }
 }

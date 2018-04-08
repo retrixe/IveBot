@@ -19,6 +19,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/astronomy-picture-of-the-day\` or \`/apod\`
 **Utilities.**
     TP \`/request\` - Request a specific feature.
+    \`/weather\` - It's really cloudy here..
     \`/say\` - Say something, even in another channel.
     \`/editLastSay\` - Even if it was another channel.
     \`/avatar\` - Avatar of a user.
@@ -27,8 +28,6 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
 **Administrative commands.**
     \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
     \`/togglepublicroles\` - Enable public roles.
-**Music.**
-    \`/join\` - Join the channel.
 
 **There are some easter egg auto responses.**
 **Commands with TP are test pilot only.**`
@@ -104,7 +103,7 @@ const commandDocs: { [index: string]: any } = {
     'Enable public roles, which let members add roles to themselves. Roles lower than their highest role of course.',
     '/togglepublicroles on'
   ),
-  'join': b('/join', 'Join your voice channel.', '/join')
+  'weather': b('/weather <city name>(,country name)', 'What\'s the weather like at your place?', '/weather Shanghai,CN', '/wt')
 }
 
 export default function help (message: string, client: client, c: string, u: string) {

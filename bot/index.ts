@@ -14,7 +14,7 @@ import {
   handleZalgo, handleDezalgo
 } from './commands/games'
 import {
-  handleUrban, handleCat, handleDog, handleRobohash, handleApod
+  handleUrban, handleCat, handleDog, handleRobohash, handleApod, handleWeather
 } from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
 import {
@@ -87,25 +87,28 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
   const testPilot: string = testPilots.find((user: string) => user === userID)
   // Non-appendable commands which have to be re-defined on all callbacks. Taxing and waste of RAM.
   const commandMaps: { [index: string]: Function } = {
+    // Weather.
+    '/weather': () => handleWeather(message, sendResponse, client, channelID),
+    '/wt': () => handleWeather(message, sendResponse, client, channelID),
     // Request.
     '/request': () => { if (testPilot) handleRequest(client, userID, sendResponse, message) },
-    '/req': this['/request'],
+    '/req': () => { if (testPilot) handleRequest(client, userID, sendResponse, message) },
     // Gunfight.
     '/gunfight': () => handleGunfight(command, userID, sendResponse, tempDB, channelID),
-    '/gfi': this['/gunfight'],
+    '/gfi': () => handleGunfight(command, userID, sendResponse, tempDB, channelID),
     '/accept': () => handleAccept(tempDB, userID, sendResponse, channelID),
     // Say.
     '/say': () => handleSay(message, sendResponse, client, event, testPilot, tempDB),
     '/editLastSay': () => handleEditLastSay(message, sendResponse, client, event, testPilot, tempDB),
-    '/els': this['/editLastSay'],
+    '/els': () => handleEditLastSay(message, sendResponse, client, event, testPilot, tempDB),
     // Edit.
     // '/edit': () => client.editMessage({ message })
     // Avatar.
     '/avatar': () => handleAvatar(message, sendResponse, client, userID),
-    '/av': this['/avatar'],
+    '/av': () => handleAvatar(message, sendResponse, client, userID),
     // Administrative commands.
     '/ban': () => handleBan(client, event, sendResponse, message),
-    '/banana': this['/ban'],
+    '/banana': () => handleBan(client, event, sendResponse, message),
     '/unban': () => handleUnban(client, event, sendResponse, message),
     '/kick': () => handleKick(client, event, sendResponse, message),
     '/mute': () => handleMute(client, event, sendResponse, message),
@@ -148,7 +151,10 @@ For noobs, this bot is licensed and protected by law. Copy code and I will sue y
       const serverSettings = await getServerSettings(client.channels[event.d.channel_id].guild_id)
       handleAddrole(client, event, sendResponse, message, serverSettings)
     },
-    '/ar': this['/addrole'],
+    '/ar': async () => {
+      const serverSettings = await getServerSettings(client.channels[event.d.channel_id].guild_id)
+      handleAddrole(client, event, sendResponse, message, serverSettings)
+    },
     '/togglepublicroles': async () => {
       const serverSettings = await getServerSettings(client.channels[event.d.channel_id].guild_id)
       handleTogglepublicroles(client, event, sendResponse, message, serverSettings)
@@ -157,7 +163,10 @@ For noobs, this bot is licensed and protected by law. Copy code and I will sue y
       const serverSettings = await getServerSettings(client.channels[event.d.channel_id].guild_id)
       handleRemoverole(client, event, sendResponse, message, serverSettings)
     },
-    '/rr': this['/removerole']
+    '/rr': async () => {
+      const serverSettings = await getServerSettings(client.channels[event.d.channel_id].guild_id)
+      handleRemoverole(client, event, sendResponse, message, serverSettings)
+    }
   }
   // Check for the commands in appendableCommandMaps.
   for (let i = 0; i < Object.keys(appendableCommandMaps).length; i++) {

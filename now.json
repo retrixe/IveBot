@@ -1,0 +1,7 @@
+{
+  "dotenv": true,
+  "files": [
+    "bot", "database", "pages", "server", ".env", ".graphqlconfig.yml", ".config.json5",
+    "index.d.ts", "next.config.js", "package.json", "now.json", "tsconfig.json", "yarn.lock"
+  ]
+}
