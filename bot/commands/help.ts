@@ -19,6 +19,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/astronomy-picture-of-the-day\` or \`/apod\`
 **Utilities.**
     TP \`/request\` - Request a specific feature.
+    \`/link\` - Links your Discord to IveBot Web (use in DM only)
     \`/weather\` - It's really cloudy here..
     \`/say\` - Say something, even in another channel.
     \`/editLastSay\` - Even if it was another channel.
@@ -103,7 +104,8 @@ const commandDocs: { [index: string]: any } = {
     'Enable public roles, which let members add roles to themselves. Roles lower than their highest role of course.',
     '/togglepublicroles on'
   ),
-  'weather': b('/weather <city name>(,country name)', 'What\'s the weather like at your place?', '/weather Shanghai,CN', '/wt')
+  'weather': b('/weather <city name>(,country name)', 'What\'s the weather like at your place?', '/weather Shanghai,CN', '/wt'),
+  'link': b('/link', 'Links your Discord to IveBot Web (use in DM only, or your account may be hacked)', '/link')
 }
 
 export default function help (message: string, client: client, c: string, u: string) {

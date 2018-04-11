@@ -5,7 +5,7 @@ import * as prisma from 'prisma-binding'
 // Import our resolvers.
 import resolvers from './resolvers'
 // Import the bot. Yes, it's a module.
-const bot = require('./bot-connect') // eslint-disable-line no-unused-vars
+const { tempDB, client } = require('./bot-connect') // eslint-disable-line no-unused-vars
 // Import environment variables from dotenv.
 require('dotenv').config()
 // Get Prisma from prisma and some more configuration.
@@ -27,7 +27,7 @@ const handle = app.getRequestHandler()
 app.prepare().then(() => {
   const server = new graphql.GraphQLServer({
     typeDefs: './server/schema.graphql',
-    resolvers,
+    resolvers: resolvers(tempDB, client),
     context: req => ({
       ...req,
       db: new Prisma({

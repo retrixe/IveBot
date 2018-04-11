@@ -51,6 +51,9 @@ export type DB = {
   say: {
     // Channels.
     [index: string]: string
+  },
+  link: {
+    [index: string]: string
   }
 }
 /* eslint-enable no-undef */

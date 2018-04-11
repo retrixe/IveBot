@@ -4,6 +4,7 @@ import { testPilots, host } from '../config.json5'
 import { version } from '../package.json'
 import * as ms from 'ms'
 import { execSync } from 'child_process'
+import { randomBytes } from 'crypto'
 // Commands.
 import { handleRequest, handleSay, handleEditLastSay, handleAvatar } from './commands/utilities'
 import {
@@ -87,6 +88,21 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
   const testPilot: string = testPilots.find((user: string) => user === userID)
   // Non-appendable commands which have to be re-defined on all callbacks. Taxing and waste of RAM.
   const commandMaps: { [index: string]: Function } = {
+    // Linking for authentication on the web dashboard.
+    '/link': () => {
+      let secureToken = randomBytes(3).toString('hex')
+      tempDB.link[secureToken] = userID
+      client.sendMessage({ to: userID,
+        message: 'Your token is: **' + secureToken + '** | **DO NOT SHARE THIS WITH ANYONE >_<**'
+      }, (err: string, { id }: { id: string }) => {
+        if (err) sendResponse('There was an error processing your request.')
+        setTimeout(() => {
+          client.deleteMessage({ channelID: userID, messageID: id })
+          tempDB.link[secureToken] = undefined
+        }, 30000)
+      })
+      sendResponse('The token has been DMed ✅ | **It will be invalidated after 30 seconds.**')
+    },
     // Weather.
     '/weather': () => handleWeather(message, sendResponse, client, channelID),
     '/wt': () => handleWeather(message, sendResponse, client, channelID),

@@ -18,14 +18,32 @@ type ServerSetting {
   addRoleForAll: Boolean
 }
 
+# Server type.
+type Server {
+  # ID of server.
+  serverId: String!
+  # Permission to manage it?
+  perms: Boolean!
+  # Icon of server.
+  icon: String!
+}
+
+# User type.
+type User {
+  # ID first.
+  userId: String!
+  # List of his servers.
+  servers: [Server!]
+}
+
 # Enable queries.
 type Query {
   # We need to have allWarns to query for every warns in the database.
   allWarnsOfUser(userId: String!, serverId: String!): [WarningDiscord!]!
   # Query server settings.
   serverSettings(serverId: String!): [ServerSetting!]!
-  # All server settings
-  # allserverSettings(a: String): [ServerSetting!]!
+  # Get the user for a link code.
+  getLinkUser(linkToken: String!): User!
 }
 
 # Enable mutations.

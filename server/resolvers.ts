@@ -1,5 +1,8 @@
+// Import permission checks.
+import { checkUserForPermission } from '../bot/imports/permissions'
+
 // Set up resolvers.
-export default {
+export default (tempDB, client) => ({
   // Queries.
   Query: {
     // Warns of user.
@@ -8,7 +11,27 @@ export default {
     }, info),
     serverSettings: (parent, { serverId }, ctx, info) => ctx.db.query.serverSettings({
       where: { serverId }
-    }, info)
+    }, info),
+    getLinkUser: (parent, { linkToken }) => {
+      if (tempDB.link[linkToken]) {
+        const b = JSON.parse(JSON.stringify(tempDB.link))
+        tempDB.link[linkToken] = undefined
+        let servers = []
+        Object.keys(client.servers).forEach(server => {
+          client.servers[server].members.forEach(member => {
+            if (member === b[linkToken]) {
+              servers.push({
+                serverId: server,
+                icon: client.servers[server].icon,
+                perms: checkUserForPermission(client, member, server, 'GENERAL_MANAGE_GUILD')
+              })
+            }
+          })
+        })
+        return { userId: b[linkToken], servers }
+      }
+      return { userId: 'Could not verify token.' }
+    }
   },
   Mutation: {
     warn: (parent, {warnedId, warnerId, reason, serverId}, ctx, info) => ctx.db.mutation.createWarningDiscord(
@@ -28,4 +51,4 @@ export default {
       info
     )
   }
-}
+})
