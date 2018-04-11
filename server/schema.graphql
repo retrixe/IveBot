@@ -1,15 +1,3 @@
-# A warn in Discord.
-type WarningDiscord {
-  # ID of the warned.
-  warnedId: String!
-  # ID of the warner.
-  warnerId: String!
-  # Reason for the warn.
-  reason: String
-  # Number since epoch for date.
-  date: String!
-}
-
 # Server specific settings.
 type ServerSetting {
   # Server ID.
@@ -26,38 +14,24 @@ type Server {
   perms: Boolean!
   # Icon of server.
   icon: String!
-}
-
-# User type.
-type User {
-  # ID first.
-  userId: String!
-  # List of his servers.
-  servers: [Server!]
+  # Name of server.
+  name: String!
 }
 
 # Enable queries.
 type Query {
-  # We need to have allWarns to query for every warns in the database.
-  allWarnsOfUser(userId: String!, serverId: String!): [WarningDiscord!]!
   # Query server settings.
-  serverSettings(serverId: String!): [ServerSetting!]!
+  serverSettings(serverId: String!, linkToken: String!): [ServerSetting!]!
   # Get the user for a link code.
-  getLinkUser(linkToken: String!): User!
+  getLinkUser(linkToken: String!): [Server!]!
 }
 
 # Enable mutations.
 type Mutation {
-  # Add a warn.
-  warn(warnedId: String!, warnerId: String!, reason: String!, serverId: String!): WarningDiscord!
-  # Clear warns.
-  clearWarns(userId: String!, serverId: String!): [WarningDiscord]!
-  # Remove a specific warn.
-  removeWarn(userId: String!, id: String!, serverId: String!): WarningDiscord!
   # Edit server settings.
   editServerSettings(serverId: String!, addRoleForAll: Boolean): [ServerSetting!]!
   # Init server settings.
-  initServerSettings(serverId: String!): ServerSetting!
+  initServerSettings(serverId: String!, linkToken: String!): ServerSetting!
 }
 
 schema {

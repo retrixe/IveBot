@@ -1,12 +1,17 @@
 // Tokens and stuff.
 import { Client } from 'discord.io'
+// Get MongoDB.
+import { MongoClient } from 'mongodb'
+// Get the token needed.
 import 'json5/lib/require'
-const { token } = require('../config.json5')
+const { token, mongoURL } = require('../config.json5')
+// Import environment variables from dotenv.
+// require('dotenv').config()
 
 // Online since?
 let onlineSince = Math.abs(new Date().getTime())
 
-// Require the bot, built ot unbuilt.
+// Require the bot, built or unbuilt.
 let botCallback
 try {
   botCallback = require('../lib/index').default
@@ -14,9 +19,17 @@ try {
   botCallback = require('../bot/index').default
 }
 
+// Create a MongoDB instance.
+let db
+MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (err, client) => {
+  if (err) throw new Error('Error:\n' + err)
+  console.log('Connected successfully to MongoDB.')
+  db = client.db('ivebot')
+})
+
 // Create a client to connect to Discord API Gateway.
 const client = new Client({
-  token,
+  token: token === 'dotenv' ? process.env.IVEBOT_TOKEN : token,
   autorun: true
 })
 
@@ -75,5 +88,6 @@ client.on('guildMemberRemove', (member, event) => {
 export default {
   tempDB,
   onlineSince,
-  client
+  client,
+  db
 }

@@ -19,7 +19,10 @@ export default class DashboardIndex extends React.Component {
   query = gql`
 {
   getLinkUser(linkToken: "$token") {
-    userId
+    serverId
+    perms
+    icon
+    name
   }
 }
   `

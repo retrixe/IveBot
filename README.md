@@ -34,24 +34,9 @@ It's planned to have some nifty commands like /assistant which directly communic
 </details>
 <hr />
 
-
-## Self hosting information
-
-You will need to install Yarn (or npm), run `yarn`/`npm i` from the CLI in the bot directory and then configure the project by creating a file `.env` which should have the following contents in the root directory.
-
-```bash
-PRISMA_STAGE=<dev/stable/something else depending on which stage you wish to deploy the database to>
-PRISMA_CLUSTER=<this is in database/prisma.yml when running `prisma init ivebot` in another directory>
-PRISMA_SECRET=<this can be anything but used for authentication>
-```
-
-Then run `yarn prisma deploy`/`npm run prisma deploy` from the CLI to deploy the database.
-
-Once done, proceed with configuration.
-
-To start the bot, you need to run `yarn dev`/`npm run dev` if in development mode, or `yarn build`/`npm run build` to build the bot followed by `yarn start`/`npm start` to start the bot in production (no live reload, verbose logging or playground).
-
 ## Configuration
+
+Set up a MongoDB instance and note its URL. You can set it to store its data in `database` within this folder (you must first make the folder before starting MongoDB)
 
 Make a file named `config.json5` in the top-level directory. It should be something like this:
 
@@ -61,8 +46,9 @@ Make a file named `config.json5` in the top-level directory. It should be someth
   "testPilots": ["array of people who can use test pilot commands via user ID"],
   "NASAtoken": "<to enable /astronomy-picture-of-the-day or /apod>",
   "host": "<your user ID to give you certain privileges like /remoteexec>",
-  "weatherAPIkey": "<an http://openweathermap.org API key to enable /weather>"
+  "weatherAPIkey": "<an http://openweathermap.org API key to enable /weather>",
+  "mongoURL": "<the link to your MongoDB database instance>"
 }
 ```
 
-You can use comments in JSON5.
+You can use comments in JSON5. If you're using a deployment service like Now which supports secrets, then you can secure your token and MongoDB database URL by setting the value of both keys to `dotenv` and then setting the IVEBOT_TOKEN environment variable to your token and the MONGO_URL env variable to the MongoDB instance URL.

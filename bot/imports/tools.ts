@@ -1,4 +1,5 @@
 import { request } from 'graphql-request'
+import { mongoDB } from './types'
 
 export const getArguments = (message: string) => {
   const splitMessage = message.split(' ')
@@ -8,7 +9,8 @@ export const getArguments = (message: string) => {
 
 export const getIdFromMention = (mention: string) => mention.substring(2, mention.length - 1).split('!').join('')
 
-export const getServerSettings = async (serverID: string) => {
+export const getServerSettings = async (db: mongoDB, serverID: string) => {
+  // (_, { serverId }, ctx) => ctx.db.collection('servers').find({ serverId }).toArray()
   let a
   // First, get the server settings via query.
   const port = parseInt(process.env.PORT, 10) || 3000 // If port variable has been set.
