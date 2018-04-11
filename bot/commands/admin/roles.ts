@@ -1,6 +1,5 @@
 import { getArguments, getIdFromMention } from '../../imports/tools'
 import { checkUserForPermission, checkRolePosition } from '../../imports/permissions'
-import { request } from 'graphql-request'
 // Get types.
 import { client, event } from '../../imports/types'
 
@@ -123,54 +122,4 @@ export function handleRemoverole (
     if (err) sendResponse('Could not remove role from user. Did you specify a role?')
     else sendResponse(`Removed you from role ${role}.`)
   })
-}
-
-// Toggle public role system.
-export async function handleTogglepublicroles (
-  client: client, event: event, sendResponse: Function, message: string,
-  serverSettings: { addRoleForAll: boolean }
-) {
-  // Can person manage server?
-  if (!checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'GENERAL_MANAGE_GUILD')) {
-    sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
-    return
-  }
-  // Query.
-  const port = parseInt(process.env.PORT, 10) || 3000 // If port variable has been set.
-  // If no arguments..
-  if (message.split(' ').length === 1) {
-    // eslint-disable-next-line typescript/no-explicit-any
-    await request(`http://localhost:${port}/graphql`, `
-mutation {
-  editServerSettings(serverId: "${client.channels[event.d.channel_id].guild_id}", addRoleForAll: ${!serverSettings.addRoleForAll}) {
-    addRoleForAll
-  }
-}
-    `)
-    sendResponse(`Public role system set to ${!serverSettings.addRoleForAll}.`)
-    if (!serverSettings.addRoleForAll) sendResponse(`Regular members may give themselves roles if the role is below their highest one.`)
-  } else if (message.split(' ')[1] === 'on') {
-    // eslint-disable-next-line typescript/no-explicit-any
-    await request(`http://localhost:${port}/graphql`, `
-mutation {
-  editServerSettings(serverId: "${client.channels[event.d.channel_id].guild_id}", addRoleForAll: true) {
-    addRoleForAll
-  }
-}
-    `)
-    sendResponse(`Public role system set to ${true}.
-Regular members may now give themselves roles if the role is below their highest one.`)
-  } else if (message.split(' ')[1] === 'off') {
-    // eslint-disable-next-line typescript/no-explicit-any
-    await request(`http://localhost:${port}/graphql`, `
-mutation {
-  editServerSettings(serverId: "${client.channels[event.d.channel_id].guild_id}", addRoleForAll: false) {
-    addRoleForAll
-  }
-}
-    `)
-    sendResponse(`Public role system set to ${false}.`)
-  } else {
-    sendResponse('Proper usage: /togglepublicroles (on/off)')
-  }
 }

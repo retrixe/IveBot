@@ -1,4 +1,3 @@
-import { request } from 'graphql-request'
 import { mongoDB } from './types'
 
 export const getArguments = (message: string) => {
@@ -10,30 +9,18 @@ export const getArguments = (message: string) => {
 export const getIdFromMention = (mention: string) => mention.substring(2, mention.length - 1).split('!').join('')
 
 export const getServerSettings = async (db: mongoDB, serverID: string) => {
-  // (_, { serverId }, ctx) => ctx.db.collection('servers').find({ serverId }).toArray()
-  let a
-  // First, get the server settings via query.
-  const port = parseInt(process.env.PORT, 10) || 3000 // If port variable has been set.
-  // eslint-disable-next-line typescript/no-explicit-any
-  const res: any = await request(`http://localhost:${port}/graphql`, `
-{
-  serverSettings(serverId: "${serverID}") {
-    addRoleForAll
-    serverId
+  // Get serverSettings through query.
+  const serverSettings = await db.collection('servers').find({ serverID }).toArray()
+  if (serverSettings.length === 0) {
+    // Initialize server settings.
+    await db.collection('servers').insertOne({
+      serverID,
+      addRoleForAll: false
+    })
+    const newServerSettings = await db.collection('servers').find({ serverID }).toArray()
+    newServerSettings[0].serverId = serverID
+    return newServerSettings[0]
   }
-}
-  `)
-  if (res.serverSettings.length === 0) {
-    // eslint-disable-next-line typescript/no-explicit-any
-    const initRes: any = await request(`http://localhost:${port}/graphql`, `
-mutation {
-  initServerSettings(serverId: "${serverID}") {
-    addRoleForAll
-    serverId
-  }
-}
-    `)
-    a = initRes.initServerSettings
-  } else a = res.serverSettings
-  return a
+  serverSettings[0].serverId = serverID
+  return serverSettings[0]
 }

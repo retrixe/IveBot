@@ -1,11 +1,10 @@
 import { getArguments, getIdFromMention } from '../../imports/tools'
 import { checkUserForPermission } from '../../imports/permissions'
-import { request } from 'graphql-request'
 // Get types.
-import { client, event } from '../../imports/types'
+import { client, event, mongoDB } from '../../imports/types'
 
 // Warn.
-export function handleWarn (client: client, event: event, sendResponse: Function, message: string) {
+export function handleWarn (client: client, event: event, sendResponse: Function, message: string, db: mongoDB) {
   // Check user for permissions.
   if (!checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'TEXT_MANAGE_MESSAGES')) {
     sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
@@ -33,22 +32,18 @@ export function handleWarn (client: client, event: event, sendResponse: Function
   // Reason.
   const reason = getArguments(getArguments(message))
   // Set up the mutation.
-  const serverID = client.channels[event.d.channel_id].guild_id
-  const mutation = `
-mutation {
-  warn(warnedId: "${userID}", warnerId: "${event.d.author.id}", reason: "${reason}", serverId: "${serverID}") {
-    date
-  }
-}
-  `
-  console.log(mutation)
-  // Tell the database via our API about this.
   let warned = true
-  const port = parseInt(process.env.PORT, 10) || 3000 // If port variable has been set.
-  request(`http://localhost:${port}/graphql`, mutation)
-    .catch((err: string) => {
-      if (err) { sendResponse(`Something went wrong 👾 Error: ${err}`); warned = false }
-    })
+  const serverID = client.channels[event.d.channel_id].guild_id
+  const warningCollection = db.collection('warnings')
+  warningCollection.insertOne({
+    warnedID: userID,
+    warnerID: event.d.author.id,
+    reason: reason,
+    serverID
+  }).catch((err: string) => {
+    sendResponse(`Something went wrong 👾 Error: ${err}`)
+    warned = false
+  })
   // DM the poor user.
   setTimeout(() => {
     if (warned) {

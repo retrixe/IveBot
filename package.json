@@ -18,8 +18,8 @@
   "dependencies": {
     "apollo-boost": "^0.1.4",
     "discord.io": "woor/discord.io#gateway_v6",
-    "graphql": "^0.12.3",
-    "graphql-yoga": "^1.2.1",
+    "graphql": "^0.13.2",
+    "graphql-yoga": "^1.8.5",
     "isomorphic-unfetch": "^2.0.0",
     "json5": "^0.5.1",
     "material-ui": "1.0.0-beta.41",
