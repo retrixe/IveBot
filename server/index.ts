@@ -1,17 +1,12 @@
 // Import our express-based GraphQL server, Prisma and next.
 import * as next from 'next'
 import * as graphql from 'graphql-yoga'
-import * as prisma from 'prisma-binding'
 // Import our resolvers.
 import resolvers from './resolvers'
 // Import the bot. Yes, it's a module.
-const { tempDB, client } = require('./bot-connect') // eslint-disable-line no-unused-vars
+const { tempDB, client, db } = require('./bot-connect') // eslint-disable-line no-unused-vars
 // Import environment variables from dotenv.
-require('dotenv').config()
-// Get Prisma from prisma and some more configuration.
-const Prisma = prisma.Prisma
-const PrismaDeployedCluster = process.env.PRISMA_CLUSTER.split('/')[0]
-const PrismaClusterRegion = process.env.PRISMA_CLUSTER.split('-')[3]
+// require('dotenv').config()
 
 // If production is explicitly specified via flag..
 if (process.argv[2] === '--production') process.env.NODE_ENV = 'production'
@@ -27,16 +22,8 @@ const handle = app.getRequestHandler()
 app.prepare().then(() => {
   const server = new graphql.GraphQLServer({
     typeDefs: './server/schema.graphql',
-    resolvers: resolvers(tempDB, client),
-    context: req => ({
-      ...req,
-      db: new Prisma({
-        typeDefs: './server/generated/prisma.graphql',
-        endpoint: `https://${PrismaClusterRegion}.prisma.sh/${PrismaDeployedCluster}/ivebot/dev`, // the endpoint of the Prisma DB service
-        secret: process.env.PRISMA_SECRET, // specified in database/prisma.yml
-        debug: dev // log all GraphQL queries & mutations
-      })
-    })
+    resolvers,
+    context: { tempDB, client, db }
   })
 
   // Listen to requests on specified port.

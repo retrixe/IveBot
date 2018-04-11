@@ -56,4 +56,5 @@ export type DB = {
     [index: string]: string
   }
 }
+export type mongoDB = {}
 /* eslint-enable no-undef */

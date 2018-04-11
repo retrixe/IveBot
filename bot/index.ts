@@ -25,7 +25,7 @@ import {
 } from './commands/admin'
 
 // We need types.
-import { client, event, DB } from './imports/types'
+import { client, event, DB, mongoDB } from './imports/types'
 import { getArguments, getServerSettings } from './imports/tools'
 import help from './commands/help'
 
@@ -68,7 +68,7 @@ const appendableCommandMaps: { [index: string]: Function } = {
 }
 
 // When client recieves a message, it will callback.
-export default (client: client, tempDB: DB, onlineSince: number) => async (
+export default (client: client, tempDB: DB, onlineSince: number, db: mongoDB) => async (
   user: string,
   userID: string,
   channelID: string,
@@ -95,13 +95,19 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
       client.sendMessage({ to: userID,
         message: 'Your token is: **' + secureToken + '** | **DO NOT SHARE THIS WITH ANYONE >_<**'
       }, (err: string, { id }: { id: string }) => {
-        if (err) sendResponse('There was an error processing your request.')
+        if (err) sendResponse('There was an error processing your request (unable to DM token)')
         setTimeout(() => {
           client.deleteMessage({ channelID: userID, messageID: id })
-          tempDB.link[secureToken] = undefined
         }, 30000)
       })
-      sendResponse('The token has been DMed ✅ | **It will be invalidated after 30 seconds.**')
+      sendResponse('The token has been DMed ✅' +
+      ' | **It will be deleted after 30 seconds.** | **DO NOT SHARE THIS WITH ANYONE >_<**',
+      (err: string, { id }: { id: string }) => {
+        if (err) sendResponse('There was an error processing your request.')
+        setTimeout(() => {
+          client.deleteMessage({ channelID, messageID: id })
+        }, 30000)
+      })
     },
     // Weather.
     '/weather': () => handleWeather(message, sendResponse, client, channelID),
@@ -164,23 +170,23 @@ For noobs, this bot is licensed and protected by law. Copy code and I will sue y
     // Role system.
     // Certain commands rely on server settings. I hope we can await for them.
     '/addrole': async () => {
-      const serverSettings = await getServerSettings(client.channels[event.d.channel_id].guild_id)
+      const serverSettings = await getServerSettings(db, client.channels[event.d.channel_id].guild_id)
       handleAddrole(client, event, sendResponse, message, serverSettings)
     },
     '/ar': async () => {
-      const serverSettings = await getServerSettings(client.channels[event.d.channel_id].guild_id)
+      const serverSettings = await getServerSettings(db, client.channels[event.d.channel_id].guild_id)
       handleAddrole(client, event, sendResponse, message, serverSettings)
     },
     '/togglepublicroles': async () => {
-      const serverSettings = await getServerSettings(client.channels[event.d.channel_id].guild_id)
+      const serverSettings = await getServerSettings(db, client.channels[event.d.channel_id].guild_id)
       handleTogglepublicroles(client, event, sendResponse, message, serverSettings)
     },
     '/removerole': async () => {
-      const serverSettings = await getServerSettings(client.channels[event.d.channel_id].guild_id)
+      const serverSettings = await getServerSettings(db, client.channels[event.d.channel_id].guild_id)
       handleRemoverole(client, event, sendResponse, message, serverSettings)
     },
     '/rr': async () => {
-      const serverSettings = await getServerSettings(client.channels[event.d.channel_id].guild_id)
+      const serverSettings = await getServerSettings(db, client.channels[event.d.channel_id].guild_id)
       handleRemoverole(client, event, sendResponse, message, serverSettings)
     }
   }

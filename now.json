@@ -1,7 +1,11 @@
 {
   "dotenv": true,
   "files": [
-    "bot", "database", "pages", "server", "client", ".env", ".graphqlconfig.yml", "config.json5",
+    "bot", "pages", "server", "client", ".env", "config.json5",
     "index.d.ts", "next.config.js", "package.json", "now.json", "tsconfig.json", "yarn.lock"
-  ]
+  ],
+  "env": {
+    "IVEBOT_TOKEN": "@ivebot-token",
+    "MONGO_URL": "@ivebot-mongo-url"
+  }
 }

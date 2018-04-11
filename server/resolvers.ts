@@ -1,29 +1,36 @@
 // Import permission checks.
 import { checkUserForPermission } from '../bot/imports/permissions'
+// Import getServerSettings.
+import { getServerSettings } from '../bot/imports/tools'
+// Who's the host? He gets special permission.
+import 'json5/lib/require'
+const { host } = require('../config.json5')
 
 // Set up resolvers.
-export default (tempDB, client) => ({
+export default {
   // Queries.
   Query: {
-    // Warns of user.
-    allWarnsOfUser: (parent, { userId, serverId }, ctx, info) => ctx.db.query.warningDiscords({
-      where: { warnedId: userId, serverId }
-    }, info),
-    serverSettings: (parent, { serverId }, ctx, info) => ctx.db.query.serverSettings({
-      where: { serverId }
-    }, info),
-    getLinkUser: (parent, { linkToken }) => {
-      if (tempDB.link[linkToken]) {
-        const b = JSON.parse(JSON.stringify(tempDB.link))
-        tempDB.link[linkToken] = undefined
+    serverSettings: (_, { serverId, linkToken }, ctx) => {
+      if (
+        checkUserForPermission(
+          ctx.client, ctx.tempDB.link[linkToken], serverId, 'GENERAL_MANAGE_GUILD') ||
+        host === ctx.tempDB.link[linkToken]
+      ) return getServerSettings(ctx.db, serverId)
+      else return { serverId: 'Forbidden.' }
+    },
+    getLinkUser: (_, { linkToken }, ctx) => {
+      if (ctx.tempDB.link[linkToken]) {
+        const b = JSON.parse(JSON.stringify(ctx.tempDB.link))
+        ctx.tempDB.link[linkToken] = undefined
         let servers = []
-        Object.keys(client.servers).forEach(server => {
-          client.servers[server].members.forEach(member => {
+        Object.keys(ctx.client.servers).forEach(server => {
+          ctx.client.servers[server].members.forEach(member => {
             if (member === b[linkToken]) {
               servers.push({
                 serverId: server,
-                icon: client.servers[server].icon,
-                perms: checkUserForPermission(client, member, server, 'GENERAL_MANAGE_GUILD')
+                name: ctx.client.servers[server].name,
+                icon: ctx.client.servers[server].icon,
+                perms: checkUserForPermission(ctx.client, member, server, 'GENERAL_MANAGE_GUILD')
               })
             }
           })
@@ -34,21 +41,11 @@ export default (tempDB, client) => ({
     }
   },
   Mutation: {
-    warn: (parent, {warnedId, warnerId, reason, serverId}, ctx, info) => ctx.db.mutation.createWarningDiscord(
-      { data: { warnedId, warnerId, reason, date: new Date().toUTCString(), serverId } },
-      info
+    editServerSettings: (_, { serverId, addRoleForAll }, ctx) => ctx.db.mutation.updateManyServerSettings(
+      { data: { addRoleForAll, serverId }, where: { serverId } }
     ),
-    clearWarns: (parent, { userId, serverId }, ctx, info) => ctx.db.mutation.deleteManyWarningDiscords(
-      { where: { userId, serverId } },
-      info
-    ),
-    editServerSettings: (parent, { serverId, addRoleForAll }, ctx, info) => ctx.db.mutation.updateManyServerSettings(
-      { data: { addRoleForAll, serverId }, where: { serverId } },
-      info
-    ),
-    initServerSettings: (parent, { serverId }, ctx, info) => ctx.db.mutation.createServerSetting(
-      { data: { serverId } },
-      info
+    initServerSettings: (_, { serverId }, ctx) => ctx.db.mutation.createServerSetting(
+      { data: { serverId } }
     )
   }
-})
+}
