@@ -21,7 +21,7 @@ type Server {
 # Enable queries.
 type Query {
   # Query server settings.
-  serverSettings(serverId: String!, linkToken: String!): [ServerSetting!]!
+  serverSettings(serverId: String!, linkToken: String!): ServerSetting!
   # Get the user for a link code.
   getLinkUser(linkToken: String!): [Server!]!
 }
@@ -29,9 +29,7 @@ type Query {
 # Enable mutations.
 type Mutation {
   # Edit server settings.
-  editServerSettings(serverId: String!, addRoleForAll: Boolean): [ServerSetting!]!
-  # Init server settings.
-  initServerSettings(serverId: String!, linkToken: String!): ServerSetting!
+  editServerSettings(serverId: String!, addRoleForAll: Boolean, linkToken: String!): ServerSetting!
 }
 
 schema {

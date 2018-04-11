@@ -9,7 +9,8 @@ import { ApolloProvider, Query } from 'react-apollo'
 import Dashboard from '../client'
 
 // Apollo Client definition.
-const client = new ApolloClient({ uri: `https://localhost:3000/graphql` })
+const { protocol, host } = window.location
+const client = new ApolloClient({ uri: `${protocol}//${host}/graphql` })
 
 /* eslint-disable quotes, no-multi-str, no-undef */
 export default class DashboardIndex extends React.Component {
@@ -18,13 +19,14 @@ export default class DashboardIndex extends React.Component {
   closeDialog = () => this.setState({ open: false })
   query = gql`
 {
-  getLinkUser(linkToken: "$token") {
+  getLinkUser(linkToken:"$token") {
     serverId
+    name
     perms
     icon
-    name
   }
 }
+
   `
   render () {
     return (
@@ -38,7 +40,8 @@ export default class DashboardIndex extends React.Component {
               Enter your link token here, retrievable through /link on Discord.
             </DialogContentText>
             <TextField onChange={(e) => this.setState({ token: e.target.value })}
-              autoFocus margin='dense' label='Link Token' type='password' fullWidth />
+              autoFocus margin='dense' label='Link Token' type='password' fullWidth
+              value={this.state.token} />
           </DialogContent>
           <DialogActions>
             <Button onClick={this.closeDialog} color='primary'>
@@ -62,7 +65,10 @@ export default class DashboardIndex extends React.Component {
             if (error && this.state.token) {
               return (
                 <Typography color='error'>
-                  Could not fetch data. Refresh the page and try again. {`\n${error}`}
+                  Could not fetch data. You may have entered a wrong token.
+                  Refresh the page and try again.
+                  <br />
+                  {`${error}`}
                 </Typography>
               )
             } else if (error) {

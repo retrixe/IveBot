@@ -20,8 +20,7 @@ import {
 import { handleGunfight, handleAccept } from './commands/gunfight'
 import {
   handleKick, handleBan, handleUnban, handleMute, handleUnmute, handleWarn,
-  handleAddrole, handleRemoverole,
-  handleTogglepublicroles
+  handleAddrole, handleRemoverole
 } from './commands/admin'
 
 // We need types.
@@ -135,7 +134,7 @@ export default (client: client, tempDB: DB, onlineSince: number, db: mongoDB) =>
     '/kick': () => handleKick(client, event, sendResponse, message),
     '/mute': () => handleMute(client, event, sendResponse, message),
     '/unmute': () => handleUnmute(client, event, sendResponse, message),
-    '/warn': () => handleWarn(client, event, sendResponse, message),
+    '/warn': () => handleWarn(client, event, sendResponse, message, db),
     // Version, about, ping, uptime, remoteexec for remote command line.
     '/version': () => sendResponse(`**IveBot ${version}**`),
     '/about': () => sendResponse(`**IveBot ${version}**
@@ -176,10 +175,6 @@ For noobs, this bot is licensed and protected by law. Copy code and I will sue y
     '/ar': async () => {
       const serverSettings = await getServerSettings(db, client.channels[event.d.channel_id].guild_id)
       handleAddrole(client, event, sendResponse, message, serverSettings)
-    },
-    '/togglepublicroles': async () => {
-      const serverSettings = await getServerSettings(db, client.channels[event.d.channel_id].guild_id)
-      handleTogglepublicroles(client, event, sendResponse, message, serverSettings)
     },
     '/removerole': async () => {
       const serverSettings = await getServerSettings(db, client.channels[event.d.channel_id].guild_id)

@@ -28,7 +28,6 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/addrole\` and \`/removerole\`
 **Administrative commands.**
     \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
-    \`/togglepublicroles\` - Enable public roles.
 
 **There are some easter egg auto responses.**
 **Commands with TP are test pilot only.**`
@@ -100,10 +99,6 @@ const commandDocs: { [index: string]: any } = {
   'kick': b('/kick <user by ID/username/mention> (reason)', 'Kick someone.', '/kick voldemort you is suck'),
   'mute': b('/mute <user by ID/username/mention> (time limit) (reason)', 'Mute someone. Compatible with Dyno.', '/mute voldemort 1h bored'),
   'unmute': b('/unmute <user by ID/username/mention> (reason)', 'Unmute someone.', '/unmute voldemort wrong person'),
-  'togglepublicroles': b('/togglepublicroles (on/off)',
-    'Enable public roles, which let members add roles to themselves. Roles lower than their highest role of course.',
-    '/togglepublicroles on'
-  ),
   'weather': b('/weather <city name>(,country name)', 'What\'s the weather like at your place?', '/weather Shanghai,CN', '/wt'),
   'link': b('/link', 'Links your Discord to IveBot Web (use in DM only, or your account may be hacked)', '/link')
 }

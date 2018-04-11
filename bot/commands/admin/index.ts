@@ -1,13 +1,13 @@
-import { getArguments, getIdFromMention } from '../imports/tools'
-import { checkUserForPermission } from '../imports/permissions'
+import { getArguments, getIdFromMention } from '../../imports/tools'
+import { checkUserForPermission } from '../../imports/permissions'
 // Get types.
-import { client, event } from '../imports/types'
+import { client, event } from '../../imports/types'
 
 // Import export from sub-files.
-export { handleBan, handleUnban } from './admin/ban'
-export { handleWarn } from './admin/warn'
-export { handleMute, handleUnmute } from './admin/mute'
-export { handleRemoverole, handleAddrole, handleTogglepublicroles } from './admin/roles'
+export { handleBan, handleUnban } from './ban'
+export { handleWarn } from './warn'
+export { handleMute, handleUnmute } from './mute'
+export { handleRemoverole, handleAddrole } from './roles'
 
 // Kick!
 export function handleKick (client: client, event: event, sendResponse: Function, message: string) {
