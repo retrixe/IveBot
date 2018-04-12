@@ -8,7 +8,8 @@
     "lint": "eslint . --ext .ts,.tsx && tsc --noEmit && graphql-schema-linter server/schema.graphql",
     "start": "ts-node server/index.ts --production",
     "build": "next build && tsc",
-    "dev": "nodemon server/index.ts"
+    "dev": "nodemon server/index.ts",
+    "start:mongo": "mongod --dbpath=database"
   },
   "author": "Ibrahim Ansari <ansari.ibrahim1@gmail.com>",
   "license": "Apache-2.0",
@@ -29,10 +30,11 @@
     "react": "^16.2.0",
     "react-apollo": "^2.1.3",
     "react-dom": "^16.2.0",
-    "ts-node": "^4.1.0",
-    "typescript": "^2.7.1"
+    "ts-node": "^5.0.1",
+    "typescript": "^2.8.1"
   },
   "devDependencies": {
+    "@types/mongodb": "^3.0.12",
     "@types/next": "^2.4.7",
     "@types/node": "^8.0.53",
     "@types/react": "^16.0.36",

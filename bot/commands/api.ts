@@ -137,7 +137,7 @@ export function handleWeather (message: string, sendResponse: Function, client: 
 `${json.snow ? `**Snow (past 3 hours):** ${json.snow['3h']}mm` : ''}\n`,
             footer: { text: 'Weather data from https://openweathermap.org' }
           },
-          message: `**🌇🌃🌁🌆 The weather for ${getArguments(message)}:**:`,
+          message: `**🌇🌃🌁🌆 The weather for ${getArguments(message)}:**`,
           to: channel
         })
       }

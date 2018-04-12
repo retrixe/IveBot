@@ -7,6 +7,8 @@ import * as next from 'next'
 import * as graphql from 'graphql-yoga'
 // Import our resolvers.
 import resolvers from './resolvers'
+// Import types.
+import { mongoDB, DB } from '../bot/imports/types'
 // Import environment variables from dotenv.
 // require('dotenv').config()
 /* SERVER CODE ENDS HERE */
@@ -43,7 +45,7 @@ try {
 }
 
 // Create a MongoDB instance.
-let db
+let db: mongoDB
 MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (err, client) => {
   if (err) throw new Error('Error:\n' + err)
   console.log('Connected successfully to MongoDB.')
@@ -78,10 +80,10 @@ client.on('disconnect', (errMsg, code) => {
 })
 
 // Create a database to handle certain stuff.
-const tempDB = {gunfight: [], say: {}, link: {}}
+const tempDB: DB = {gunfight: [], say: {}, link: {}}
 
 // When client recieves a message, it will callback.
-client.on('message', botCallback(client, tempDB, onlineSince, db))
+client.on('message', botCallback(client, tempDB, onlineSince))
 
 // WeChill specific configuration.
 client.on('guildMemberAdd', (member, event) => {
