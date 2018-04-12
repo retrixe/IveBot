@@ -1,5 +1,4 @@
 {
-  "dotenv": true,
   "files": [
     "bot", "pages", "server", "client", ".env", "config.json5",
     "index.d.ts", "next.config.js", "package.json", "now.json", "tsconfig.json", "yarn.lock"

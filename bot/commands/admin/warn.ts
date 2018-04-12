@@ -57,6 +57,21 @@ export function handleWarn (client: client, event: event, sendResponse: Function
       const user = client.users[userID]
       sendResponse(`**${user.username}#${user.discriminator}** has been warned. **lol.**`)
     }
+    if (warned && serverID === '402423671551164416') {
+      const user = client.users[userID]
+      client.sendMessage({
+        to: '427911595352391680',
+        message: `**${user.username}#${user.discriminator}** has been warned:`,
+        embed: {
+          color: 0x00AE86,
+          type: 'rich',
+          title: 'Information',
+          description: `
+**| Moderator:** ${event.d.author.username}#${event.d.author.discriminator} **| Reason:** ${getArguments(getArguments(message))}
+**| Date:** ${moment(new Date().toUTCString()).format('dddd, MMMM Do YYYY, h:mm:ss A')}`
+        }
+      })
+    }
   }, 1000)
 }
 
@@ -137,7 +152,7 @@ export function handleRemovewarn (client: client, event: event, sendResponse: Fu
   const warningCollection = db.collection('warnings')
   warningCollection.deleteOne({
     _id: id
-  }).toArray().then(() => sendResponse('Warning deleted.'), (err: string) => {
+  }).then(() => sendResponse('Warning deleted.'), (err: string) => {
     if (err) sendResponse('Send a proper ID of a warning obtainable through /warnings.')
   })
 }
