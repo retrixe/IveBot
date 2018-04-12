@@ -9,14 +9,14 @@ import { ApolloProvider, Query } from 'react-apollo'
 import Dashboard from '../client'
 
 // Apollo Client definition.
-const { protocol, host } = window.location
-const client = new ApolloClient({ uri: `${protocol}//${host}/graphql` })
+const client = new ApolloClient({ uri: `/graphql` })
 
 /* eslint-disable quotes, no-multi-str, no-undef */
 export default class DashboardIndex extends React.Component {
-  state = { open: false, token: '' }
+  state = { open: false, token: '', skip: true }
   openDialog = () => this.setState({ open: true })
-  closeDialog = () => this.setState({ open: false })
+  closeDialog = () => this.setState({ open: false, skip: true })
+  loadData = () => this.setState({ open: false, skip: false })
   query = gql`
 {
   getLinkUser(linkToken:"$token") {
@@ -47,7 +47,7 @@ export default class DashboardIndex extends React.Component {
             <Button onClick={this.closeDialog} color='primary'>
               Cancel
             </Button>
-            <Button onClick={this.closeDialog} color='primary'>
+            <Button onClick={this.loadData} color='primary'>
               Log In
             </Button>
           </DialogActions>
@@ -60,8 +60,8 @@ export default class DashboardIndex extends React.Component {
           </Toolbar>
         </AppBar>
         <br /><br /><br /><br />
-        <Query query={this.query} variables={{ token: this.state.token }}>
-          {({ loading, error, data }) => {
+        <Query skip={this.state.skip} query={this.query} variables={{ token: this.state.token }}>
+          {({ loading, error, data, refetch }) => {
             if (error && this.state.token) {
               return (
                 <Typography color='error'>
@@ -73,10 +73,18 @@ export default class DashboardIndex extends React.Component {
               )
             } else if (error) {
               return (
-                <Typography>Log in through the upper-right corner.</Typography>
+                <Typography color='error'>
+                  Could not fetch data. Refresh the page and try again.
+                  <br />
+                  {`${error}`}
+                </Typography>
               )
             }
-            if (loading || !data) return <Typography>Fetching data...</Typography>
+            if ((loading || !data) && (!this.state.token || this.state.skip)) {
+              return (
+                <Typography>Log in through the upper-right corner.</Typography>
+              )
+            } else if (loading || !data) return <Typography>Fetching data...</Typography>
             return <Dashboard data={data.getLinkUser} />
           }}
         </Query>

@@ -20,13 +20,28 @@ import {
 import { handleGunfight, handleAccept } from './commands/gunfight'
 import {
   handleKick, handleBan, handleUnban, handleMute, handleUnmute, handleWarn,
-  handleAddrole, handleRemoverole
+  handleAddrole, handleRemoverole, handleWarnings, handleRemovewarn
 } from './commands/admin'
 
 // We need types.
 import { client, event, DB, mongoDB } from './imports/types'
 import { getArguments, getServerSettings } from './imports/tools'
 import help from './commands/help'
+
+// MongoDB.
+// Get MongoDB.
+import { MongoClient } from 'mongodb'
+// Get the token needed.
+const { mongoURL } = require('../config.json5')
+// Import environment variables from dotenv.
+// require('dotenv').config()
+// Create a MongoDB instance.
+let db: mongoDB
+MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (err, client) => {
+  if (err) throw new Error('Error:\n' + err)
+  console.log('Bot connected successfully to MongoDB.')
+  db = client.db('ivebot')
+})
 
 // All commands which take (message, sendResponse) as args and can be appended and interpreted.
 const appendableCommandMaps: { [index: string]: Function } = {
@@ -67,7 +82,7 @@ const appendableCommandMaps: { [index: string]: Function } = {
 }
 
 // When client recieves a message, it will callback.
-export default (client: client, tempDB: DB, onlineSince: number, db: mongoDB) => async (
+export default (client: client, tempDB: DB, onlineSince: number) => async (
   user: string,
   userID: string,
   channelID: string,
@@ -135,6 +150,9 @@ export default (client: client, tempDB: DB, onlineSince: number, db: mongoDB) =>
     '/mute': () => handleMute(client, event, sendResponse, message),
     '/unmute': () => handleUnmute(client, event, sendResponse, message),
     '/warn': () => handleWarn(client, event, sendResponse, message, db),
+    '/warnings': () => handleWarnings(client, event, sendResponse, message, db),
+    '/warns': () => handleWarnings(client, event, sendResponse, message, db),
+    '/removewarn': () => handleRemovewarn(client, event, sendResponse, message, db),
     // Version, about, ping, uptime, remoteexec for remote command line.
     '/version': () => sendResponse(`**IveBot ${version}**`),
     '/about': () => sendResponse(`**IveBot ${version}**
