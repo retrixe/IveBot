@@ -72,15 +72,17 @@ export function handleMute (client: client, event: event, sendResponse: Function
     })
   }
   // If time given, set timeout.
-  if (getArguments(message).split(' ')[1]) {
-    setTimeout(() => {
-      client.removeFromRole({
-        serverID: client.channels[event.d.channel_id].guild_id,
-        roleID: role.id,
-        userID
-      })
-    }, ms(getArguments(message).split(' ')[1]))
-  }
+  try {
+    if (ms(getArguments(message).split(' ')[1])) {
+      setTimeout(() => {
+        client.removeFromRole({
+          serverID: client.channels[event.d.channel_id].guild_id,
+          roleID: role.id,
+          userID
+        })
+      }, ms(getArguments(message).split(' ')[1]))
+    }
+  } catch (e) {}
 }
 
 // Unmute. Aw..

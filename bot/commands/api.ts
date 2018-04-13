@@ -143,3 +143,49 @@ export function handleWeather (message: string, sendResponse: Function, client: 
       }
     })
 }
+
+// Namemc.
+export function handleNamemc (message: string, sendResponse: Function, client: client, channel: string) {
+  if (getArguments(message).split(' ').length > 1) {
+    sendResponse('Minecraft users cannot have spaces in their name.')
+    return
+  }
+  fetch(`https://api.mojang.com/users/profiles/minecraft/${getArguments(message).trim()}`)
+    .then((res: { json: Function }) => res.json())
+    .catch((err: string) => { if (err) sendResponse(`Enter a valid Minecraft username (account must be premium)`) })
+    .then((json1: { id: string, name: string }) => {
+      fetch(`https://api.mojang.com/user/profiles/${json1.id}/names`)
+        .then((res: { json: Function }) => res.json())
+        .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
+        .then((json2: Array<{ name: string, changedToAt?: number }>) => {
+          let history = '\n'
+          json2.forEach(object => {
+            if (object.changedToAt) {
+              history += `**-** Name: ${object.name}
+  Changed to this name on ${moment(object.changedToAt).format('dddd, MMMM Do YYYY, h:mm:ss A')}\n`
+            } else history += `**-** Name: ${object.name}\n`
+          })
+          if (json2.length === 1) history = 'Name has not been changed.\n'
+          client.sendMessage({
+            to: channel,
+            message: '**Minecraft history and skin for ' + getArguments(message).trim() + ':**',
+            embed: {
+              color: 0x00AE86,
+              type: 'rich',
+              title: 'Skin and Name History',
+              description: `
+**Name History**
+${history}
+[**Skin**](https://mc-heads.net/body/${json1.id})\n
+              `,
+              image: {
+                url: `https://mc-heads.net/body/${json1.id}`,
+                height: 216,
+                width: 90
+              },
+              footer: { text: 'Skin is recovered through https://mc-heads.net' }
+            }
+          })
+        })
+    })
+}

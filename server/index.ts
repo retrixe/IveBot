@@ -9,8 +9,6 @@ import * as graphql from 'graphql-yoga'
 import resolvers from './resolvers'
 // Import types.
 import { mongoDB, DB } from '../bot/imports/types'
-// Import environment variables from dotenv.
-// require('dotenv').config()
 /* SERVER CODE ENDS HERE */
 
 // Tokens and stuff.

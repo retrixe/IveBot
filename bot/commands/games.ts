@@ -1,4 +1,5 @@
 import { getArguments } from '../imports/tools'
+import { eval as eva } from 'mathjs'
 
 // Zalgo characters.
 const characters = [ // TODO de adaugat u0e49
@@ -120,4 +121,20 @@ export function handleRandom (message: string, sendResponse: Function) {
     return
   }
   sendResponse(Math.floor(Math.random() * 10))
+}
+
+export function handleCalculate (message: string, sendResponse: Function) {
+  // Arguments.
+  const args = getArguments(message).split(' ')
+  // If argument length is 1 and the argument is a number..
+  if (args.length === 0) {
+    sendResponse('Specify an expression >_<')
+    return
+  }
+  try {
+    const result = eva(args.join(' '))
+    sendResponse(result)
+  } catch (e) {
+    sendResponse('Invalid expression >_<')
+  }
 }

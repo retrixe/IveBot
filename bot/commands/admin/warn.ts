@@ -134,25 +134,3 @@ export function handleWarnings (client: client, event: event, sendResponse: Func
     })
   })
 }
-
-// Remove warn.
-export function handleRemovewarn (client: client, event: event, sendResponse: Function, message: string, db: mongoDB) {
-  // Check user for permissions.
-  if (!checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'TEXT_MANAGE_MESSAGES')) {
-    sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
-    return
-  } else if (getArguments(message).split(' ').length !== 1) {
-    sendResponse('Correct usage: /removewarn <warn ID>')
-    return
-  }
-
-  // ID.
-  const id = getArguments(getArguments(message))
-  // Set up the mutation.
-  const warningCollection = db.collection('warnings')
-  warningCollection.deleteOne({
-    _id: id
-  }).then(() => sendResponse('Warning deleted.'), (err: string) => {
-    if (err) sendResponse('Send a proper ID of a warning obtainable through /warnings.')
-  })
-}

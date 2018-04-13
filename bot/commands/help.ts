@@ -11,11 +11,13 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/reverse\` - Reverse a sentence.
     \`/8ball\` - Random answers to random questions.
     \`/repeat\` - Repeat a string.
+    \`/calculate\` - Calculate an expression.
 **Random searches.**
     \`/urban\` - Get an Urban Dictionary definition ;)
     \`/cat\` and \`/dog\` - Random cats and dogs from <https://random.cat> and <https://dog.ceo>
     \`/robohash\` - Take some text, make it a robot/monster/head/cat.
     \`/zalgo\` \`/dezalgo\` - The zalgo demon's writing.
+    \`/namemc\` - A Minecraft user's previous usernames and skin.
     \`/astronomy-picture-of-the-day\` or \`/apod\`
 **Utilities.**
     TP \`/request\` - Request a specific feature.
@@ -103,7 +105,9 @@ const commandDocs: { [index: string]: any } = {
   'mute': b('/mute <user by ID/username/mention> (time limit) (reason)', 'Mute someone. Compatible with Dyno.', '/mute voldemort 1h bored'),
   'unmute': b('/unmute <user by ID/username/mention> (reason)', 'Unmute someone.', '/unmute voldemort wrong person'),
   'weather': b('/weather <city name>(,country name)', 'What\'s the weather like at your place?', '/weather Shanghai,CN', '/wt'),
-  'link': b('/link', 'Links your Discord to IveBot Web (use in DM only, or your account may be hacked)', '/link')
+  'link': b('/link', 'Links your Discord to IveBot Web (use in DM only, or your account may be hacked)', '/link'),
+  'namemc': b('/namemc <premium Minecraft username>', 'Displays previous usernames and skins of a Minecraft player.', '/namemc voldemort', '/nmc'),
+  'calculate': b('/calculate <expression>', 'Calculate the value of an expression.', '/calculate 2 + 2', '/calc')
 }
 
 export default function help (message: string, client: client, c: string, u: string) {

@@ -12,15 +12,15 @@ import {
   handleReverse,
   handle8Ball,
   handleRepeat, handleRandom,
-  handleZalgo, handleDezalgo
+  handleZalgo, handleDezalgo, handleCalculate
 } from './commands/games'
 import {
-  handleUrban, handleCat, handleDog, handleRobohash, handleApod, handleWeather
+  handleUrban, handleCat, handleDog, handleRobohash, handleApod, handleWeather, handleNamemc
 } from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
 import {
   handleKick, handleBan, handleUnban, handleMute, handleUnmute, handleWarn,
-  handleAddrole, handleRemoverole, handleWarnings, handleRemovewarn
+  handleAddrole, handleRemoverole, handleWarnings
 } from './commands/admin'
 
 // We need types.
@@ -33,8 +33,6 @@ import help from './commands/help'
 import { MongoClient } from 'mongodb'
 // Get the token needed.
 const { mongoURL } = require('../config.json5')
-// Import environment variables from dotenv.
-// require('dotenv').config()
 // Create a MongoDB instance.
 let db: mongoDB
 MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (err, client) => {
@@ -78,7 +76,10 @@ const appendableCommandMaps: { [index: string]: Function } = {
   '/rh': handleRobohash,
   // Astronomy picture of the day.
   '/astronomy-picture-of-the-day': handleApod,
-  '/apod': handleApod
+  '/apod': handleApod,
+  // Calculator.
+  '/calculate': handleCalculate,
+  '/calc': handleCalculate
 }
 
 // When client recieves a message, it will callback.
@@ -126,6 +127,9 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
     // Weather.
     '/weather': () => handleWeather(message, sendResponse, client, channelID),
     '/wt': () => handleWeather(message, sendResponse, client, channelID),
+    // NameMC port.
+    '/namemc': () => handleNamemc(message, sendResponse, client, channelID),
+    '/nmc': () => handleNamemc(message, sendResponse, client, channelID),
     // Request.
     '/request': () => { if (testPilot) handleRequest(client, userID, sendResponse, message) },
     '/req': () => { if (testPilot) handleRequest(client, userID, sendResponse, message) },
@@ -152,7 +156,6 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
     '/warn': () => handleWarn(client, event, sendResponse, message, db),
     '/warnings': () => handleWarnings(client, event, sendResponse, message, db),
     '/warns': () => handleWarnings(client, event, sendResponse, message, db),
-    '/removewarn': () => handleRemovewarn(client, event, sendResponse, message, db),
     // Version, about, ping, uptime, remoteexec for remote command line.
     '/version': () => sendResponse(`**IveBot ${version}**`),
     '/about': () => sendResponse(`**IveBot ${version}**
