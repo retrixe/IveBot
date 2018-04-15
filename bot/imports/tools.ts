@@ -6,7 +6,10 @@ export const getArguments = (message: string) => {
   return splitMessage.join(' ').trim()
 }
 
-export const getIdFromMention = (mention: string) => mention.substring(2, mention.length - 1).split('!').join('')
+export const getIdFromMention = (mention: string) => {
+  const f = mention.substring(2, mention.length - 1).split('!').join('').split('&').join('').split(':')
+  return f[f.length - 1]
+}
 
 export const getServerSettings = async (db: mongoDB, serverID: string) => {
   // Get serverSettings through query.
