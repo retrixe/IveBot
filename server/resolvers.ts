@@ -35,7 +35,7 @@ export default (ctx) => ({
         })
         return servers
       }
-      return [{ serverId: 'Unavailable: invalid link token.' }]
+      return [{ serverId: 'Unavailable: invalid link token.', icon: 'no icon' }]
     }
   },
   Mutation: {

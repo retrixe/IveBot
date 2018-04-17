@@ -13,22 +13,20 @@ const client = new ApolloClient({ uri: `/graphql` })
 
 /* eslint-disable quotes, no-multi-str, no-undef */
 export default class DashboardIndex extends React.Component {
-  state = { open: false, token: '', skip: true }
+  state = { open: false, token: '' }
   openDialog = () => this.setState({ open: true })
-  closeDialog = () => this.setState({ open: false, skip: true })
-  loadData = () => this.setState({ open: false, skip: false })
-  query = gql`
+  closeDialog = () => this.setState({ open: false })
+  render () {
+    const query = gql`
 {
-  getLinkUser(linkToken:"$token") {
+  getLinkUser(linkToken: "3a8cdc") {
     serverId
     name
     perms
     icon
   }
 }
-
-  `
-  render () {
+    `
     return (
       <ApolloProvider client={client}>
       <>
@@ -47,7 +45,7 @@ export default class DashboardIndex extends React.Component {
             <Button onClick={this.closeDialog} color='primary'>
               Cancel
             </Button>
-            <Button onClick={this.loadData} color='primary'>
+            <Button onClick={this.closeDialog} color='primary'>
               Log In
             </Button>
           </DialogActions>
@@ -60,18 +58,9 @@ export default class DashboardIndex extends React.Component {
           </Toolbar>
         </AppBar>
         <br /><br /><br /><br />
-        <Query skip={this.state.skip} query={this.query} variables={{ token: this.state.token }}>
-          {({ loading, error, data, refetch }) => {
-            if (error && this.state.token) {
-              return (
-                <Typography color='error'>
-                  Could not fetch data. You may have entered a wrong token.
-                  Refresh the page and try again.
-                  <br />
-                  {`${error}`}
-                </Typography>
-              )
-            } else if (error) {
+        {this.state.token ? <Query query={query} variables={{ token: this.state.token }}>
+          {({ loading, error, data }) => {
+            if (error) {
               return (
                 <Typography color='error'>
                   Could not fetch data. Refresh the page and try again.
@@ -80,14 +69,10 @@ export default class DashboardIndex extends React.Component {
                 </Typography>
               )
             }
-            if ((loading || !data) && (!this.state.token || this.state.skip)) {
-              return (
-                <Typography>Log in through the upper-right corner.</Typography>
-              )
-            } else if (loading || !data) return <Typography>Fetching data...</Typography>
+            if (loading || !data) return <Typography>Fetching data...</Typography>
             return <Dashboard data={data.getLinkUser} />
-          }}
-        </Query>
+          }}</Query> : <Typography>Log into the dashboard through the button in the upper right corner.</Typography>
+        }
       </>
       </ApolloProvider>
     )

@@ -209,7 +209,8 @@ For noobs, this bot is licensed and protected by law. Copy code and I will sue y
   // Check for the commands in appendableCommandMaps.
   for (let i = 0; i < Object.keys(appendableCommandMaps).length; i++) {
     if (command.split(' ')[0] === Object.keys(appendableCommandMaps)[i]) {
-      appendableCommandMaps[Object.keys(appendableCommandMaps)[i]](message, sendResponse)
+      const a = appendableCommandMaps[Object.keys(appendableCommandMaps)[i]](message)
+      if (typeof a === 'string') sendResponse(a)
       break
     }
   }
@@ -227,6 +228,8 @@ For noobs, this bot is licensed and protected by law. Copy code and I will sue y
   else if (command.startsWith('iphone x')) sendResponse(`You don't deserve it. 😎`)
   else if (command.startsWith('triggered')) sendResponse('Ah, pathetic people again.')
   else if (command.startsWith('ayy')) sendResponse('lmao')
+  // eeeeeee.
+  else if (command.startsWith('/pussy')) sendResponse('hahaha no. you have been automatically warned for being an immoral person.')
   // Handle answers to gunfight.
   // else if (command in ['fire', 'water', 'gun', 'dot']) return
 }

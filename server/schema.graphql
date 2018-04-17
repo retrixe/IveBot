@@ -11,11 +11,11 @@ type Server {
   # ID of server.
   serverId: String!
   # Permission to manage it?
-  perms: Boolean!
+  perms: Boolean
   # Icon of server.
-  icon: String!
+  icon: String
   # Name of server.
-  name: String!
+  name: String
 }
 
 # Enable queries.

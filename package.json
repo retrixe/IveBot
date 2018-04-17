@@ -18,6 +18,7 @@
     "node": ">=8.5.0"
   },
   "dependencies": {
+    "@material-ui/icons": "^1.0.0-beta.42",
     "apollo-boost": "^0.1.4",
     "discord.io": "woor/discord.io#gateway_v6",
     "graphql": "^0.13.2",

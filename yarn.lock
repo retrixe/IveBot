@@ -291,6 +291,12 @@
     pretty-ms "^0.2.1"
     text-table "^0.2.0"
 
+"@material-ui/icons@^1.0.0-beta.42":
+  version "1.0.0-beta.42"
+  resolved "https://registry.yarnpkg.com/@material-ui/icons/-/icons-1.0.0-beta.42.tgz#1e0e45e8f4de533071c7e4532508fa79bf1f29d9"
+  dependencies:
+    recompose "^0.26.0"
+
 "@types/async@2.0.47":
   version "2.0.47"
   resolved "https://registry.yarnpkg.com/@types/async/-/async-2.0.47.tgz#f49ba1dd1f189486beb6e1d070a850f6ab4bd521"
