@@ -1,5 +1,5 @@
 import { getArguments, getIdFromMention } from '../../imports/tools'
-import { checkUserForPermission } from '../../imports/permissions'
+import { checkUserForPermission, checkRolePosition } from '../../imports/permissions'
 // Get types.
 import { client, event } from '../../imports/types'
 
@@ -26,6 +26,13 @@ export function handleBan (client: client, event: event, sendResponse: Function,
   // Get information about user.
   const user = client.users[userID]
   const serverName = client.servers[client.channels[event.d.channel_id].guild_id].name
+  // Respect role order.
+  if (checkRolePosition(client, user.id, client.channels[event.d.channel_id].guild_id) >=
+    checkRolePosition(client, event.d.author.id, client.channels[event.d.channel_id].guild_id)
+  ) {
+    sendResponse('You cannot ban this person! People nowadays.')
+    return
+  }
   // and.. cut.
   let banned = true
   client.ban({
