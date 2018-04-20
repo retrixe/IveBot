@@ -96,7 +96,7 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
   // Convert message to lowercase to ensure it works.
   const command = message.toLocaleLowerCase()
   // Helper command to send message to same channel.
-  const sendResponse = (m: string|Buffer, cb?: (error: {}, response: { id: string }) => void) => client.sendMessage({
+  const sendResponse = (m: string | Buffer, cb?: (error: {}, response: { id: string }) => void) => client.sendMessage({
     to: channelID, message: m
   }, cb)
   // Is the person a test pilot.
@@ -107,7 +107,8 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
     '/link': () => {
       let secureToken = randomBytes(3).toString('hex')
       tempDB.link[secureToken] = userID
-      client.sendMessage({ to: userID,
+      client.sendMessage({
+        to: userID,
         message: 'Your token is: **' + secureToken + '** | **DO NOT SHARE THIS WITH ANYONE >_<**'
       }, (err: string, { id }: { id: string }) => {
         if (err) sendResponse('There was an error processing your request (unable to DM token)')
@@ -116,7 +117,7 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
         }, 30000)
       })
       sendResponse('The token has been DMed ✅' +
-      ' | **It will be deleted after 30 seconds.** | **DO NOT SHARE THIS WITH ANYONE >_<**',
+        ' | **It will be deleted after 30 seconds.** | **DO NOT SHARE THIS WITH ANYONE >_<**',
       (err: string, { id }: { id: string }) => {
         if (err) sendResponse('There was an error processing your request.')
         setTimeout(() => {
@@ -209,8 +210,7 @@ For noobs, this bot is licensed and protected by law. Copy code and I will sue y
   // Check for the commands in appendableCommandMaps.
   for (let i = 0; i < Object.keys(appendableCommandMaps).length; i++) {
     if (command.split(' ')[0] === Object.keys(appendableCommandMaps)[i]) {
-      const a = appendableCommandMaps[Object.keys(appendableCommandMaps)[i]](message)
-      if (typeof a === 'string') sendResponse(a)
+      appendableCommandMaps[Object.keys(appendableCommandMaps)[i]](message, sendResponse)
       break
     }
   }
@@ -228,8 +228,6 @@ For noobs, this bot is licensed and protected by law. Copy code and I will sue y
   else if (command.startsWith('iphone x')) sendResponse(`You don't deserve it. 😎`)
   else if (command.startsWith('triggered')) sendResponse('Ah, pathetic people again.')
   else if (command.startsWith('ayy')) sendResponse('lmao')
-  // eeeeeee.
-  else if (command.startsWith('/pussy')) sendResponse('hahaha no. you have been automatically warned for being an immoral person.')
   // Handle answers to gunfight.
   // else if (command in ['fire', 'water', 'gun', 'dot']) return
 }

@@ -22,23 +22,25 @@ const characters = [ // TODO de adaugat u0e49
   '\u0356', '\u0359', '\u035a', '\u0323'
 ]
 
-export function handleChoose (message: string) {
+export function handleChoose (message: string, sendResponse: Function) {
   // Is it used correctly?
   if (message.split('|').length === 1) {
-    return 'Correct usage: /choose item1|item2|...'
+    sendResponse('Correct usage: /choose item1|item2|...')
+    return
   }
   const choices = getArguments(message).split('|')
-  return `I choose: ${choices[Math.floor(Math.random() * choices.length)]}`
+  sendResponse(`I choose: ${choices[Math.floor(Math.random() * choices.length)]}`)
 }
 
-export function handleReverse (message: string) {
-  return getArguments(message).split('').reverse().join('')
+export function handleReverse (message: string, sendResponse: Function) {
+  sendResponse(getArguments(message).split('').reverse().join(''))
 }
 
-export function handle8Ball (message: string) {
+export function handle8Ball (message: string, sendResponse: Function) {
   // Check for an argument.
   if (message.split(' ').length === 1) {
-    return 'Please ask the 8ball a question.'
+    sendResponse('Please ask the 8ball a question.')
+    return
   }
   // Possible responses, taken from Diary Of A Wimpy Kid: Hard Luck.
   const responses = [
@@ -48,35 +50,38 @@ export function handle8Ball (message: string) {
     'Ask again later.', 'Reply hazy, try again later.'
   ]
   // Respond.
-  return `The 🎱 has spoken.
-8ball: ${responses[Math.floor(Math.random() * responses.length)]}`
+  sendResponse(`The 🎱 has spoken.
+8ball: ${responses[Math.floor(Math.random() * responses.length)]}`)
 }
 
-export function handleRepeat (message: string) {
+export function handleRepeat (message: string, sendResponse: Function) {
   // All arguments.
   const args: Array<string> = message.split(' ')
   // If there are not sufficient arguments or number of repeats is not a string.
   if (args.length <= 2 || isNaN(+args[1])) {
-    return 'Correct usage: /repeat <no of repeats> <words to repeat>'
+    sendResponse('Correct usage: /repeat <no of repeats> <words to repeat>')
+    return
     // Prevent repeated message from exceeding 5000 characters.
   } else if (+args[1] * message.substring(8 + args[1].length + 1).length >= 2001) {
-    return 'To prevent spam, your excessive message has not been repeated.'
+    sendResponse('To prevent spam, your excessive message has not been repeated.')
+    return
   } else if (
     getArguments(getArguments(message)) === '_' ||
     getArguments(getArguments(message)) === '*' ||
     getArguments(getArguments(message)) === '~'
   ) {
-    return 'This is known to lag users and is disabled.'
+    sendResponse('This is known to lag users and is disabled.')
+    return
   }
   // Generate the repeated string.
   let generatedMessage = ''
   for (let x = 0; x < +args[1]; x++) {
     generatedMessage += message.substring(8 + args[1].length + 1)
   }
-  return generatedMessage
+  sendResponse(generatedMessage)
 }
 
-export function handleZalgo (message: string) {
+export function handleZalgo (message: string, sendResponse: Function) {
   let textToZalgo = getArguments(message).split('')
   let newMessage = ''
   textToZalgo.forEach(element => {
@@ -85,47 +90,51 @@ export function handleZalgo (message: string) {
       newMessage += characters[Math.floor(Math.random() * characters.length)]
     }
   })
-  return newMessage
+  sendResponse(newMessage)
 }
 
-export function handleDezalgo (message: string) {
+export function handleDezalgo (message: string, sendResponse: Function) {
   let textToZalgo = getArguments(message).split('')
   let newMessage = ''
   textToZalgo.forEach(element => {
     if (characters.indexOf(element) === -1) newMessage += element
   })
-  return newMessage
+  sendResponse(newMessage)
 }
 
-export function handleRandom (message: string) {
+export function handleRandom (message: string, sendResponse: Function) {
   // Arguments.
   const args = getArguments(message).split(' ')
   // If argument length is 1 and the argument is a number..
   if (args.length === 1 && !isNaN(+args[0])) {
     const number = +args[0]
-    return Math.floor(Math.random() * 10) + number
+    sendResponse(Math.floor(Math.random() * 10) + number)
+    return
     // If argument length is 2 and both arguments are numbers..
   } else if (args.length === 2 && !isNaN(+args[0]) && !isNaN(+args[1])) {
     const number1 = +args[0]
     const number2 = +args[1]
-    return Math.floor(Math.random() * (number2 - number1)) + number1
+    sendResponse(Math.floor(Math.random() * (number2 - number1)) + number1)
+    return
   } else if (args.length >= 1) {
-    return 'Correct usage: /random (optional start number) (optional end number)'
+    sendResponse('Correct usage: /random (optional start number) (optional end number)')
+    return
   }
-  return Math.floor(Math.random() * 10)
+  sendResponse(Math.floor(Math.random() * 10))
 }
 
-export function handleCalculate (message: string) {
+export function handleCalculate (message: string, sendResponse: Function) {
   // Arguments.
   const args = getArguments(message).split(' ')
   // If argument length is 1 and the argument is a number..
   if (args.length === 0) {
-    return 'Specify an expression >_<'
+    sendResponse('Specify an expression >_<')
+    return
   }
   try {
     const result = eva(args.join(' '))
-    return result
+    sendResponse(result)
   } catch (e) {
-    return 'Invalid expression >_<'
+    sendResponse('Invalid expression >_<')
   }
 }
