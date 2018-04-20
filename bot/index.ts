@@ -96,9 +96,11 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
   // Convert message to lowercase to ensure it works.
   const command = message.toLocaleLowerCase()
   // Helper command to send message to same channel.
-  const sendResponse = (m: string | Buffer, cb?: (error: {}, response: { id: string }) => void) => client.sendMessage({
-    to: channelID, message: m
-  }, cb)
+  const sendResponse = (m: string | Buffer, cb?: (error: {}, response: { id: string }) => void, e?: {}) => {
+    client.sendMessage({
+      to: channelID, message: m, embed: e || undefined
+    }, cb)
+  }
   // Is the person a test pilot.
   const testPilot: string = testPilots.find((user: string) => user === userID)
   // Non-appendable commands which have to be re-defined on all callbacks. Taxing and waste of RAM.
@@ -171,7 +173,7 @@ For noobs, this bot is licensed and protected by law. Copy code and I will sue y
       // Get current time.
       const startTime = new Date().getTime()
       // Then send a message.
-      sendResponse('Ping?', (err, { id }) => {
+      sendResponse('Ping?', (err: {}, { id }: { id: string }) => {
         // Latency (unrealistic, this can be negative or positive)
         const fl = startTime - new Date().getTime()
         // Divide latency by 2 to get more realistic latency and get absolute value (positive)

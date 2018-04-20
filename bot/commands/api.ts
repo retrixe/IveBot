@@ -85,7 +85,10 @@ export function handleApod (message: string, sendResponse: Function) {
       .then((res: { json: Function }) => res.json())
       .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
       .then((json: { url: string, title: string, explanation: string }
-      ) => sendResponse(json.title + '\n' + json.url + '\n' + json.explanation))
+      ) => sendResponse('**' + json.title + '**\n' + json.explanation, () => '', {
+        image: { url: json.url },
+        color: 0x2361BE
+      }))
     return
   } else if (getArguments(message)) {
     sendResponse('Invalid date. Sending today\'s APOD. ')
@@ -95,7 +98,10 @@ export function handleApod (message: string, sendResponse: Function) {
     .then((res: { json: Function }) => res.json())
     .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
     .then((json: { hdurl: string, title: string, explanation: string }
-    ) => sendResponse(json.title + '\n' + json.hdurl + '\n' + json.explanation))
+    ) => sendResponse('**' + json.title + '**\n' + json.explanation, () => '', {
+      image: { url: json.hdurl },
+      color: 0x2361BE
+    }))
 }
 
 // Weather command.

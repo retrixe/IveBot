@@ -132,7 +132,8 @@ export function handleCalculate (message: string, sendResponse: Function) {
     return
   }
   try {
-    const result = eva(args.join(' '))
+    let expression = args.join(' ').split(',').join('.').split('÷').join('/')
+    const result = eva(expression)
     sendResponse(result)
   } catch (e) {
     sendResponse('Invalid expression >_<')
