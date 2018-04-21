@@ -19,6 +19,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/zalgo\` \`/dezalgo\` - The zalgo demon's writing.
     \`/namemc\` - A Minecraft user's previous usernames and skin.
     \`/astronomy-picture-of-the-day\` or \`/apod\`
+    \`/currency\` - Currency conversion (\`/help currency\`)
 **Utilities.**
     TP \`/request\` - Request a specific feature.
     \`/link\` - Links your Discord to IveBot Web (use in DM only)
@@ -31,9 +32,10 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
 **Administrative commands.**
     \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
     \`/warn\` and \`/warnings\`
+    OP \`/edit\` - Edits any command sent by IveBot.
 
 **There are some easter egg auto responses.**
-**Commands with TP are test pilot only.**`
+**Commands with TP are test pilot only, ones with OP are only executable by the bot host.**`
 
 const createHelpObject = (commandUsage: string, description: string, example: string, aliases?: string) => {
   return {
@@ -76,6 +78,10 @@ const commandDocs: { [index: string]: any } = {
   'urban': b('/urban <term>', 'Get an Urban Dictionary definition ;)', '/urban nub', '/urb'),
   'cat': b('/cat', 'Random cat from <https://random.cat>', '/cat'),
   'dog': b('/dog (breed)', 'Random dog from <https://dog.ceo>', '/dog labrador'),
+  'currency': b(
+    '/currency <currency symbol to convert from> <currency symbol to convert to> (amount, default: 1)',
+    'Convert a currency from one currency to another.', '/currency EUR USD 40', '/cur'
+  ),
   'robohash': b('/robohash <cat/robot/monster/head> <text to hash>',
     'Takes some text and hashes it in the form of an image :P', '/robohash cat voldemort#6931', '/robo, /rh'),
   'zalgo': b('/zalgo <text>', 'The zalgo demon\'s handwriting.', '/zalgo sup', '/zgo'),
@@ -88,6 +94,7 @@ const commandDocs: { [index: string]: any } = {
   'request': b('/request <something>', 'Request a feature. Only available to test pilots.', '/request a /userinfo command.', '/req'),
   'say': b('/say (channel) <text>', 'Say something. Test pilots and admins/mods only.', '/say #general heyo'),
   'editLastSay': b('/editLastSay (channel) <new text>', 'Edits the last say in a channel.', '/editLastSay #general hey', '/els'),
+  'edit': b('/edit (channel) <message ID> <new text>', 'Edits a single message. Owner only command.', '/edit #general 123456789012345678 hi'),
   'avatar': b('/avatar <user>', 'Avatar of a user.', '/avatar @voldemort#6931', '/av'),
   'about': b('/about', 'About IveBot.', '/about'),
   'ping': b('/ping', 'Latency of IveBot\'s connection to your server.', '/ping'),

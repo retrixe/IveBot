@@ -86,9 +86,11 @@ export function handleWarnings (client: client, event: event, sendResponse: Func
   ) userID = Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase()).id
   // eslint-disable-next-line no-unused-vars
   const a = client.users[userID]
-  if (!a) {
+  if (!a && userID) {
     sendResponse('Please specify a valid user.')
     return
+  } else {
+    userID = event.d.author.id
   }
   // Check user for permissions.
   let notPermitted = false

@@ -6,7 +6,7 @@ import * as ms from 'ms'
 import { execSync } from 'child_process'
 import { randomBytes } from 'crypto'
 // Commands.
-import { handleRequest, handleSay, handleEditLastSay, handleAvatar } from './commands/utilities'
+import { handleRequest, handleSay, handleEditLastSay, handleAvatar, handleEdit } from './commands/utilities'
 import {
   handleChoose,
   handleReverse,
@@ -15,7 +15,8 @@ import {
   handleZalgo, handleDezalgo, handleCalculate
 } from './commands/games'
 import {
-  handleUrban, handleCat, handleDog, handleRobohash, handleApod, handleWeather, handleNamemc
+  handleUrban, handleCat, handleDog, handleRobohash, handleApod, handleWeather, handleNamemc,
+  handleCurrency
 } from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
 import {
@@ -46,6 +47,9 @@ const appendableCommandMaps: { [index: string]: Function } = {
   // Choose.
   '/choose': handleChoose,
   '/cho': handleChoose,
+  // Currency conversion.
+  '/currency': handleCurrency,
+  '/cur': handleCurrency,
   // Random.
   '/random': handleRandom,
   '/rand': handleRandom,
@@ -144,6 +148,7 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
     '/say': () => handleSay(message, sendResponse, client, event, testPilot, tempDB),
     '/editLastSay': () => handleEditLastSay(message, sendResponse, client, event, testPilot, tempDB),
     '/els': () => handleEditLastSay(message, sendResponse, client, event, testPilot, tempDB),
+    '/edit': () => handleEdit(message, sendResponse, client, event),
     // Edit.
     // '/edit': () => client.editMessage({ message })
     // Avatar.

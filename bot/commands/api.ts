@@ -5,7 +5,7 @@ import * as moment from 'moment'
 import { client } from '../imports/types'
 // Get the NASA API token.
 import 'json5/lib/require'
-const { NASAtoken, weatherAPIkey } = require('../../config.json5')
+const { NASAtoken, weatherAPIkey, fixerAPIkey } = require('../../config.json5')
 
 export function handleUrban (message: string, sendResponse: Function) {
   // Fetch the definition.
@@ -148,6 +148,42 @@ export function handleWeather (message: string, sendResponse: Function, client: 
         })
       }
     })
+}
+
+let exchangeRates: { timestamp: number, rates: { [index: string]: number } }
+// Currency.
+export function handleCurrency (message: string, sendResponse: Function) {
+  // Whee, currency conversion!
+  const from = getArguments(message).split(' ')[0]
+  const to = getArguments(message).split(' ')[1]
+  let amount = getArguments(getArguments(getArguments(message))).trim()
+  if (from.length !== 3) {
+    sendResponse('Invalid currency for base.')
+    return
+  } else if (!to || to.length !== 3) {
+    sendResponse('Invalid currency for symbol.')
+    return
+  } else if (!amount) {
+    amount = '1'
+  } else if (amount && amount.split(' ').length !== 1) {
+    sendResponse('Enter a single number for currency conversion.')
+    return
+  } else if (amount && isNaN(+amount)) {
+    sendResponse('Enter a proper number to convert.')
+    return
+  }
+  if (!exchangeRates || Date.now() - exchangeRates.timestamp > 43200000) {
+    fetch(`http://data.fixer.io/api/latest?access_key=${fixerAPIkey}`)
+      .then((res: { json: Function }) => res.json())
+      .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
+      .then((json: { rates: { [index: string]: number }, timestamp: number }) => {
+        sendResponse(`**${from}** ${amount} = **${to}** ${json.rates[to] * +amount}`)
+        exchangeRates = json
+        exchangeRates.timestamp = Date.now()
+      })
+  } else {
+    sendResponse(`**${from}** ${amount} = **${to}** ${exchangeRates.rates[to] * +amount}`)
+  }
 }
 
 // Namemc.

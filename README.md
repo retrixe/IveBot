@@ -47,6 +47,7 @@ Make a file named `config.json5` in the top-level directory. It should be someth
   "NASAtoken": "<to enable /astronomy-picture-of-the-day or /apod>",
   "host": "<your user ID to give you certain privileges like /remoteexec>",
   "weatherAPIkey": "<an http://openweathermap.org API key to enable /weather>",
+  "fixerAPIkey": "<an http://fixer.io API key to enable /currencyconvert>",
   "mongoURL": "<the link to your MongoDB database instance>"
 }
 ```
