@@ -18,8 +18,8 @@ export default class DashboardIndex extends React.Component {
   closeDialog = () => this.setState({ open: false })
   render () {
     const query = gql`
-{
-  getLinkUser(linkToken: "3a8cdc") {
+query getAllCommonServers($token: String!) {
+  getLinkUser(linkToken: $token) {
     serverId
     name
     perms
@@ -70,7 +70,7 @@ export default class DashboardIndex extends React.Component {
               )
             }
             if (loading || !data) return <Typography>Fetching data...</Typography>
-            return <Dashboard data={data.getLinkUser} />
+            return <Dashboard data={data.getLinkUser} token={this.state.token} />
           }}</Query> : <Typography>Log into the dashboard through the button in the upper right corner.</Typography>
         }
       </>

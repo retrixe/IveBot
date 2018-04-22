@@ -116,18 +116,24 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
       client.sendMessage({
         to: userID,
         message: 'Your token is: **' + secureToken + '** | **DO NOT SHARE THIS WITH ANYONE >_<**'
-      }, (err: string, { id }: { id: string }) => {
-        if (err) sendResponse('There was an error processing your request (unable to DM token)')
+      }, (err: string, a: { id: string }) => {
+        if (err) {
+          sendResponse('There was an error processing your request (unable to DM token)')
+          return
+        }
         setTimeout(() => {
-          client.deleteMessage({ channelID: userID, messageID: id })
+          client.deleteMessage({ channelID: userID, messageID: a.id })
         }, 30000)
       })
       sendResponse('The token has been DMed ✅' +
         ' | **It will be deleted after 30 seconds.** | **DO NOT SHARE THIS WITH ANYONE >_<**',
-      (err: string, { id }: { id: string }) => {
-        if (err) sendResponse('There was an error processing your request.')
+      (err: string, a: { id: string }) => {
+        if (err) {
+          sendResponse('There was an error processing your request.')
+          return
+        }
         setTimeout(() => {
-          client.deleteMessage({ channelID, messageID: id })
+          client.deleteMessage({ channelID, messageID: a.id })
         }, 30000)
       })
     },

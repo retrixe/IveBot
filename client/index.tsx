@@ -14,7 +14,8 @@ import { gql } from 'apollo-boost'
 
 /* eslint-disable quotes, no-multi-str, no-undef */
 interface Props {
-  data: Array<{ perms: boolean, icon: string, serverId: string, name: string }>
+  data: Array<{ perms: boolean, icon: string, serverId: string, name: string }>,
+  token: string
 }
 interface State {
   selected: boolean | { perms: boolean, icon: string, serverId: string, name: string }
@@ -29,8 +30,8 @@ export default class DashboardIndex extends React.Component<Props, State> {
 
   render () {
     const query = gql`
-{
-  serverSettings(serverId: "307405489963008012", linkToken: "3a8cdc") {
+query getServerSettings($server: String!, $token: String!) {
+  serverSettings(serverId: $server, linkToken: $token) {
     addRoleForAll
   }
 }
@@ -66,7 +67,7 @@ export default class DashboardIndex extends React.Component<Props, State> {
             }} variant='title' component='h1'>{element.name} ({element.serverId})</Typography>
           </div>
           <Divider />
-          <Query query={query}>
+          <Query query={query} variables={{ server: element.serverId, token: this.props.token }}>
             {({ loading, error, data }) => {
               if (error) {
                 return (
@@ -78,7 +79,7 @@ export default class DashboardIndex extends React.Component<Props, State> {
                 )
               }
               if (loading || !data) return <Typography>Fetching data...</Typography>
-              return <Settings data={data.serverSettings} />
+              return <Settings data={data.serverSettings} token={this.props.token} server={element.serverId} />
             }}
           </Query>
         </>
