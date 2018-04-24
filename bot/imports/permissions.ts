@@ -4,7 +4,8 @@ type client = { /* eslint-disable no-undef */
     [index: string]: {
       name: string,
       roles: { [index: string]: { position: number, [index: string]: {} } },
-      members: { [index: string]: { roles: Array<string> } }
+      members: { [index: string]: { roles: Array<string> } },
+      owner_id: string // eslint-disable-line camelcase
     }
   },
   users: {
@@ -22,6 +23,7 @@ export function checkUserForPermission (
   const rolesInServer = client.servers[serverID].roles
   // Iterate over roles.
   let userHasPermission = false
+  if (client.servers[serverID].owner_id === userID) userHasPermission = true
   for (let roleIndex in rolesOfUser) {
     if (userHasPermission) break
     // Obviously.

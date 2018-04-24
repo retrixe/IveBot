@@ -94,8 +94,8 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
   message: string,
   event: event
 ) => {
-  // Disable bots from responding.
-  if (client.users[userID].bot) return
+  // Disable bots and webhooks from being responded to.
+  try { if (client.users[userID].bot) return } catch (e) { return }
   // Helper variables and functions.
   // Convert message to lowercase to ensure it works.
   const command = message.toLocaleLowerCase()

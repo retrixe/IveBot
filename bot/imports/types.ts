@@ -9,8 +9,10 @@ export type client = {
     [index: string]: {
       name: string,
       roles: { [index: string]: roleType },
-      // eslint-disable-next-line camelcase
-      members: { [index: string]: { roles: Array<string>, voice_channel_id: boolean } }
+      /* eslint-disable camelcase */
+      members: { [index: string]: { roles: Array<string>, voice_channel_id: boolean } },
+      owner_id: string
+      /* eslint-enable camelcase */
     }
   },
   users: {
