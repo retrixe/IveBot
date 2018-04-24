@@ -53,7 +53,7 @@ query getServerSettings($server: String!, $token: String!) {
       settings = (
         <>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
-            <IconButton style={{
+            <IconButton color='primary' style={{
               marginRight: 10
             }} onClick={() => this.setState({ selected: false })}>
               <ArrowBack />

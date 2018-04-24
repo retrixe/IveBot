@@ -27,7 +27,7 @@ export function handleMute (client: client, event: event, sendResponse: Function
   if (checkRolePosition(client, client.users[userID].id, client.channels[event.d.channel_id].guild_id) >=
     checkRolePosition(client, event.d.author.id, client.channels[event.d.channel_id].guild_id)
   ) {
-    sendResponse('You cannot ban this person! People nowadays.')
+    sendResponse('You cannot mute this person! People nowadays.')
     return
   }
   // Find a Muted role.

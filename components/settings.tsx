@@ -28,7 +28,7 @@ export default class Settings extends React.Component<Props, State> {
   render () {
     const mutation = gql`
 mutation variables($server: String!, $token: String!, $role: Boolean) {
-  editServerSettings(serverId: $server, linkToken: $token, addRoleForAll: $role) {
+  editServerSettings(input: { serverId: $server, linkToken: $token, addRoleForAll: $role }) {
     addRoleForAll
   }
 }
@@ -46,18 +46,22 @@ mutation variables($server: String!, $token: String!, $role: Boolean) {
               <ExpansionPanelDetails>
                 <FormGroup row>
                   <FormControlLabel
-                    control={<Switch checked={this.state.role} onChange={() => this.setState({ role: !this.state.role })} />}
+                    control={
+                      <Switch color='secondary' checked={this.state.role}
+                        onChange={() => this.setState({ role: !this.state.role })}
+                      />
+                    }
                     label='Enable Public Roles'
                   />
                 </FormGroup>
               </ExpansionPanelDetails>
               <ExpansionPanelActions>
                 <Button size='small'>Cancel</Button>
-                <Button size='small' color='primary' onClick={() => updateSettings()}>Save</Button>
+                <Button size='small' onClick={() => updateSettings()}>Save</Button>
               </ExpansionPanelActions>
             </ExpansionPanel>
-            {loading && <><br /><p>Loading...</p></>}
-            {error && <><br /><p>Error :( Please try again</p></>}
+            {loading && <><br /><Typography>Loading...</Typography></>}
+            {error && <><br /><Typography>Error :( Please try again</Typography></>}
           </>
         )}
       </Mutation>

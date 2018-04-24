@@ -23,13 +23,23 @@ type Query {
   # Query server settings.
   serverSettings(serverId: String!, linkToken: String!): ServerSetting!
   # Get the user for a link code.
-  getLinkUser(linkToken: String!): [Server!]!
+  getUserInfo(linkToken: String!): [Server!]!
+}
+
+# Input for editServerSettings mutation.
+input EditServerSettingsInput {
+  # Server ID of the server.
+  serverId: String!
+  # Token of the user by whom the operation is performed.
+  linkToken: String!
+  # Enable public roles through this setting.
+  addRoleForAll: Boolean
 }
 
 # Enable mutations.
 type Mutation {
   # Edit server settings.
-  editServerSettings(serverId: String!, addRoleForAll: Boolean, linkToken: String!): ServerSetting!
+  editServerSettings(input: EditServerSettingsInput!): ServerSetting!
 }
 
 schema {

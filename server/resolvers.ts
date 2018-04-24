@@ -18,7 +18,7 @@ export default (ctx) => ({
       ) return getServerSettings(ctx.db, serverId)
       else return { serverId: 'Forbidden.' }
     },
-    getLinkUser: (_, { linkToken }) => {
+    getUserInfo: (_, { linkToken }) => {
       if (ctx.tempDB.link[linkToken]) {
         let servers = []
         Object.keys(ctx.client.servers).forEach(server => {
