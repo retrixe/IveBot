@@ -10,7 +10,7 @@
     "start": "ts-node server/index.ts --production",
     "build": "next build && tsc",
     "dev": "nodemon server/index.ts",
-    "start:mongo": "mongod --dbpath=database"
+    "mongo": "mongod --dbpath=database"
   },
   "author": "Ibrahim Ansari <ansari.ibrahim1@gmail.com>",
   "license": "Apache-2.0",

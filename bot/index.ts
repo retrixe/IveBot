@@ -27,6 +27,7 @@ import {
 // We need types.
 import { client, event, DB, mongoDB } from './imports/types'
 import { getArguments, getServerSettings } from './imports/tools'
+import { checkChannelPermission } from './imports/permissions'
 import help from './commands/help'
 
 // MongoDB.
@@ -96,6 +97,7 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
 ) => {
   // Disable bots and webhooks from being responded to.
   try { if (client.users[userID].bot) return } catch (e) { return }
+  if (!checkChannelPermission(client, client.id, channelID, 11)) return
   // Helper variables and functions.
   // Convert message to lowercase to ensure it works.
   const command = message.toLocaleLowerCase()

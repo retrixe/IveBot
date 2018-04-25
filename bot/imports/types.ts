@@ -2,8 +2,14 @@
 /* eslint-disable no-undef */
 export type roleType = { TEXT_SEND_MESSAGES: boolean, VOICE_SPEAK: boolean, name: string, id: string, position: number }
 export type client = {
+  id: string,
   channels: {
-    [index: string]: { guild_id: string } // eslint-disable-line camelcase
+    [index: string]: {
+      guild_id: string, permissions: { // eslint-disable-line camelcase
+        role: { [index: string]: { allow: number, deny: number } },
+        user: { [index: string]: { allow: number, deny: number } }
+      }
+    }
   },
   servers: {
     [index: string]: {

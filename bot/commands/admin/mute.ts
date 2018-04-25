@@ -117,7 +117,13 @@ export function handleUnmute (client: client, event: event, sendResponse: Functi
     sendResponse('Please specify a valid user.')
     return
   }
-
+  // Respect role order.
+  if (checkRolePosition(client, client.users[userID].id, client.channels[event.d.channel_id].guild_id) >=
+    checkRolePosition(client, event.d.author.id, client.channels[event.d.channel_id].guild_id)
+  ) {
+    sendResponse('You cannot unmute this person! People nowadays.')
+    return
+  }
   // All roles of user and server.
   const roles = client.servers[client.channels[event.d.channel_id].guild_id].members[userID].roles
   const rolesOfServer = client.servers[client.channels[event.d.channel_id].guild_id].roles
