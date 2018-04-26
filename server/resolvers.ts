@@ -1,10 +1,21 @@
-// Import permission checks.
+// Import permission checks and function to retrieve server settings.
 import { checkUserForPermission } from '../bot/imports/permissions'
-// Import getServerSettings.
 import { getServerSettings } from '../bot/imports/tools'
+// Get types.
+import { mongoDB } from '../bot/imports/types'
+// Get MongoDB.
+import { MongoClient } from 'mongodb'
 // Who's the host? He gets special permission.
 import 'json5/lib/require'
-const { host } = require('../config.json5')
+const { host, mongoURL } = require('../config.json5')
+
+// Create a MongoDB instance.
+let db: mongoDB
+MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (err, client) => {
+  if (err) throw new Error('Error:\n' + err)
+  console.log('GraphQL server connected successfully to MongoDB.')
+  db = client.db('ivebot')
+})
 
 // Set up resolvers.
 export default (ctx) => ({
@@ -15,7 +26,7 @@ export default (ctx) => ({
         checkUserForPermission(
           ctx.client, ctx.tempDB.link[linkToken], serverId, 'GENERAL_MANAGE_GUILD') ||
         host === ctx.tempDB.link[linkToken]
-      ) return getServerSettings(ctx.db, serverId)
+      ) return getServerSettings(db, serverId)
       else return { serverId: 'Forbidden.' }
     },
     getUserInfo: (_, { linkToken }) => {
@@ -28,7 +39,9 @@ export default (ctx) => ({
                 serverId: server,
                 name: ctx.client.servers[server].name,
                 icon: ctx.client.servers[server].icon || 'no icon',
-                perms: checkUserForPermission(ctx.client, member, server, 'GENERAL_MANAGE_GUILD')
+                perms: host === ctx.tempDB.link[linkToken]
+                  ? true
+                  : checkUserForPermission(ctx.client, member, server, 'GENERAL_MANAGE_GUILD')
               })
             }
           })
@@ -45,12 +58,12 @@ export default (ctx) => ({
           ctx.client, ctx.tempDB.link[linkToken], serverId, 'GENERAL_MANAGE_GUILD'
         ) || host === ctx.tempDB.link[linkToken]
       ) {
-        await getServerSettings(ctx.db, serverId)
-        await ctx.db.collection('servers').updateOne({ serverID: serverId }, { $set: {
+        await getServerSettings(db, serverId)
+        await db.collection('servers').updateOne({ serverID: serverId }, { $set: {
           // eslint-disable-next-line no-unneeded-ternary
           addRoleForAll: addRoleForAll ? addRoleForAll : undefined
         } })
-        return getServerSettings(ctx.db, serverId)
+        return getServerSettings(db, serverId)
       } else return { serverId: 'Forbidden.' }
     }
   }

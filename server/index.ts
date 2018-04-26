@@ -8,16 +8,14 @@ import * as graphql from 'graphql-yoga'
 // Import our resolvers.
 import resolvers from './resolvers'
 // Import types.
-import { mongoDB, DB } from '../bot/imports/types'
+import { DB } from '../bot/imports/types'
 /* SERVER CODE ENDS HERE */
 
 // Tokens and stuff.
 import { Client } from 'discord.io'
-// Get MongoDB.
-import { MongoClient } from 'mongodb'
 // Get the token needed.
 import 'json5/lib/require'
-const { token, mongoURL } = require('../config.json5')
+const { token } = require('../config.json5')
 
 /* SERVER CODE STARTS HERE */
 // If production is explicitly specified via flag..
@@ -41,14 +39,6 @@ try {
 } catch (e) {
   botCallback = require('../bot/index').default
 }
-
-// Create a MongoDB instance.
-let db: mongoDB
-MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (err, client) => {
-  if (err) throw new Error('Error:\n' + err)
-  console.log('Connected successfully to MongoDB.')
-  db = client.db('ivebot')
-})
 
 // Create a client to connect to Discord API Gateway.
 const client = new Client({
@@ -111,7 +101,7 @@ client.on('guildMemberRemove', (member, event) => {
 app.prepare().then(() => {
   const server = new graphql.GraphQLServer({
     typeDefs: './server/schema.graphql',
-    resolvers: resolvers({ tempDB, client, db })
+    resolvers: resolvers({ tempDB, client })
   })
 
   // Listen to requests on specified port.
