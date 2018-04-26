@@ -6,7 +6,7 @@ The bot that created the iPhone X. It's strictly private. You may run it locally
 
 It's planned to have some nifty commands like /assistant which directly communicates with the Google Assistant gRPC API. You heard that, Google Assistant in a Discord bot.
 
-2.0 is built upon Meteor and coming with music, administrative commands and a web dashboard, but it does not support ARM without bundling it on an x86 computer (untested). 1.0 is still supported and recommended because of its stability.
+2.0 is built upon Next.js and releasing with administrative commands and a web dashboard. 1.0 is no longer supported and 2.0 is now recommended (canary 6 onwards) because it has reached a high stability phase. 1.0 is still very rock-solid but lacks a lot of features that can be gained through 2.0, hence I recommend moving to 2.0. There is very little change required to your configuration in this regard.
 
 <hr />
 <details><summary>Commands</summary>
