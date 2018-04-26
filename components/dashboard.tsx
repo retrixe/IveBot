@@ -3,9 +3,11 @@ import Typography from 'material-ui/Typography'
 import Paper from 'material-ui/Paper'
 import List, { ListItem, ListItemText } from 'material-ui/List'
 import Avatar from 'material-ui/Avatar'
+import Hidden from 'material-ui/Hidden'
 import Divider from 'material-ui/Divider'
 import IconButton from 'material-ui/IconButton'
 import { LinearProgress } from 'material-ui/Progress'
+import withWidth from 'material-ui/utils/withWidth'
 import ArrowBack from '@material-ui/icons/ArrowBack'
 import { Query } from 'react-apollo'
 import Settings from './settings'
@@ -19,7 +21,7 @@ interface Props {
 interface State {
   selected: boolean | { perms: boolean, icon: string, serverId: string, name: string }
 }
-export default class DashboardIndex extends React.Component<Props, State> {
+class DashboardIndex extends React.Component<Props, State> {
   constructor (props) {
     super(props)
     this.state = {
@@ -37,18 +39,25 @@ query getServerSettings($server: String!, $token: String!) {
     `
     let settings
     if (!this.state.selected) {
-      settings = <List>{this.props.data.map(element => (
-        <ListItem disabled={!element.perms}
-          divider button key={element.serverId} onClick={() => this.setState({ selected: element })}>
-          {element.icon === 'no icon'
-            ? ''
-            : <Avatar src={`https://cdn.discordapp.com/icons/${element.serverId}/${element.icon}.webp`} />
-          }
-          <ListItemText primary={element.name} secondary={element.serverId} />
-        </ListItem>
-      ))}</List>
+      settings = <List>{this.props.data.map(element => {
+        let nameOfServer = element.name
+        if (nameOfServer.length >= 32) nameOfServer = element.name.substr(0, 29) + '...'
+        return (
+          <ListItem disabled={!element.perms}
+            divider button key={element.serverId} onClick={() => this.setState({ selected: element })}>
+            {element.icon === 'no icon'
+              ? ''
+              : <Avatar src={`https://cdn.discordapp.com/icons/${element.serverId}/${element.icon}.webp`} />
+            }
+            <ListItemText primary={nameOfServer} secondary={element.serverId} />
+          </ListItem>
+        )
+      })}</List>
     } else if (typeof this.state.selected === 'object') {
       const element = this.state.selected
+      let nameOfServer = element.name
+      if (nameOfServer.length >= 20) nameOfServer = element.name.substr(0, 20) + '...'
+      // cap 32
       settings = (
         <>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
@@ -63,7 +72,7 @@ query getServerSettings($server: String!, $token: String!) {
             }
             <Typography style={{
               marginLeft: 10
-            }} variant='title' component='h1'>{element.name} ({element.serverId})</Typography>
+            }} variant='title' component='h1'>{nameOfServer} <Hidden mdDown>({element.serverId})</Hidden></Typography>
           </div>
           <Divider />
           <Query query={query} variables={{ server: element.serverId, token: this.props.token }}>
@@ -94,3 +103,5 @@ query getServerSettings($server: String!, $token: String!) {
   }
 }
 /* eslint-enable quotes, no-multi-str, no-undef */
+
+export default withWidth()(DashboardIndex)
