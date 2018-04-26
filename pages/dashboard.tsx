@@ -3,6 +3,7 @@ import { AppBar, Toolbar, Button } from 'material-ui'
 import Dialog, { DialogTitle, DialogActions, DialogContent, DialogContentText } from 'material-ui/Dialog'
 import Typography from 'material-ui/Typography'
 import TextField from 'material-ui/TextField'
+import { LinearProgress } from 'material-ui/Progress'
 import Link from 'next/link'
 import ApolloClient, { gql } from 'apollo-boost'
 import { ApolloProvider, Query } from 'react-apollo'
@@ -40,7 +41,7 @@ query getAllCommonServers($token: String!) {
             </DialogContentText>
             <TextField onChange={(e) => this.setState({ token: e.target.value })}
               autoFocus margin='dense' label='Link Token' type='password' fullWidth
-              value={this.state.token} required inputProps={{ maxWidth: 6 }} />
+              value={this.state.token} required />
           </DialogContent>
           <DialogActions>
             <Button onClick={this.closeDialog} color='primary'>Cancel</Button>
@@ -72,7 +73,7 @@ query getAllCommonServers($token: String!) {
                     </Typography>
                   )
                 }
-                if (loading || !data) return <Typography>Fetching data...</Typography>
+                if (loading || !data) return <LinearProgress color='secondary' variant='query' />
                 return <Dashboard data={data.getUserInfo} token={this.state.token} />
               }}
             </Query>

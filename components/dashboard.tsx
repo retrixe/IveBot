@@ -5,12 +5,11 @@ import List, { ListItem, ListItemText } from 'material-ui/List'
 import Avatar from 'material-ui/Avatar'
 import Divider from 'material-ui/Divider'
 import IconButton from 'material-ui/IconButton'
+import { LinearProgress } from 'material-ui/Progress'
 import ArrowBack from '@material-ui/icons/ArrowBack'
 import { Query } from 'react-apollo'
 import Settings from './settings'
 import { gql } from 'apollo-boost'
-// Add a command, re-write architecture and finish initial dashboard.
-// import TextField from 'material-ui/TextField'
 
 /* eslint-disable quotes, no-multi-str, no-undef */
 interface Props {
@@ -78,7 +77,7 @@ query getServerSettings($server: String!, $token: String!) {
                   </Typography>
                 )
               }
-              if (loading || !data) return <Typography>Fetching data...</Typography>
+              if (loading || !data) return <LinearProgress color='secondary' variant='query' />
               return <Settings data={data.serverSettings} token={this.props.token} server={element.serverId} />
             }}
           </Query>

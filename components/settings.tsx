@@ -6,6 +6,7 @@ import ExpansionPanel, {
   ExpansionPanelActions
 } from 'material-ui/ExpansionPanel'
 import Button from 'material-ui/Button'
+import { LinearProgress } from 'material-ui/Progress'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import { FormGroup, FormControlLabel } from 'material-ui/Form'
 import Switch from 'material-ui/Switch'
@@ -60,8 +61,8 @@ mutation variables($server: String!, $token: String!, $role: Boolean) {
                 <Button size='small' onClick={() => updateSettings()}>Save</Button>
               </ExpansionPanelActions>
             </ExpansionPanel>
-            {loading && <><br /><Typography>Loading...</Typography></>}
-            {error && <><br /><Typography>Error :( Please try again</Typography></>}
+            {loading && <><br /><LinearProgress color='secondary' variant='query' /></>}
+            {error && <><br /><Typography color='error'>Error :( Please try again</Typography></>}
           </>
         )}
       </Mutation>
