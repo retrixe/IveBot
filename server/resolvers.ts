@@ -52,7 +52,8 @@ export default (ctx) => ({
     }
   },
   Mutation: {
-    editServerSettings: async (_, { serverId, linkToken, addRoleForAll }) => {
+    editServerSettings: async (_, { input }) => {
+      const { serverId, linkToken, addRoleForAll } = input
       if (
         checkUserForPermission(
           ctx.client, ctx.tempDB.link[linkToken], serverId, 'GENERAL_MANAGE_GUILD'
