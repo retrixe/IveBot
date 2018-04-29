@@ -154,14 +154,14 @@ let exchangeRates: { timestamp: number, rates: { [index: string]: number } }
 // Currency.
 export function handleCurrency (message: string, sendResponse: Function) {
   // Whee, currency conversion!
-  const from = getArguments(message).split(' ')[0]
-  const to = getArguments(message).split(' ')[1]
+  const from = getArguments(message).split(' ')[0].toLocaleUpperCase()
+  const to = getArguments(message).split(' ')[1].toLocaleUpperCase()
   let amount = getArguments(getArguments(getArguments(message))).trim()
-  if (from.length !== 3) {
-    sendResponse('Invalid currency for base.')
+  if (from.length !== 3 || !exchangeRates.rates[from]) {
+    sendResponse('Invalid currency to convert from.')
     return
-  } else if (!to || to.length !== 3) {
-    sendResponse('Invalid currency for symbol.')
+  } else if (!to || to.length !== 3 || !exchangeRates.rates[to]) {
+    sendResponse('Invalid currency to convert to.')
     return
   } else if (!amount) {
     amount = '1'
@@ -172,7 +172,7 @@ export function handleCurrency (message: string, sendResponse: Function) {
     sendResponse('Enter a proper number to convert.')
     return
   }
-  if (!exchangeRates || Date.now() - exchangeRates.timestamp > 43200000) {
+  if (!exchangeRates || Date.now() - exchangeRates.timestamp > 3600000) {
     fetch(`http://data.fixer.io/api/latest?access_key=${fixerAPIkey}`)
       .then((res: { json: Function }) => res.json())
       .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))

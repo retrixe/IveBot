@@ -22,7 +22,10 @@ export type client = {
     }
   },
   users: {
-    [index: string]: { id: string, username: string, discriminator: string, bot: boolean, avatar: string }
+    [index: string]: {
+      id: string, username: string, discriminator: string, bot: boolean,
+      avatar: string, avatarURL: string
+    }
   },
   sendMessage: Function,
   ban: Function,

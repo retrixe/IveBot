@@ -100,5 +100,5 @@ export function handleEdit (message: string, sendResponse: Function, client: cli
 export function handleAvatar (message: string, sendResponse: Function, client: client, userID: string) {
   let user: string = getIdFromMention(getArguments(message).split(' ')[0])
   if (!client.users[user].avatar) user = userID
-  sendResponse(`https://cdn.discordapp.com/avatars/${user}/${client.users[user].avatar}.png?size=2048`)
+  sendResponse(client.users[user].avatarURL)
 }
