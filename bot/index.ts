@@ -87,6 +87,14 @@ const appendableCommandMaps: { [index: string]: Function } = {
   '/calc': handleCalculate
 }
 
+// When client gains/loses a member, it will callback.
+export const guildMemberEditCallback = (client: client) => async (member: {
+  guild_id: string // eslint-disable-line indent
+}, event: {}) => {
+  const serverSettings = await getServerSettings(db, member.guild_id)
+  if (serverSettings.addRoleForAll) return true
+}
+
 // When client recieves a message, it will callback.
 export default (client: client, tempDB: DB, onlineSince: number) => async (
   user: string,

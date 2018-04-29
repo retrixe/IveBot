@@ -22,11 +22,12 @@ export default (ctx) => ({
   // Queries.
   Query: {
     serverSettings: async (_, { serverId, linkToken }) => {
+      const { addRoleForAll } = await getServerSettings(db, serverId)
       if (
         checkUserForPermission(
           ctx.client, ctx.tempDB.link[linkToken], serverId, 'GENERAL_MANAGE_GUILD') ||
         host === ctx.tempDB.link[linkToken]
-      ) return getServerSettings(db, serverId)
+      ) return { serverId, addRoleForAll }
       else return { serverId: 'Forbidden.' }
     },
     getUserInfo: (_, { linkToken }) => {

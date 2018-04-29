@@ -21,9 +21,7 @@ export const getServerSettings = async (db: mongoDB, serverID: string) => {
       addRoleForAll: false
     })
     const newServerSettings = await db.collection('servers').find({ serverID }).toArray()
-    newServerSettings[0].serverId = serverID
     return newServerSettings[0]
   }
-  serverSettings[0].serverId = serverID
   return serverSettings[0]
 }
