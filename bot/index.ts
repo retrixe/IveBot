@@ -21,7 +21,7 @@ import {
 import { handleGunfight, handleAccept } from './commands/gunfight'
 import {
   handleKick, handleBan, handleUnban, handleMute, handleUnmute, handleWarn,
-  handleAddrole, handleRemoverole, handleWarnings
+  handleAddrole, handleRemoverole, handleWarnings, handleClearwarns, handleRemovewarn
 } from './commands/admin'
 
 // We need types.
@@ -170,6 +170,10 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
     '/mute': () => handleMute(client, event, sendResponse, message),
     '/unmute': () => handleUnmute(client, event, sendResponse, message),
     '/warn': () => handleWarn(client, event, sendResponse, message, db),
+    '/clearwarns': () => handleClearwarns(client, event, sendResponse, message, db),
+    '/cw': () => handleClearwarns(client, event, sendResponse, message, db),
+    '/removewarn': () => handleRemovewarn(client, event, sendResponse, message, db),
+    '/rw': () => handleRemovewarn(client, event, sendResponse, message, db),
     '/warnings': () => handleWarnings(client, event, sendResponse, message, db),
     '/warns': () => handleWarnings(client, event, sendResponse, message, db),
     // Version, about, ping, uptime, remoteexec for remote command line.

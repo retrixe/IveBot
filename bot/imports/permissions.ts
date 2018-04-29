@@ -45,7 +45,8 @@ export function checkUserForPermission (
 }
 
 // Export function.
-export function checkRolePosition (client: client, userID: string, serverID: string) {
+// eslint-disable-next-line space-infix-ops
+export function checkRolePosition (client: client, userID: string, serverID: string, considerOwnership: boolean=true) {
   // Get roles of user.
   const rolesOfUser = client.servers[serverID].members[userID].roles
   // Get all roles in server.
@@ -57,6 +58,7 @@ export function checkRolePosition (client: client, userID: string, serverID: str
       highestRolePosition = rolesInServer[rolesOfUser[roleIndex]].position
     }
   }
+  if (client.servers[serverID].owner_id === userID && considerOwnership) highestRolePosition = 9999
   return highestRolePosition
 }
 
