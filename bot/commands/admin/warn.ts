@@ -127,8 +127,10 @@ export function handleWarnings (client: client, event: event, sendResponse: Func
     for (let x = 0; x < array.length; x++) {
       const a = client.users[array[x].warnerID]
       if (response) response += '\n\n'
+      const modUsername = a ? a.username : array[x].warnerID
+      const modDiscriminator = a ? '#' + a.discriminator : ''
       response += `**Warning ${x + 1}**
-**| Moderator:** ${a.username}#${a.discriminator} **| Reason:** ${array[x].reason}
+**| Moderator:** ${modUsername}${modDiscriminator} **| Reason:** ${array[x].reason}
 **| ID:** ${array[x]._id} **| Date:** ${moment(array[x].date).format('dddd, MMMM Do YYYY, h:mm:ss A')}`
     }
     client.sendMessage({
