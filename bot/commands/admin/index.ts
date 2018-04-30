@@ -7,7 +7,7 @@ import { client, event } from '../../imports/types'
 export { handleBan, handleUnban } from './ban'
 export { handleWarn, handleWarnings, handleClearwarns, handleRemovewarn } from './warn'
 export { handleMute, handleUnmute } from './mute'
-export { handleRemoverole, handleAddrole } from './roles'
+export { handleGiverole, handleTakerole } from './roles'
 
 // Kick!
 export function handleKick (client: client, event: event, sendResponse: Function, message: string) {

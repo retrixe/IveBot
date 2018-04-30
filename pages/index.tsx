@@ -37,7 +37,7 @@ query getAllCommonServers($token: String!) {
           <DialogTitle>Log In</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Enter your link token here, retrievable through /link on Discord.
+              Enter your link token here, retrievable through /token on Discord.
             </DialogContentText>
             <TextField onChange={(e) => this.setState({ token: e.target.value })}
               autoFocus margin='dense' label='Link Token' type='password' fullWidth

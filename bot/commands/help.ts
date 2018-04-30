@@ -28,7 +28,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/editLastSay\` - Even if it was another channel.
     \`/avatar\` - Avatar of a user.
     \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
-    \`/addrole\` and \`/removerole\`
+    \`/giverole\` and \`/takerole\` - Edit roles.
 **Administrative commands.**
     \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
     \`/warn\` and \`/warnings\` | \`/clearwarns\` and \`/removewarn\`
@@ -100,10 +100,10 @@ const commandDocs: { [index: string]: any } = {
   'ping': b('/ping', 'Latency of IveBot\'s connection to your server.', '/ping'),
   'uptime': b('/uptime', 'How long was IveBot on?', '/uptime'),
   'version': b('/version', 'Current running version of IveBot.', '/version'),
-  'addrole': b('/addrole (user) <role>',
-    'Add role to yourself/user. Usually Manager/Mod only unless togglepublicroles is on.', '/addrole @voldemort#6931 Helper', '/ar'),
+  'giverole': b('/giverole (user) <role>',
+    'Give role to yourself/user. Manager/Mod only unless Public Roles are on.', '/giverole @voldemort#6931 Helper', '/gr'),
   'removerole': b('/removerole (user) <role>',
-    'Remove role from yourself/user. Usually Manager/Mod only unless togglepublicroles is on.', '/removerole @voldemort#6931 Helper', '/rr'),
+    'Remove role from yourself/user. Usually Manager/Mod only unless togglepublicroles is on.', '/takerole @voldemort#6931 Helper', '/tr'),
   'ban': b('/ban <user by ID/username/mention> (reason)', 'Ban someone.', '/ban voldemort you is suck', '/banana'),
   'unban': b('/unban <user by ID/username/mention> (reason)', 'Unban someone.', '/unban voldemort wrong person'),
   'kick': b('/kick <user by ID/username/mention> (reason)', 'Kick someone.', '/kick voldemort you is suck'),
@@ -117,7 +117,7 @@ const commandDocs: { [index: string]: any } = {
   'mute': b('/mute <user by ID/username/mention> (time limit) (reason)', 'Mute someone. Compatible with Dyno.', '/mute voldemort 1h bored'),
   'unmute': b('/unmute <user by ID/username/mention> (reason)', 'Unmute someone.', '/unmute voldemort wrong person'),
   'weather': b('/weather <city name>(,country name)', 'What\'s the weather like at your place?', '/weather Shanghai,CN', '/wt'),
-  'link': b('/link', 'Links your Discord to IveBot Web (use in DM only, or your account may be hacked)', '/link'),
+  'token': b('/token', 'Links your Discord to IveBot Web (use in DM only, or your account may be hacked)', '/token'),
   'namemc': b('/namemc <premium Minecraft username>', 'Displays previous usernames and skins of a Minecraft player.', '/namemc voldemort', '/nmc'),
   'calculate': b('/calculate <expression>', 'Calculate the value of an expression.', '/calculate 2 + 2', '/calc')
 }

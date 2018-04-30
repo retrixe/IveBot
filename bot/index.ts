@@ -21,7 +21,7 @@ import {
 import { handleGunfight, handleAccept } from './commands/gunfight'
 import {
   handleKick, handleBan, handleUnban, handleMute, handleUnmute, handleWarn,
-  handleAddrole, handleRemoverole, handleWarnings, handleClearwarns, handleRemovewarn
+  handleGiverole, handleTakerole, handleWarnings, handleClearwarns, handleRemovewarn
 } from './commands/admin'
 
 // We need types.
@@ -148,7 +148,7 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
   // Non-appendable commands which have to be re-defined on all callbacks. Taxing and waste of RAM.
   const commandMaps: { [index: string]: Function } = {
     // Linking for authentication on the web dashboard.
-    '/link': () => {
+    '/token': () => {
       let secureToken = randomBytes(3).toString('hex')
       tempDB.link[secureToken] = userID
       client.sendMessage({
@@ -245,21 +245,21 @@ For noobs, this bot is licensed and protected by law. Copy code and I will sue y
     '/remoteexec': () => { if (userID === host) sendResponse(execSync(getArguments(message), { encoding: 'utf8' })) },
     // Role system.
     // Certain commands rely on server settings. I hope we can await for them.
-    '/addrole': async () => {
+    '/giverole': async () => {
       const serverSettings = await getServerSettings(db, client.channels[event.d.channel_id].guild_id)
-      handleAddrole(client, event, sendResponse, message, serverSettings)
+      handleGiverole(client, event, sendResponse, message, serverSettings)
     },
-    '/ar': async () => {
+    '/gr': async () => {
       const serverSettings = await getServerSettings(db, client.channels[event.d.channel_id].guild_id)
-      handleAddrole(client, event, sendResponse, message, serverSettings)
+      handleGiverole(client, event, sendResponse, message, serverSettings)
     },
-    '/removerole': async () => {
+    '/takerole': async () => {
       const serverSettings = await getServerSettings(db, client.channels[event.d.channel_id].guild_id)
-      handleRemoverole(client, event, sendResponse, message, serverSettings)
+      handleTakerole(client, event, sendResponse, message, serverSettings)
     },
-    '/rr': async () => {
+    '/tr': async () => {
       const serverSettings = await getServerSettings(db, client.channels[event.d.channel_id].guild_id)
-      handleRemoverole(client, event, sendResponse, message, serverSettings)
+      handleTakerole(client, event, sendResponse, message, serverSettings)
     }
   }
   // Check for the commands in appendableCommandMaps.

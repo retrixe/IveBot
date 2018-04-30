@@ -3,8 +3,8 @@ import { checkUserForPermission, checkRolePosition } from '../../imports/permiss
 // Get types.
 import { client, event } from '../../imports/types'
 
-// Add role.
-export function handleAddrole (
+// Give role.
+export function handleGiverole (
   client: client, event: event, sendResponse: Function, message: string,
   serverSettings: { addRoleForAll: boolean }
 ) {
@@ -71,8 +71,8 @@ export function handleAddrole (
   })
 }
 
-// Remove role.
-export function handleRemoverole (
+// Take role.
+export function handleTakerole (
   client: client, event: event, sendResponse: Function, message: string,
   serverSettings: { addRoleForAll: boolean }
 ) {
