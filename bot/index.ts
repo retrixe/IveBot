@@ -89,10 +89,38 @@ const appendableCommandMaps: { [index: string]: Function } = {
 
 // When client gains/loses a member, it will callback.
 export const guildMemberEditCallback = (client: client) => async (member: {
-  guild_id: string // eslint-disable-line indent
-}, event: {}) => {
+  guild_id: string, id: string // eslint-disable-line indent
+}, event: { t: string, d: { user: { username: string, discriminator: string } } }) => {
+  // WeChill specific configuration.
+  if (member.guild_id === '402423671551164416' && event.t === 'GUILD_MEMBER_REMOVE') {
+    const message = `Well ${event.d.user.username}#${event.d.user.discriminator} left us.`
+    client.sendMessage({ to: '402437089557217290', message })
+    return // Why wait.
+  } else if (member.guild_id === '402423671551164416' && event.t === 'GUILD_MEMBER_ADD') {
+    const message = `Yoyo <@${member.id}> welcome to WeChill, stay chill.`
+    client.sendMessage({ to: '402437089557217290', message })
+    client.addToRole({ serverID: member.guild_id, userID: member.id, roleID: '402429353096642561' })
+    return // Why wait.
+  }
   const serverSettings = await getServerSettings(db, member.guild_id)
-  if (serverSettings.addRoleForAll) return true
+  if (event.t === 'GUILD_MEMBER_REMOVE' && serverSettings.joinLeaveMessages[1]) {
+    client.sendMessage({
+      to: serverSettings.joinLeaveMessages[0],
+      message: serverSettings.joinLeaveMessages[1]
+    })
+  } else if (event.t === 'GUILD_MEMBER_ADD' && serverSettings.joinLeaveMessages[2]) {
+    client.sendMessage({
+      to: serverSettings.joinLeaveMessages[0],
+      message: serverSettings.joinLeaveMessages[2]
+    })
+  }
+  if (event.t === 'GUILD_MEMBER_ADD' && serverSettings.joinAutorole) {
+    client.addToRole({
+      serverID: member.guild_id,
+      userID: member.id,
+      roleID: serverSettings.joinAutorole
+    })
+  }
 }
 
 // When client recieves a message, it will callback.

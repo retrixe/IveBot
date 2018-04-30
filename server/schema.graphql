@@ -4,6 +4,10 @@ type ServerSetting {
   serverId: String!
   # If add role is enabled for everyone.
   addRoleForAll: Boolean
+  # If join/leave messages are enabled, and if so, what message and channel.
+  joinLeaveMessages: [String]
+  # If join autorole is enabled, and if so, what role.
+  joinAutorole: String
 }
 
 # Server type.

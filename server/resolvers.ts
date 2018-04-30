@@ -22,12 +22,15 @@ export default (ctx) => ({
   // Queries.
   Query: {
     serverSettings: async (_, { serverId, linkToken }) => {
-      const { addRoleForAll } = await getServerSettings(db, serverId)
+      let {
+        addRoleForAll, joinLeaveMessages, joinAutorole
+      } = await getServerSettings(db, serverId)
+      if (!joinLeaveMessages) joinLeaveMessages = ['', '', '']
       if (
         checkUserForPermission(
           ctx.client, ctx.tempDB.link[linkToken], serverId, 'GENERAL_MANAGE_GUILD') ||
         host === ctx.tempDB.link[linkToken]
-      ) return { serverId, addRoleForAll }
+      ) return { serverId, addRoleForAll, joinLeaveMessages, joinAutorole }
       else return { serverId: 'Forbidden.' }
     },
     getUserInfo: (_, { linkToken }) => {

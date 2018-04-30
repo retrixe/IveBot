@@ -13,15 +13,11 @@ export const getIdFromMention = (mention: string) => {
 
 export const getServerSettings = async (db: mongoDB, serverID: string) => {
   // Get serverSettings through query.
-  const serverSettings = await db.collection('servers').find({ serverID }).toArray()
+  let serverSettings = await db.collection('servers').find({ serverID }).toArray()
   if (serverSettings.length === 0) {
     // Initialize server settings.
-    await db.collection('servers').insertOne({
-      serverID,
-      addRoleForAll: false
-    })
-    const newServerSettings = await db.collection('servers').find({ serverID }).toArray()
-    return newServerSettings[0]
+    await db.collection('servers').insertOne({ serverID })
+    serverSettings = await db.collection('servers').find({ serverID }).toArray()
   }
   return serverSettings[0]
 }

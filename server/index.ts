@@ -34,10 +34,13 @@ let onlineSince = Math.abs(new Date().getTime())
 
 // Require the bot, built or unbuilt.
 let botCallback
+let guildMemberEditCallback
 try {
   botCallback = require('../lib/index').default
+  guildMemberEditCallback = require('../lib/index').guildMemberEditCallback
 } catch (e) {
   botCallback = require('../bot/index').default
+  guildMemberEditCallback = require('../bot/index').guildMemberEditCallback
 }
 
 // Create a client to connect to Discord API Gateway.
@@ -73,28 +76,9 @@ const tempDB: DB = {gunfight: [], say: {}, link: {}}
 // When client recieves a message, it will callback.
 client.on('message', botCallback(client, tempDB, onlineSince))
 
-// WeChill specific configuration.
-client.on('guildMemberAdd', (member, event) => {
-  if (member.guild_id === '402423671551164416') {
-    client.sendMessage({
-      to: '402437089557217290',
-      message: `Yoyo <@${member.id}> welcome to WeChill, stay chill.`
-    })
-    client.addToRole({
-      serverID: member.guild_id,
-      userID: member.id,
-      roleID: '402429353096642561'
-    })
-  }
-})
-client.on('guildMemberRemove', (member, event) => {
-  if (member.guild_id === '402423671551164416') {
-    client.sendMessage({
-      to: '402437089557217290',
-      message: `Well ${event.d.user.username}#${event.d.user.discriminator} left us.`
-    })
-  }
-})
+// When a server loses a member, it will callback.
+client.on('guildMemberAdd', guildMemberEditCallback(client))
+client.on('guildMemberRemove', guildMemberEditCallback(client))
 
 /* SERVER CODE STARTS HERE */
 // Prepare Next.js and then start server.
