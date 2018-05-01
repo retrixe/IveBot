@@ -34,13 +34,14 @@ class DashboardIndex extends React.Component<Props, State> {
 query getServerSettings($server: String!, $token: String!) {
   serverSettings(serverId: $server, linkToken: $token) {
     addRoleForAll
+    joinLeaveMessages
   }
 }
     `
     let settings
     if (!this.state.selected) {
       settings = <List>{this.props.data.map(element => {
-        let nameOfServer = element.name
+        let nameOfServer = element.name ? element.name : ''
         if (nameOfServer.length >= 32) nameOfServer = element.name.substr(0, 29) + '...'
         return (
           <ListItem disabled={!element.perms}

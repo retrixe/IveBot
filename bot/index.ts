@@ -103,15 +103,15 @@ export const guildMemberEditCallback = (client: client) => async (member: {
     return // Why wait.
   }
   const serverSettings = await getServerSettings(db, member.guild_id)
-  if (event.t === 'GUILD_MEMBER_REMOVE' && serverSettings.joinLeaveMessages[1]) {
-    client.sendMessage({
-      to: serverSettings.joinLeaveMessages[0],
-      message: serverSettings.joinLeaveMessages[1]
-    })
-  } else if (event.t === 'GUILD_MEMBER_ADD' && serverSettings.joinLeaveMessages[2]) {
+  if (event.t === 'GUILD_MEMBER_REMOVE' && serverSettings.joinLeaveMessages[2]) {
     client.sendMessage({
       to: serverSettings.joinLeaveMessages[0],
       message: serverSettings.joinLeaveMessages[2]
+    })
+  } else if (event.t === 'GUILD_MEMBER_ADD' && serverSettings.joinLeaveMessages[1]) {
+    client.sendMessage({
+      to: serverSettings.joinLeaveMessages[0],
+      message: serverSettings.joinLeaveMessages[1]
     })
   }
   if (event.t === 'GUILD_MEMBER_ADD' && serverSettings.joinAutorole) {
