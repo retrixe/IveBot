@@ -34,7 +34,7 @@ class DashboardIndex extends React.Component<Props, State> {
 query getServerSettings($server: String!, $token: String!) {
   serverSettings(serverId: $server, linkToken: $token) {
     addRoleForAll
-    joinLeaveMessages
+    joinAutorole
   }
 }
     `

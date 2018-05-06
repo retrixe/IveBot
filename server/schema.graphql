@@ -38,6 +38,8 @@ input EditServerSettingsInput {
   linkToken: String!
   # Enable public roles through this setting.
   addRoleForAll: Boolean
+  # Edit join autorole through this setting.
+  joinAutorole: String
 }
 
 # Enable mutations.

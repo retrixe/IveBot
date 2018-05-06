@@ -25,7 +25,6 @@ export default (ctx) => ({
       let {
         addRoleForAll, joinLeaveMessages, joinAutorole
       } = await getServerSettings(db, serverId)
-      if (!joinLeaveMessages) joinLeaveMessages = ['', '', '']
       if (
         checkUserForPermission(
           ctx.client, ctx.tempDB.link[linkToken], serverId, 'GENERAL_MANAGE_GUILD') ||
@@ -57,7 +56,7 @@ export default (ctx) => ({
   },
   Mutation: {
     editServerSettings: async (_, { input }) => {
-      const { serverId, linkToken, addRoleForAll } = input
+      const { serverId, linkToken, addRoleForAll, joinAutorole } = input
       if (
         checkUserForPermission(
           ctx.client, ctx.tempDB.link[linkToken], serverId, 'GENERAL_MANAGE_GUILD'
@@ -65,9 +64,12 @@ export default (ctx) => ({
       ) {
         await getServerSettings(db, serverId)
         await db.collection('servers').updateOne({ serverID: serverId }, { $set: {
-          // eslint-disable-next-line no-unneeded-ternary
-          addRoleForAll: addRoleForAll ? addRoleForAll : undefined
+          /* eslint-disable no-unneeded-ternary */
+          addRoleForAll: addRoleForAll ? addRoleForAll : undefined,
+          joinAutorole: joinAutorole ? joinAutorole : undefined
+          /* eslint-enable no-unneeded-ternary */
         } })
+        console.log(await getServerSettings(db, serverId))
         return getServerSettings(db, serverId)
       } else return { serverId: 'Forbidden.' }
     }

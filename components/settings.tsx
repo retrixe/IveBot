@@ -12,33 +12,39 @@ import { gql } from 'apollo-boost'
 
 /* eslint-disable quotes, no-multi-str, no-undef */
 interface Props {
-  data: { addRoleForAll: boolean, joinLeaveMessages: Array<string> },
+  data: { addRoleForAll: boolean, joinAutorole: string },
   token: string,
   server: string
 }
 interface State {
   role: boolean,
-  joinLeaveMessages: Array<string>
+  joinAutorole: string
 }
 export default class Settings extends React.Component<Props, State> {
   constructor (props) {
     super(props); this.state = {
       role: this.props.data.addRoleForAll,
-      joinLeaveMessages: this.props.data.joinLeaveMessages
+      joinAutorole: this.props.data.joinAutorole
     }
   }
 
   render () {
     const mutation = gql`
-mutation variables($server: String!, $token: String!, $role: Boolean) {
-  editServerSettings(input: { serverId: $server, linkToken: $token, addRoleForAll: $role }) {
+mutation variables($server: String!, $token: String!, $role: Boolean, $joinAutorole: String) {
+  editServerSettings(input: {
+    serverId: $server, linkToken: $token, addRoleForAll: $role, joinAutorole: $joinAutorole
+  }) {
     addRoleForAll
+    joinAutorole
   }
 }
     `
     return (
       <Mutation mutation={mutation} variables={{
-        token: this.props.token, role: this.state.role, server: this.props.server
+        token: this.props.token,
+        role: this.state.role,
+        server: this.props.server,
+        joinAutorole: this.state.joinAutorole
       }}>
         {(updateSettings, { loading, error }) => (
           <>
@@ -64,41 +70,20 @@ mutation variables($server: String!, $token: String!, $role: Boolean) {
             <Typography variant='title' gutterBottom>Join/Leave Actions</Typography>
             <Divider />
             <br />
-            <Typography variant='subheading' gutterBottom>Join/Leave Message Configuration</Typography>
+            <Typography variant='subheading' gutterBottom>Join Autorole</Typography>
             <Typography gutterBottom>
-              {'Join/leave messages enable you to customize your server. \
-              A join/leave message will be sent in a specific channel whenever \
-              someone joins or leaves this server. It is useful for logging as well.'}
+              {'Join autorole automatically gives a joining person a specified role. \
+              It is useful in giving members specified colors or in combination with public \
+              roles by giving a person a high role.'}
             </Typography>
             <Typography gutterBottom>
-              {'Use {id} for the joining or leaving user\'s ID, {un} for username, {me} \
-              for mentioning and {ds} for the discriminator.'}
+              {'Use | to separate roles. If a role contains |, it will not be added.'}
             </Typography>
             <FormControl>
-              <InputLabel>Channel Name</InputLabel>
-              <Input value={this.state.joinLeaveMessages[0]} onChange={e => {
-                const joinLeaveMessages = JSON.parse(JSON.stringify(this.state.joinLeaveMessages))
-                joinLeaveMessages[0] = e.target.value
-                this.setState({ joinLeaveMessages })
-              }} margin='dense' />
-              <FormHelperText>Leave blank to disable</FormHelperText>
-            </FormControl>
-            <FormControl>
-              <InputLabel>Join Message</InputLabel>
-              <Input value={this.state.joinLeaveMessages[1]} onChange={e => {
-                const joinLeaveMessages = JSON.parse(JSON.stringify(this.state.joinLeaveMessages))
-                joinLeaveMessages[1] = e.target.value
-                this.setState({ joinLeaveMessages })
-              }} multiline fullWidth margin='dense' />
-              <FormHelperText>Leave blank to disable</FormHelperText>
-            </FormControl>
-            <FormControl>
-              <InputLabel>Leave Message</InputLabel>
-              <Input value={this.state.joinLeaveMessages[2]} onChange={e => {
-                const joinLeaveMessages = JSON.parse(JSON.stringify(this.state.joinLeaveMessages))
-                joinLeaveMessages[2] = e.target.value
-                this.setState({ joinLeaveMessages })
-              }} multiline fullWidth margin='dense' />
+              <InputLabel>Role Names</InputLabel>
+              <Input
+                value={this.state.joinAutorole} fullWidth
+                onChange={e => this.setState({ joinAutorole: e.target.value })} margin='dense' />
               <FormHelperText>Leave blank to disable</FormHelperText>
             </FormControl>
             <div style={{ height: 10 }} />

@@ -99,27 +99,40 @@ export const guildMemberEditCallback = (client: client) => async (member: {
   } else if (member.guild_id === '402423671551164416' && event.t === 'GUILD_MEMBER_ADD') {
     const message = `Yoyo <@${member.id}> welcome to WeChill, stay chill.`
     client.sendMessage({ to: '402437089557217290', message })
-    client.addToRole({ serverID: member.guild_id, userID: member.id, roleID: '402429353096642561' })
     return // Why wait.
   }
   const serverSettings = await getServerSettings(db, member.guild_id)
-  if (event.t === 'GUILD_MEMBER_REMOVE' && serverSettings.joinLeaveMessages[2]) {
+  /* if (event.t === 'GUILD_MEMBER_REMOVE' && serverSettings.joinLeaveMessages[2]) {
+    const channelID = Object.keys(client.servers[member.guild_id].channels).find(
+      element => client.servers[member.guild_id].channels[element].name ===
+        serverSettings.joinLeaveMessages[0]
+    )
     client.sendMessage({
-      to: serverSettings.joinLeaveMessages[0],
+      to: client.servers[member.guild_id].channels[channelID].name,
       message: serverSettings.joinLeaveMessages[2]
     })
   } else if (event.t === 'GUILD_MEMBER_ADD' && serverSettings.joinLeaveMessages[1]) {
+    const channelID = Object.keys(client.servers[member.guild_id].channels).find(
+      element => client.servers[member.guild_id].channels[element].name ===
+        serverSettings.joinLeaveMessages[0]
+    )
     client.sendMessage({
-      to: serverSettings.joinLeaveMessages[0],
+      to: client.servers[member.guild_id].channels[channelID].name,
       message: serverSettings.joinLeaveMessages[1]
     })
-  }
+  } */
   if (event.t === 'GUILD_MEMBER_ADD' && serverSettings.joinAutorole) {
-    client.addToRole({
-      serverID: member.guild_id,
-      userID: member.id,
-      roleID: serverSettings.joinAutorole
-    })
+    const roles = serverSettings.joinAutorole.split('|')
+    for (let x = 0; x < roles.length; x++) {
+      const roleID = Object.keys(client.servers[member.guild_id].roles).find(
+        element => client.servers[member.guild_id].roles[element].name === roles[x]
+      )
+      client.addToRole({
+        serverID: member.guild_id,
+        userID: member.id,
+        roleID
+      })
+    }
   }
 }
 
