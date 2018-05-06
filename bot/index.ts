@@ -206,6 +206,7 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
     '/accept': () => handleAccept(tempDB, userID, sendResponse, channelID),
     // Say.
     '/say': () => handleSay(message, sendResponse, client, event, testPilot, tempDB),
+    '/type': () => handleSay(message, sendResponse, client, event, testPilot, tempDB),
     '/editLastSay': () => handleEditLastSay(message, sendResponse, client, event, testPilot, tempDB),
     '/els': () => handleEditLastSay(message, sendResponse, client, event, testPilot, tempDB),
     '/edit': () => handleEdit(message, sendResponse, client, event),

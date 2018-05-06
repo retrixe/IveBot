@@ -24,7 +24,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     TP \`/request\` - Request a specific feature.
     \`/link\` - Links your Discord to IveBot Web (use in DM only)
     \`/weather\` - It's really cloudy here..
-    \`/say\` - Say something, even in another channel.
+    \`/say\` | \`/type\` - Say something, even in another channel.
     \`/editLastSay\` - Even if it was another channel.
     \`/avatar\` - Avatar of a user.
     \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
@@ -32,6 +32,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
 **Administrative commands.**
     \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
     \`/warn\` and \`/warnings\` | \`/clearwarns\` and \`/removewarn\`
+    \`/purge\` - Bulk delete a set of messages.
     OP \`/edit\` - Edits any command sent by IveBot.
 
 **There are some easter egg auto responses.**
@@ -93,6 +94,7 @@ const commandDocs: { [index: string]: any } = {
   'apod': b('/apod (date)', 'The astronomy picture of the day. Truly beautiful. Usually.', '/apod 2nd March 2017', '/astronomy-picture-of-the-day'),
   'request': b('/request <something>', 'Request a feature. Only available to test pilots.', '/request a /userinfo command.', '/req'),
   'say': b('/say (channel) <text>', 'Say something. Test pilots and admins/mods only.', '/say #general heyo'),
+  'type': b('/type (channel) <text>', 'Type something. Test pilots and admins/mods only.', '/type #general heyo'),
   'editLastSay': b('/editLastSay (channel) <new text>', 'Edits the last say in a channel.', '/editLastSay #general hey', '/els'),
   'edit': b('/edit (channel) <message ID> <new text>', 'Edits a single message. Owner only command.', '/edit #general 123456789012345678 hi'),
   'avatar': b('/avatar <user>', 'Avatar of a user.', '/avatar @voldemort#6931', '/av'),
@@ -104,8 +106,9 @@ const commandDocs: { [index: string]: any } = {
     'Give role to yourself/user. Manager/Mod only unless Public Roles are on.', '/giverole @voldemort#6931 Helper', '/gr'),
   'removerole': b('/removerole (user) <role>',
     'Remove role from yourself/user. Usually Manager/Mod only unless togglepublicroles is on.', '/takerole @voldemort#6931 Helper', '/tr'),
-  'ban': b('/ban <user by ID/username/mention> (reason)', 'Ban someone.', '/ban voldemort you is suck', '/banana'),
+  'ban': b('/ban <user by ID/username/mention> (reason)', 'Ban someone.', '/ban voldemort you is suck', '/banana, /nuke'),
   'unban': b('/unban <user by ID/username/mention> (reason)', 'Unban someone.', '/unban voldemort wrong person'),
+  'purge': b('/purge <number greater than 0>', 'Bulk delete messages newer than 2 weeks.', '/purge 10'),
   'kick': b('/kick <user by ID/username/mention> (reason)', 'Kick someone.', '/kick voldemort you is suck'),
   'warn': b('/warn <user by ID/username/mention> <reason>', 'Warn someone.', '/warn voldemort you is suck'),
   'warnings': b('/warnings <user by ID/username/mention>', 'Find out about a person\'s warnings.', '/warnings voldemort', '/warns'),

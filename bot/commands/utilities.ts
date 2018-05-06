@@ -68,6 +68,37 @@ export function handleEditLastSay (message: string, sendResponse: Function, clie
   }, (err: string) => { if (err) sendResponse('Nothing to edit.') })
 }
 
+export function handleType (message: string, sendResponse: Function, client: client, event: event, testPilot: string, db: DB) {
+  // Check for enough permissions.
+  let check = false
+  if (checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'TEXT_MANAGE_MESSAGES')) check = true
+  else if (testPilot) check = true
+  if (!check) {
+    sendResponse('You cannot fool me. You do not have enough permissions.')
+    return
+  }
+  // Delete the message.
+  client.deleteMessage({ channelID: event.d.channel_id, messageID: event.d.id })
+  // Should it be sent to another channel?
+  const possibleChannel = getIdFromMention(getArguments(message).split(' ')[0])
+  if (possibleChannel in client.channels) {
+    client.sendMessage({
+      to: possibleChannel, message: getArguments(getArguments(message)), typing: true
+    }, (err: string, { id }: { id: string }) => {
+      if (err) sendResponse('There was an error processing your request.')
+      else db.say[possibleChannel] = id
+    })
+    return
+  }
+  // Send the message all over again.
+  client.sendMessage({
+    to: event.d.channel_id, message: getArguments(message), typing: true
+  }, (err: string, { id }: { id: string }) => {
+    if (err) sendResponse('There was an error processing your request.')
+    else db.say[event.d.channel_id] = id
+  })
+}
+
 export function handleEdit (message: string, sendResponse: Function, client: client, event: event) {
   // Check for enough permissions.
   let check = false
