@@ -38,7 +38,9 @@ export type client = {
   removeFromRole: Function,
   createDMChannel: Function,
   deleteMessage: Function,
+  deleteMessages: Function,
   editMessage: Function,
+  getMessages: Function,
   joinVoiceChannel: Function
 }
 export type event = {

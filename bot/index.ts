@@ -21,7 +21,7 @@ import {
 import { handleGunfight, handleAccept } from './commands/gunfight'
 import {
   handleKick, handleBan, handleUnban, handleMute, handleUnmute, handleWarn,
-  handleGiverole, handleTakerole, handleWarnings, handleClearwarns, handleRemovewarn
+  handleGiverole, handleTakerole, handleWarnings, handleClearwarns, handleRemovewarn, handlePurge
 } from './commands/admin'
 
 // We need types.
@@ -90,7 +90,9 @@ const appendableCommandMaps: { [index: string]: Function } = {
 // When client gains/loses a member, it will callback.
 export const guildMemberEditCallback = (client: client) => async (member: {
   guild_id: string, id: string // eslint-disable-line indent
-}, event: { t: string, d: { user: { username: string, discriminator: string } } }) => {
+}, event: { t: string, d: {
+  user: { username: string, discriminator: string, bot: boolean }
+} }) => { // eslint-disable-line indent
   // WeChill specific configuration.
   if (member.guild_id === '402423671551164416' && event.t === 'GUILD_MEMBER_REMOVE') {
     const message = `Well ${event.d.user.username}#${event.d.user.discriminator} left us.`
@@ -121,7 +123,8 @@ export const guildMemberEditCallback = (client: client) => async (member: {
       message: serverSettings.joinLeaveMessages[1]
     })
   } */
-  if (event.t === 'GUILD_MEMBER_ADD' && serverSettings.joinAutorole) {
+  if (event.t === 'GUILD_MEMBER_ADD' && serverSettings.joinAutorole && !event.d.user.bot) {
+    console.log(member, event)
     const roles = serverSettings.joinAutorole.split('|')
     for (let x = 0; x < roles.length; x++) {
       const roleID = Object.keys(client.servers[member.guild_id].roles).find(
@@ -214,14 +217,18 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
     // Administrative commands.
     '/ban': () => handleBan(client, event, sendResponse, message),
     '/banana': () => handleBan(client, event, sendResponse, message),
+    '/nuke': () => handleBan(client, event, sendResponse, message),
     '/unban': () => handleUnban(client, event, sendResponse, message),
     '/kick': () => handleKick(client, event, sendResponse, message),
+    '/purge': () => handlePurge(client, event, sendResponse, message),
     '/mute': () => handleMute(client, event, sendResponse, message),
     '/unmute': () => handleUnmute(client, event, sendResponse, message),
     '/warn': () => handleWarn(client, event, sendResponse, message, db),
     '/clearwarns': () => handleClearwarns(client, event, sendResponse, message, db),
+    '/clearw': () => handleClearwarns(client, event, sendResponse, message, db),
     '/cw': () => handleClearwarns(client, event, sendResponse, message, db),
     '/removewarn': () => handleRemovewarn(client, event, sendResponse, message, db),
+    '/removew': () => handleRemovewarn(client, event, sendResponse, message, db),
     '/rw': () => handleRemovewarn(client, event, sendResponse, message, db),
     '/warnings': () => handleWarnings(client, event, sendResponse, message, db),
     '/warns': () => handleWarnings(client, event, sendResponse, message, db),

@@ -150,12 +150,28 @@ export function handleWeather (message: string, sendResponse: Function, client: 
     })
 }
 
+fetch(`http://data.fixer.io/api/latest?access_key=${fixerAPIkey}`)
+  .then((res: { json: Function }) => res.json())
+  .catch((err: string) => console.log(`Something went wrong 👾 Error: ${err}`))
+  .then((json: { rates: { [index: string]: number }, timestamp: number }) => {
+    exchangeRates = json
+    exchangeRates.timestamp = Date.now()
+  })
 let exchangeRates: { timestamp: number, rates: { [index: string]: number } }
 // Currency.
 export function handleCurrency (message: string, sendResponse: Function) {
+  if (!exchangeRates || Date.now() - exchangeRates.timestamp > 3600000) {
+    fetch(`http://data.fixer.io/api/latest?access_key=${fixerAPIkey}`)
+      .then((res: { json: Function }) => res.json())
+      .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
+      .then((json: { rates: { [index: string]: number }, timestamp: number }) => {
+        exchangeRates = json
+        exchangeRates.timestamp = Date.now()
+      })
+  }
   // Whee, currency conversion!
-  const from = getArguments(message).split(' ')[0].toLocaleUpperCase()
-  const to = getArguments(message).split(' ')[1].toLocaleUpperCase()
+  let from = getArguments(message).split(' ')[0]
+  let to = getArguments(message).split(' ')[1]
   let amount = getArguments(getArguments(getArguments(message))).trim()
   if (from.length !== 3 || !exchangeRates.rates[from]) {
     sendResponse('Invalid currency to convert from.')
@@ -172,18 +188,13 @@ export function handleCurrency (message: string, sendResponse: Function) {
     sendResponse('Enter a proper number to convert.')
     return
   }
-  if (!exchangeRates || Date.now() - exchangeRates.timestamp > 3600000) {
-    fetch(`http://data.fixer.io/api/latest?access_key=${fixerAPIkey}`)
-      .then((res: { json: Function }) => res.json())
-      .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
-      .then((json: { rates: { [index: string]: number }, timestamp: number }) => {
-        sendResponse(`**${from}** ${amount} = **${to}** ${json.rates[to] * +amount}`)
-        exchangeRates = json
-        exchangeRates.timestamp = Date.now()
-      })
-  } else {
-    sendResponse(`**${from}** ${amount} = **${to}** ${exchangeRates.rates[to] * +amount}`)
-  }
+  from = from.toUpperCase()
+  to = to.toUpperCase()
+  let converted: string|Array<string> =
+    ((exchangeRates.rates[to] / exchangeRates.rates[from]) * +amount).toString().split('.')
+  converted[1] = converted[1].substr(0, 4)
+  converted = converted.join('.')
+  sendResponse(`**${from}** ${amount} = **${to}** ${converted}`)
 }
 
 // Namemc.
