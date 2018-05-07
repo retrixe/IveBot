@@ -33,7 +33,6 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
     \`/warn\` and \`/warnings\` | \`/clearwarns\` and \`/removewarn\`
     \`/purge\` - Bulk delete a set of messages.
-    OP \`/edit\` - Edits any command sent by IveBot.
 
 **There are some easter egg auto responses.**
 **Commands with TP are test pilot only, ones with OP are only executable by the bot host.**`
@@ -117,6 +116,7 @@ const commandDocs: { [index: string]: any } = {
     '/removewarn <user by ID/username/mention> <warning ID>',
     'Remove a single warnings from a person.', '/removewarn voldemort 5adf7a0e825aa7005a4e7be2', '/rw'
   ),
+  'remoteexec': b('/remoteexec <command>', 'Execute a command on the host. Owner only command.', '/remoteexec killall node'),
   'mute': b('/mute <user by ID/username/mention> (time limit) (reason)', 'Mute someone. Compatible with Dyno.', '/mute voldemort 1h bored'),
   'unmute': b('/unmute <user by ID/username/mention> (reason)', 'Unmute someone.', '/unmute voldemort wrong person'),
   'weather': b('/weather <city name>(,country name)', 'What\'s the weather like at your place?', '/weather Shanghai,CN', '/wt'),

@@ -6,7 +6,9 @@ import * as ms from 'ms'
 import { execSync } from 'child_process'
 import { randomBytes } from 'crypto'
 // Commands.
-import { handleRequest, handleSay, handleEditLastSay, handleAvatar, handleEdit } from './commands/utilities'
+import {
+  handleRequest, handleSay, handleEditLastSay, handleAvatar, handleEdit, handleType
+} from './commands/utilities'
 import {
   handleChoose,
   handleReverse,
@@ -206,12 +208,10 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
     '/accept': () => handleAccept(tempDB, userID, sendResponse, channelID),
     // Say.
     '/say': () => handleSay(message, sendResponse, client, event, testPilot, tempDB),
-    '/type': () => handleSay(message, sendResponse, client, event, testPilot, tempDB),
+    '/type': () => handleType(message, sendResponse, client, event, testPilot, tempDB),
     '/editLastSay': () => handleEditLastSay(message, sendResponse, client, event, testPilot, tempDB),
     '/els': () => handleEditLastSay(message, sendResponse, client, event, testPilot, tempDB),
     '/edit': () => handleEdit(message, sendResponse, client, event),
-    // Edit.
-    // '/edit': () => client.editMessage({ message })
     // Avatar.
     '/avatar': () => handleAvatar(message, sendResponse, client, userID),
     '/av': () => handleAvatar(message, sendResponse, client, userID),
