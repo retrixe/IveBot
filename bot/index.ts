@@ -7,7 +7,8 @@ import { execSync } from 'child_process'
 import { randomBytes } from 'crypto'
 // Commands.
 import {
-  handleRequest, handleSay, handleEditLastSay, handleAvatar, handleEdit, handleType, handleRemindme
+  handleRequest, handleSay, handleEditLastSay, handleAvatar, handleListserverregions,
+  handleEdit, handleType, handleRemindme, handleChangeserverregion
 } from './commands/utilities'
 import {
   handleChoose,
@@ -90,7 +91,10 @@ const appendableCommandMaps: { [index: string]: Function } = {
   '/apod': handleApod,
   // Calculator.
   '/calculate': handleCalculate,
-  '/calc': handleCalculate
+  '/calc': handleCalculate,
+  // List available server regions.
+  '/listserveregions': handleListserverregions,
+  '/lsr': handleListserverregions
 }
 
 // When client gains/loses a member, it will callback.
@@ -222,6 +226,9 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
     // Remind me.
     '/remindme': () => handleRemindme(message, sendResponse, client, userID),
     '/rm': () => handleRemindme(message, sendResponse, client, userID),
+    // Server region commands.
+    '/changeserverregion': () => handleChangeserverregion(client, event, sendResponse, message),
+    '/csr': () => handleChangeserverregion(client, event, sendResponse, message),
     // Administrative commands.
     '/ban': () => handleBan(client, event, sendResponse, message),
     '/banana': () => handleBan(client, event, sendResponse, message),

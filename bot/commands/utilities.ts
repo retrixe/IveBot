@@ -7,10 +7,11 @@ import { host } from '../../config.json5'
 import * as ms from 'ms'
 
 export function handleRequest (client: client, userID: string, sendResponse: Function, message: string) {
+  const user = client.users[userID]
   client.createDMChannel(host)
   client.sendMessage({
     to: host,
-    message: `<@${userID}>: ${getArguments(message)}`
+    message: `${user.username}#${user.discriminator} with ID ${userID}: ${getArguments(message)}`
   })
   sendResponse(`<@${userID}>, what a pathetic idea. It has been DMed to the main developer and will be read shortly.
 You may recieve a response soon, and you can keep track here:
@@ -154,4 +155,34 @@ export function handleRemindme (
       message: `⏰ ${description}\nReminder set ${message.split(' ')[1]} ago.`
     })
   }, ms(message.split(' ')[1]))
+}
+
+// List server regions!
+const arrayOfServers = [
+  'brazil', 'frankfurt', 'amsterdam', 'london', 'singapore', 'us-east',
+  'us-central', 'us-south', 'us-west', 'sydney', 'japan', 'hongkong',
+  'russia'
+]
+export function handleListserverregions (message: string, sendResponse: Function) {
+  sendResponse('Available server regions: `brazil`, `frankfurt`, `amsterdam`, ' +
+  '`london`, `singapore`, `us-east`, `us-central`, `us-south`, `us-west`, ' + '`sydney`, ' +
+  '`japan`, `russia` and `hongkong`.')
+}
+
+export function handleChangeserverregion (client: client, event: event, sendResponse: Function, message: string) {
+  // Check user for permissions.
+  if (!checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'GENERAL_MANAGE_GUILD')) {
+    sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
+    return
+  } else if (message.split(' ').length !== 2) {
+    sendResponse('Correct usage: /changeserverregion <valid server region, /listserverregion>')
+    return
+  } else if (!arrayOfServers.includes(getArguments(message))) {
+    sendResponse('Invalid server voice region.')
+    return
+  }
+  client.editServer({
+    region: getArguments(message), serverID: client.channels[event.d.channel_id].guild_id
+  })
+  sendResponse('Voice region changed to `' + getArguments(message) + '` \\o/')
 }

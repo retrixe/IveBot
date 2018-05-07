@@ -32,6 +32,7 @@ export type client = {
   ban: Function,
   kick: Function,
   unban: Function,
+  editServer: Function,
   createRole: Function,
   editRole: Function,
   addToRole: Function,

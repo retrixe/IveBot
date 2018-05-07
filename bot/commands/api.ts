@@ -79,10 +79,12 @@ export function handleUrban (message: string, sendResponse: Function) {
           for (let i = 0; i < 595; i += 1) response += splitRes[i]
           response += '[...]'
         }
-        sendResponse(`
-        **🍸 Definition of ${getArguments(message)}:**
-        \`\`\`${response}\`\`\`
-        `)
+        sendResponse(`**🍸 Definition of ${getArguments(message)}:**`, () => {}, {
+          color: 0x555555,
+          description: response,
+          footer: { text: 'Do not trust Urban Dictionary.' },
+          title: getArguments(message)
+        })
         // Else, there will be an exception thrown.
       } catch (err) {
         sendResponse('No definition was found.')
