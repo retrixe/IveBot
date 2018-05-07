@@ -45,6 +45,10 @@ Make a file named `config.json5` in the top-level directory. It should be someth
   "token": "<insert token here>",
   "testPilots": ["array of people who can use test pilot commands via user ID"],
   "NASAtoken": "<to enable /astronomy-picture-of-the-day or /apod>",
+  "oxfordAPI": {
+    "appKey": "<enables /define, use Oxford Dictionary API>",
+    "appId": "<read above>"
+  },
   "host": "<your user ID to give you certain privileges like /remoteexec>",
   "weatherAPIkey": "<an http://openweathermap.org API key to enable /weather>",
   "fixerAPIkey": "<an http://fixer.io API key to enable /currencyconvert>",

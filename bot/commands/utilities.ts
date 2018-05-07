@@ -147,7 +147,7 @@ export function handleRemindme (
     return
   }
   const description = getArguments(getArguments(message))
-  sendResponse(`You will be reminded in ${message.split(' ')[1]} to ${description} through a DM.`)
+  sendResponse(`You will be reminded in ${message.split(' ')[1]} - ${description} - through a DM.`)
   setTimeout(() => {
     client.sendMessage({
       to: userID,

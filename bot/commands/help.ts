@@ -76,6 +76,7 @@ const commandDocs: { [index: string]: any } = {
   '8ball': b('/8ball (question)', 'Random answers to random questions.', '/8ball Will I flunk my exam?'),
   'repeat': b('/repeat <number of times> <string to repeat>', 'Repeat a string.', '/repeat 10 a', '/rep'),
   'urban': b('/urban <term>', 'Get an Urban Dictionary definition ;)', '/urban nub', '/urb'),
+  'define': b('/define <term>', 'Define a word in the Oxford Dictionary.', '/urban cyclone', '/def'),
   'cat': b('/cat', 'Random cat from <https://random.cat>', '/cat'),
   'dog': b('/dog (breed)', 'Random dog from <https://dog.ceo>', '/dog labrador'),
   'currency': b(

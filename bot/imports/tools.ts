@@ -21,3 +21,5 @@ export const getServerSettings = async (db: mongoDB, serverID: string) => {
   }
   return serverSettings[0]
 }
+
+export const zeroWidthSpace = '​'

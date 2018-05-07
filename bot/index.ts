@@ -18,7 +18,8 @@ import {
 } from './commands/games'
 import {
   handleUrban, handleCat, handleDog, handleRobohash, handleApod, handleWeather, handleNamemc,
-  handleCurrency
+  handleCurrency,
+  handleDefine
 } from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
 import {
@@ -56,6 +57,9 @@ const appendableCommandMaps: { [index: string]: Function } = {
   // Random.
   '/random': handleRandom,
   '/rand': handleRandom,
+  // Define.
+  '/define': handleDefine,
+  '/def': handleDefine,
   // Reverse.
   '/reverse': handleReverse,
   '/rev': handleReverse,
