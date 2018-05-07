@@ -132,6 +132,23 @@ export default function help (message: string, client: client, c: string, u: str
       to: c, message: generateDocs(commandDocs[getArguments(message).trim().split('/').join('')])
     })
     return
+    // Alias support.
+  } else if (Object.keys(commandDocs).find((element: string) => (
+    commandDocs[element].aliases
+      ? commandDocs[element].aliases.split('/').join('').split(', ').includes(
+        getArguments(message).trim().split('/').join('')
+      )
+      : undefined
+  ))) {
+    const command = Object.keys(commandDocs).find((element: string) => (
+      commandDocs[element].aliases
+        ? commandDocs[element].aliases.split('/').join('').split(', ').includes(
+          getArguments(message).trim().split('/').join('')
+        )
+        : undefined
+    ))
+    client.sendMessage({ to: c, message: generateDocs(commandDocs[command]) })
+    return
   } else if (getArguments(message)) {
     client.sendMessage({
       to: c, message: 'Incorrect parameters. Run /help for general help.'
