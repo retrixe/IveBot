@@ -7,7 +7,7 @@ import { execSync } from 'child_process'
 import { randomBytes } from 'crypto'
 // Commands.
 import {
-  handleRequest, handleSay, handleEditLastSay, handleAvatar, handleEdit, handleType
+  handleRequest, handleSay, handleEditLastSay, handleAvatar, handleEdit, handleType, handleRemindme
 } from './commands/utilities'
 import {
   handleChoose,
@@ -215,6 +215,9 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
     // Avatar.
     '/avatar': () => handleAvatar(message, sendResponse, client, userID),
     '/av': () => handleAvatar(message, sendResponse, client, userID),
+    // Remind me.
+    '/remindme': () => handleRemindme(message, sendResponse, client, userID),
+    '/rm': () => handleRemindme(message, sendResponse, client, userID),
     // Administrative commands.
     '/ban': () => handleBan(client, event, sendResponse, message),
     '/banana': () => handleBan(client, event, sendResponse, message),

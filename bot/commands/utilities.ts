@@ -4,6 +4,7 @@ import { checkUserForPermission } from '../imports/permissions'
 import { client, event, DB } from '../imports/types'
 import 'json5/lib/require'
 import { host } from '../../config.json5'
+import * as ms from 'ms'
 
 export function handleRequest (client: client, userID: string, sendResponse: Function, message: string) {
   client.createDMChannel(host)
@@ -136,4 +137,21 @@ export function handleAvatar (message: string, sendResponse: Function, client: c
     return
   }
   sendResponse('Link: ' + client.users[user].avatarURL + '?size=2048')
+}
+
+export function handleRemindme (
+  message: string, sendResponse: Function, client: client, userID: string
+) {
+  if (message.split(' ').length < 3 || !ms(message.split(' ')[1])) {
+    sendResponse('Correct usage: /remindme <time in 1d|1h|1m|1s> <description>')
+    return
+  }
+  const description = getArguments(getArguments(message))
+  sendResponse(`You will be reminded in ${message.split(' ')[1]} to ${description} through a DM.`)
+  setTimeout(() => {
+    client.sendMessage({
+      to: userID,
+      message: `⏰ ${description}\nReminder set ${message.split(' ')[1]} ago.`
+    })
+  }, ms(message.split(' ')[1]))
 }

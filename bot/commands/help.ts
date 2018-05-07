@@ -97,6 +97,7 @@ const commandDocs: { [index: string]: any } = {
   'editLastSay': b('/editLastSay (channel) <new text>', 'Edits the last say in a channel.', '/editLastSay #general hey', '/els'),
   'edit': b('/edit (channel) <message ID> <new text>', 'Edits a single message. Owner only command.', '/edit #general 123456789012345678 hi'),
   'avatar': b('/avatar <user>', 'Avatar of a user.', '/avatar @voldemort#6931', '/av'),
+  'remindme': b('/remindme <time in 1d|1h|1m|1s> <description>', 'Remind you of something.', '/remindme 1h do your homework', '/rm'),
   'about': b('/about', 'About IveBot.', '/about'),
   'ping': b('/ping', 'Latency of IveBot\'s connection to your server.', '/ping'),
   'uptime': b('/uptime', 'How long was IveBot on?', '/uptime'),
