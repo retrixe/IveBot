@@ -174,6 +174,8 @@ export function handleChangeserverregion (client: client, event: event, sendResp
   if (!checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'GENERAL_MANAGE_GUILD')) {
     sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
     return
+  } else if (!checkUserForPermission(client, client.id, client.channels[event.d.channel_id].guild_id, 'GENERAL_MANAGE_GUILD')) {
+    sendResponse('I require the Manage Server permission to do that..')
   } else if (message.split(' ').length !== 2) {
     sendResponse('Correct usage: /changeserverregion <valid server region, /listserverregion>')
     return

@@ -32,6 +32,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
 **Administrative commands.**
     \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
     \`/warn\` and \`/warnings\` | \`/clearwarns\` and \`/removewarn\`
+    \`/changeserverregion\` and \`/listserverregions\`
     \`/purge\` - Bulk delete a set of messages.
 
 **There are some easter egg auto responses.**
@@ -112,6 +113,8 @@ const commandDocs: { [index: string]: any } = {
   'purge': b('/purge <number greater than 0>', 'Bulk delete messages newer than 2 weeks.', '/purge 10'),
   'kick': b('/kick <user by ID/username/mention> (reason)', 'Kick someone.', '/kick voldemort you is suck'),
   'warn': b('/warn <user by ID/username/mention> <reason>', 'Warn someone.', '/warn voldemort you is suck'),
+  'changeserverregion': b('/changeserverregion <server region>', 'Changes the voice region of the server.', '/changeserverregion russia', '/csr'),
+  'listserverregions': b('/listserverregions', 'List available voice regions.', '/listserverregions', '/lsr'),
   'warnings': b('/warnings <user by ID/username/mention>', 'Find out about a person\'s warnings.', '/warnings voldemort', '/warns'),
   'clearwarns': b('/clearwarns <user by ID/username/mention>', 'Clear all warnings a person has.', '/clearwarns voldemort', '/cw'),
   'removewarn': b(

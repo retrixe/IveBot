@@ -93,7 +93,7 @@ const appendableCommandMaps: { [index: string]: Function } = {
   '/calculate': handleCalculate,
   '/calc': handleCalculate,
   // List available server regions.
-  '/listserveregions': handleListserverregions,
+  '/listserverregions': handleListserverregions,
   '/lsr': handleListserverregions
 }
 
