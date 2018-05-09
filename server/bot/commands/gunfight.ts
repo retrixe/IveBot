@@ -3,7 +3,7 @@ import { getIdFromMention } from '../imports/tools'
 import { DB } from '../imports/types'
 
 // Gunfight handler.
-export function handleGunfight (command: string, userID: string, sendResponse: Function, db: DB, channelID: string) {
+export function handleGunfight (command: string, id: string, userID: string, sendResponse: Function, db: DB, channelID: string) {
   // Get challenged mention and ID.
   const challenged = command.split(' ')[1]
   const challengedID = getIdFromMention(challenged)
@@ -21,7 +21,7 @@ export function handleGunfight (command: string, userID: string, sendResponse: F
   }
   // Challenging the bot and themselves.
   if (challengedID === userID) { sendResponse('You cannot challenge yourself :P'); return }
-  if (challengedID === '383591525944262656') {
+  if (challengedID === id) {
     sendResponse('Aw, how sweet. But I don\'t play with pathetic fools who try to fool me :>')
     return
   }

@@ -1,10 +1,10 @@
 // Tokens and stuff.
 import 'json5/lib/require'
-import { testPilots, host } from '../config.json5'
-import { version } from '../package.json'
-import * as ms from 'ms'
+import { testPilots, host, mongoURL } from '../../config.json5'
+import { version } from '../../package.json'
 import { execSync } from 'child_process'
 import { randomBytes } from 'crypto'
+import * as ms from 'ms'
 // Commands.
 import {
   handleRequest, handleSay, handleEditLastSay, handleAvatar, handleListserverregions,
@@ -29,16 +29,14 @@ import {
 } from './commands/admin'
 
 // We need types.
-import { client, event, DB, mongoDB } from './imports/types'
+import { client, DB, mongoDB, member, message } from './imports/types'
+import { PrivateChannel } from 'eris'
 import { getArguments, getServerSettings } from './imports/tools'
-import { checkChannelPermission } from './imports/permissions'
 import help from './commands/help'
 
 // MongoDB.
 // Get MongoDB.
 import { MongoClient } from 'mongodb'
-// Get the token needed.
-const { mongoURL } = require('../config.json5')
 // Create a MongoDB instance.
 let db: mongoDB
 MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (err, client) => {
@@ -98,22 +96,20 @@ const appendableCommandMaps: { [index: string]: Function } = {
 }
 
 // When client gains/loses a member, it will callback.
-export const guildMemberEditCallback = (client: client) => async (member: {
-  guild_id: string, id: string // eslint-disable-line indent
-}, event: { t: string, d: {
-  user: { username: string, discriminator: string, bot: boolean }
-} }) => { // eslint-disable-line indent
+export const guildMemberEditCallback = (client: client, event: string) => async (
+  guild: { id: string }, member: member
+) => { // eslint-disable-line indent
   // WeChill specific configuration.
-  if (member.guild_id === '402423671551164416' && event.t === 'GUILD_MEMBER_REMOVE') {
-    const message = `Well ${event.d.user.username}#${event.d.user.discriminator} left us.`
-    client.sendMessage({ to: '402437089557217290', message })
+  if (guild.id === '402423671551164416' && event === 'guildMemberRemove') {
+    const message = `Well ${member.user.username}#${member.user.discriminator} left us.`
+    client.createMessage('402437089557217290', message)
     return // Why wait.
-  } else if (member.guild_id === '402423671551164416' && event.t === 'GUILD_MEMBER_ADD') {
+  } else if (guild.id === '402423671551164416' && event === 'guildMemberAdd') {
     const message = `Yoyo <@${member.id}> welcome to WeChill, stay chill.`
-    client.sendMessage({ to: '402437089557217290', message })
+    client.createMessage('402437089557217290', message)
     return // Why wait.
   }
-  const serverSettings = await getServerSettings(db, member.guild_id)
+  const serverSettings = await getServerSettings(db, guild.id)
   /* if (event.t === 'GUILD_MEMBER_REMOVE' && serverSettings.joinLeaveMessages[2]) {
     const channelID = Object.keys(client.servers[member.guild_id].channels).find(
       element => client.servers[member.guild_id].channels[element].name ===
@@ -133,42 +129,32 @@ export const guildMemberEditCallback = (client: client) => async (member: {
       message: serverSettings.joinLeaveMessages[1]
     })
   } */
-  if (event.t === 'GUILD_MEMBER_ADD' && serverSettings.joinAutorole && !event.d.user.bot) {
+  if (event === 'guildMemberAdd' && serverSettings.joinAutorole && !member.user.bot) {
     console.log(member, event)
     const roles = serverSettings.joinAutorole.split('|')
     for (let x = 0; x < roles.length; x++) {
-      const roleID = Object.keys(client.servers[member.guild_id].roles).find(
-        element => client.servers[member.guild_id].roles[element].name === roles[x]
-      )
-      client.addToRole({
-        serverID: member.guild_id,
-        userID: member.id,
-        roleID
-      })
+      const roleID = client.guilds.find(a => a.id === guild.id).roles.find(
+        element => element.name === roles[x]
+      ).id
+      client.addGuildMemberRole(guild.id, member.id, roleID)
     }
   }
 }
 
 // When client recieves a message, it will callback.
-export default (client: client, tempDB: DB, onlineSince: number) => async (
-  user: string,
-  userID: string,
-  channelID: string,
-  message: string,
-  event: event
-) => {
+export default (client: client, tempDB: DB) => async (event: message) => {
+  console.log('hi')
   // Disable bots and webhooks from being responded to.
-  try { if (client.users[userID].bot) return } catch (e) { return }
-  try { if (!checkChannelPermission(client, client.id, channelID, 11)) return } catch (e) {}
-  // Helper variables and functions.
-  // Convert message to lowercase to ensure it works.
-  const command = message.toLocaleLowerCase()
-  // Helper command to send message to same channel.
-  const sendResponse = (m: string | Buffer, cb?: (error: {}, response: { id: string }) => void, e?: {}) => {
-    client.sendMessage({
-      to: channelID, message: m, embed: e || undefined
-    }, cb)
-  }
+  try { if (event.author.bot) return } catch (e) { return }
+  try { if (!event.channel.permissionsOf(client.user.id).has('sendMessages')) return } catch (e) {}
+  // Content of message and sendResponse.
+  const sendResponse = (content: string, embed?: {}) => client.createMessage(
+    event.channel.id, embed ? content : { content, embed }
+  )
+  const channelID = event.channel.id
+  const userID = event.author.id
+  const message = event.content
+  const command = event.content.toLowerCase()
   // Is the person a test pilot.
   const testPilot: string = testPilots.find((user: string) => user === userID)
   // Non-appendable commands which have to be re-defined on all callbacks. Taxing and waste of RAM.
@@ -177,29 +163,23 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
     '/token': () => {
       let secureToken = randomBytes(3).toString('hex')
       tempDB.link[secureToken] = userID
-      client.sendMessage({
-        to: userID,
-        message: 'Your token is: **' + secureToken + '** | **DO NOT SHARE THIS WITH ANYONE >_<**'
-      }, (err: string, a: { id: string }) => {
-        if (err) {
-          sendResponse('There was an error processing your request (unable to DM token)')
-          return
-        }
-        setTimeout(() => {
-          client.deleteMessage({ channelID: userID, messageID: a.id })
-        }, 30000)
-      })
+      // The DM part.
+      client.getDMChannel(userID).then((channel: PrivateChannel) => {
+        client.createMessage(
+          channel.id,
+          'Your token is: **' + secureToken + '** | **DO NOT SHARE THIS WITH ANYONE >_<**'
+        ).then((message: message) => {
+          setTimeout(() => {
+            client.deleteMessage(channel.id, message.id)
+          }, 30000)
+        }).catch(() => sendResponse('There was an error processing your request (unable to DM token)'))
+      }).catch(() => sendResponse('There was an error processing your request (unable to DM)'))
+      // The non-DM part.
       sendResponse('The token has been DMed ✅' +
-        ' | **It will be deleted after 30 seconds.** | **DO NOT SHARE THIS WITH ANYONE >_<**',
-      (err: string, a: { id: string }) => {
-        if (err) {
-          sendResponse('There was an error processing your request.')
-          return
-        }
-        setTimeout(() => {
-          client.deleteMessage({ channelID, messageID: a.id })
-        }, 30000)
-      })
+        ' | **It will be deleted after 30 seconds.** | **DO NOT SHARE THIS WITH ANYONE >_<**'
+      ).then((message: message) => {
+        setTimeout(() => { client.deleteMessage(channelID, message.id) }, 30000)
+      }).catch(() => sendResponse('There was an error processing your request.'))
     },
     // Weather.
     '/weather': () => handleWeather(message, sendResponse, client, channelID),
@@ -208,18 +188,18 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
     '/namemc': () => handleNamemc(message, sendResponse, client, channelID),
     '/nmc': () => handleNamemc(message, sendResponse, client, channelID),
     // Request.
-    '/request': () => { if (testPilot) handleRequest(client, userID, sendResponse, message) },
-    '/req': () => { if (testPilot) handleRequest(client, userID, sendResponse, message) },
+    '/request': () => { if (testPilot) handleRequest(client, event.author, sendResponse, message) },
+    '/req': () => { if (testPilot) handleRequest(client, event.author, sendResponse, message) },
     // Gunfight.
-    '/gunfight': () => handleGunfight(command, userID, sendResponse, tempDB, channelID),
-    '/gfi': () => handleGunfight(command, userID, sendResponse, tempDB, channelID),
+    '/gunfight': () => handleGunfight(message, client.user.id, userID, sendResponse, tempDB, channelID),
+    '/gfi': () => handleGunfight(message, client.user.id, userID, sendResponse, tempDB, channelID),
     '/accept': () => handleAccept(tempDB, userID, sendResponse, channelID),
     // Say.
-    '/say': () => handleSay(message, sendResponse, client, event, testPilot, tempDB),
-    '/type': () => handleType(message, sendResponse, client, event, testPilot, tempDB),
-    '/editLastSay': () => handleEditLastSay(message, sendResponse, client, event, testPilot, tempDB),
-    '/els': () => handleEditLastSay(message, sendResponse, client, event, testPilot, tempDB),
-    '/edit': () => handleEdit(message, sendResponse, client, event),
+    '/say': () => handleSay(event, sendResponse, client, testPilot, tempDB),
+    '/type': () => handleType(event, sendResponse, client, testPilot, tempDB),
+    '/editLastSay': () => handleEditLastSay(event, sendResponse, client, testPilot, tempDB),
+    '/els': () => handleEditLastSay(event, sendResponse, client, testPilot, tempDB),
+    '/edit': () => handleEdit(event, sendResponse, client),
     // Avatar.
     '/avatar': () => handleAvatar(message, sendResponse, client, userID),
     '/av': () => handleAvatar(message, sendResponse, client, userID),
@@ -261,58 +241,55 @@ For noobs, this bot is licensed and protected by law. Copy code and I will sue y
       // Get current time.
       const startTime = new Date().getTime()
       // Then send a message.
-      sendResponse('Ping?', (err: {}, { id }: { id: string }) => {
+      sendResponse('Ping?').then((message: message) => {
         // Latency (unrealistic, this can be negative or positive)
         const fl = startTime - new Date().getTime()
         // Divide latency by 2 to get more realistic latency and get absolute value (positive)
         const l = Math.abs(fl) / 2
         // Get latency.
         const e = l < 200 ? `latency of **${l}ms** 🚅🔃` : `latency of **${l}ms** 🔃`
-        if (err) sendResponse('IveBot has experienced an internal error.')
-        client.editMessage({
-          channelID,
-          messageID: id,
-          message: `Aha! IveBot ${version} is connected to your server with a ${e}`
-        })
+        client.editMessage(
+          channelID, message.id, `Aha! IveBot ${version} is connected to your server with a ${e}`
+        ).catch(() => sendResponse('IveBot has experienced an internal error.'))
       })
     },
-    '/uptime': () => sendResponse(ms(Math.abs(new Date().getTime()) - onlineSince, { long: true })),
+    '/uptime': () => sendResponse(ms(client.uptime, { long: true })),
     '/remoteexec': () => { if (userID === host) sendResponse(execSync(getArguments(message), { encoding: 'utf8' })) },
     // Role system.
     // Certain commands rely on server settings. I hope we can await for them.
     '/giverole': async () => {
-      const serverSettings = await getServerSettings(db, client.channels[event.d.channel_id].guild_id)
+      const serverSettings = await getServerSettings(db, event.channel.guild)
       handleGiverole(client, event, sendResponse, message, serverSettings)
     },
     '/gr': async () => {
-      const serverSettings = await getServerSettings(db, client.channels[event.d.channel_id].guild_id)
+      const serverSettings = await getServerSettings(db, event.channel.guild)
       handleGiverole(client, event, sendResponse, message, serverSettings)
     },
     '/takerole': async () => {
-      const serverSettings = await getServerSettings(db, client.channels[event.d.channel_id].guild_id)
+      const serverSettings = await getServerSettings(db, event.channel.guild)
       handleTakerole(client, event, sendResponse, message, serverSettings)
     },
     '/tr': async () => {
-      const serverSettings = await getServerSettings(db, client.channels[event.d.channel_id].guild_id)
+      const serverSettings = await getServerSettings(db, event.channel.guild)
       handleTakerole(client, event, sendResponse, message, serverSettings)
     }
   }
   // Check for the commands in appendableCommandMaps.
   for (let i = 0; i < Object.keys(appendableCommandMaps).length; i++) {
-    if (command.split(' ')[0] === Object.keys(appendableCommandMaps)[i]) {
+    if (command.toLowerCase().split(' ')[0] === Object.keys(appendableCommandMaps)[i]) {
       appendableCommandMaps[Object.keys(appendableCommandMaps)[i]](message, sendResponse)
       break
     }
   }
   // Check for the commands in commandMaps.
   for (let i = 0; i < Object.keys(commandMaps).length; i++) {
-    if (command.split(' ')[0] === Object.keys(commandMaps)[i]) {
+    if (command.toLowerCase().split(' ')[0] === Object.keys(commandMaps)[i]) {
       commandMaps[Object.keys(commandMaps)[i]]()
       break
     }
   }
   // Help command.
-  if (command.startsWith('/help') || command.startsWith('/halp')) help(message, client, channelID, userID)
+  if (command.startsWith('/help') || command.startsWith('/halp')) help(command, client, channelID, userID)
   // Auto responses and easter eggs.
   else if (command.startsWith('is dot a good boy')) sendResponse('Shame on you. He\'s undefined.')
   else if (command.startsWith('iphone x')) sendResponse(`You don't deserve it. 😎`)

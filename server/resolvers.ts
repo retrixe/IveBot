@@ -1,8 +1,7 @@
 // Import permission checks and function to retrieve server settings.
-import { checkUserForPermission } from '../bot/imports/permissions'
-import { getServerSettings } from '../bot/imports/tools'
+import { getServerSettings } from './bot/imports/tools'
 // Get types.
-import { mongoDB } from '../bot/imports/types'
+import { mongoDB, DB, client } from './bot/imports/types'
 // Get MongoDB.
 import { MongoClient } from 'mongodb'
 // Who's the host? He gets special permission.
@@ -18,33 +17,36 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (e
 })
 
 // Set up resolvers.
-export default (ctx) => ({
+export default (ctx: { tempDB: DB, client: client }) => ({
   // Queries.
   Query: {
-    serverSettings: async (_, { serverId, linkToken }) => {
+    serverSettings: async (
+      _: string, { serverId, linkToken }: { serverId: string, linkToken: string }
+    ) => {
+      const member = ctx.client.guilds
+        .find(t => t.id === serverId).members.find(t => t.id === ctx.tempDB.link[linkToken])
       let {
         addRoleForAll, joinLeaveMessages, joinAutorole
       } = await getServerSettings(db, serverId)
       if (
-        checkUserForPermission(
-          ctx.client, ctx.tempDB.link[linkToken], serverId, 'GENERAL_MANAGE_GUILD') ||
-        host === ctx.tempDB.link[linkToken]
+        member.permission.has('manageGuild') || host === ctx.tempDB.link[linkToken]
       ) return { serverId, addRoleForAll, joinLeaveMessages, joinAutorole }
       else return { serverId: 'Forbidden.' }
     },
-    getUserInfo: (_, { linkToken }) => {
+    getUserInfo: (_: string, { linkToken }: { linkToken: string }) => {
       if (ctx.tempDB.link[linkToken]) {
-        let servers = []
-        Object.keys(ctx.client.servers).forEach(server => {
-          Object.keys(ctx.client.servers[server].members).forEach(member => {
+        let servers: Array<{ perms: boolean, icon: string, serverId: string, name: string }> = []
+        Object.keys(ctx.client.guilds).forEach(server => {
+          Object.keys(ctx.client.guilds.find(a => a.id === server).members).forEach(member => {
             if (member === ctx.tempDB.link[linkToken]) {
               servers.push({
                 serverId: server,
-                name: ctx.client.servers[server].name,
-                icon: ctx.client.servers[server].icon || 'no icon',
+                name: ctx.client.guilds.find(a => a.id === server).name,
+                icon: ctx.client.guilds.find(a => a.id === server).iconURL || 'no icon',
                 perms: host === ctx.tempDB.link[linkToken]
                   ? true
-                  : checkUserForPermission(ctx.client, member, server, 'GENERAL_MANAGE_GUILD')
+                  : ctx.client.guilds.find(t => t.id === server).members
+                    .find(t => t.id === ctx.tempDB.link[linkToken]).permission.has('manageGuild')
               })
             }
           })
@@ -55,12 +57,16 @@ export default (ctx) => ({
     }
   },
   Mutation: {
-    editServerSettings: async (_, { input }) => {
+    editServerSettings: async (
+      _: string, { input }: { input: { // eslint-disable-next-line indent
+        serverId: string, linkToken: string, addRoleForAll: string, joinAutorole: string
+      } }
+    ) => {
       const { serverId, linkToken, addRoleForAll, joinAutorole } = input
+      const member = ctx.client.guilds
+        .find(t => t.id === serverId).members.find(t => t.id === ctx.tempDB.link[linkToken])
       if (
-        checkUserForPermission(
-          ctx.client, ctx.tempDB.link[linkToken], serverId, 'GENERAL_MANAGE_GUILD'
-        ) || host === ctx.tempDB.link[linkToken]
+        member.permission.has('manageGuild') || host === ctx.tempDB.link[linkToken]
       ) {
         await getServerSettings(db, serverId)
         await db.collection('servers').updateOne({ serverID: serverId }, { $set: {

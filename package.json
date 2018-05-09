@@ -7,7 +7,7 @@
     "test": "tsc && ava",
     "nyan": "ava --tap | tap-nyan",
     "lint": "eslint . --ext .js,.ts,.tsx && tsc --noEmit && graphql-schema-linter server/schema.graphql",
-    "start": "ts-node server/index.ts --production",
+    "start": "node lib/index.js --production",
     "build": "next build && tsc",
     "dev": "nodemon server/index.ts",
     "mongo": "mongod --dbpath=database"
@@ -20,7 +20,7 @@
   "dependencies": {
     "@material-ui/icons": "^1.0.0-beta.43",
     "apollo-boost": "^0.1.4",
-    "discord.io": "woor/discord.io#gateway_v6",
+    "eris": "abalabahaha/eris#dev",
     "graphql": "^0.13.2",
     "graphql-yoga": "^1.8.5",
     "isomorphic-unfetch": "^2.0.0",

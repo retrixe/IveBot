@@ -48,7 +48,7 @@ query getServerSettings($server: String!, $token: String!) {
             divider button key={element.serverId} onClick={() => this.setState({ selected: element })}>
             {element.icon === 'no icon'
               ? ''
-              : <Avatar src={`https://cdn.discordapp.com/icons/${element.serverId}/${element.icon}.webp`} />
+              : <Avatar src={element.icon} />
             }
             <ListItemText primary={nameOfServer} secondary={element.serverId} />
           </ListItem>

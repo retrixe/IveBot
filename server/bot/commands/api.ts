@@ -5,7 +5,7 @@ import * as moment from 'moment'
 import { client } from '../imports/types'
 // Get the NASA API token.
 import 'json5/lib/require'
-const { NASAtoken, weatherAPIkey, fixerAPIkey, oxfordAPI } = require('../../config.json5')
+const { NASAtoken, weatherAPIkey, fixerAPIkey, oxfordAPI } = require('../../../config.json5')
 
 export function handleDefine (message: string, sendResponse: Function) {
   if (!getArguments(message)) {
@@ -52,7 +52,7 @@ export function handleDefine (message: string, sendResponse: Function) {
               })
             }))
           })
-          sendResponse(`📕 **|** Definition of **${getArguments(message)}**:`, () => {}, {
+          sendResponse(`📕 **|** Definition of **${getArguments(message)}**:`, {
             color: 0x7289DA,
             type: 'rich',
             title: getArguments(message),
@@ -79,7 +79,7 @@ export function handleUrban (message: string, sendResponse: Function) {
           for (let i = 0; i < 595; i += 1) response += splitRes[i]
           response += '[...]'
         }
-        sendResponse(`**🍸 Definition of ${getArguments(message)}:**`, () => {}, {
+        sendResponse(`**🍸 Definition of ${getArguments(message)}:**`, {
           color: 0x555555,
           description: response,
           footer: { text: 'Do not trust Urban Dictionary.' },
@@ -144,7 +144,7 @@ export function handleApod (message: string, sendResponse: Function) {
       .then((res: { json: Function }) => res.json())
       .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
       .then((json: { url: string, title: string, explanation: string }
-      ) => sendResponse('**' + json.title + '**\n' + json.explanation, () => '', {
+      ) => sendResponse('**' + json.title + '**\n' + json.explanation, {
         image: { url: json.url },
         color: 0x2361BE
       }))
@@ -157,7 +157,7 @@ export function handleApod (message: string, sendResponse: Function) {
     .then((res: { json: Function }) => res.json())
     .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
     .then((json: { hdurl: string, title: string, explanation: string }
-    ) => sendResponse('**' + json.title + '**\n' + json.explanation, () => '', {
+    ) => sendResponse('**' + json.title + '**\n' + json.explanation, {
       image: { url: json.hdurl },
       color: 0x2361BE
     }))
@@ -183,7 +183,7 @@ export function handleWeather (message: string, sendResponse: Function, client: 
       if (json.cod === '404') {
         sendResponse('Enter a valid city >_<')
       } else {
-        client.sendMessage({
+        client.createMessage(channel, {
           embed: {
             color: 0x00AE86,
             type: 'rich',
@@ -202,8 +202,7 @@ export function handleWeather (message: string, sendResponse: Function, client: 
 `${json.snow ? `**Snow (past 3 hours):** ${json.snow['3h']}mm` : ''}\n`,
             footer: { text: 'Weather data from https://openweathermap.org' }
           },
-          message: `**🌇🌃🌁🌆 The weather for ${getArguments(message)}:**`,
-          to: channel
+          content: `**🌇🌃🌁🌆 The weather for ${getArguments(message)}:**`
         })
       }
     })
@@ -278,9 +277,8 @@ export function handleNamemc (message: string, sendResponse: Function, client: c
             } else history += `**-** Name: ${object.name}\n`
           })
           if (json2.length === 1) history = 'Name has not been changed.\n'
-          client.sendMessage({
-            to: channel,
-            message: '**Minecraft history and skin for ' + getArguments(message).trim() + ':**',
+          client.createMessage(channel, {
+            content: '**Minecraft history and skin for ' + getArguments(message).trim() + ':**',
             embed: {
               color: 0x00AE86,
               type: 'rich',

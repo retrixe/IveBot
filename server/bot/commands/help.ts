@@ -132,9 +132,9 @@ const commandDocs: { [index: string]: any } = {
 
 export default function help (message: string, client: client, c: string, u: string) {
   if (getArguments(message).trim().split('/').join('') in commandDocs) {
-    client.sendMessage({
-      to: c, message: generateDocs(commandDocs[getArguments(message).trim().split('/').join('')])
-    })
+    client.createMessage(
+      c, generateDocs(commandDocs[getArguments(message).trim().split('/').join('')])
+    )
     return
     // Alias support.
   } else if (Object.keys(commandDocs).find((element: string) => (
@@ -151,24 +151,22 @@ export default function help (message: string, client: client, c: string, u: str
         )
         : undefined
     ))
-    client.sendMessage({ to: c, message: generateDocs(commandDocs[command]) })
+    client.createMessage(c, generateDocs(commandDocs[command]))
     return
   } else if (getArguments(message)) {
-    client.sendMessage({
-      to: c, message: 'Incorrect parameters. Run /help for general help.'
-    })
+    client.createMessage(c, 'Incorrect parameters. Run /help for general help.')
     return
   }
-  client.createDMChannel(u)
-  client.sendMessage({
-    embed: {
-      color: 0x00AE86,
-      type: 'rich',
-      title: 'Help',
-      description: generalHelp,
-      footer: { text: 'For help on a specific command or aliases, run /help <command>.' }
-    },
-    to: u
+  client.getDMChannel(u).then((PrivateChannel) => {
+    client.createMessage(PrivateChannel.id, {
+      embed: {
+        color: 0x00AE86,
+        type: 'rich',
+        title: 'Help',
+        description: generalHelp,
+        footer: { text: 'For help on a specific command or aliases, run /help <command>.' }
+      }
+    })
   })
-  client.sendMessage({ to: c, message: 'newbie, help has been direct messaged to you ✅' })
+  client.createChannel(c, 'newbie, help has been direct messaged to you ✅')
 }
