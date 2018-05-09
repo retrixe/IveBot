@@ -1,5 +1,5 @@
 import { getArguments, getIdFromMention } from '../../imports/tools'
-import { checkUserForPermission, checkRolePosition } from '../../imports/permissions'
+import { checkRolePosition } from '../../imports/permissions'
 // Get types.
 import { client, event } from '../../imports/types'
 
@@ -12,7 +12,7 @@ export { handleGiverole, handleTakerole } from './roles'
 // Purge!
 export function handlePurge (client: client, event: event, sendResponse: Function, message: string) {
   // Check user for permissions.
-  if (!checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'TEXT_MANAGE_MESSAGES')) {
+  if (!event.member.permission.has('manageMessages')) {
     sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
     return
   } else if (isNaN(+getArguments(message)) ||
@@ -21,29 +21,19 @@ export function handlePurge (client: client, event: event, sendResponse: Functio
     return
   }
   // Get the list of messages.
-  client.getMessages({
-    channelID: event.d.channel_id,
-    limit: +getArguments(message),
-    before: event.d.id
-  }, (err: string, res: Array<{ id: string }>) => {
-    if (err) { sendResponse(`Could not fetch messages, error ${err}`); return }
-    res.push({ id: event.d.id })
-    client.deleteMessages({
-      channelID: event.d.channel_id, messageIDs: res.map(element => element.id)
-    }, (err: string) => {
-      if (err) sendResponse(`Could not delete messages. Are the messages older than 2 weeks?`)
-      else {
-        sendResponse(`**${event.d.author.username}#${event.d.author.discriminator}** successfully \
+  client.getMessages(event.channel.id, +getArguments(message), event.id).then((res) => {
+    res.push(event)
+    client.deleteMessages(event.channel.id, res.map(e => e.id)).then(() => {
+      sendResponse(`**${event.author.username}#${event.author.discriminator}** successfully \
 purged **${res.length - 1}** messages from channel.`)
-      }
-    })
-  })
+    }).catch(() => sendResponse(`Could not delete messages. Are the messages older than 2 weeks?`))
+  }).catch(() => sendResponse('Could not retrieve messages.'))
 }
 
 // Kick!
 export function handleKick (client: client, event: event, sendResponse: Function, message: string) {
   // Check user for permissions.
-  if (!checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'GENERAL_KICK_MEMBERS')) {
+  if (!event.member.permission.has('kickMembers')) {
     sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
     return
   }

@@ -143,7 +143,6 @@ export const guildMemberEditCallback = (client: client, event: string) => async 
 
 // When client recieves a message, it will callback.
 export default (client: client, tempDB: DB) => async (event: message) => {
-  console.log('hi')
   // Disable bots and webhooks from being responded to.
   try { if (event.author.bot) return } catch (e) { return }
   try { if (!event.channel.permissionsOf(client.user.id).has('sendMessages')) return } catch (e) {}
@@ -258,19 +257,19 @@ For noobs, this bot is licensed and protected by law. Copy code and I will sue y
     // Role system.
     // Certain commands rely on server settings. I hope we can await for them.
     '/giverole': async () => {
-      const serverSettings = await getServerSettings(db, event.channel.guild)
+      const serverSettings = await getServerSettings(db, event.member.guild.id)
       handleGiverole(client, event, sendResponse, message, serverSettings)
     },
     '/gr': async () => {
-      const serverSettings = await getServerSettings(db, event.channel.guild)
+      const serverSettings = await getServerSettings(db, event.member.guild.id)
       handleGiverole(client, event, sendResponse, message, serverSettings)
     },
     '/takerole': async () => {
-      const serverSettings = await getServerSettings(db, event.channel.guild)
+      const serverSettings = await getServerSettings(db, event.member.guild.id)
       handleTakerole(client, event, sendResponse, message, serverSettings)
     },
     '/tr': async () => {
-      const serverSettings = await getServerSettings(db, event.channel.guild)
+      const serverSettings = await getServerSettings(db, event.member.guild.id)
       handleTakerole(client, event, sendResponse, message, serverSettings)
     }
   }

@@ -4,7 +4,7 @@ The script has been as well documented as possible. */
 /* SERVER CODE STARTS HERE */
 // Import our express-based GraphQL server and next.
 import * as next from 'next'
-import * as graphql from 'graphql-yoga'
+import { GraphQLServer } from 'graphql-yoga'
 // Import our resolvers.
 import resolvers from './resolvers'
 // Import types.
@@ -30,10 +30,13 @@ const client = new Eris.Client(token === 'dotenv' ? process.env.IVEBOT_TOKEN : t
   autoreconnect: true
 })
 
+// Connect ASAP, hopefully before the server starts.
+client.connect()
+
 // On connecting..
 client.on('ready', () => {
   console.log('Connected to Discord.')
-  client.createMessage('361577668677861399', ``)
+  // client.createMessage('361577668677861399', ``)
   client.editStatus('online', {
     name: 'DXMD (5k) on iMac Pro.',
     type: 1,
@@ -62,7 +65,7 @@ const app = next({ dev })
 const handle = app.getRequestHandler()
 // Prepare Next.js and then start server.
 app.prepare().then(() => {
-  const server = new graphql.GraphQLServer({
+  const server = new GraphQLServer({
     typeDefs: './server/schema.graphql',
     resolvers: resolvers({ tempDB, client })
   })

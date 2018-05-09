@@ -5,13 +5,14 @@ import Typography from 'material-ui/Typography'
 import TextField from 'material-ui/TextField'
 import { LinearProgress } from 'material-ui/Progress'
 import Link from 'next/link'
+import fetch from 'isomorphic-unfetch'
 import ApolloClient, { gql } from 'apollo-boost'
 import { ApolloProvider, Query } from 'react-apollo'
 import Dashboard from '../components/dashboard'
 import withRoot from '../components/withRoot'
 
 // Apollo Client definition.
-const client = new ApolloClient({ uri: `/graphql` })
+const client = new ApolloClient({ uri: `/graphql`, fetchOptions: { fetch } })
 
 /* eslint-disable quotes, no-multi-str, no-undef */
 class DashboardIndex extends React.Component {
