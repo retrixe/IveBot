@@ -33,24 +33,41 @@ export function handleDefine (message: string, sendResponse: Function) {
         .then((json: { results: Array<{ lexicalEntries: Array<{
         lexicalCategory: string,
         entries: Array<{ senses: Array<{
+        definitions: Array<string>,
         short_definitions: Array<string>, examples: Array<{ text: string }>, registers: Array<string>
         }> }>
         }> }> }) => {
           let fields: Array<{ name: string, value: string, inline?: boolean }> = []
-          json.results[0].lexicalEntries.forEach(element => {
+          json.results[0].lexicalEntries.forEach((element, index) => {
+            if (fields.length === 24) {
+              fields.push({
+                name: '..too many definitions', value: 'More definitions will not be displayed.'
+              })
+            } else if (fields.length === 25) return
+            console.log(element.entries)
             fields.push({ name: '**' + element.lexicalCategory + '**', value: zeroWidthSpace })
             element.entries.forEach(element => element.senses.forEach((element, index) => {
+              if (fields.length === 24) {
+                fields.push({
+                  name: '..too many definitions', value: 'More definitions will not be displayed.'
+                })
+              } else if (fields.length === 25) return
               let i = ''
               if (element.registers) i += `(${element.registers[0]})`
               const shouldExample = element.examples && element.examples[0].text
+              if (!element.short_definitions && !element.definitions) return
+              const definition = element.short_definitions ? element.short_definitions[0]
+                : element.definitions[0]
               fields.push(shouldExample ? {
-                name: `**${index + 1}.** ${i} ${element.short_definitions[0]}`,
+                name: `**${index + 1}.** ${i} ${definition}`,
                 value: `e.g. ${element.examples[0].text}`
               } : {
-                name: `**${index + 1}.** ${i} ${element.short_definitions[0]}`,
+                name: `**${index + 1}.** ${i} ${definition}`,
                 value: 'No example is available.'
               })
             }))
+            const emptyField = { name: zeroWidthSpace, value: zeroWidthSpace }
+            if (index + 1 !== json.results[0].lexicalEntries.length) fields.push(emptyField)
           })
           sendResponse(`📕 **|** Definition of **${getArguments(message)}**:`, () => {}, {
             color: 0x7289DA,

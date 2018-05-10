@@ -5,6 +5,7 @@ export type client = {
   id: string,
   channels: {
     [index: string]: {
+      name: string,
       guild_id: string, permissions: { // eslint-disable-line camelcase
         role: { [index: string]: { allow: number, deny: number } },
         user: { [index: string]: { allow: number, deny: number } }

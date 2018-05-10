@@ -15,10 +15,30 @@ export function handlePurge (client: client, event: event, sendResponse: Functio
   if (!checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'TEXT_MANAGE_MESSAGES')) {
     sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
     return
-  } else if (isNaN(+getArguments(message)) ||
-    !getArguments(message) || +getArguments(message) === 0) {
-    sendResponse('Correct usage: /purge <number greater than 0>')
-    return
+  } else if ((isNaN(+getArguments(message)) && isNaN(+getArguments(getArguments(message)))) ||
+    !getArguments(message) ||
+    (+getArguments(message) === 0 && +getArguments(getArguments(message)) === 0)
+  ) { sendResponse('Correct usage: /purge (channel) <number greater than 0>'); return }
+  // Should it be purged from another channel?
+  const possibleChannel = getIdFromMention(getArguments(message).split(' ')[0])
+  if (possibleChannel in client.channels) {
+    // Get the list of messages.
+    client.getMessages({
+      channelID: event.d.channel_id,
+      limit: +getArguments(getArguments(message))
+    }, (err: string, res: Array<{ id: string }>) => {
+      if (err) { sendResponse(`Could not fetch messages, error ${err}`); return }
+      res.push({ id: event.d.id })
+      client.deleteMessages({
+        channelID: event.d.channel_id, messageIDs: res.map(element => element.id)
+      }, (err: string) => {
+        if (err) sendResponse(`Could not delete messages. Are the messages older than 2 weeks?`)
+        else {
+          sendResponse(`**${event.d.author.username}#${event.d.author.discriminator}** successfully \
+purged **${res.length - 1}** messages from #${client.channels[possibleChannel].name}.`)
+        }
+      })
+    })
   }
   // Get the list of messages.
   client.getMessages({

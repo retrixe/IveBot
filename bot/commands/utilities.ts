@@ -7,6 +7,7 @@ import { host } from '../../config.json5'
 import * as ms from 'ms'
 
 export function handleRequest (client: client, userID: string, sendResponse: Function, message: string) {
+  if (!getArguments(message)) return
   const user = client.users[userID]
   client.createDMChannel(host)
   client.sendMessage({
@@ -179,12 +180,13 @@ export function handleChangeserverregion (client: client, event: event, sendResp
   } else if (message.split(' ').length !== 2) {
     sendResponse('Correct usage: /changeserverregion <valid server region, /listserverregion>')
     return
-  } else if (!arrayOfServers.includes(getArguments(message))) {
+  } else if (!arrayOfServers.includes(getArguments(message).toLowerCase())) {
     sendResponse('Invalid server voice region.')
     return
   }
   client.editServer({
-    region: getArguments(message), serverID: client.channels[event.d.channel_id].guild_id
+    region: getArguments(message).toLowerCase(),
+    serverID: client.channels[event.d.channel_id].guild_id
   })
   sendResponse('Voice region changed to `' + getArguments(message) + '` \\o/')
 }
