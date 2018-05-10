@@ -80,8 +80,10 @@ export function handleKick (client: client, event: event, sendResponse: Function
   // Get information about user.
   const user = client.users[userID]
   const serverName = client.servers[client.channels[event.d.channel_id].guild_id].name
-  if (checkRolePosition(client, user.id, client.channels[event.d.channel_id].guild_id) >=
-    checkRolePosition(client, event.d.author.id, client.channels[event.d.channel_id].guild_id)
+  if (
+    checkRolePosition(client, client.users[userID].id, client.channels[event.d.channel_id].guild_id) >=
+    checkRolePosition(client, event.d.author.id, client.channels[event.d.channel_id].guild_id) &&
+    checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'GENERAL_KICK_MEMBERS')
   ) { sendResponse('You cannot kick this person! People nowadays.'); return }
   // and.. cut.
   let kicked = true
