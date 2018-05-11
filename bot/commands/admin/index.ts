@@ -39,6 +39,7 @@ purged **${res.length - 1}** messages from #${client.channels[possibleChannel].n
         }
       })
     })
+    return
   }
   // Get the list of messages.
   client.getMessages({

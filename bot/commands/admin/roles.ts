@@ -81,7 +81,7 @@ export function handleTakerole (
   if (checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'GENERAL_MANAGE_ROLES')) allowed = true
   else if (serverSettings.addRoleForAll) allowed = true
   if (!allowed) {
-    sendResponse('Your server does not allow you to add roles.')
+    sendResponse('Your server does not allow you to take roles.')
     return
   }
   // Respect role order.
