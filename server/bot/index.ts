@@ -145,7 +145,12 @@ export const guildMemberEditCallback = (client: client, event: string) => async 
 export default (client: client, tempDB: DB) => async (event: message) => {
   // Disable bots and webhooks from being responded to.
   try { if (event.author.bot) return } catch (e) { return }
-  try { if (!event.channel.permissionsOf(client.user.id).has('sendMessages')) return } catch (e) {}
+  try {
+    if (
+      !event.member.guild.channels.find(i => i.id === event.channel.id)
+        .permissionsOf(client.user.id).has('sendMessages')
+    ) return
+  } catch (e) {}
   // Content of message and sendResponse.
   const sendResponse = (content: string, embed?: {}) => client.createMessage(
     event.channel.id, embed ? content : { content, embed }
@@ -229,7 +234,7 @@ export default (client: client, tempDB: DB) => async (event: message) => {
     // Version, about, ping, uptime, remoteexec for remote command line.
     '/version': () => sendResponse(`**IveBot ${version}**`),
     '/about': () => sendResponse(`**IveBot ${version}**
-IveBot is a Discord bot written with discord.io and care.
+IveBot is a Discord bot written with Eris and care.
 Unlike most other dumb bots, IveBot was not written with discord.js and has 0% copied code.
 Built with community feedback mainly, IveBot does a lot of random stuff and fun.
 IveBot 2.0 is planned to be built complete with administrative commands and a web dashboard.

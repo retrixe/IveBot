@@ -1,5 +1,5 @@
 import { getArguments, getIdFromMention } from '../../imports/tools'
-import { checkUserForPermission, checkRolePosition } from '../../imports/permissions'
+import { checkRolePosition } from '../../imports/permissions'
 // Get types.
 import { client, event, mongoDB } from '../../imports/types'
 import { ObjectID } from 'mongodb'
@@ -9,7 +9,7 @@ import * as moment from 'moment'
 // Warn.
 export function handleWarn (client: client, event: event, sendResponse: Function, message: string, db: mongoDB) {
   // Check user for permissions.
-  if (!checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'TEXT_MANAGE_MESSAGES')) {
+  if (!event.member.permission.has('manageMessages')) {
     sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
     return
   } else if (getArguments(message).split(' ').length < 2) {
@@ -19,34 +19,28 @@ export function handleWarn (client: client, event: event, sendResponse: Function
   // Check for valid user.
   let userID = getIdFromMention(getArguments(message).split(' ')[0])
   const ifUserId = getArguments(message).split(' ')[0]
-  if (ifUserId in client.users) userID = ifUserId
+  if (event.member.guild.members.find(a => a.id === ifUserId)) userID = ifUserId
   else if (
-    Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase())
-  ) userID = Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase()).id
+    event.member.guild.members.find(a => a.username.toLowerCase() === ifUserId.toLowerCase())
+  ) userID = event.member.guild.members.find(a => a.username.toLowerCase() === ifUserId.toLowerCase()).id
   // eslint-disable-next-line no-unused-vars
-  const a = client.users[userID]
-  if (!a) {
-    sendResponse('Please specify a valid user.')
-    return
-  }
+  const member = event.member.guild.members.find(a => a.id === userID)
+  if (!member) { sendResponse('Please specify a valid user.'); return }
   // Respect role order.
-  if (checkRolePosition(client, client.users[userID].id, client.channels[event.d.channel_id].guild_id) >=
-    checkRolePosition(client, event.d.author.id, client.channels[event.d.channel_id].guild_id)
-  ) {
-    sendResponse('You cannot warn this person! People nowadays.')
-    return
+  if (checkRolePosition(member) >= checkRolePosition(event.member)) {
+    sendResponse('You cannot warn this person! People nowadays.'); return
   }
   // userID and server name.
-  const serverName = client.servers[client.channels[event.d.channel_id].guild_id].name
+  const serverName = event.member.guild.name
   // Reason.
   const reason = getArguments(getArguments(message))
   // Set up the mutation.
   let warned = true
-  const serverID = client.channels[event.d.channel_id].guild_id
+  const serverID = event.member.guild.id
   const warningCollection = db.collection('warnings')
   warningCollection.insertOne({
     warnedID: userID,
-    warnerID: event.d.author.id,
+    warnerID: event.author.id,
     reason: reason,
     serverID,
     date: new Date().toUTCString()
@@ -57,24 +51,20 @@ export function handleWarn (client: client, event: event, sendResponse: Function
   // DM the poor user.
   setTimeout(() => {
     if (warned) {
-      client.sendMessage({
-        to: userID,
-        message: `You have been warned in ${serverName} for: ${reason}.`
-      })
-      const user = client.users[userID]
-      sendResponse(`**${user.username}#${user.discriminator}** has been warned. **lol.**`)
+      client.getDMChannel(userID).then((c) => client.createMessage(
+        c.id, `You have been warned in ${serverName} for: ${reason}.`
+      ))
+      sendResponse(`**${member.username}#${member.discriminator}** has been warned. **lol.**`)
     }
     if (warned && serverID === '402423671551164416') {
-      const user = client.users[userID]
-      client.sendMessage({
-        to: '427911595352391680',
-        message: `**${user.username}#${user.discriminator}** has been warned:`,
+      client.createMessage('427911595352391680', {
+        content: `**${member.username}#${member.discriminator}** has been warned:`,
         embed: {
           color: 0x00AE86,
           type: 'rich',
           title: 'Information',
           description: `
-**| Moderator:** ${event.d.author.username}#${event.d.author.discriminator} **| Reason:** ${getArguments(getArguments(message))}
+**| Moderator:** ${event.author.username}#${event.author.discriminator} **| Reason:** ${getArguments(getArguments(message))}
 **| Date:** ${moment(new Date().toUTCString()).format('dddd, MMMM Do YYYY, h:mm:ss A')}`
         }
       })
@@ -87,33 +77,32 @@ export function handleWarnings (client: client, event: event, sendResponse: Func
   // Check for valid user.
   let userID = getIdFromMention(getArguments(message).split(' ')[0])
   const ifUserId = getArguments(message).split(' ')[0]
-  if (ifUserId in client.users) userID = ifUserId
+  if (event.member.guild.members.find(a => a.id === ifUserId)) userID = ifUserId
   else if (
-    Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase())
-  ) userID = Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase()).id
+    event.member.guild.members.find(a => a.username.toLowerCase() === ifUserId.toLowerCase())
+  ) userID = event.member.guild.members.find(a => a.username.toLowerCase() === ifUserId.toLowerCase()).id
   // eslint-disable-next-line no-unused-vars
-  const a = client.users[userID]
-  if (!a && userID) {
+  const member = event.member.guild.members.find(a => a.id === userID)
+  if (!member && userID) {
     sendResponse('Please specify a valid user.')
     return
-  } else if (!a) {
-    userID = event.d.author.id
+  } else if (!member) {
+    userID = event.author.id
   }
   // Check user for permissions.
   let notPermitted = false
-  if (!checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'TEXT_MANAGE_MESSAGES')) {
-    notPermitted = true
-  } else if (getArguments(message).split(' ').length < 1) {
+  if (!event.member.permission.has('manageMessages')) notPermitted = true
+  else if (getArguments(message).split(' ').length < 1) {
     sendResponse('Correct usage: /warnings <user>')
     return
   }
-  if (userID === event.d.author.id) notPermitted = false
+  if (userID === event.author.id) notPermitted = false
   if (notPermitted) {
     sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
     return
   }
   // Set up the mutation.
-  const serverID = client.channels[event.d.channel_id].guild_id
+  const serverID = event.member.guild.id
   const warningCollection = db.collection('warnings')
   warningCollection.find({
     warnedID: userID,
@@ -125,7 +114,7 @@ export function handleWarnings (client: client, event: event, sendResponse: Func
       return
     }
     for (let x = 0; x < array.length; x++) {
-      const a = client.users[array[x].warnerID]
+      const a = client.users.find(i => i.id === array[x].warnerID)
       if (response) response += '\n\n'
       const modUsername = a ? a.username : array[x].warnerID
       const modDiscriminator = a ? '#' + a.discriminator : ''
@@ -133,9 +122,8 @@ export function handleWarnings (client: client, event: event, sendResponse: Func
 **| Moderator:** ${modUsername}${modDiscriminator} **| Reason:** ${array[x].reason}
 **| ID:** ${array[x]._id} **| Date:** ${moment(array[x].date).format('dddd, MMMM Do YYYY, h:mm:ss A')}`
     }
-    client.sendMessage({
-      to: event.d.channel_id,
-      message: `**Warnings for ${a.username}#${a.discriminator}:**`,
+    client.createMessage(event.channel.id, {
+      content: `**Warnings for ${member.username}#${member.discriminator}:**`,
       embed: {
         color: 0x00AE86,
         type: 'rich',
@@ -149,7 +137,7 @@ export function handleWarnings (client: client, event: event, sendResponse: Func
 // Clear warns.
 export function handleClearwarns (client: client, event: event, sendResponse: Function, message: string, db: mongoDB) {
   // Check user for permissions.
-  if (!checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'TEXT_MANAGE_MESSAGES')) {
+  if (!event.member.permission.has('manageMessages')) {
     sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
     return
   } else if (getArguments(message).split(' ').length < 1) {
@@ -159,26 +147,23 @@ export function handleClearwarns (client: client, event: event, sendResponse: Fu
   // Check for valid user.
   let userID = getIdFromMention(getArguments(message).split(' ')[0])
   const ifUserId = getArguments(message).split(' ')[0]
-  if (ifUserId in client.users) userID = ifUserId
+  if (event.member.guild.members.find(a => a.id === ifUserId)) userID = ifUserId
   else if (
-    Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase())
-  ) userID = Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase()).id
-  // eslint-disable-next-line no-unused-vars
-  const a = client.users[userID]
-  if (!a) {
+    event.member.guild.members.find(a => a.username.toLowerCase() === ifUserId.toLowerCase())
+  ) userID = event.member.guild.members.find(a => a.username.toLowerCase() === ifUserId.toLowerCase()).id
+  const member = event.member.guild.members.find(a => a.id === userID)
+  if (!member) {
     sendResponse('Please specify a valid user.')
     return
   }
   // Respect role order.
-  if (checkRolePosition(client, client.users[userID].id, client.channels[event.d.channel_id].guild_id) >=
-    checkRolePosition(client, event.d.author.id, client.channels[event.d.channel_id].guild_id)
-  ) {
+  if (checkRolePosition(member) >= checkRolePosition(event.member)) {
     sendResponse('You cannot clear the warnings of this person! People nowadays.')
     return
   }
   // Set up the mutation.
   let warned = true
-  const serverID = client.channels[event.d.channel_id].guild_id
+  const serverID = event.member.guild.id
   const warningCollection = db.collection('warnings')
   warningCollection.deleteMany({ warnedID: userID, serverID }).catch((err: string) => {
     sendResponse(`Something went wrong 👾 Error: ${err}`)
@@ -187,8 +172,7 @@ export function handleClearwarns (client: client, event: event, sendResponse: Fu
   // DM the poor user.
   setTimeout(() => {
     if (warned) {
-      const user = client.users[userID]
-      sendResponse(`Warnings of **${user.username}#${user.discriminator}** have been **cleared**.`)
+      sendResponse(`Warnings of **${member.username}#${member.discriminator}** have been **cleared**.`)
     }
   }, 1000)
 }
@@ -196,7 +180,7 @@ export function handleClearwarns (client: client, event: event, sendResponse: Fu
 // Clear warns.
 export function handleRemovewarn (client: client, event: event, sendResponse: Function, message: string, db: mongoDB) {
   // Check user for permissions.
-  if (!checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'TEXT_MANAGE_MESSAGES')) {
+  if (!event.member.permission.has('manageMessages')) {
     sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
     return
   } else if (getArguments(message).split(' ').length < 2) {
@@ -206,26 +190,24 @@ export function handleRemovewarn (client: client, event: event, sendResponse: Fu
   // Check for valid user.
   let userID = getIdFromMention(getArguments(message).split(' ')[0])
   const ifUserId = getArguments(message).split(' ')[0]
-  if (ifUserId in client.users) userID = ifUserId
+  if (event.member.guild.members.find(a => a.id === ifUserId)) userID = ifUserId
   else if (
-    Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase())
-  ) userID = Object.values(client.users).find(a => a.username.toLocaleLowerCase() === ifUserId.toLocaleLowerCase()).id
+    event.member.guild.members.find(a => a.username.toLowerCase() === ifUserId.toLowerCase())
+  ) userID = event.member.guild.members.find(a => a.username.toLowerCase() === ifUserId.toLowerCase()).id
   // eslint-disable-next-line no-unused-vars
-  const a = client.users[userID]
-  if (!a) {
+  const member = event.member.guild.members.find(a => a.id === userID)
+  if (!member) {
     sendResponse('Please specify a valid user.')
     return
   }
   // Respect role order.
-  if (checkRolePosition(client, client.users[userID].id, client.channels[event.d.channel_id].guild_id) >=
-    checkRolePosition(client, event.d.author.id, client.channels[event.d.channel_id].guild_id)
-  ) {
+  if (checkRolePosition(member) >= checkRolePosition(event.member)) {
     sendResponse('You cannot remove a warning from this person! People nowadays.')
     return
   }
   // Set up the mutation.
   let warned = true
-  const serverID = client.channels[event.d.channel_id].guild_id
+  const serverID = event.member.guild.id
   const warningCollection = db.collection('warnings')
   warningCollection.find({ _id: new ObjectID(getArguments(getArguments(message))) })
     .toArray().catch((err: string) => {

@@ -7,6 +7,7 @@ import { host } from '../../../config.json5'
 import * as ms from 'ms'
 
 export function handleRequest (client: client, user: User, sendResponse: Function, message: string) {
+  if (!getArguments(message)) return
   client.getDMChannel(host).then((PrivateChannel) => {
     client.createMessage(
       PrivateChannel.id,
@@ -178,7 +179,7 @@ export function handleChangeserverregion (client: client, event: message, sendRe
     return
   }
   client.editGuild(event.member.guild.id, {
-    region: getArguments(message)
+    region: getArguments(message).toLowerCase()
   }).then(() => sendResponse('Voice region changed to `' + getArguments(message) + '` \\o/'))
     .catch(() => sendResponse('Invalid server voice region.'))
 }
