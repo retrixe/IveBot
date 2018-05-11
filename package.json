@@ -28,7 +28,7 @@
     "material-ui": "^1.0.0-beta.43",
     "mathjs": "^4.1.1",
     "mongodb": "^3.0.6",
-    "next": "^6.0.0",
+    "next": "^6.0.1",
     "react": "^16.2.0",
     "react-apollo": "^2.1.3",
     "react-dom": "^16.2.0",

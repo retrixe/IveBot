@@ -46,14 +46,20 @@ export function handleMute (client: client, event: event, sendResponse: Function
   if (hasPerms && role) {
     event.member.guild.channels.forEach((a) => {
       if (a.type === 0) {
-        client.editChannelPermission(a.id, role.id, 0, Constants.Permissions.sendMessages, 'role')
-        client.editChannelPermission(a.id, role.id, 0, Constants.Permissions.addReactions, 'role')
+        client.editChannelPermission(
+          a.id, role.id, 0,
+          Constants.Permissions.sendMessages | Constants.Permissions.addReactions,
+          'role'
+        )
       } else if (a.type === 2) {
         client.editChannelPermission(a.id, role.id, 0, Constants.Permissions.voiceSpeak, 'role')
       } else if (a.type === 4) {
-        client.editChannelPermission(a.id, role.id, 0, Constants.Permissions.voiceSpeak, 'role')
-        client.editChannelPermission(a.id, role.id, 0, Constants.Permissions.sendMessages, 'role')
-        client.editChannelPermission(a.id, role.id, 0, Constants.Permissions.addReactions, 'role')
+        client.editChannelPermission(
+          a.id, role.id, 0,
+          Constants.Permissions.sendMessages |
+          Constants.Permissions.addReactions | Constants.Permissions.voiceSpeak,
+          'role'
+        )
       }
     })
     // Mute person.
@@ -68,14 +74,20 @@ export function handleMute (client: client, event: event, sendResponse: Function
       // Modify channel permissions.
       event.member.guild.channels.forEach((a) => {
         if (a.type === 0) {
-          client.editChannelPermission(a.id, res.id, 0, Constants.Permissions.sendMessages, 'role')
-          client.editChannelPermission(a.id, res.id, 0, Constants.Permissions.addReactions, 'role')
+          client.editChannelPermission(
+            a.id, res.id, 0,
+            Constants.Permissions.sendMessages | Constants.Permissions.addReactions,
+            'role'
+          )
         } else if (a.type === 2) {
           client.editChannelPermission(a.id, res.id, 0, Constants.Permissions.voiceSpeak, 'role')
         } else if (a.type === 4) {
-          client.editChannelPermission(a.id, res.id, 0, Constants.Permissions.sendMessages, 'role')
-          client.editChannelPermission(a.id, res.id, 0, Constants.Permissions.addReactions, 'role')
-          client.editChannelPermission(a.id, res.id, 0, Constants.Permissions.voiceSpeak, 'role')
+          client.editChannelPermission(
+            a.id, res.id, 0,
+            Constants.Permissions.sendMessages |
+            Constants.Permissions.addReactions | Constants.Permissions.voiceSpeak,
+            'role'
+          )
         }
       })
       // Then mute the person.
