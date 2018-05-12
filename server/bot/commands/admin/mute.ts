@@ -69,7 +69,7 @@ export function handleMute (client: client, event: event, sendResponse: Function
     // If no role, make a Muted role.
   } else if (!role) {
     client.createRole(
-      event.member.guild.id, { name: 'Muted', color: 0xFF8973 }
+      event.member.guild.id, { name: 'Muted', color: 0x444444 }
     ).then((res) => {
       // Modify channel permissions.
       event.member.guild.channels.forEach((a) => {
