@@ -8,16 +8,18 @@ import { GraphQLServer } from 'graphql-yoga'
 // Import our resolvers.
 import resolvers from './resolvers'
 // Import types.
-import { DB } from './bot/imports/types'
+import { DB, IveBotCommand } from './bot/imports/types'
 /* SERVER CODE ENDS HERE */
 
 // Tokens and stuff.
-import * as Eris from 'eris'
+import { CommandClient } from 'eris'
+// Import fs.
+import { readdir, statSync } from 'fs'
 // Import the bot.
 import botCallback, { guildMemberEditCallback } from './bot'
 // Get the token needed.
 import 'json5/lib/require'
-const { token } = require('../config.json5')
+import { token, host } from '../config.json5'
 
 // If production is explicitly specified via flag..
 if (process.argv[2] === '--production') process.env.NODE_ENV = 'production'
@@ -26,8 +28,17 @@ const dev = process.env.NODE_ENV !== 'production'
 const port = parseInt(process.env.PORT, 10) || 3000 // If port variable has been set.
 
 // Create a client to connect to Discord API Gateway.
-const client = new Eris.Client(token === 'dotenv' ? process.env.IVEBOT_TOKEN : token, {
+const client = new CommandClient(token === 'dotenv' ? process.env.IVEBOT_TOKEN : token, {
   autoreconnect: true
+}, {
+  description: 'The bot that created the iPhone X.',
+  owner: host,
+  prefix: '/',
+  name: 'IveBot',
+  defaultHelpCommand: false,
+  defaultCommandOptions: {
+    argsRequired: true, caseInsensitive: true, errorMessage: 'IveBot experienced an internal error.'
+  }
 })
 
 // Connect ASAP, hopefully before the server starts.
@@ -52,7 +63,30 @@ client.on('error', (err: string, id: string) => {
 // Create a database to handle certain stuff.
 const tempDB: DB = {gunfight: [], say: {}, link: {}}
 
+// Register all commands in bot/commands onto the CommandClient.
+readdir('./server/bot/commands', (err, commandFiles) => {
+  // Handle any errors.
+  if (err) { console.error(err); throw new Error('Commands could not be retrieved.') }
+  // This only supports two levels of files, one including files inside commands, and one in..
+  // a subfolder.
+  commandFiles.forEach(commandFile => {
+    // If it's a file..
+    if (statSync('./server/bot/commands/' + commandFile).isFile() && commandFile.endsWith('.ts')) {
+      const commands: { [index: string]: IveBotCommand } = require('./bot/commands/' + commandFile)
+      // ..and there are commands..
+      if (!Object.keys(commands).length) return
+      // ..register the commands.
+      Object.keys(commands).forEach((commandName: string) => {
+        const command = commands[commandName]
+        client.registerCommand(command.name, command.generator(client), command.opts)
+      })
+    }
+  })
+})
+
 // When a message is sent, the function should be called.
+// This is here for temporary compatibility with older commands which have not been re-written.
+// Avoid usage, submit PRs to bot/commands and not bot/index and bot/oldCommands.
 client.on('messageCreate', botCallback(client, tempDB))
 
 // When a server loses a member, it will callback.

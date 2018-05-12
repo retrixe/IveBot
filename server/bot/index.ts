@@ -7,32 +7,32 @@ import { randomBytes } from 'crypto'
 import * as ms from 'ms'
 // Commands.
 import {
-  handleRequest, handleSay, handleEditLastSay, handleAvatar, handleListserverregions,
+  handleSay, handleEditLastSay, handleAvatar, handleListserverregions,
   handleEdit, handleType, handleRemindme, handleChangeserverregion
-} from './commands/utilities'
+} from './oldCommands/utilities'
 import {
   handleChoose,
   handleReverse,
   handle8Ball,
   handleRepeat, handleRandom,
   handleZalgo, handleDezalgo, handleCalculate
-} from './commands/games'
+} from './oldCommands/games'
 import {
   handleUrban, handleCat, handleDog, handleRobohash, handleApod, handleWeather, handleNamemc,
   handleCurrency,
   handleDefine
-} from './commands/api'
-import { handleGunfight, handleAccept } from './commands/gunfight'
+} from './oldCommands/api'
+import { handleGunfight, handleAccept } from './oldCommands/gunfight'
 import {
   handleKick, handleBan, handleUnban, handleMute, handleUnmute, handleWarn,
   handleGiverole, handleTakerole, handleWarnings, handleClearwarns, handleRemovewarn, handlePurge
-} from './commands/admin'
+} from './oldCommands/admin'
 
 // We need types.
 import { client, DB, mongoDB, member, message } from './imports/types'
 import { PrivateChannel } from 'eris'
 import { getArguments, getServerSettings } from './imports/tools'
-import help from './commands/help'
+import help from './oldCommands/help'
 
 // MongoDB.
 // Get MongoDB.
@@ -191,9 +191,6 @@ export default (client: client, tempDB: DB) => async (event: message) => {
     // NameMC port.
     '/namemc': () => handleNamemc(message, sendResponse, client, channelID),
     '/nmc': () => handleNamemc(message, sendResponse, client, channelID),
-    // Request.
-    '/request': () => { if (testPilot) handleRequest(client, event.author, sendResponse, message) },
-    '/req': () => { if (testPilot) handleRequest(client, event.author, sendResponse, message) },
     // Gunfight.
     '/gunfight': () => handleGunfight(message, client.user.id, userID, sendResponse, tempDB, channelID),
     '/gfi': () => handleGunfight(message, client.user.id, userID, sendResponse, tempDB, channelID),

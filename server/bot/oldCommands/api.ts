@@ -5,7 +5,7 @@ import * as moment from 'moment'
 import { client } from '../imports/types'
 // Get the NASA API token.
 import 'json5/lib/require'
-const { NASAtoken, weatherAPIkey, fixerAPIkey, oxfordAPI } = require('../../../config.json5')
+import { NASAtoken, weatherAPIkey, fixerAPIkey, oxfordAPI } from '../../../config.json5'
 
 export function handleDefine (message: string, sendResponse: Function) {
   if (!getArguments(message)) {

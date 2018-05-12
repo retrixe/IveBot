@@ -6,7 +6,7 @@ import { mongoDB, DB, client } from './bot/imports/types'
 import { MongoClient } from 'mongodb'
 // Who's the host? He gets special permission.
 import 'json5/lib/require'
-const { host, mongoURL } = require('../config.json5')
+import { host, mongoURL } from '../config.json5'
 
 // Create a MongoDB instance.
 let db: mongoDB

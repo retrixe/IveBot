@@ -1,8 +1,15 @@
 // Flow our types.
 /* eslint-disable no-undef */
-import { Client, Member, Message } from 'eris'
+import { CommandClient, Member, Message, CommandOptions, CommandGenerator } from 'eris'
 
-export class client extends Client {}
+export type IveBotCommand = {
+  // eslint-disable-next-line no-use-before-define
+  generator: (client: CommandClient) => CommandGenerator,
+  opts: CommandOptions,
+  name: string
+}
+
+export class client extends CommandClient {}
 export class member extends Member {}
 export class message extends Message {}
 export class event extends message {}
