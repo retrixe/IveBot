@@ -77,8 +77,8 @@ readdir('./server/bot/commands', (err, commandFiles) => {
       if (!Object.keys(commands).length) return
       // ..register the commands.
       Object.keys(commands).forEach((commandName: string) => {
-        const command = commands[commandName]
-        client.registerCommand(command.name, command.generator(client), command.opts)
+        const command = commands[commandName](client, tempDB)
+        client.registerCommand(command.name, command.generator, command.opts)
       })
     }
   })

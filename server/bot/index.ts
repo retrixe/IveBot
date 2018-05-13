@@ -7,8 +7,8 @@ import { randomBytes } from 'crypto'
 import * as ms from 'ms'
 // Commands.
 import {
-  handleSay, handleEditLastSay, handleAvatar, handleListserverregions,
-  handleEdit, handleType, handleRemindme, handleChangeserverregion
+  handleEditLastSay, handleListserverregions,
+  handleEdit, handleType, handleChangeserverregion
 } from './oldCommands/utilities'
 import {
   handleChoose,
@@ -196,17 +196,10 @@ export default (client: client, tempDB: DB) => async (event: message) => {
     '/gfi': () => handleGunfight(message, client.user.id, userID, sendResponse, tempDB, channelID),
     '/accept': () => handleAccept(tempDB, userID, sendResponse, channelID),
     // Say.
-    '/say': () => handleSay(event, sendResponse, client, testPilot, tempDB),
     '/type': () => handleType(event, sendResponse, client, testPilot, tempDB),
     '/editLastSay': () => handleEditLastSay(event, sendResponse, client, testPilot, tempDB),
     '/els': () => handleEditLastSay(event, sendResponse, client, testPilot, tempDB),
     '/edit': () => handleEdit(event, sendResponse, client),
-    // Avatar.
-    '/avatar': () => handleAvatar(message, sendResponse, client, userID),
-    '/av': () => handleAvatar(message, sendResponse, client, userID),
-    // Remind me.
-    '/remindme': () => handleRemindme(message, sendResponse, client, userID),
-    '/rm': () => handleRemindme(message, sendResponse, client, userID),
     // Server region commands.
     '/changeserverregion': () => handleChangeserverregion(client, event, sendResponse, message),
     '/csr': () => handleChangeserverregion(client, event, sendResponse, message),

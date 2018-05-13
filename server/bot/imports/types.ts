@@ -2,9 +2,9 @@
 /* eslint-disable no-undef */
 import { CommandClient, Member, Message, CommandOptions, CommandGenerator } from 'eris'
 
-export type IveBotCommand = {
-  // eslint-disable-next-line no-use-before-define
-  generator: (client: CommandClient) => CommandGenerator,
+// eslint-disable-next-line no-use-before-define
+export type IveBotCommand = (client: CommandClient, db?: DB) => {
+  generator: CommandGenerator,
   opts: CommandOptions,
   name: string
 }

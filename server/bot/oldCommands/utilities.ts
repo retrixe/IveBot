@@ -3,32 +3,6 @@ import { getArguments, getIdFromMention } from '../imports/tools'
 import { client, message, DB } from '../imports/types'
 import 'json5/lib/require'
 import { host } from '../../../config.json5'
-import * as ms from 'ms'
-
-export function handleSay (message: message, sendResponse: Function, client: client, testPilot: string, db: DB) {
-  // Check for enough permissions.
-  let check = false
-  if (message.member.permission.has('manageMessages')) check = true
-  else if (testPilot) check = true
-  if (!check) {
-    sendResponse('You cannot fool me. You do not have enough permissions.')
-    return
-  }
-  // Delete the message.
-  client.deleteMessage(message.channel.id, message.id)
-  // Should it be edited in another channel?
-  const possibleChannel = getIdFromMention(getArguments(message.content).split(' ')[0])
-  if (message.channelMentions[0] === possibleChannel) {
-    client.createMessage(message.channelMentions[0], getArguments(getArguments(message.content)))
-      .then((newMessage) => { db.say[message.channelMentions[0]] = newMessage.id })
-      .catch(() => sendResponse('There was an error processing your request.'))
-    return
-  }
-  // Send the message all over again.
-  sendResponse(getArguments(message.content))
-    .then((newMessage: { id: string }) => { db.say[message.channel.id] = newMessage.id })
-    .catch(() => sendResponse('There was an error processing your request.'))
-}
 
 export function handleEditLastSay (message: message, sendResponse: Function, client: client, testPilot: string, db: DB) {
   // Check for enough permissions.
@@ -111,36 +85,6 @@ export function handleEdit (message: message, sendResponse: Function, client: cl
     message.channel.id, getArguments(message.content).split(' ')[0],
     getArguments(getArguments(message.content))
   ).catch(() => sendResponse('Nothing to edit.'))
-}
-
-export function handleAvatar (message: string, sendResponse: Function, client: client, userID: string) {
-  let user: string = getIdFromMention(getArguments(message).split(' ')[0])
-  if (!user) user = userID
-  if (!client.users.find(userElement => userElement.id === user).avatarURL) {
-    sendResponse(
-      'Link: https://cdn.discordapp.com/embed/avatars/' +
-      +client.users.find(userElement => userElement.id === user).discriminator % 5 +
-      '.png?size=2048'
-    )
-    return
-  }
-  sendResponse('Link: ' + client.users.find(E => E.id === user).avatarURL + '?size=2048')
-}
-
-export function handleRemindme (
-  message: string, sendResponse: Function, client: client, userID: string
-) {
-  if (message.split(' ').length < 3 || !ms(message.split(' ')[1])) {
-    sendResponse('Correct usage: /remindme <time in 1d|1h|1m|1s> <description>')
-    return
-  }
-  const description = getArguments(getArguments(message))
-  sendResponse(`You will be reminded in ${message.split(' ')[1]} - ${description} - through a DM.`)
-  setTimeout(() => {
-    client.getDMChannel(userID).then((PrivateChannel) => client.createMessage(
-      PrivateChannel.id, `⏰ ${description}\nReminder set ${message.split(' ')[1]} ago.`
-    ))
-  }, ms(message.split(' ')[1]))
 }
 
 // List server regions!
