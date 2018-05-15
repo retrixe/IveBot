@@ -96,3 +96,40 @@ export const handleAvatar: IveBotCommand = (client) => ({
     return 'Link: ' + user.avatarURL.split('128').join('') + '2048'
   }
 })
+
+export const handleLeave: IveBotCommand = (client, db) => ({
+  opts: {
+    description: 'Makes you leave the server.',
+    fullDescription: 'This kicks you from the server, essentially making you leave.',
+    usage: '/leave',
+    errorMessage: 'There was an error processing your request.',
+    guildOnly: true,
+    argsRequired: false
+  },
+  name: 'leave',
+  generator: (message) => {
+    if (!db.leave.includes(message.author.id)) {
+      client.createMessage(
+        message.channel.id,
+        'Are you sure you want to leave the server? ' +
+        'You will require an invite link to join back. Type /leave to confirm.'
+      )
+      db.leave.push(message.author.id)
+      setTimeout(() => {
+        if (db.leave.findIndex(i => i === message.author.id) === -1) return
+        client.createMessage(message.channel.id, 'Your leave request has timed out.')
+        db.leave.splice(db.leave.findIndex(i => i === message.author.id), 1)
+      }, 30000)
+    } else if (db.leave.includes(message.author.id)) {
+      db.leave.splice(db.leave.findIndex(i => i === message.author.id), 1)
+      client.kickGuildMember(message.member.guild.id, message.author.id, 'Used /leave.')
+        .then(() => client.createMessage(
+          message.channel.id,
+          `${message.author.username}#${message.author.discriminator} has left the server.`
+        )).catch(() => client.createMessage(
+          message.channel.id,
+          'You will have to manually leave the server or transfer ownership before leaving.'
+        ))
+    }
+  }
+})

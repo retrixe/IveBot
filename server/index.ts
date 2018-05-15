@@ -61,7 +61,7 @@ client.on('error', (err: string, id: string) => {
 })
 
 // Create a database to handle certain stuff.
-const tempDB: DB = {gunfight: [], say: {}, link: {}}
+const tempDB: DB = {gunfight: [], say: {}, link: {}, leave: []}
 
 // Register all commands in bot/commands onto the CommandClient.
 readdir('./server/bot/commands', (err, commandFiles) => {
