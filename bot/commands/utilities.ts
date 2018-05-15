@@ -33,11 +33,17 @@ export function handleSay (message: string, sendResponse: Function, client: clie
   // Should it be sent to another channel?
   const possibleChannel = getIdFromMention(getArguments(message).split(' ')[0])
   if (possibleChannel in client.channels) {
+    if (getArguments(getArguments(message)).toLowerCase() === 'pls adim me') {
+      sendResponse('no'); return
+    }
     client.sendMessage({ to: possibleChannel, message: getArguments(getArguments(message)) }, (err: string, { id }: { id: string }) => {
       if (err) sendResponse('There was an error processing your request.')
       else db.say[possibleChannel] = id
     })
     return
+  }
+  if (getArguments(message).toLowerCase() === 'pls adim me') {
+    sendResponse('no'); return
   }
   // Send the message all over again.
   sendResponse(getArguments(message), (err: string, { id }: { id: string }) => {
@@ -104,10 +110,7 @@ export function handleType (message: string, sendResponse: Function, client: cli
 
 export function handleEdit (message: string, sendResponse: Function, client: client, event: event) {
   // Check for enough permissions.
-  let check = false
-  if (checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'TEXT_MANAGE_MESSAGES')) check = true
-  else if (host === event.d.author.id) check = true
-  if (!check) {
+  if (host !== event.d.author.id) {
     sendResponse('You cannot fool me. You do not have enough permissions.')
     return
   }

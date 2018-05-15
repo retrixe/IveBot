@@ -24,7 +24,7 @@ export function handlePurge (client: client, event: event, sendResponse: Functio
   if (possibleChannel in client.channels) {
     // Get the list of messages.
     client.getMessages({
-      channelID: event.d.channel_id,
+      channelID: possibleChannel,
       limit: +getArguments(getArguments(message))
     }, (err: string, res: Array<{ id: string }>) => {
       if (err) { sendResponse(`Could not fetch messages, error ${err}`); return }
@@ -33,10 +33,6 @@ export function handlePurge (client: client, event: event, sendResponse: Functio
         channelID: event.d.channel_id, messageIDs: res.map(element => element.id)
       }, (err: string) => {
         if (err) sendResponse(`Could not delete messages. Are the messages older than 2 weeks?`)
-        else {
-          sendResponse(`**${event.d.author.username}#${event.d.author.discriminator}** successfully \
-purged **${res.length - 1}** messages from #${client.channels[possibleChannel].name}.`)
-        }
       })
     })
     return
@@ -53,10 +49,6 @@ purged **${res.length - 1}** messages from #${client.channels[possibleChannel].n
       channelID: event.d.channel_id, messageIDs: res.map(element => element.id)
     }, (err: string) => {
       if (err) sendResponse(`Could not delete messages. Are the messages older than 2 weeks?`)
-      else {
-        sendResponse(`**${event.d.author.username}#${event.d.author.discriminator}** successfully \
-purged **${res.length - 1}** messages from channel.`)
-      }
     })
   })
 }

@@ -11,6 +11,9 @@ export function handleDefine (message: string, sendResponse: Function) {
   if (!getArguments(message)) {
     sendResponse('Enter a valid word for me to define.')
     return
+  } else if (getArguments(message).toLowerCase() === 'ibu') {
+    sendResponse('someone you do not deserve to know about, haha')
+    return
   }
   // Fetch the definition.
   const headers = { 'app_id': oxfordAPI.appId, 'app_key': oxfordAPI.appKey, Accept: 'application/json' }

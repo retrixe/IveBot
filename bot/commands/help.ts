@@ -26,6 +26,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/weather\` - It's really cloudy here..
     \`/say\` | \`/type\` - Say something, even in another channel.
     \`/editLastSay\` - Even if it was another channel.
+    \`/remindme\` - Reminders.
     \`/avatar\` - Avatar of a user.
     \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
     \`/giverole\` and \`/takerole\` - Edit roles.
@@ -36,7 +37,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/purge\` - Bulk delete a set of messages.
 
 **There are some easter egg auto responses.**
-**Commands with TP are test pilot only, ones with OP are only executable by the bot host.**`
+**Commands with TP are test pilot only.**`
 
 const createHelpObject = (commandUsage: string, description: string, example: string, aliases?: string) => {
   return {
