@@ -15,22 +15,9 @@ export function handlePurge (client: client, event: event, sendResponse: Functio
   if (!event.member.permission.has('manageMessages')) {
     sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
     return
-  } else if ((isNaN(+getArguments(message)) && isNaN(+getArguments(getArguments(message)))) ||
-    !getArguments(message) ||
-    (+getArguments(message) === 0 && +getArguments(getArguments(message)) === 0)
+  } else if (
+    isNaN(+getArguments(message)) || !getArguments(message) || +getArguments(message) === 0
   ) { sendResponse('Correct usage: /purge (channel) <number greater than 0>'); return }
-  // Should it be purged from another channel?
-  const possibleChannel = getIdFromMention(getArguments(message).split(' ')[0])
-  if (event.channelMentions[0] === possibleChannel) {
-    // Get the list of messages.
-    client.getMessages(possibleChannel, +getArguments(message), event.id).then((res) => {
-      res.push(event)
-      client.deleteMessages(possibleChannel, res.map(e => e.id)).catch(() => {
-        sendResponse(`Could not delete messages. Are the messages older than 2 weeks?`)
-      })
-    }).catch(() => sendResponse('Could not retrieve messages.'))
-    return
-  }
   // Get the list of messages.
   client.getMessages(event.channel.id, +getArguments(message), event.id).then((res) => {
     res.push(event)
