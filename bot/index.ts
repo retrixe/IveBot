@@ -8,7 +8,7 @@ import { randomBytes } from 'crypto'
 // Commands.
 import {
   handleRequest, handleSay, handleEditLastSay, handleAvatar, handleListserverregions,
-  handleEdit, handleType, handleRemindme, handleChangeserverregion
+  handleEdit, handleType, handleRemindme, handleChangeserverregion, handleLeave
 } from './commands/utilities'
 import {
   handleChoose,
@@ -226,6 +226,8 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
     // Remind me.
     '/remindme': () => handleRemindme(message, sendResponse, client, userID),
     '/rm': () => handleRemindme(message, sendResponse, client, userID),
+    // Leave.
+    '/leave': () => handleLeave(sendResponse, client, event, tempDB),
     // Server region commands.
     '/changeserverregion': () => handleChangeserverregion(client, event, sendResponse, message),
     '/csr': () => handleChangeserverregion(client, event, sendResponse, message),

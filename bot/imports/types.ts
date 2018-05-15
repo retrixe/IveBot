@@ -71,7 +71,8 @@ export type DB = {
   },
   link: {
     [index: string]: string
-  }
+  },
+  leave: Array<string>
 }
 export type mongoDB = {
   collection: Function

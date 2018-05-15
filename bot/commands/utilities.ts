@@ -193,3 +193,23 @@ export function handleChangeserverregion (client: client, event: event, sendResp
   })
   sendResponse('Voice region changed to `' + getArguments(message) + '` \\o/')
 }
+
+export function handleLeave (sendResponse: Function, client: client, event: event, db: DB) {
+  if (!db.leave.includes(event.d.author.id)) {
+    sendResponse('Are you sure you want to leave the server? You will require an invite link to join back. Type /leave to confirm.')
+    db.leave.push(event.d.author.id)
+    setTimeout(() => {
+      if (db.leave.findIndex(i => i === event.d.author.id) === -1) return
+      sendResponse('Your leave request has timed out.')
+      db.leave.splice(db.leave.findIndex(i => i === event.d.author.id), 1)
+    }, 30000)
+  } else if (db.leave.includes(event.d.author.id)) {
+    db.leave.splice(db.leave.findIndex(i => i === event.d.author.id), 1)
+    client.kick({
+      serverID: client.channels[event.d.channel_id].guild_id, userID: event.d.author.id
+    }, (err: boolean) => {
+      if (err) sendResponse('You will have to manually leave the server or transfer ownership before leaving.')
+      else sendResponse(`${event.d.author.username}#${event.d.author.discriminator} has left the server.`)
+    })
+  }
+}

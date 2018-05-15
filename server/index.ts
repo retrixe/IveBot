@@ -71,7 +71,7 @@ client.on('disconnect', (errMsg, code) => {
 })
 
 // Create a database to handle certain stuff.
-const tempDB: DB = {gunfight: [], say: {}, link: {}}
+const tempDB: DB = {gunfight: [], say: {}, link: {}, leave: []}
 
 // When client recieves a message, it will callback.
 client.on('message', botCallback(client, tempDB, onlineSince))

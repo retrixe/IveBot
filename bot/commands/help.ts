@@ -27,6 +27,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/say\` | \`/type\` - Say something, even in another channel.
     \`/editLastSay\` - Even if it was another channel.
     \`/remindme\` - Reminders.
+    \`/leave\` - Makes you leave the server.
     \`/avatar\` - Avatar of a user.
     \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
     \`/giverole\` and \`/takerole\` - Edit roles.
@@ -127,6 +128,7 @@ const commandDocs: { [index: string]: any } = {
   'unmute': b('/unmute <user by ID/username/mention> (reason)', 'Unmute someone.', '/unmute voldemort wrong person'),
   'weather': b('/weather <city name>(,country name)', 'What\'s the weather like at your place?', '/weather Shanghai,CN', '/wt'),
   'token': b('/token', 'Links your Discord to IveBot Web (use in DM only, or your account may be hacked)', '/token'),
+  'leave': b('/leave', 'This kicks you from the server, essentially making you leave.', '/leave'),
   'namemc': b('/namemc <premium Minecraft username>', 'Displays previous usernames and skins of a Minecraft player.', '/namemc voldemort', '/nmc'),
   'calculate': b('/calculate <expression>', 'Calculate the value of an expression.', '/calculate 2 + 2', '/calc')
 }
