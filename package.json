@@ -1,6 +1,6 @@
 {
   "name": "ivebot",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "The bot that created the iPhone X.",
   "main": "server/index.ts",
   "scripts": {
