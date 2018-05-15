@@ -46,12 +46,14 @@ export const handleSay: IveBotCommand = (client, db) => ({
     const possibleChannel = getIdFromMention(args[0])
     if (message.channelMentions[0] === possibleChannel) {
       args.shift()
+      if (args.join(' ') === 'pls adim me') args = ['no']
       client.createMessage(message.channelMentions[0], args.join(' ')).then((newMessage) => {
         db.say[message.channelMentions[0]] = newMessage.id
       }).catch((err) => console.error(err))
       return
     }
     // Send the message.
+    if (args.join(' ') === 'pls adim me') args = ['no']
     client.createMessage(message.channel.id, args.join(' ')).then((newMessage) => {
       db.say[message.channelMentions[0]] = newMessage.id
     }).catch((err) => console.error(err))

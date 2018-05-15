@@ -23,22 +23,20 @@ export function handlePurge (client: client, event: event, sendResponse: Functio
   const possibleChannel = getIdFromMention(getArguments(message).split(' ')[0])
   if (event.channelMentions[0] === possibleChannel) {
     // Get the list of messages.
-    client.getMessages(event.channel.id, +getArguments(message), event.id).then((res) => {
+    client.getMessages(possibleChannel, +getArguments(message), event.id).then((res) => {
       res.push(event)
-      client.deleteMessages(event.channel.id, res.map(e => e.id)).then(() => {
-        sendResponse(`**${event.author.username}#${event.author.discriminator}** successfully \
-purged **${res.length - 1}** messages from channel.`)
-      }).catch(() => sendResponse(`Could not delete messages. Are the messages older than 2 weeks?`))
+      client.deleteMessages(possibleChannel, res.map(e => e.id)).catch(() => {
+        sendResponse(`Could not delete messages. Are the messages older than 2 weeks?`)
+      })
     }).catch(() => sendResponse('Could not retrieve messages.'))
     return
   }
   // Get the list of messages.
   client.getMessages(event.channel.id, +getArguments(message), event.id).then((res) => {
     res.push(event)
-    client.deleteMessages(event.channel.id, res.map(e => e.id)).then(() => {
-      sendResponse(`**${event.author.username}#${event.author.discriminator}** successfully \
-purged **${res.length - 1}** messages from channel.`)
-    }).catch(() => sendResponse(`Could not delete messages. Are the messages older than 2 weeks?`))
+    client.deleteMessages(event.channel.id, res.map(e => e.id)).catch(() => {
+      sendResponse(`Could not delete messages. Are the messages older than 2 weeks?`)
+    })
   }).catch(() => sendResponse('Could not retrieve messages.'))
 }
 

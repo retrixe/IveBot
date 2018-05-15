@@ -22,7 +22,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/currency\` - Currency conversion (\`/help currency\`)
 **Utilities.**
     TP \`/request\` - Request a specific feature.
-    \`/link\` - Links your Discord to IveBot Web (use in DM only)
+    \`/token\` - Links your Discord to IveBot Web (use in DM only)
     \`/weather\` - It's really cloudy here..
     \`/remindme\` - Reminders.
     \`/say\` | \`/type\` - Say something, even in another channel.
@@ -37,7 +37,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/purge\` - Bulk delete a set of messages.
 
 **There are some easter egg auto responses.**
-**Commands with TP are test pilot only, ones with OP are only executable by the bot host.**`
+**Commands with TP are test pilot only.**`
 
 const createHelpObject = (commandUsage: string, description: string, example: string, aliases?: string) => {
   return {

@@ -62,10 +62,7 @@ export function handleType (message: message, sendResponse: Function, client: cl
 
 export function handleEdit (message: message, sendResponse: Function, client: client) {
   // Check for enough permissions.
-  let check = false
-  if (message.member.permission.has('manageMessages')) check = true
-  else if (host === message.author.id) check = true
-  if (!check) {
+  if (host !== message.author.id) {
     sendResponse('You cannot fool me. You do not have enough permissions.')
     return
   }
