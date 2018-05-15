@@ -22,7 +22,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/currency\` - Currency conversion (\`/help currency\`)
 **Utilities.**
     TP \`/request\` - Request a specific feature.
-    \`/link\` - Links your Discord to IveBot Web (use in DM only)
+    \`/token\` - Links your Discord to IveBot Web (use in DM only)
     \`/weather\` - It's really cloudy here..
     \`/say\` | \`/type\` - Say something, even in another channel.
     \`/editLastSay\` - Even if it was another channel.

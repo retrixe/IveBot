@@ -30,7 +30,7 @@ export function handlePurge (client: client, event: event, sendResponse: Functio
       if (err) { sendResponse(`Could not fetch messages, error ${err}`); return }
       res.push({ id: event.d.id })
       client.deleteMessages({
-        channelID: event.d.channel_id, messageIDs: res.map(element => element.id)
+        channelID: possibleChannel, messageIDs: res.map(element => element.id)
       }, (err: string) => {
         if (err) sendResponse(`Could not delete messages. Are the messages older than 2 weeks?`)
       })
