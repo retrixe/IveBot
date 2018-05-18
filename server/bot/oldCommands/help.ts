@@ -69,7 +69,7 @@ Arguments in () are optional :P
 
 const commandDocs: { [index: string]: any } = {
   'help': b('/help (command name)', 'The most innovative halp.', '/help zalgo', '/halp'),
-  'gunfight': b('/gunfight <user>', 'For that good ol\' fight bro.', '/gunfight @voldemort#6931', '/gfi'),
+  'gunfight': b('/gunfight <user>', 'Challenge someone to a gunfight showdown.', '/gunfight @voldemort#6931', '/gfi'),
   'random': b('/random (starting number) (ending number)',
     'Returns a random number, by default between 0 and 10.', '/random 1 69', '/rand'),
   // 'randomword': b('/randomword', 'Returns a random word.', '/randomword', '/rw, /randw'),

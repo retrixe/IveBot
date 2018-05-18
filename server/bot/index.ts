@@ -11,18 +11,10 @@ import {
   handleEdit, handleType, handleChangeserverregion
 } from './oldCommands/utilities'
 import {
-  handleChoose,
-  handleReverse,
-  handle8Ball,
-  handleRepeat, handleRandom,
-  handleZalgo, handleDezalgo, handleCalculate
-} from './oldCommands/games'
-import {
   handleUrban, handleCat, handleDog, handleRobohash, handleApod, handleWeather, handleNamemc,
   handleCurrency,
   handleDefine
 } from './oldCommands/api'
-import { handleGunfight, handleAccept } from './oldCommands/gunfight'
 import {
   handleKick, handleBan, handleUnban, handleMute, handleUnmute, handleWarn,
   handleGiverole, handleTakerole, handleWarnings, handleClearwarns, handleRemovewarn, handlePurge
@@ -47,26 +39,12 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (e
 
 // All commands which take (message, sendResponse) as args and can be appended and interpreted.
 const appendableCommandMaps: { [index: string]: Function } = {
-  // Choose.
-  '/choose': handleChoose,
-  '/cho': handleChoose,
   // Currency conversion.
   '/currency': handleCurrency,
   '/cur': handleCurrency,
-  // Random.
-  '/random': handleRandom,
-  '/rand': handleRandom,
   // Define.
   '/define': handleDefine,
   '/def': handleDefine,
-  // Reverse.
-  '/reverse': handleReverse,
-  '/rev': handleReverse,
-  // 8ball.
-  '/8ball': handle8Ball,
-  // Repeat.
-  '/repeat': handleRepeat,
-  '/rep': handleRepeat,
   // Urban.
   '/urban': handleUrban,
   '/urb': handleUrban,
@@ -74,12 +52,6 @@ const appendableCommandMaps: { [index: string]: Function } = {
   '/cat': handleCat,
   // Dog.
   '/dog': handleDog,
-  // Zalgo.
-  '/zalgo': handleZalgo,
-  '/zgo': handleZalgo,
-  // Dezalgo.
-  '/dezalgo': handleDezalgo,
-  '/dzgo': handleDezalgo,
   // Robohash.
   '/robohash': handleRobohash,
   '/robo': handleRobohash,
@@ -87,9 +59,6 @@ const appendableCommandMaps: { [index: string]: Function } = {
   // Astronomy picture of the day.
   '/astronomy-picture-of-the-day': handleApod,
   '/apod': handleApod,
-  // Calculator.
-  '/calculate': handleCalculate,
-  '/calc': handleCalculate,
   // List available server regions.
   '/listserverregions': handleListserverregions,
   '/lsr': handleListserverregions
@@ -191,10 +160,6 @@ export default (client: client, tempDB: DB) => async (event: message) => {
     // NameMC port.
     '/namemc': () => handleNamemc(message, sendResponse, client, channelID),
     '/nmc': () => handleNamemc(message, sendResponse, client, channelID),
-    // Gunfight.
-    '/gunfight': () => handleGunfight(message, client.user.id, userID, sendResponse, tempDB, channelID),
-    '/gfi': () => handleGunfight(message, client.user.id, userID, sendResponse, tempDB, channelID),
-    '/accept': () => handleAccept(tempDB, userID, sendResponse, channelID),
     // Say.
     '/type': () => handleType(event, sendResponse, client, testPilot, tempDB),
     '/editLastSay': () => handleEditLastSay(event, sendResponse, client, testPilot, tempDB),

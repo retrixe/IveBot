@@ -1,13 +1,8 @@
 import * as React from 'react'
-import Typography from 'material-ui/Typography'
-import Paper from 'material-ui/Paper'
-import List, { ListItem, ListItemText } from 'material-ui/List'
-import Avatar from 'material-ui/Avatar'
-import Hidden from 'material-ui/Hidden'
-import Divider from 'material-ui/Divider'
-import IconButton from 'material-ui/IconButton'
-import { LinearProgress } from 'material-ui/Progress'
-import withWidth from 'material-ui/utils/withWidth'
+import {
+  Typography, Paper, List, ListItem, ListItemText, Avatar, Hidden, Divider, IconButton,
+  LinearProgress, withWidth
+} from '@material-ui/core'
 import ArrowBack from '@material-ui/icons/ArrowBack'
 import { Query } from 'react-apollo'
 import Settings from './settings'

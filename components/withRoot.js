@@ -1,6 +1,5 @@
 import React from 'react'
-import { MuiThemeProvider } from 'material-ui/styles'
-import CssBaseline from 'material-ui/CssBaseline'
+import { CssBaseline, MuiThemeProvider } from '@material-ui/core'
 import getPageContext from './getPageContext'
 import PropTypes from 'prop-types'
 
