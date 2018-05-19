@@ -1,5 +1,6 @@
 # Configuration
 config.json5
+config.dev.json5
 package-lock.json
 
 # Built files.

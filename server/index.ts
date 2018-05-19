@@ -12,10 +12,10 @@ import { DB } from '../bot/imports/types'
 /* SERVER CODE ENDS HERE */
 
 // Tokens and stuff.
+import { existsSync } from 'fs'
 import { Client } from 'discord.io'
 // Get the token needed.
 import 'json5/lib/require'
-const { token } = require('../config.json5')
 
 /* SERVER CODE STARTS HERE */
 // If production is explicitly specified via flag..
@@ -28,6 +28,11 @@ const port = parseInt(process.env.PORT, 10) || 3000 // If port variable has been
 const app = next({ dev })
 const handle = app.getRequestHandler()
 /* SERVER CODE ENDS HERE */
+
+// Get token.
+const { token } = require(
+  dev && existsSync('../config.dev.json5') ? '../config.dev.json5' : '../config.json5'
+)
 
 // Online since?
 let onlineSince = Math.abs(new Date().getTime())
