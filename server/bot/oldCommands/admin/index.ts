@@ -5,7 +5,7 @@ import { client, event } from '../../imports/types'
 
 // Import export from sub-files.
 export { handleBan, handleUnban } from './ban'
-export { handleWarn, handleWarnings, handleClearwarns, handleRemovewarn } from './warn'
+export { handleWarnings, handleClearwarns, handleRemovewarn } from './warn'
 export { handleMute, handleUnmute } from './mute'
 export { handleGiverole, handleTakerole } from './roles'
 

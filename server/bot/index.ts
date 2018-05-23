@@ -16,7 +16,7 @@ import {
   handleDefine
 } from './oldCommands/api'
 import {
-  handleKick, handleBan, handleUnban, handleMute, handleUnmute, handleWarn,
+  handleKick, handleBan, handleUnban, handleMute, handleUnmute,
   handleGiverole, handleTakerole, handleWarnings, handleClearwarns, handleRemovewarn, handlePurge
 } from './oldCommands/admin'
 
@@ -167,7 +167,6 @@ export default (client: client, tempDB: DB, db: mongoDB) => async (event: messag
     '/purge': () => handlePurge(client, event, sendResponse, message),
     '/mute': () => handleMute(client, event, sendResponse, message),
     '/unmute': () => handleUnmute(client, event, sendResponse, message),
-    '/warn': () => handleWarn(client, event, sendResponse, message, db),
     '/clearwarns': () => handleClearwarns(client, event, sendResponse, message, db),
     '/clearw': () => handleClearwarns(client, event, sendResponse, message, db),
     '/cw': () => handleClearwarns(client, event, sendResponse, message, db),

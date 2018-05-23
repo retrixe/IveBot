@@ -2652,11 +2652,11 @@ equal-length@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/equal-length/-/equal-length-1.0.1.tgz#21ca112d48ab24b4e1e7ffc0e5339d31fdfc274c"
 
-eris@abalabahaha/eris#dev:
-  version "0.8.5"
-  resolved "https://codeload.github.com/abalabahaha/eris/tar.gz/eb234f8b44d776b8bb68d1bf731f2d78fd3d222e"
+eris@^0.8.6:
+  version "0.8.6"
+  resolved "https://registry.yarnpkg.com/eris/-/eris-0.8.6.tgz#507a3b909b39a4b82bf7dfd70f5c60e34dd47454"
   dependencies:
-    ws "^3.3.2"
+    ws "^5.2.0"
   optionalDependencies:
     opusscript "^0.0.4"
     tweetnacl "^1.0.0"
@@ -7261,13 +7261,19 @@ write@^0.2.1:
   dependencies:
     mkdirp "^0.5.1"
 
-ws@^3.0.0, ws@^3.3.2:
+ws@^3.0.0:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/ws/-/ws-3.3.3.tgz#f1cf84fe2d5e901ebce94efaece785f187a228f2"
   dependencies:
     async-limiter "~1.0.0"
     safe-buffer "~5.1.0"
     ultron "~1.1.0"
+
+ws@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-5.2.0.tgz#9fd95e3ac7c76f6ae8bcc868a0e3f11f1290c33e"
+  dependencies:
+    async-limiter "~1.0.0"
 
 xdg-basedir@^3.0.0:
   version "3.0.0"
