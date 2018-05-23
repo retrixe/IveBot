@@ -1,7 +1,7 @@
 import test from 'ava'
 import {
   getArguments as ga, getIdFromMention as gifm
-} from '../../../lib/imports/tools'
+} from '../../../lib/bot/imports/tools'
 
 test('getArguments returns proper arguments', t => t.is(ga('/test command args'), 'command args'))
 test('getIdFromMention returns a correct ID for users', t => {

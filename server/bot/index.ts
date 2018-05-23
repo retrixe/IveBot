@@ -1,6 +1,6 @@
 // Tokens and stuff.
 import 'json5/lib/require'
-import { testPilots, host, mongoURL } from '../../config.json5'
+import { testPilots, host } from '../../config.json5'
 import { version } from '../../package.json'
 import { execSync } from 'child_process'
 import { randomBytes } from 'crypto'
@@ -25,17 +25,7 @@ import { client, DB, mongoDB, member, message } from './imports/types'
 import { PrivateChannel } from 'eris'
 import { getArguments, getServerSettings } from './imports/tools'
 import help from './oldCommands/help'
-
-// MongoDB.
-// Get MongoDB.
-import { MongoClient } from 'mongodb'
-// Create a MongoDB instance.
-let db: mongoDB
-MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (err, client) => {
-  if (err) throw new Error('Error:\n' + err)
-  console.log('Bot connected successfully to MongoDB.')
-  db = client.db('ivebot')
-})
+import { Db } from 'mongodb'
 
 // All commands which take (message, sendResponse) as args and can be appended and interpreted.
 const appendableCommandMaps: { [index: string]: Function } = {
@@ -65,7 +55,7 @@ const appendableCommandMaps: { [index: string]: Function } = {
 }
 
 // When client gains/loses a member, it will callback.
-export const guildMemberEditCallback = (client: client, event: string) => async (
+export const guildMemberEditCallback = (client: client, event: string, db: Db) => async (
   guild: { id: string }, member: member
 ) => { // eslint-disable-line indent
   // WeChill specific configuration.
@@ -111,7 +101,7 @@ export const guildMemberEditCallback = (client: client, event: string) => async 
 }
 
 // When client recieves a message, it will callback.
-export default (client: client, tempDB: DB) => async (event: message) => {
+export default (client: client, tempDB: DB, db: mongoDB) => async (event: message) => {
   // Disable bots and webhooks from being responded to.
   try { if (event.author.bot) return } catch (e) { return }
   try {

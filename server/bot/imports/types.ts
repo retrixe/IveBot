@@ -1,9 +1,10 @@
 // Flow our types.
 /* eslint-disable no-undef */
 import { CommandClient, Member, Message, CommandOptions, CommandGenerator } from 'eris'
+import { Db } from 'mongodb' // eslint-disable-line no-unused-vars
 
 // eslint-disable-next-line no-use-before-define
-export type IveBotCommand = (client: CommandClient, db?: DB) => {
+export type IveBotCommand = (client: CommandClient, db?: DB, mongoDB?: Db) => {
   generator: CommandGenerator,
   opts: CommandOptions,
   name: string
@@ -30,7 +31,5 @@ export type DB = {
   },
   leave: Array<string>
 }
-export type mongoDB = {
-  collection: Function
-}
+export type mongoDB = Db
 /* eslint-enable no-undef */

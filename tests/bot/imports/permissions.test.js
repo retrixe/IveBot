@@ -1,7 +1,7 @@
 import test from 'ava'
 import {
   checkUserForPermission as cufp, checkRolePosition as crp
-} from '../../../lib/imports/permissions'
+} from '../../../lib/bot/imports/permissions'
 
 const client = {
   servers: {

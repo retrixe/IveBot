@@ -13,13 +13,15 @@ import { DB, IveBotCommand } from './bot/imports/types'
 
 // Tokens and stuff.
 import { CommandClient } from 'eris'
+// Get MongoDB.
+import { MongoClient, Db } from 'mongodb'
 // Import fs.
 import { readdir, statSync } from 'fs'
 // Import the bot.
 import botCallback, { guildMemberEditCallback } from './bot'
 // Get the token needed.
 import 'json5/lib/require'
-import { token, host } from '../config.json5'
+import { token, host, mongoURL } from '../config.json5'
 
 // If production is explicitly specified via flag..
 if (process.argv[2] === '--production') process.env.NODE_ENV = 'production'
@@ -43,6 +45,21 @@ const client = new CommandClient(token === 'dotenv' ? process.env.IVEBOT_TOKEN :
 
 // Connect ASAP, hopefully before the server starts.
 client.connect()
+
+// Create a MongoDB instance.
+let db: Db
+MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (err, mongoDB) => {
+  if (err) throw new Error('Error:\n' + err)
+  console.log('Bot connected successfully to MongoDB.')
+  db = mongoDB.db('ivebot')
+  // When a server loses a member, it will callback.
+  client.on('guildMemberAdd', guildMemberEditCallback(client, 'guildMemberAdd', db))
+  client.on('guildMemberRemove', guildMemberEditCallback(client, 'guildMemberRemove', db))
+  // When a message is sent, the function should be called.
+  // This is here for temporary compatibility with older commands which have not been re-written.
+  // Avoid usage, submit PRs to bot/commands and not bot/index and bot/oldCommands.
+  client.on('messageCreate', botCallback(client, tempDB, db))
+})
 
 // On connecting..
 client.on('ready', () => {
@@ -83,15 +100,6 @@ readdir('./server/bot/commands', (err, commandFiles) => {
     }
   })
 })
-
-// When a message is sent, the function should be called.
-// This is here for temporary compatibility with older commands which have not been re-written.
-// Avoid usage, submit PRs to bot/commands and not bot/index and bot/oldCommands.
-client.on('messageCreate', botCallback(client, tempDB))
-
-// When a server loses a member, it will callback.
-client.on('guildMemberAdd', guildMemberEditCallback(client, 'guildMemberAdd'))
-client.on('guildMemberRemove', guildMemberEditCallback(client, 'guildMemberRemove'))
 
 /* SERVER CODE STARTS HERE */
 // Initialize Next.js app.

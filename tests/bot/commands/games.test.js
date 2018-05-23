@@ -1,7 +1,12 @@
 import test from 'ava'
 import {
-  handleReverse, handle8Ball, handleChoose, handleRandom
-} from '../../../lib/commands/games'
+  handleReverse as hr, handle8Ball as h8, handleChoose as hc, handleRandom as hrand
+} from '../../../lib/bot/commands/games'
+
+const handleReverse = hr({}).generator
+const handle8Ball = h8({}).generator
+const handleChoose = hc({}).generator
+const handleRandom = hrand({}).generator
 
 test('/reverse works as expected', t => handleReverse('/reverse ab', result => t.is(result, 'ba')))
 test('/8ball works as expected', t => handle8Ball('/8ball hi', result => {
