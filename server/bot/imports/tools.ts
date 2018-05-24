@@ -1,8 +1,9 @@
-import { mongoDB } from './types'
+import { Db } from 'mongodb'
+import { Message } from 'eris'
 
 export const getArguments = (message: string) => {
   const splitMessage = message.split(' ')
-  splitMessage.splice(0, 1)
+  splitMessage.shift()
   return splitMessage.join(' ').trim()
 }
 
@@ -13,7 +14,7 @@ export const getIdFromMention = (mention: string) => {
   return f[f.length - 1]
 }
 
-export const getServerSettings = async (db: mongoDB, serverID: string) => {
+export const getServerSettings = async (db: Db, serverID: string) => {
   // Get serverSettings through query.
   let serverSettings = await db.collection('servers').find({ serverID }).toArray()
   if (serverSettings.length === 0) {
@@ -25,3 +26,21 @@ export const getServerSettings = async (db: mongoDB, serverID: string) => {
 }
 
 export const zeroWidthSpace = '​'
+
+export const getUser = (message: Message, arg: string) => {
+  const mentions = message.mentions
+  const guild = message.member.guild
+  if (guild.members.find(i => i.id === arg)) return guild.members.find(i => i.id === arg).user
+  else if (mentions.length && mentions[0].id === getIdFromMention(arg)) return mentions[0]
+  else if (guild.members.find(i => i.username.toLowerCase() === arg.toLowerCase())) {
+    return guild.members.find(i => i.username.toLowerCase() === arg.toLowerCase()).user
+  }
+}
+
+// Fresh insults. They come and go, I suppose.
+export const getInsult = () => {
+  const insults = [
+    'pathetic lifeform', 'ungrateful bastard', 'idiotic slimeball', 'worthless ass'
+  ]
+  return insults[Math.floor(Math.random() * insults.length)]
+}

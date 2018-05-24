@@ -1,6 +1,6 @@
 import * as moment from 'moment'
 import { IveBotCommand } from '../../imports/types'
-import { getIdFromMention } from '../../imports/tools'
+import { getUser, getInsult } from '../../imports/tools'
 import { checkRolePosition } from '../../imports/permissions'
 
 export const handleWarn: IveBotCommand = ({ createMessage, getDMChannel }, tempDB, db) => ({
@@ -14,19 +14,15 @@ export const handleWarn: IveBotCommand = ({ createMessage, getDMChannel }, tempD
   generator: (message, args) => {
     // Check user for permissions.
     if (!message.member.permission.has('manageMessages')) {
-      return '**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**'
+      return `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
     // Or if improper arguments were provided, then we must inform the user.
     } else if (args.length < 2) return 'Correct usage: /warn <user> <reason>'
     // Now find the user ID.
-    let user: string = args[0]
-    if (message.member.guild.members.find(i => i.id === args[0])) user = args[0]
-    else if (message.mentions[0].id === getIdFromMention(args[0])) user = message.mentions[0].id
-    else if (message.member.guild.members.find(i => i.username === args[0])) {
-      user = message.member.guild.members.find(i => i.username === args[0]).id
-    } else return 'Specify a valid member of this guild, pathetic life form.'
+    let user = getUser(message, args[0])
+    if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
     // Respect role order.
     if (
-      checkRolePosition(message.member.guild.members.find(i => i.id === user)) >=
+      checkRolePosition(message.member.guild.members.find(i => i.user === user)) >=
       checkRolePosition(message.member)
     ) {
       return 'You cannot warn this person! People nowadays.'
@@ -40,10 +36,10 @@ export const handleWarn: IveBotCommand = ({ createMessage, getDMChannel }, tempD
       serverID: message.member.guild.id,
       date: new Date().toUTCString()
     }).then(() => {
-      getDMChannel(user).then((c) => createMessage(
+      getDMChannel(user.id).then((c) => createMessage(
         c.id, `You have been warned in ${message.member.guild.name} for: ${args.join(' ')}.`
       ))
-      const member = message.member.guild.members.find(i => i.id === user)
+      const member = message.member.guild.members.find(i => i.user === user)
       createMessage(
         message.channel.id,
         `**${member.username}#${member.discriminator}** has been warned. **lol.**`
@@ -61,8 +57,8 @@ export const handleWarn: IveBotCommand = ({ createMessage, getDMChannel }, tempD
           }
         })
       }
-    }).catch((err: string) => {
+    }).catch(console.error /* (err: string) => {
       createMessage(message.channel.id, `Something went wrong 👾 Error: ${err}`)
-    })
+    } */)
   }
 })
