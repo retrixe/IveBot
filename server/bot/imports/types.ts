@@ -10,6 +10,8 @@ export type IveBotCommand = (client: CommandClient, db?: DB, mongoDB?: Db) => {
   name: string
 }
 
+export type FalseUser = { id: string, username: string, discriminator: string }
+
 export class client extends CommandClient {}
 export class member extends Member {}
 export class message extends Message {}
