@@ -16,8 +16,8 @@ import {
   handleDefine
 } from './oldCommands/api'
 import {
-  handleKick, handleBan, handleUnban, handleMute, handleUnmute,
-  handleGiverole, handleTakerole, handleWarnings, handleClearwarns, handleRemovewarn, handlePurge
+  handleUnban, handleMute, handleUnmute, handleTakerole,
+  handleGiverole, handleWarnings, handleClearwarns, handleRemovewarn
 } from './oldCommands/admin'
 
 // We need types.
@@ -159,12 +159,7 @@ export default (client: client, tempDB: DB, db: mongoDB) => async (event: messag
     '/changeserverregion': () => handleChangeserverregion(client, event, sendResponse, message),
     '/csr': () => handleChangeserverregion(client, event, sendResponse, message),
     // Administrative commands.
-    '/ban': () => handleBan(client, event, sendResponse, message),
-    '/banana': () => handleBan(client, event, sendResponse, message),
-    '/nuke': () => handleBan(client, event, sendResponse, message),
     '/unban': () => handleUnban(client, event, sendResponse, message),
-    '/kick': () => handleKick(client, event, sendResponse, message),
-    '/purge': () => handlePurge(client, event, sendResponse, message),
     '/mute': () => handleMute(client, event, sendResponse, message),
     '/unmute': () => handleUnmute(client, event, sendResponse, message),
     '/clearwarns': () => handleClearwarns(client, event, sendResponse, message, db),

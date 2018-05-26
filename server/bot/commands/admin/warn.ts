@@ -9,14 +9,13 @@ export const handleWarn: IveBotCommand = ({ createMessage, getDMChannel }, tempD
     description: 'Warn someone.',
     fullDescription: 'Warn someone.',
     usage: '/warn <user by ID/username/mention> <reason>',
-    guildOnly: true
+    guildOnly: true,
+    requirements: { permissions: { 'manageMessages': true } },
+    permissionMessage: `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
   },
   generator: (message, args) => {
-    // Check user for permissions.
-    if (!message.member.permission.has('manageMessages')) {
-      return `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
-    // Or if improper arguments were provided, then we must inform the user.
-    } else if (args.length < 2) return 'Correct usage: /warn <user> <reason>'
+    // If improper arguments were provided, then we must inform the user.
+    if (args.length < 2) return 'Correct usage: /warn <user> <reason>'
     // Now find the user ID.
     let user = getUser(message, args[0])
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
@@ -25,7 +24,7 @@ export const handleWarn: IveBotCommand = ({ createMessage, getDMChannel }, tempD
       checkRolePosition(message.member.guild.members.find(i => i.user === user)) >=
       checkRolePosition(message.member)
     ) {
-      return 'You cannot warn this person! People nowadays.'
+      return `You cannot warn this person, you ${getInsult()}.`
     }
     // Warn the person internally.
     args.shift()
