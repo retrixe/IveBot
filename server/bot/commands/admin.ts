@@ -2,7 +2,8 @@ import { IveBotCommand } from '../imports/types'
 import { getInsult, getUser } from '../imports/tools'
 import { checkRolePosition } from '../imports/permissions'
 export { handleWarn } from './admin/warn'
-export { handleBan } from './admin/ban'
+export { handleMute, handleUnmute } from './admin/mute'
+export { handleBan, handleUnban } from './admin/ban'
 
 export const handlePurge: IveBotCommand = (client) => ({
   name: 'purge',
@@ -11,8 +12,7 @@ export const handlePurge: IveBotCommand = (client) => ({
     fullDescription: 'Bulk delete messages newer than 2 weeks.',
     usage: '/purge <number greater than 0>',
     guildOnly: true,
-    requirements: { permissions: { 'manageMessages': true } },
-    permissionMessage: `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
+    requirements: { permissions: { 'manageMessages': true } }
   },
   generator: (message, args) => {
     // Check if usage is correct.
@@ -38,8 +38,7 @@ export const handleKick: IveBotCommand = (client) => ({
     fullDescription: 'Kick someone.',
     usage: '/kick <user by ID/username/mention> (reason)',
     guildOnly: true,
-    requirements: { permissions: { 'kickMembers': true } },
-    permissionMessage: `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
+    requirements: { permissions: { 'kickMembers': true } }
   },
   generator: (message, args) => {
     // Find the user ID.

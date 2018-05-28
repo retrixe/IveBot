@@ -11,8 +11,7 @@ export const handleBan: IveBotCommand = (client) => ({
     usage: '/ban <user by ID/username/mention> (reason)',
     aliases: ['banana', 'nuke'],
     guildOnly: true,
-    requirements: { permissions: { 'banMembers': true } },
-    permissionMessage: `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
+    requirements: { permissions: { 'banMembers': true } }
   },
   generator: (message, args) => {
     // Find the user ID.
@@ -60,8 +59,7 @@ export const handleUnban: IveBotCommand = (client) => ({
     fullDescription: 'Unban someone.',
     usage: '/unban <user by ID/username> (reason)',
     guildOnly: true,
-    requirements: { permissions: { 'banMembers': true } },
-    permissionMessage: `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
+    requirements: { permissions: { 'banMembers': true } }
   },
   generator: (message, args) => {
     // Find the user ID.

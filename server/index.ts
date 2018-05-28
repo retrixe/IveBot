@@ -19,6 +19,8 @@ import { MongoClient, Db } from 'mongodb'
 import { readdir, statSync } from 'fs'
 // Import the bot.
 import botCallback, { guildMemberEditCallback } from './bot'
+// Import insults.
+import { getInsult } from './bot/imports/tools'
 // Get the token needed.
 import 'json5/lib/require'
 import { token, host, mongoURL } from '../config.json5'
@@ -39,7 +41,12 @@ const client = new CommandClient(token === 'dotenv' ? process.env.IVEBOT_TOKEN :
   name: 'IveBot',
   defaultHelpCommand: false,
   defaultCommandOptions: {
-    argsRequired: true, caseInsensitive: true, errorMessage: 'IveBot experienced an internal error.'
+    argsRequired: true,
+    caseInsensitive: true,
+    errorMessage: 'IveBot experienced an internal error.',
+    permissionMessage: (
+      () => `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
+    )()
   }
 })
 

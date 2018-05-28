@@ -10,8 +10,7 @@ export const handleWarn: IveBotCommand = ({ createMessage, getDMChannel }, tempD
     fullDescription: 'Warn someone.',
     usage: '/warn <user by ID/username/mention> <reason>',
     guildOnly: true,
-    requirements: { permissions: { 'manageMessages': true } },
-    permissionMessage: `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
+    requirements: { permissions: { 'manageMessages': true } }
   },
   generator: (message, args) => {
     // If improper arguments were provided, then we must inform the user.
