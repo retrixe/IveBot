@@ -4,7 +4,7 @@
   "description": "The bot that created the iPhone X.",
   "main": "server/index.ts",
   "scripts": {
-    "test": "tsc && ava",
+    "test": "ava",
     "nyan": "ava --tap | tap-nyan",
     "lint": "eslint . --ext .js,.ts,.tsx && tsc --noEmit && graphql-schema-linter server/schema.graphql",
     "start": "node lib/index.js --production",
@@ -15,11 +15,11 @@
   "author": "Ibrahim Ansari <ansari.ibrahim1@gmail.com>",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=8.5.0"
+    "node": ">=6.5.0"
   },
   "dependencies": {
-    "@material-ui/core": "^1.0.0-rc.1",
-    "@material-ui/icons": "^1.0.0-rc.0",
+    "@material-ui/core": "^1.2.0",
+    "@material-ui/icons": "^1.1.0",
     "apollo-boost": "^0.1.4",
     "eris": "^0.8.6",
     "graphql": "^0.13.2",
@@ -36,12 +36,13 @@
     "typescript": "^2.8.1"
   },
   "devDependencies": {
+    "@babel/plugin-syntax-typescript": "^7.0.0-beta.49",
     "@types/mongodb": "^3.0.12",
     "@types/next": "^2.4.7",
     "@types/node": "^8.0.53",
     "@types/react": "^16.0.36",
     "@zeit/next-typescript": "^0.1.1",
-    "ava": "^1.0.0-beta.3",
+    "ava": "^1.0.0-beta.5.1",
     "eslint": "^4.17.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-config-standard-react": "^5.0.0",
@@ -64,11 +65,15 @@
     }
   },
   "ava": {
-    "files": [
-      "tests/**/*.js"
-    ],
-    "sources": [
-      "bot/**/*.ts"
-    ]
+    "files": ["tests/**/*.test.ts"],
+    "sources": ["server/**/*.ts"],
+    "require": ["ts-node/register"],
+    "babel": {
+      "testOptions": {
+        "presets": [["module:ava/stage-4", false]],
+        "plugins": ["@babel/plugin-syntax-typescript"]
+      },
+      "extensions": ["js", "ts"]
+    }
   }
 }
