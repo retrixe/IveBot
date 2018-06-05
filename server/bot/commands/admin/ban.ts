@@ -13,7 +13,7 @@ export const handleBan: IveBotCommand = (client) => ({
     guildOnly: true,
     requirements: { permissions: { 'banMembers': true } }
   },
-  generator: (message, args) => {
+  generator: async (message, args) => {
     // Find the user ID.
     const userSpecified = args.shift()
     let user: FalseUser|User = getUser(message, userSpecified)
@@ -33,22 +33,21 @@ export const handleBan: IveBotCommand = (client) => ({
       return `You cannot ban this person, you ${getInsult()}.`
     }
     // Now we ban the person.
-    client.banGuildMember(message.member.guild.id, user.id, 0, args.join(' ')).then(() => {
-      client.createMessage(
-        message.channel.id, `**${user.username}#${user.discriminator}** has been banned. **rip.**`
+    try {
+      await client.banGuildMember(message.member.guild.id, user.id, 0, args.join(' '))
+    } catch (e) { return 'That person could not be banned.' }
+    client.createMessage((await client.getDMChannel(user.id)).id, args.length !== 0
+      ? `You have been banned from ${message.member.guild.name} for ${args.join(' ')}.`
+      : `You have been banned from ${message.member.guild.name}.`
+    )
+    // WeChill
+    if (message.member.guild.id === '402423671551164416') {
+      client.createMessage('402437089557217290', args.length !== 0
+        ? `**${user.username}#${user.discriminator}** has been banned for **${args.join(' ')}**.`
+        : `**${user.username}#${user.discriminator}** has been banned for not staying chill >:L `
       )
-      client.getDMChannel(user.id).then((c) => client.createMessage(c.id, args.length !== 0
-        ? `You have been banned from ${message.member.guild.name} for ${args.join(' ')}.`
-        : `You have been banned from ${message.member.guild.name}.`
-      ))
-      // WeChill
-      if (message.member.guild.id === '402423671551164416') {
-        client.createMessage('402437089557217290', args.length !== 0
-          ? `**${user.username}#${user.discriminator}** has been banned for **${args.join(' ')}**.`
-          : `**${user.username}#${user.discriminator}** has been banned for not staying chill >:L `
-        )
-      }
-    }).catch(() => client.createMessage(message.channel.id, 'That person could not be banned.'))
+    }
+    return `**${user.username}#${user.discriminator}** has been banned. **rip.**`
   }
 })
 
@@ -61,7 +60,7 @@ export const handleUnban: IveBotCommand = (client) => ({
     guildOnly: true,
     requirements: { permissions: { 'banMembers': true } }
   },
-  generator: (message, args) => {
+  generator: async (message, args) => {
     // Find the user ID.
     const userSpecified = args.shift()
     let user: User
@@ -71,10 +70,9 @@ export const handleUnban: IveBotCommand = (client) => ({
       user = client.users.find(i => i.id === userSpecified)
     } else return 'I cannot find that user.'
     // Now we unban the person.
-    client.unbanGuildMember(message.member.guild.id, user.id, args.join(' ')).then(() => {
-      client.createMessage(
-        message.channel.id, `**${user.username}#${user.discriminator}** has been unbanned.`
-      )
-    }).catch(() => client.createMessage(message.channel.id, 'That user could not be unbanned.'))
+    try {
+      await client.unbanGuildMember(message.member.guild.id, user.id, args.join(' '))
+    } catch (e) { return 'That user could not be unbanned.' }
+    return `**${user.username}#${user.discriminator}** has been unbanned.`
   }
 })

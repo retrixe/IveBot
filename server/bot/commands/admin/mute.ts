@@ -13,7 +13,7 @@ export const handleMute: IveBotCommand = (client) => ({
     guildOnly: true,
     requirements: { permissions: { 'manageMessages': true } }
   },
-  generator: (message, args) => {
+  generator: async (message, args) => {
     // Find the user ID.
     let user = getUser(message, args.shift())
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
@@ -62,60 +62,70 @@ export const handleMute: IveBotCommand = (client) => ({
         }
       })
       // Mute person.
-      client.addGuildMemberRole(
-        message.member.guild.id, user.id, role.id, args.join(' ')
-      ).then(() => client.createMessage(message.channel.id, 'Muted.')).catch(
-        () => client.createMessage(message.channel.id, 'Could not mute that person.')
-      )
+      try {
+        client.addGuildMemberRole(message.member.guild.id, user.id, role.id, args.join(' '))
+      } catch (e) { return 'Could not mute that person.' }
+      // If time given, set timeout.
+      try {
+        if (ms(args[1])) {
+          setTimeout(() => {
+            client.removeGuildMemberRole(message.member.guild.id, user.id, role.id)
+          }, ms(args[1]))
+        }
+      } catch (e) { }
+      return 'Muted.'
       // If no role, make a Muted role.
     } else if (!role) {
-      client.createRole(
-        message.member.guild.id, { name: 'Muted', color: 0x444444 }
-      ).then((res) => {
-        // Modify channel permissions.
-        message.member.guild.channels.forEach((a) => {
-          if (a.type === 0) {
-            client.editChannelPermission(
-              a.id, res.id, 0,
-              Constants.Permissions.sendMessages | Constants.Permissions.addReactions,
-              'role'
-            )
-          } else if (a.type === 2) {
-            client.editChannelPermission(a.id, res.id, 0, Constants.Permissions.voiceSpeak, 'role')
-          } else if (a.type === 4) {
-            client.editChannelPermission(
-              a.id, res.id, 0,
-              Constants.Permissions.sendMessages |
-              Constants.Permissions.addReactions | Constants.Permissions.voiceSpeak,
-              'role'
-            )
-          }
-        })
-        // Then mute the person.
-        client.addGuildMemberRole(
-          message.member.guild.id, user.id, res.id, args.join(' ')
-        ).then(() => client.createMessage(message.channel.id, 'Muted.')).catch(
-          () => client.createMessage(message.channel.id, 'Could not mute that person.')
-        )
-      }).catch(() => client.createMessage(
-        message.channel.id, 'I could not find a Muted role and cannot create a new one.')
-      )
+      try {
+        role = await client.createRole(message.member.guild.id, { name: 'Muted', color: 0x444444 })
+      } catch (e) { return 'I could not find a Muted role and cannot create a new one.' }
+      // Modify channel permissions.
+      message.member.guild.channels.forEach((a) => {
+        if (a.type === 0) {
+          client.editChannelPermission(
+            a.id, role.id, 0,
+            Constants.Permissions.sendMessages | Constants.Permissions.addReactions,
+            'role'
+          )
+        } else if (a.type === 2) {
+          client.editChannelPermission(a.id, role.id, 0, Constants.Permissions.voiceSpeak, 'role')
+        } else if (a.type === 4) {
+          client.editChannelPermission(
+            a.id, role.id, 0,
+            Constants.Permissions.sendMessages |
+            Constants.Permissions.addReactions | Constants.Permissions.voiceSpeak,
+            'role'
+          )
+        }
+      })
+      // Then mute the person.
+      try {
+        client.addGuildMemberRole(message.member.guild.id, user.id, role.id, args.join(' '))
+      } catch (e) { return 'Could not mute that person.' }
+      // If time given, set timeout.
+      try {
+        if (ms(args[1])) {
+          setTimeout(() => {
+            client.removeGuildMemberRole(message.member.guild.id, user.id, role.id)
+          }, ms(args[1]))
+        }
+      } catch (e) { }
+      return 'Muted.'
     } else {
       // Mute person.
-      client.addGuildMemberRole(
-        message.member.guild.id, user.id, role.id, args.join(' ')
-      ).then(() => client.createMessage(message.channel.id, 'Muted.')).catch(
-        () => client.createMessage(message.channel.id, 'Could not mute that person.')
-      )
+      try {
+        client.addGuildMemberRole(message.member.guild.id, user.id, role.id, args.join(' '))
+      } catch (e) { return 'Could not mute that person.' }
+      // If time given, set timeout.
+      try {
+        if (ms(args[1])) {
+          setTimeout(() => {
+            client.removeGuildMemberRole(message.member.guild.id, user.id, role.id)
+          }, ms(args[1]))
+        }
+      } catch (e) {}
+      return 'Muted.'
     }
-    // If time given, set timeout.
-    try {
-      if (ms(args[1])) {
-        setTimeout(() => {
-          client.removeGuildMemberRole(message.member.guild.id, user.id, role.id)
-        }, ms(args[1]))
-      }
-    } catch (e) { }
   }
 })
 

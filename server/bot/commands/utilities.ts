@@ -16,13 +16,11 @@ export const handleRequest: IveBotCommand = (client, db) => ({
     fullDescription: 'Request a feature. Only available to test pilots.',
     usage: '/request <suggestion>'
   },
-  generator: ({ author, content, channel }, args) => {
-    client.getDMChannel(host).then((PrivateChannel) => {
-      client.createMessage(
-        PrivateChannel.id,
-        `${author.username}#${author.discriminator} with ID ${author.id}: ${args.join(' ')}`
-      )
-    })
+  generator: async ({ author, content, channel }, args) => {
+    client.createMessage(
+      (await client.getDMChannel(host)).id,
+      `${author.username}#${author.discriminator} with ID ${author.id}: ${args.join(' ')}`
+    )
     return `${author.mention}, what a pathetic idea. It has been DMed to the main developer \
 and will be read shortly.
 You may recieve a response soon, and you can keep track here:
@@ -41,22 +39,22 @@ export const handleSay: IveBotCommand = (client, db) => ({
     errorMessage: 'There was an error processing your request.'
   },
   name: 'say',
-  generator: (message, args) => {
+  generator: async (message, args) => {
     // Should it be sent in another channel?
     const possibleChannel = getIdFromMention(args[0])
     if (message.channelMentions[0] === possibleChannel) {
       args.shift()
       if (args.join(' ') === 'pls adim me') args = ['no']
-      client.createMessage(message.channelMentions[0], args.join(' ')).then((newMessage) => {
-        db.say[message.channelMentions[0]] = newMessage.id
-      }).catch((err) => console.error(err))
+      db.say[message.channelMentions[0]] = (
+        await client.createMessage(message.channelMentions[0], args.join(' '))
+      ).id
       return
     }
     // Send the message.
     if (args.join(' ') === 'pls adim me') args = ['no']
-    client.createMessage(message.channel.id, args.join(' ')).then((newMessage) => {
-      db.say[message.channelMentions[0]] = newMessage.id
-    }).catch((err) => console.error(err))
+    db.say[message.channelMentions[0]] = (
+      await client.createMessage(message.channel.id, args.join(' '))
+    ).id
   }
 })
 
@@ -72,12 +70,13 @@ export const handleRemindme: IveBotCommand = (client) => ({
     if (args.length < 2 || !ms(args[0])) {
       return 'Correct usage: /remindme <time in 1d|1h|1m|1s> <description>'
     }
-    client.createMessage(message.channel.id, `You will be reminded in ${args[0]} through a DM.`)
-    setTimeout(() => {
-      client.getDMChannel(message.author.id).then((PrivateChannel) => client.createMessage(
-        PrivateChannel.id, `⏰ ${getDesc(message)}\nReminder set ${args[0]} ago.`
-      ))
+    setTimeout(async () => {
+      client.createMessage(
+        (await client.getDMChannel(message.author.id)).id,
+        `⏰ ${getDesc(message)}\nReminder set ${args[0]} ago.`
+      )
     }, ms(args[0]))
+    return `You will be reminded in ${args[0]} through a DM.`
   }
 })
 
@@ -122,14 +121,12 @@ export const handleLeave: IveBotCommand = (client, db) => ({
       }, 30000)
     } else if (db.leave.includes(message.author.id)) {
       db.leave.splice(db.leave.findIndex(i => i === message.author.id), 1)
-      client.kickGuildMember(message.member.guild.id, message.author.id, 'Used /leave.')
-        .then(() => client.createMessage(
-          message.channel.id,
-          `${message.author.username}#${message.author.discriminator} has left the server.`
-        )).catch(() => client.createMessage(
-          message.channel.id,
-          'You will have to manually leave the server or transfer ownership before leaving.'
-        ))
+      try {
+        client.kickGuildMember(message.member.guild.id, message.author.id, 'Used /leave.')
+      } catch (e) {
+        return 'You will have to manually leave the server or transfer ownership before leaving.'
+      }
+      return `${message.author.username}#${message.author.discriminator} has left the server.`
     }
   }
 })
