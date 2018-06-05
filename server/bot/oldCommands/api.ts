@@ -273,7 +273,7 @@ export function handleCurrency (message: string, sendResponse: Function) {
   to = to.toUpperCase()
   let converted: string|Array<string> =
     ((exchangeRates.rates[to] / exchangeRates.rates[from]) * +amount).toString().split('.')
-  converted[1] = converted[1].substr(0, 4)
+  if (converted[1]) converted[1] = converted[1].substr(0, 4)
   converted = converted.join('.')
   sendResponse(`**${from}** ${amount} = **${to}** ${converted}`)
 }
