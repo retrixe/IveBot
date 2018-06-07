@@ -11,7 +11,8 @@ import { gql } from 'apollo-boost'
 interface Props {
   data: { addRoleForAll: boolean, joinAutorole: string },
   token: string,
-  server: string
+  server: string,
+  refetch: Function
 }
 interface State {
   role: boolean,
@@ -85,7 +86,10 @@ mutation variables($server: String!, $token: String!, $role: Boolean, $joinAutor
             </FormControl>
             <div style={{ height: 10 }} />
             <Button size='small'>Cancel</Button>
-            <Button size='small' onClick={() => updateSettings()}>Save</Button>
+            <Button size='small' onClick={() => {
+              updateSettings()
+              this.props.refetch()
+            }}>Save</Button>
             {loading && <><br /><LinearProgress color='secondary' variant='query' /></>}
             {error && <><br /><Typography color='error'>Error :( Please try again</Typography></>}
           </>

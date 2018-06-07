@@ -28,6 +28,8 @@ type Query {
   serverSettings(serverId: String!, linkToken: String!): ServerSetting!
   # Get the user for a link code.
   getUserInfo(linkToken: String!): [Server!]!
+  # Get bot ID.
+  getBotId: String!
 }
 
 # Input for editServerSettings mutation.

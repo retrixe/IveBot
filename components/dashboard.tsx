@@ -62,17 +62,14 @@ query getServerSettings($server: String!, $token: String!) {
             }} onClick={() => this.setState({ selected: false })}>
               <ArrowBack />
             </IconButton>
-            {element.icon === 'no icon'
-              ? ''
-              : <Avatar src={`https://cdn.discordapp.com/icons/${element.serverId}/${element.icon}.webp`} />
-            }
+            {element.icon === 'no icon' ? '' : <Avatar src={element.icon} />}
             <Typography style={{
               marginLeft: 10
             }} variant='title' component='h1'>{nameOfServer} <Hidden mdDown>({element.serverId})</Hidden></Typography>
           </div>
           <Divider />
-          <Query query={query} variables={{ server: element.serverId, token: this.props.token }}>
-            {({ loading, error, data }) => {
+          <Query pollInterval={30000} query={query} variables={{ server: element.serverId, token: this.props.token }}>
+            {({ loading, error, data, refetch }) => {
               if (error) {
                 return (
                   <Typography color='error'>
@@ -83,7 +80,12 @@ query getServerSettings($server: String!, $token: String!) {
                 )
               }
               if (loading || !data) return <LinearProgress color='secondary' variant='query' />
-              return <Settings data={data.serverSettings} token={this.props.token} server={element.serverId} />
+              return <Settings
+                refetch={refetch}
+                data={data.serverSettings}
+                token={this.props.token}
+                server={element.serverId}
+              />
             }}
           </Query>
         </>

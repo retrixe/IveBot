@@ -1,91 +1,56 @@
 import * as React from 'react'
 import {
-  AppBar, Toolbar, Button, Dialog, DialogTitle, DialogActions, DialogContent, DialogContentText,
-  Typography, TextField, LinearProgress
+  AppBar, Toolbar, Button, Typography
 } from '@material-ui/core'
 import Link from 'next/link'
-import fetch from 'isomorphic-unfetch'
-import ApolloClient, { gql } from 'apollo-boost'
-import { ApolloProvider, Query } from 'react-apollo'
-import Dashboard from '../components/dashboard'
+import { request } from 'graphql-request'
 import withRoot from '../components/withRoot'
 
 // Apollo Client definition.
-const client = new ApolloClient({ uri: `/graphql`, fetchOptions: { fetch } })
-
 /* eslint-disable quotes, no-multi-str, no-undef */
-class DashboardIndex extends React.Component {
-  state = { open: false, token: '' }
-  openDialog = () => this.setState({ open: true })
-  closeDialog = () => this.setState({ open: false })
-  render () {
-    const query = gql`
-query getAllCommonServers($token: String!) {
-  getUserInfo(linkToken: $token) {
-    serverId
-    name
-    perms
-    icon
+class Index extends React.Component {
+  state = { id: '' }
+
+  componentDidMount () {
+    request('/graphql', `{
+  getBotId
+}`
+    ).then((data: { getBotId: string }) => this.setState({ id: data.getBotId }))
   }
-}
-    `
+
+  render () {
     return (
-      <ApolloProvider client={client}>
-      <>
-        {/* login dialog. */}
-        <Dialog open={this.state.open} onClose={this.closeDialog}>
-          <DialogTitle>Log In</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Enter your link token here, retrievable through /token on Discord.
-            </DialogContentText>
-            <TextField onChange={(e) => this.setState({ token: e.target.value })}
-              autoFocus margin='dense' label='Link Token' type='password' fullWidth
-              value={this.state.token} required />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.closeDialog} color='primary'>Cancel</Button>
-            <Button onClick={this.closeDialog} color='primary'>Log In</Button>
-          </DialogActions>
-        </Dialog>
-        {/* actual code starts here. */}
+      <div style={{ marginRight: 16, marginLeft: 16 }}>
         <AppBar>
           <Toolbar>
             <Typography variant='title' color='inherit' style={{ flex: 1 }}>IveBot</Typography>
-            <Link prefetch href='/'><Button color='inherit'>Home</Button></Link>
-            {this.state.token.length === 6 && !this.state.open
-              ? <Button color='inherit' onClick={() => this.setState({ token: '' })}>Logout</Button>
-              : <Button color='inherit' onClick={this.openDialog}>Login</Button>
-            }
+            <Link prefetch href='/dashboard'><Button color='inherit'>Dashboard</Button></Link>
           </Toolbar>
         </AppBar>
         <br /><br /><br /><br />
-        <div style={{ padding: 10 }}>
-          {this.state.token.length === 6 && !this.state.open
-            ? <Query query={query} variables={{ token: this.state.token }}>
-              {({ loading, error, data }) => {
-                if (error) {
-                  return (
-                    <Typography color='error'>
-                      Could not fetch data. Refresh the page and try again.
-                      <br />
-                      {`${error}`}
-                    </Typography>
-                  )
-                }
-                if (loading || !data) return <LinearProgress color='secondary' variant='query' />
-                return <Dashboard data={data.getUserInfo} token={this.state.token} />
-              }}
-            </Query>
-            : <Typography align='center'
-            >Log into the dashboard through the button in the upper right corner.</Typography>
-          }
-        </div>
-      </>
-      </ApolloProvider>
+        <Button href={
+          `https://discordapp.com/oauth2/authorize?client_id=${this.state.id}&scope=bot&permissions=8`
+        } fullWidth>Add IveBot to your server</Button>
+        <hr />
+        <Typography align='center' variant='display1'>
+IveBot is not just a multipurpose Discord bot.
+        </Typography>
+        <Typography align='center' variant='display1'>
+It is THE multipurpose Discord bot.
+        </Typography>
+        <hr />
+        <Typography>Intended as a Discord bot driven by the community,
+IveBot is 100% open source and always will be.</Typography>
+        <Typography>IveBot also provides an API for other bots to authenticate
+          and communicate with.
+        </Typography>
+        <hr />
+        <Typography>IveBot boasts fast ping and is highly scalable.</Typography>
+        <Typography>Also, {'it\'s'} just a pretty good bot.</Typography>
+      </div>
     )
   }
 }
 /* eslint-enable quotes, no-multi-str, no-undef */
 
-export default withRoot(DashboardIndex)
+export default withRoot(Index)

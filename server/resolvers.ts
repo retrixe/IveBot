@@ -36,17 +36,15 @@ export default (ctx: { tempDB: DB, client: client }) => ({
     getUserInfo: (_: string, { linkToken }: { linkToken: string }) => {
       if (ctx.tempDB.link[linkToken]) {
         let servers: Array<{ perms: boolean, icon: string, serverId: string, name: string }> = []
-        Object.keys(ctx.client.guilds).forEach(server => {
-          Object.keys(ctx.client.guilds.find(a => a.id === server).members).forEach(member => {
-            if (member === ctx.tempDB.link[linkToken]) {
+        ctx.client.guilds.forEach(server => {
+          ctx.client.guilds.find(a => a.id === server.id).members.forEach(member => {
+            if (member.id === ctx.tempDB.link[linkToken]) {
               servers.push({
-                serverId: server,
-                name: ctx.client.guilds.find(a => a.id === server).name,
-                icon: ctx.client.guilds.find(a => a.id === server).iconURL || 'no icon',
+                serverId: server.id,
+                name: server.name,
+                icon: server.iconURL || 'no icon',
                 perms: host === ctx.tempDB.link[linkToken]
-                  ? true
-                  : ctx.client.guilds.find(t => t.id === server).members
-                    .find(t => t.id === ctx.tempDB.link[linkToken]).permission.has('manageGuild')
+                  ? true : member.permission.has('manageGuild')
               })
             }
           })
@@ -54,7 +52,8 @@ export default (ctx: { tempDB: DB, client: client }) => ({
         return servers
       }
       return [{ serverId: 'Unavailable: invalid link token.', icon: 'no icon' }]
-    }
+    },
+    getBotId: () => ctx.client.user.id
   },
   Mutation: {
     editServerSettings: async (
@@ -75,7 +74,6 @@ export default (ctx: { tempDB: DB, client: client }) => ({
           joinAutorole: joinAutorole ? joinAutorole : undefined
           /* eslint-enable no-unneeded-ternary */
         } })
-        console.log(await getServerSettings(db, serverId))
         return getServerSettings(db, serverId)
       } else return { serverId: 'Forbidden.' }
     }
