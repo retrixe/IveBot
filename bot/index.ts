@@ -92,6 +92,7 @@ const appendableCommandMaps: { [index: string]: Function } = {
   // Calculator.
   '/calculate': handleCalculate,
   '/calc': handleCalculate,
+  '/cal': handleCalculate,
   // List available server regions.
   '/listserverregions': handleListserverregions,
   '/lsr': handleListserverregions

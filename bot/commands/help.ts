@@ -83,7 +83,7 @@ const commandDocs: { [index: string]: any } = {
   'cat': b('/cat', 'Random cat from <https://random.cat>', '/cat'),
   'dog': b('/dog (breed)', 'Random dog from <https://dog.ceo>', '/dog labrador'),
   'currency': b(
-    '/currency <currency symbol to convert from> <currency symbol to convert to> (amount, default: 1)',
+    '/currency (list) <currency symbol to convert from> <currency symbol to convert to> (amount, default: 1)',
     'Convert a currency from one currency to another.', '/currency EUR USD 40', '/cur'
   ),
   'robohash': b('/robohash <cat/robot/monster/head> <text to hash>',
@@ -130,7 +130,7 @@ const commandDocs: { [index: string]: any } = {
   'token': b('/token', 'Links your Discord to IveBot Web (use in DM only, or your account may be hacked)', '/token'),
   'leave': b('/leave', 'This kicks you from the server, essentially making you leave.', '/leave'),
   'namemc': b('/namemc <premium Minecraft username>', 'Displays previous usernames and skins of a Minecraft player.', '/namemc voldemort', '/nmc'),
-  'calculate': b('/calculate <expression>', 'Calculate the value of an expression.', '/calculate 2 + 2', '/calc')
+  'calculate': b('/calculate <expression>', 'Calculate the value of an expression.', '/calculate 2 + 2', '/calc, /cal')
 }
 
 export default function help (message: string, client: client, c: string, u: string) {
