@@ -251,8 +251,8 @@ export function handleCurrency (message: string, sendResponse: Function) {
       })
   }
   // Whee, currency conversion!
-  let from = getArguments(message).split(' ')[0]
-  let to = getArguments(message).split(' ')[1]
+  const from = getArguments(message).split(' ')[0].toUpperCase()
+  const to = getArguments(message).split(' ')[1].toUpperCase()
   let amount = getArguments(getArguments(getArguments(message))).trim()
   if (from.length !== 3 || !exchangeRates.rates[from]) {
     sendResponse('Invalid currency to convert from.')
@@ -269,8 +269,6 @@ export function handleCurrency (message: string, sendResponse: Function) {
     sendResponse('Enter a proper number to convert.')
     return
   }
-  from = from.toUpperCase()
-  to = to.toUpperCase()
   let converted: string|Array<string> =
     ((exchangeRates.rates[to] / exchangeRates.rates[from]) * +amount).toString().split('.')
   if (converted[1]) converted[1] = converted[1].substr(0, 4)

@@ -40,7 +40,7 @@ export const handleWarn: IveBotCommand = ({ createMessage, getDMChannel }, tempD
     )
     const member = message.member.guild.members.find(i => i.user === user)
     if (message.member.guild.id === '402423671551164416') {
-      createMessage('427911595352391680', {
+      createMessage('402435742925848578', {
         content: `**${member.username}#${member.discriminator}** has been warned:`,
         embed: {
           color: 0x00AE86,

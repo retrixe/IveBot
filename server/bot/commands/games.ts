@@ -166,7 +166,7 @@ export const handleCalculate: IveBotCommand = (client) => ({
     description: 'Calculate an expression.',
     fullDescription: 'Calculate the value of an expression.',
     usage: '/calculate <expression>',
-    aliases: ['calc'],
+    aliases: ['calc', 'cal'],
     invalidUsageMessage: 'Specify an expression >_<'
   },
   generator: (message, args) => {
