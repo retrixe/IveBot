@@ -41,7 +41,7 @@
     "@types/next": "^2.4.7",
     "@types/node": "^8.0.53",
     "@types/react": "^16.0.36",
-    "@zeit/next-typescript": "^0.1.1",
+    "@zeit/next-typescript": "^1.0.1",
     "ava": "^1.0.0-beta.5.1",
     "eslint": "^4.17.0",
     "eslint-config-standard": "^10.2.1",
@@ -65,15 +65,31 @@
     }
   },
   "ava": {
-    "files": ["tests/**/*.test.ts"],
-    "sources": ["server/**/*.ts"],
-    "require": ["ts-node/register"],
+    "files": [
+      "tests/**/*.test.ts"
+    ],
+    "sources": [
+      "server/**/*.ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
     "babel": {
       "testOptions": {
-        "presets": [["module:ava/stage-4", false]],
-        "plugins": ["@babel/plugin-syntax-typescript"]
+        "presets": [
+          [
+            "module:ava/stage-4",
+            false
+          ]
+        ],
+        "plugins": [
+          "@babel/plugin-syntax-typescript"
+        ]
       },
-      "extensions": ["js", "ts"]
+      "extensions": [
+        "js",
+        "ts"
+      ]
     }
   }
 }

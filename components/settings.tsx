@@ -86,8 +86,8 @@ mutation variables($server: String!, $token: String!, $role: Boolean, $joinAutor
             </FormControl>
             <div style={{ height: 10 }} />
             <Button size='small'>Cancel</Button>
-            <Button size='small' onClick={() => {
-              updateSettings()
+            <Button size='small' onClick={async () => {
+              await updateSettings()
               this.props.refetch()
             }}>Save</Button>
             {loading && <><br /><LinearProgress color='secondary' variant='query' /></>}
