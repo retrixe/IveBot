@@ -11,7 +11,7 @@ import {
   handleEdit, handleType, handleChangeserverregion
 } from './oldCommands/utilities'
 import {
-  handleUrban, handleDog, handleApod, handleWeather, handleNamemc,
+  handleWeather, handleNamemc,
   handleCurrency,
   handleDefine
 } from './oldCommands/api'
@@ -35,14 +35,6 @@ const appendableCommandMaps: { [index: string]: Function } = {
   // Define.
   '/define': handleDefine,
   '/def': handleDefine,
-  // Urban.
-  '/urban': handleUrban,
-  '/urb': handleUrban,
-  // Dog.
-  '/dog': handleDog,
-  // Astronomy picture of the day.
-  '/astronomy-picture-of-the-day': handleApod,
-  '/apod': handleApod,
   // List available server regions.
   '/listserverregions': handleListserverregions,
   '/lsr': handleListserverregions
