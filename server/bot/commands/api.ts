@@ -3,6 +3,7 @@ import { IveBotCommand } from '../imports/types'
 // All the tools!
 import * as fetch from 'isomorphic-unfetch'
 import * as moment from 'moment'
+import { zeroWidthSpace } from '../imports/tools'
 // Get the NASA API token.
 import 'json5/lib/require'
 import { NASAtoken } from '../../../config.json5'
@@ -158,5 +159,46 @@ export const handleUrban: IveBotCommand = () => ({
     } catch (e) {
       return `Something went wrong 👾 Error: ${e}`
     }
+  }
+})
+
+export const handleNamemc: IveBotCommand = (client) => ({
+  name: 'namemc',
+  opts: {
+    description: 'A Minecraft user\'s previous usernames and skin.',
+    fullDescription: 'Displays previous usernames and skins of a Minecraft player.',
+    usage: '/namemc <premium Minecraft username>',
+    aliases: ['nmc']
+  },
+  generator: async (message, args) => {
+    if (args.length > 1) return 'Minecraft users cannot have spaces in their name.'
+    try {
+      // Fetch the UUID and name of the user and parse it to JSON.
+      const { id, name } = await (await fetch(
+        `https://api.mojang.com/users/profiles/minecraft/${args[0]}`
+      )).json()
+      // Fetch the previous names as well.
+      try {
+        const names: Array<{ name: string, changedToAt?: number }> = await (await fetch(
+          `https://api.mojang.com/user/profiles/${id}/names`
+        )).json()
+        return {
+          content: '**Minecraft history and skin for ' + name + ':**',
+          embed: {
+            color: 0x00AE86,
+            title: 'Skin and Name History',
+            fields: [...names.map(object => ({
+              name: object.name,
+              value: object.changedToAt
+                ? `Changed to this name on ${moment(object.changedToAt).format('dddd, MMMM Do YYYY, h:mm:ss A')}`
+                : zeroWidthSpace
+            })), { name: 'Skin', value: zeroWidthSpace }],
+            description: '**Name History**\n',
+            image: { url: `https://mc-heads.net/body/${id}`, height: 216, width: 90 },
+            footer: { text: 'Skin is recovered through https://mc-heads.net' }
+          }
+        }
+      } catch (err) { return `Something went wrong 👾 Error: ${err}` }
+    } catch (e) { return `Enter a valid Minecraft username (account must be premium)` }
   }
 })

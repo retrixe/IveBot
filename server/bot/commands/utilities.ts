@@ -31,12 +31,11 @@ You may recieve a response soon, and you can keep track here:
 export const handleSay: IveBotCommand = (client, db) => ({
   opts: {
     requirements: { userIDs: [...testPilots, host], permissions: { manageMessages: true } },
-    permissionMessage: 'You cannot fool me. You do not have enough permissions.',
     description: 'Say something, even in another channel.',
     fullDescription: 'Say something. Test pilots and admins/mods only.',
     usage: '/say (channel) <text>',
     deleteCommand: true,
-    errorMessage: 'There was an error processing your request.'
+    hooks: { postCommand: (message, args, sent) => { if (sent) db.say[sent.channel.id] = sent.id } }
   },
   name: 'say',
   generator: async (message, args) => {
@@ -52,9 +51,42 @@ export const handleSay: IveBotCommand = (client, db) => ({
     }
     // Send the message.
     if (args.join(' ') === 'pls adim me') args = ['no']
-    db.say[message.channelMentions[0]] = (
-      await client.createMessage(message.channel.id, args.join(' '))
-    ).id
+    return args.join(' ')
+  }
+})
+
+export const handleType: IveBotCommand = (client, db) => ({
+  opts: {
+    requirements: { userIDs: [...testPilots, host], permissions: { manageMessages: true } },
+    description: 'Type something, even in another channel.',
+    fullDescription: 'Type something. Test pilots and admins/mods only.',
+    usage: '/type (channel) <text>',
+    deleteCommand: true,
+    hooks: { postCommand: (message, args, sent) => { if (sent) db.say[sent.channel.id] = sent.id } }
+  },
+  name: 'type',
+  generator: async (message, args) => {
+    // Should it be sent in another channel?
+    const possibleChannel = getIdFromMention(args[0])
+    if (message.channelMentions[0] === possibleChannel) {
+      args.shift()
+      if (args.join(' ') === 'pls adim me') args = ['no']
+      message.channel.sendTyping()
+      await (ms => new Promise(resolve => setTimeout(resolve, ms)))(
+        args.join(' ').length * 120 > 8000 ? 8000 : args.join(' ').length * 120
+      )
+      db.say[message.channelMentions[0]] = (
+        await client.createMessage(message.channelMentions[0], args.join(' '))
+      ).id
+      return
+    }
+    // Send the message.
+    if (args.join(' ') === 'pls adim me') args = ['no']
+    message.channel.sendTyping()
+    await (ms => new Promise(resolve => setTimeout(resolve, ms)))(
+      args.join(' ').length * 120 > 8000 ? 8000 : args.join(' ').length * 120
+    )
+    return args.join(' ')
   }
 })
 
@@ -128,5 +160,47 @@ export const handleLeave: IveBotCommand = (client, db) => ({
       }
       return `${message.author.username}#${message.author.discriminator} has left the server.`
     }
+  }
+})
+
+export const handleListserverregions: IveBotCommand = (client) => ({
+  opts: {
+    fullDescription: 'List available voice regions.',
+    description: 'List available voice regions.',
+    usage: '/listserverregions',
+    aliases: ['lsr'],
+    guildOnly: true,
+    argsRequired: false
+  },
+  name: 'listserverregions',
+  generator: async (message) => 'Available server regions: `' + (await client.getVoiceRegions(
+    message.member.guild.id
+  )).map((value) => value.id).join('`, `') + '`'
+})
+
+export const handleChangeserverregion: IveBotCommand = (client) => ({
+  opts: {
+    fullDescription: 'Changes the voice region of the server.',
+    description: 'Changes the voice region of the server.',
+    usage: '/changeserverregion <server region>',
+    aliases: ['csr'],
+    guildOnly: true,
+    requirements: {
+      permissions: { manageGuild: true }
+    },
+    invalidUsageMessage: 'Correct usage: /changeserverregion <valid server region, /listserverregion>'
+  },
+  name: 'changeserverregion',
+  generator: async (message, args) => {
+    if (!message.member.guild.members.find(a => a.id === client.user.id).permission.has('manageGuild')) {
+      return 'I require the Manage Server permission to do that..'
+    }
+    try {
+      const guild = await client.editGuild(message.member.guild.id, {
+        region: args.join(' ').toLowerCase()
+      })
+      const name = (await guild.getVoiceRegions()).find(i => i.id === guild.region).name
+      return 'Voice region changed to ' + name + ' \\o/'
+    } catch (e) { return 'Invalid server voice region.' }
   }
 })
