@@ -2677,9 +2677,9 @@ equal-length@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/equal-length/-/equal-length-1.0.1.tgz#21ca112d48ab24b4e1e7ffc0e5339d31fdfc274c"
 
-eris@^0.8.6:
+eris@abalabahaha/eris#dev:
   version "0.8.6"
-  resolved "https://registry.yarnpkg.com/eris/-/eris-0.8.6.tgz#507a3b909b39a4b82bf7dfd70f5c60e34dd47454"
+  resolved "https://codeload.github.com/abalabahaha/eris/tar.gz/d02ca9f99f84d402b7b09933212d315153b73c09"
   dependencies:
     ws "^5.2.0"
   optionalDependencies:

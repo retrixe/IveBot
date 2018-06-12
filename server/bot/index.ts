@@ -1,13 +1,11 @@
-// Port server commands and move utils from index.ts to separate file.
 // Tokens and stuff.
 import 'json5/lib/require'
 import { testPilots } from '../../config.json5'
 // Commands.
-import { handleEditLastSay, handleEdit, handleType } from './oldCommands/utilities'
+import { handleEditLastSay, handleEdit } from './oldCommands/utilities'
 import { handleWeather, handleCurrency, handleDefine } from './oldCommands/api'
-import {
-  handleTakerole, handleGiverole, handleWarnings, handleClearwarns, handleRemovewarn
-} from './oldCommands/admin'
+import { handleClearwarns, handleRemovewarn, handleWarnings } from './oldCommands/admin/warn'
+import { handleGiverole, handleTakerole } from './oldCommands/admin/roles'
 
 // We need types.
 import { client, DB, mongoDB, member, message } from './imports/types'
@@ -97,7 +95,6 @@ export default (client: client, tempDB: DB, db: mongoDB) => async (event: messag
     '/weather': () => handleWeather(message, sendResponse, client, channelID),
     '/wt': () => handleWeather(message, sendResponse, client, channelID),
     // Say.
-    '/type': () => handleType(event, sendResponse, client, testPilot, tempDB),
     '/editLastSay': () => handleEditLastSay(event, sendResponse, client, testPilot, tempDB),
     '/els': () => handleEditLastSay(event, sendResponse, client, testPilot, tempDB),
     '/edit': () => handleEdit(event, sendResponse, client),
