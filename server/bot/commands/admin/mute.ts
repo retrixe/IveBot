@@ -19,10 +19,10 @@ export const handleMute: IveBotCommand = (client) => ({
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
     // Respect role order.
     if (
-      checkRolePosition(message.member.guild.members.find(i => i.user === user)) >=
-      checkRolePosition(message.member)
+      checkRolePosition(message.member.guild.members.find(i => i.user === user), true, false) >=
+      checkRolePosition(message.member, true, false)
     ) {
-      return `You cannot warn this person, you ${getInsult()}.`
+      return `You cannot mute this person, you ${getInsult()}.`
     }
     // Find a Muted role.
     const roles = message.member.guild.roles
@@ -144,10 +144,10 @@ export const handleUnmute: IveBotCommand = (client) => ({
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
     // Respect role order.
     if (
-      checkRolePosition(message.member.guild.members.find(i => i.user === user)) >=
-      checkRolePosition(message.member)
+      checkRolePosition(message.member.guild.members.find(i => i.user === user), true, false) >=
+      checkRolePosition(message.member, true, false)
     ) {
-      return `You cannot warn this person, you ${getInsult()}.`
+      return `You cannot mute this person, you ${getInsult()}.`
     }
     // All roles of user.
     const roles = message.member.guild.members.find(i => i.id === user.id).roles

@@ -2,7 +2,7 @@
 import 'json5/lib/require'
 import { testPilots } from '../../config.json5'
 // Commands.
-import { handleEditLastSay, handleEdit } from './oldCommands/utilities'
+import { handleEditLastSay } from './oldCommands/utilities'
 import { handleWeather, handleCurrency, handleDefine } from './oldCommands/api'
 import { handleClearwarns, handleRemovewarn, handleWarnings } from './oldCommands/admin/warn'
 import { handleGiverole, handleTakerole } from './oldCommands/admin/roles'
@@ -97,7 +97,6 @@ export default (client: client, tempDB: DB, db: mongoDB) => async (event: messag
     // Say.
     '/editLastSay': () => handleEditLastSay(event, sendResponse, client, testPilot, tempDB),
     '/els': () => handleEditLastSay(event, sendResponse, client, testPilot, tempDB),
-    '/edit': () => handleEdit(event, sendResponse, client),
     // Administrative commands.
     '/clearwarns': () => handleClearwarns(client, event, sendResponse, message, db),
     '/clearw': () => handleClearwarns(client, event, sendResponse, message, db),

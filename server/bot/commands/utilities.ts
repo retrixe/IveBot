@@ -204,3 +204,31 @@ export const handleChangeserverregion: IveBotCommand = (client) => ({
     } catch (e) { return 'Invalid server voice region.' }
   }
 })
+
+export const handleEdit: IveBotCommand = (client, db) => ({
+  opts: {
+    requirements: { userIDs: [host] },
+    description: 'Edits a single message.',
+    fullDescription: 'Edits a single message. Owner only command.',
+    usage: '/edit (channel) <message ID> <new text>',
+    deleteCommand: true
+  },
+  name: 'edit',
+  generator: async (message, args) => {
+    // Should it be edited in another channel?
+    const possibleChannel = getIdFromMention(args[0])
+    if (message.channelMentions[0] === possibleChannel) {
+      args.shift()
+      const messageID = args.shift()
+      try {
+        client.editMessage(possibleChannel, messageID, args.join(' '))
+      } catch (e) { return 'Nothing to edit.' }
+      return
+    }
+    // Edit the message.
+    const messageID = args.shift()
+    try {
+      client.editMessage(message.channel.id, messageID, args.join(' '))
+    } catch (e) { return 'Nothing to edit.' }
+  }
+})
