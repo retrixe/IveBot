@@ -11,25 +11,31 @@ export const handlePurge: IveBotCommand = (client) => ({
   opts: {
     description: 'Bulk delete a set of messages.',
     fullDescription: 'Bulk delete messages newer than 2 weeks.',
-    usage: '/purge <number greater than 0>',
+    usage: '/purge <number greater than 0 and less than 100>',
     guildOnly: true,
     deleteCommand: true,
-    requirements: { permissions: { 'manageMessages': true } }
+    requirements: {
+      permissions: { 'manageMessages': true },
+      custom: (message) => (
+        message.member.guild.channels.find(i => i.id === message.channel.id)
+          .permissionsOf(message.author.id).has('manageMessages')
+      )
+    }
   },
   generator: async (message, args) => {
     // Check if usage is correct.
     if (
-      isNaN(+args[0]) || args.length !== 1 || +args[0] === 0
-    ) { return 'Correct usage: /purge <number greater than 0>' }
+      isNaN(+args[0]) || args.length !== 1 || +args[0] <= 0 || +args[0] > 100
+    ) { return 'Correct usage: /purge <number greater than 0 and less than 100>' }
     // Pre-defined variables.
     let messages: Array<Message>
     // Get the list of messages.
     try {
-      messages = await client.getMessages(message.channel.id, +args[0], message.id)
+      messages = await client.getMessages(message.channel.id, +args.shift(), message.id)
     } catch (e) { return 'Could not retrieve messages.' }
     // Delete the messages.
     try {
-      client.deleteMessages(message.channel.id, messages.map(i => i.id), 'Purge')
+      client.deleteMessages(message.channel.id, messages.map(i => i.id), args.join(' ') || 'Purge')
     } catch (e) { return 'Could not delete messages. Are the messages older than 2 weeks?' }
   }
 })

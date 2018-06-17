@@ -112,7 +112,7 @@ const commandDocs: { [index: string]: any } = {
     'Remove role from yourself/user. Usually Manager/Mod only unless togglepublicroles is on.', '/takerole @voldemort#6931 Helper', '/tr'),
   'ban': b('/ban <user by ID/username/mention> (reason)', 'Ban someone.', '/ban voldemort you is suck', '/banana, /nuke'),
   'unban': b('/unban <user by ID/username/mention> (reason)', 'Unban someone.', '/unban voldemort wrong person'),
-  'purge': b('/purge <number greater than 0>', 'Bulk delete messages newer than 2 weeks.', '/purge 10'),
+  'purge': b('/purge <number greater than 0 and less than 100>', 'Bulk delete messages newer than 2 weeks.', '/purge 10'),
   'kick': b('/kick <user by ID/username/mention> (reason)', 'Kick someone.', '/kick voldemort you is suck'),
   'warn': b('/warn <user by ID/username/mention> <reason>', 'Warn someone.', '/warn voldemort you is suck'),
   'changeserverregion': b('/changeserverregion <server region>', 'Changes the voice region of the server.', '/changeserverregion russia', '/csr'),
