@@ -1,17 +1,12 @@
-// Tokens and stuff.
-import 'json5/lib/require'
-import { testPilots } from '../../config.json5'
-// Commands.
-import { handleEditLastSay } from './oldCommands/utilities'
+// Legacy commands.
 import { handleWeather, handleCurrency, handleDefine } from './oldCommands/api'
-import { handleClearwarns, handleRemovewarn, handleWarnings } from './oldCommands/admin/warn'
+import { handleClearwarns, handleRemovewarn } from './oldCommands/admin/warn'
 import { handleGiverole, handleTakerole } from './oldCommands/admin/roles'
+import help from './oldCommands/help'
 
 // We need types.
-import { client, DB, mongoDB, member, message } from './imports/types'
+import { client, DB, member, message, mongoDB } from './imports/types'
 import { getServerSettings } from './imports/tools'
-import help from './oldCommands/help'
-import { Db } from 'mongodb'
 
 // All commands which take (message, sendResponse) as args and can be appended and interpreted.
 const appendableCommandMaps: { [index: string]: Function } = {
@@ -24,7 +19,7 @@ const appendableCommandMaps: { [index: string]: Function } = {
 }
 
 // When client gains/loses a member, it will callback.
-export const guildMemberEditCallback = (client: client, event: string, db: Db) => async (
+export const guildMemberEditCallback = (client: client, event: string, db: mongoDB) => async (
   guild: { id: string }, member: member
 ) => { // eslint-disable-line indent
   // WeChill specific configuration.
@@ -87,16 +82,11 @@ export default (client: client, tempDB: DB, db: mongoDB) => async (event: messag
   const userID = event.author.id
   const message = event.content
   const command = event.content.toLowerCase()
-  // Is the person a test pilot.
-  const testPilot: string = testPilots.find((user: string) => user === userID)
   // Non-appendable commands which have to be re-defined on all callbacks. Taxing and waste of RAM.
   const commandMaps: { [index: string]: Function } = {
     // Weather.
     '/weather': () => handleWeather(message, sendResponse, client, channelID),
     '/wt': () => handleWeather(message, sendResponse, client, channelID),
-    // Say.
-    '/editLastSay': () => handleEditLastSay(event, sendResponse, client, testPilot, tempDB),
-    '/els': () => handleEditLastSay(event, sendResponse, client, testPilot, tempDB),
     // Administrative commands.
     '/clearwarns': () => handleClearwarns(client, event, sendResponse, message, db),
     '/clearw': () => handleClearwarns(client, event, sendResponse, message, db),
@@ -104,8 +94,6 @@ export default (client: client, tempDB: DB, db: mongoDB) => async (event: messag
     '/removewarn': () => handleRemovewarn(client, event, sendResponse, message, db),
     '/removew': () => handleRemovewarn(client, event, sendResponse, message, db),
     '/rw': () => handleRemovewarn(client, event, sendResponse, message, db),
-    '/warnings': () => handleWarnings(client, event, sendResponse, message, db),
-    '/warns': () => handleWarnings(client, event, sendResponse, message, db),
     // Version, about, ping, uptime, remoteexec for remote command line.
     // Role system.
     // Certain commands rely on server settings. I hope we can await for them.
@@ -128,14 +116,14 @@ export default (client: client, tempDB: DB, db: mongoDB) => async (event: messag
   }
   // Check for the commands in appendableCommandMaps.
   for (let i = 0; i < Object.keys(appendableCommandMaps).length; i++) {
-    if (command.toLowerCase().split(' ')[0] === Object.keys(appendableCommandMaps)[i]) {
+    if (command.split(' ')[0] === Object.keys(appendableCommandMaps)[i]) {
       appendableCommandMaps[Object.keys(appendableCommandMaps)[i]](message, sendResponse)
       break
     }
   }
   // Check for the commands in commandMaps.
   for (let i = 0; i < Object.keys(commandMaps).length; i++) {
-    if (command.toLowerCase().split(' ')[0] === Object.keys(commandMaps)[i]) {
+    if (command.split(' ')[0] === Object.keys(commandMaps)[i]) {
       commandMaps[Object.keys(commandMaps)[i]]()
       break
     }

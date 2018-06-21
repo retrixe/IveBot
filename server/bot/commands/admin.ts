@@ -2,7 +2,7 @@ import { IveBotCommand } from '../imports/types'
 import { getInsult, getUser } from '../imports/tools'
 import { checkRolePosition } from '../imports/permissions'
 import { Message } from 'eris'
-export { handleWarn } from './admin/warn'
+export { handleWarn, handleWarnings } from './admin/warn'
 export { handleMute, handleUnmute } from './admin/mute'
 export { handleBan, handleUnban } from './admin/ban'
 

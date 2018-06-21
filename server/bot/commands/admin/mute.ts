@@ -67,10 +67,10 @@ export const handleMute: IveBotCommand = (client) => ({
       } catch (e) { return 'Could not mute that person.' }
       // If time given, set timeout.
       try {
-        if (ms(args[1])) {
+        if (ms(args[0])) {
           setTimeout(() => {
             client.removeGuildMemberRole(message.member.guild.id, user.id, role.id)
-          }, ms(args[1]))
+          }, ms(args[0]))
         }
       } catch (e) { }
       return 'Muted.'
@@ -104,10 +104,10 @@ export const handleMute: IveBotCommand = (client) => ({
       } catch (e) { return 'Could not mute that person.' }
       // If time given, set timeout.
       try {
-        if (ms(args[1])) {
+        if (ms(args[0])) {
           setTimeout(() => {
             client.removeGuildMemberRole(message.member.guild.id, user.id, role.id)
-          }, ms(args[1]))
+          }, ms(args[0]))
         }
       } catch (e) { }
       return 'Muted.'
@@ -118,10 +118,10 @@ export const handleMute: IveBotCommand = (client) => ({
       } catch (e) { return 'Could not mute that person.' }
       // If time given, set timeout.
       try {
-        if (ms(args[1])) {
+        if (ms(args[0])) {
           setTimeout(() => {
             client.removeGuildMemberRole(message.member.guild.id, user.id, role.id)
-          }, ms(args[1]))
+          }, ms(args[0]))
         }
       } catch (e) {}
       return 'Muted.'
@@ -140,7 +140,7 @@ export const handleUnmute: IveBotCommand = (client) => ({
   },
   generator: (message, args) => {
     // Find the user ID.
-    let user = getUser(message, args[0])
+    let user = getUser(message, args.shift())
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
     // Respect role order.
     if (

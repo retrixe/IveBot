@@ -28,7 +28,7 @@ export const handleWarn: IveBotCommand = ({ createMessage, getDMChannel }, tempD
     // Warn the person internally.
     args.shift()
     await db.collection('warnings').insertOne({
-      warnedID: user,
+      warnedID: user.id,
       warnerID: message.author.id,
       reason: args.join(' '),
       serverID: message.member.guild.id,
@@ -53,5 +53,58 @@ export const handleWarn: IveBotCommand = ({ createMessage, getDMChannel }, tempD
       })
     }
     return `**${member.username}#${member.discriminator}** has been warned. **lol.**`
+  }
+})
+
+export const handleWarnings: IveBotCommand = (client, tempDB, db) => ({
+  name: 'warnings',
+  opts: {
+    description: 'Find out about a person\'s warnings.',
+    fullDescription: 'Find out about a person\'s warnings.',
+    usage: '/warnings (user by ID/username/mention)',
+    aliases: ['warns'],
+    guildOnly: true,
+    requirements: {
+      permissions: { 'manageMessages': true },
+      custom: (message) => (
+        getUser(message, message.content.split(' ')[1]).id === message.author.id ||
+        message.content.split(' ').length === 1
+      )
+    }
+  },
+  generator: async (message, args) => {
+    // If improper arguments were provided, then we must inform the user.
+    if (args.length > 1) return 'Correct usage: /warnings (user by ID/username/mention)'
+    // Now find the user ID.
+    let user = getUser(message, args[0])
+    if (!user && args.length) return `Specify a valid member of this guild, ${getInsult()}.`
+    else user = message.author
+    // Get a list of warnings.
+    const warns = await db.collection('warnings').find({
+      warnedID: user.id, serverID: message.member.guild.id
+    }).toArray()
+    // If the person has no warnings..
+    if (warns.length === 0) return '**No** warnings found.'
+    // Generate the response.
+    const format = 'dddd, MMMM Do YYYY, h:mm:ss A' // Date format.
+    return {
+      content: `🛃 **Warnings for ${message.member.username}#${message.member.discriminator}:**`,
+      embed: {
+        color: 0x00AE86,
+        type: 'rich',
+        title: 'Warnings',
+        // This function generates the fields.
+        fields: warns.map((warning, index) => {
+          // If we could find the warner then we specify his/her username+discriminator else ID.
+          const warner = client.users.find(i => i.id === warning.warnerID)
+          const mod = warner ? `${warner.username}#${warner.discriminator}` : warning.warnerID
+          return {
+            name: `Warning ${index + 1}`,
+            value: `**| Moderator:** ${mod} **| Reason:** ${warning.reason}
+**| ID:** ${warning._id} **| Date:** ${moment(warning.date).format(format)}`
+          }
+        })
+      }
+    }
   }
 })

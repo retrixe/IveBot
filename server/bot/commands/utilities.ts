@@ -232,3 +232,31 @@ export const handleEdit: IveBotCommand = (client, db) => ({
     } catch (e) { return 'Nothing to edit.' }
   }
 })
+
+export const handleEditLastSay: IveBotCommand = (client, db) => ({
+  opts: {
+    requirements: { userIDs: [...testPilots, host], permissions: { manageMessages: true } },
+    description: 'Edits the last say in a channel.',
+    fullDescription: 'Edits the last say in a channel. Test pilots and admins/mods only.',
+    usage: '/editLastSay (channel) <new text>',
+    deleteCommand: true,
+    aliases: ['els']
+  },
+  name: 'editLastSay',
+  generator: async (message, args) => {
+    // Is the edit for another channel?
+    const possibleChannel = getIdFromMention(args[0])
+    if (message.channelMentions[0] === possibleChannel) {
+      // Edit the message.
+      try {
+        args.shift()
+        client.editMessage(possibleChannel, db.say[possibleChannel], args.join(' '))
+      } catch (e) { return 'Nothing to edit.' }
+      return
+    }
+    // Edit the message.
+    try {
+      client.editMessage(message.channel.id, db.say[message.channel.id], args.join(' '))
+    } catch (e) { return 'Nothing to edit.' }
+  }
+})

@@ -117,7 +117,7 @@ const commandDocs: { [index: string]: any } = {
   'warn': b('/warn <user by ID/username/mention> <reason>', 'Warn someone.', '/warn voldemort you is suck'),
   'changeserverregion': b('/changeserverregion <server region>', 'Changes the voice region of the server.', '/changeserverregion russia', '/csr'),
   'listserverregions': b('/listserverregions', 'List available voice regions.', '/listserverregions', '/lsr'),
-  'warnings': b('/warnings <user by ID/username/mention>', 'Find out about a person\'s warnings.', '/warnings voldemort', '/warns'),
+  'warnings': b('/warnings (user by ID/username/mention)', 'Find out about a person\'s warnings.', '/warnings voldemort', '/warns'),
   'clearwarns': b('/clearwarns <user by ID/username/mention>', 'Clear all warnings a person has.', '/clearwarns voldemort', '/cw'),
   'removewarn': b(
     '/removewarn <user by ID/username/mention> <warning ID>',
