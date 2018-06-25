@@ -1,7 +1,6 @@
 // Legacy commands.
 import { handleWeather, handleCurrency, handleDefine } from './oldCommands/api'
-import { handleClearwarns, handleRemovewarn } from './oldCommands/admin/warn'
-import { handleGiverole, handleTakerole } from './oldCommands/admin/roles'
+import { handleClearwarns, handleRemovewarn } from './oldCommands/warn'
 import help from './oldCommands/help'
 
 // We need types.
@@ -93,26 +92,10 @@ export default (client: client, tempDB: DB, db: mongoDB) => async (event: messag
     '/cw': () => handleClearwarns(client, event, sendResponse, message, db),
     '/removewarn': () => handleRemovewarn(client, event, sendResponse, message, db),
     '/removew': () => handleRemovewarn(client, event, sendResponse, message, db),
-    '/rw': () => handleRemovewarn(client, event, sendResponse, message, db),
+    '/rw': () => handleRemovewarn(client, event, sendResponse, message, db)
     // Version, about, ping, uptime, remoteexec for remote command line.
     // Role system.
     // Certain commands rely on server settings. I hope we can await for them.
-    '/giverole': async () => {
-      const serverSettings = await getServerSettings(db, event.member.guild.id)
-      handleGiverole(client, event, sendResponse, message, serverSettings)
-    },
-    '/gr': async () => {
-      const serverSettings = await getServerSettings(db, event.member.guild.id)
-      handleGiverole(client, event, sendResponse, message, serverSettings)
-    },
-    '/takerole': async () => {
-      const serverSettings = await getServerSettings(db, event.member.guild.id)
-      handleTakerole(client, event, sendResponse, message, serverSettings)
-    },
-    '/tr': async () => {
-      const serverSettings = await getServerSettings(db, event.member.guild.id)
-      handleTakerole(client, event, sendResponse, message, serverSettings)
-    }
   }
   // Check for the commands in appendableCommandMaps.
   for (let i = 0; i < Object.keys(appendableCommandMaps).length; i++) {

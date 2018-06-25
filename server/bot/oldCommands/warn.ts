@@ -1,7 +1,7 @@
-import { getArguments, getIdFromMention } from '../../imports/tools'
-import { checkRolePosition } from '../../imports/permissions'
+import { getArguments, getIdFromMention } from '../imports/tools'
+import { checkRolePosition } from '../imports/permissions'
 // Get types.
-import { client, event, mongoDB } from '../../imports/types'
+import { client, event, mongoDB } from '../imports/types'
 import { ObjectID } from 'mongodb'
 
 // Clear warns.
