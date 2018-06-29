@@ -1,6 +1,5 @@
 // Legacy commands.
 import { handleWeather, handleCurrency, handleDefine } from './oldCommands/api'
-import { handleClearwarns, handleRemovewarn } from './oldCommands/warn'
 import help from './oldCommands/help'
 
 // We need types.
@@ -52,7 +51,6 @@ export const guildMemberEditCallback = (client: client, event: string, db: mongo
     })
   } */
   if (event === 'guildMemberAdd' && serverSettings.joinAutorole && !member.user.bot) {
-    console.log(member, event)
     const roles = serverSettings.joinAutorole.split('|')
     for (let x = 0; x < roles.length; x++) {
       const roleID = client.guilds.find(a => a.id === guild.id).roles.find(
@@ -85,14 +83,8 @@ export default (client: client, tempDB: DB, db: mongoDB) => async (event: messag
   const commandMaps: { [index: string]: Function } = {
     // Weather.
     '/weather': () => handleWeather(message, sendResponse, client, channelID),
-    '/wt': () => handleWeather(message, sendResponse, client, channelID),
+    '/wt': () => handleWeather(message, sendResponse, client, channelID)
     // Administrative commands.
-    '/clearwarns': () => handleClearwarns(client, event, sendResponse, message, db),
-    '/clearw': () => handleClearwarns(client, event, sendResponse, message, db),
-    '/cw': () => handleClearwarns(client, event, sendResponse, message, db),
-    '/removewarn': () => handleRemovewarn(client, event, sendResponse, message, db),
-    '/removew': () => handleRemovewarn(client, event, sendResponse, message, db),
-    '/rw': () => handleRemovewarn(client, event, sendResponse, message, db)
     // Version, about, ping, uptime, remoteexec for remote command line.
     // Role system.
     // Certain commands rely on server settings. I hope we can await for them.

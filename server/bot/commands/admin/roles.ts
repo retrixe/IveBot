@@ -8,7 +8,7 @@ export const handleGiverole: IveBotCommand = (client, tempDB, db) => ({
     description: 'Give role to yourself/user.',
     fullDescription: 'Give role to yourself/user. Manager/Mod only unless Public Roles are on.',
     usage: '/giverole (user) <role>',
-    aliases: ['gr', 'test'],
+    aliases: ['gr'],
     guildOnly: true
   },
   generator: async (message, args) => {
@@ -58,7 +58,7 @@ export const handleTakerole: IveBotCommand = (client, tempDB, db) => ({
     fullDescription: 'Take role from yourself/user. Manager/Mod only unless Public Roles are on.',
     usage: '/takerole (user) <role>',
     guildOnly: true,
-    aliases: ['tr', 'testt']
+    aliases: ['tr']
   },
   generator: async (message, args) => {
     // Check user for permissions.
