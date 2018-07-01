@@ -109,19 +109,19 @@ const commandDocs: { [index: string]: any } = {
   'giverole': b('/giverole (user) <role>',
     'Give role to yourself/user. Manager/Mod only unless Public Roles are on.', '/giverole @voldemort#6931 Helper', '/gr'),
   'removerole': b('/removerole (user) <role>',
-    'Remove role from yourself/user. Usually Manager/Mod only unless togglepublicroles is on.', '/takerole @voldemort#6931 Helper', '/tr'),
+    'Take role from yourself/user. Manager/Mod only unless Public Roles are on.', '/takerole @voldemort#6931 Helper', '/tr'),
   'ban': b('/ban <user by ID/username/mention> (reason)', 'Ban someone.', '/ban voldemort you is suck', '/banana, /nuke'),
   'unban': b('/unban <user by ID/username/mention> (reason)', 'Unban someone.', '/unban voldemort wrong person'),
-  'purge': b('/purge <number greater than 0>', 'Bulk delete messages newer than 2 weeks.', '/purge 10'),
+  'purge': b('/purge <number greater than 0 and less than 100>', 'Bulk delete messages newer than 2 weeks.', '/purge 10'),
   'kick': b('/kick <user by ID/username/mention> (reason)', 'Kick someone.', '/kick voldemort you is suck'),
   'warn': b('/warn <user by ID/username/mention> <reason>', 'Warn someone.', '/warn voldemort you is suck'),
   'changeserverregion': b('/changeserverregion <server region>', 'Changes the voice region of the server.', '/changeserverregion russia', '/csr'),
   'listserverregions': b('/listserverregions', 'List available voice regions.', '/listserverregions', '/lsr'),
   'warnings': b('/warnings <user by ID/username/mention>', 'Find out about a person\'s warnings.', '/warnings voldemort', '/warns'),
-  'clearwarns': b('/clearwarns <user by ID/username/mention>', 'Clear all warnings a person has.', '/clearwarns voldemort', '/cw'),
+  'clearwarns': b('/clearwarns <user by ID/username/mention>', 'Clear all warnings a person has.', '/clearwarns voldemort', '/clearw, /cw'),
   'removewarn': b(
     '/removewarn <user by ID/username/mention> <warning ID>',
-    'Remove a single warnings from a person.', '/removewarn voldemort 5adf7a0e825aa7005a4e7be2', '/rw'
+    'Remove a single warning from a person.', '/removewarn voldemort 5adf7a0e825aa7005a4e7be2', '/removew, /rw'
   ),
   'remoteexec': b('/remoteexec <command>', 'Execute a command on the host. Owner only command.', '/remoteexec killall node'),
   'mute': b('/mute <user by ID/username/mention> (time limit) (reason)', 'Mute someone. Compatible with Dyno.', '/mute voldemort 1h bored'),

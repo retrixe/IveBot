@@ -69,7 +69,6 @@ export default (ctx) => ({
           joinAutorole: joinAutorole ? joinAutorole : undefined
           /* eslint-enable no-unneeded-ternary */
         } })
-        console.log(await getServerSettings(db, serverId))
         return getServerSettings(db, serverId)
       } else return { serverId: 'Forbidden.' }
     }

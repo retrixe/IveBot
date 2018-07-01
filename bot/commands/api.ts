@@ -47,7 +47,6 @@ export function handleDefine (message: string, sendResponse: Function) {
                 name: '..too many definitions', value: 'More definitions will not be displayed.'
               })
             } else if (fields.length === 25) return
-            console.log(element.entries)
             fields.push({ name: '**' + element.lexicalCategory + '**', value: zeroWidthSpace })
             element.entries.forEach(element => element.senses.forEach((element, index) => {
               if (fields.length === 24) {

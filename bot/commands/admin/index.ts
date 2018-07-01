@@ -16,8 +16,9 @@ export function handlePurge (client: client, event: event, sendResponse: Functio
     sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
     return
   } else if (
-    isNaN(+getArguments(message)) || !getArguments(message) || +getArguments(message) === 0
-  ) { sendResponse('Correct usage: /purge <number greater than 0>'); return }
+    isNaN(+getArguments(message)) || !getArguments(message) || +getArguments(message) === 0 ||
+    +getArguments(message) > 100
+  ) { sendResponse('Correct usage: /purge <number greater than 0 and less than 100>'); return }
   // Get the list of messages.
   client.getMessages({
     channelID: event.d.channel_id,
