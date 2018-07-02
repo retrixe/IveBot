@@ -249,10 +249,11 @@ export function handleCurrency (message: string, sendResponse: Function) {
   }
   // Whee, currency conversion!
   const from = getArguments(message).split(' ')[0].toUpperCase()
-  const to = getArguments(message).split(' ')[1].toUpperCase()
   if (from === 'LIST') {
-    sendResponse(Object.keys(exchangeRates.rates).toString().split(',').join('\n'))
+    sendResponse('**List of symbols:**\n' + Object.keys(exchangeRates.rates).toString())
+    return
   }
+  const to = getArguments(message).split(' ')[1].toUpperCase()
   let amount = getArguments(getArguments(getArguments(message))).trim()
   if (from.length !== 3 || !exchangeRates.rates[from]) {
     sendResponse('Invalid currency to convert from.')

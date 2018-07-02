@@ -25,8 +25,8 @@ export function handleMute (client: client, event: event, sendResponse: Function
   }
   // Respect role order.
   if (
-    checkRolePosition(client, client.users[userID].id, client.channels[event.d.channel_id].guild_id) >=
-    checkRolePosition(client, event.d.author.id, client.channels[event.d.channel_id].guild_id)
+    checkRolePosition(client, client.users[userID].id, client.channels[event.d.channel_id].guild_id, true, false) >=
+    checkRolePosition(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, true, false)
   ) {
     sendResponse('You cannot mute this person! People nowadays.')
     return
@@ -120,8 +120,8 @@ export function handleUnmute (client: client, event: event, sendResponse: Functi
   }
   // Respect role order.
   if (
-    checkRolePosition(client, client.users[userID].id, client.channels[event.d.channel_id].guild_id) >=
-    checkRolePosition(client, event.d.author.id, client.channels[event.d.channel_id].guild_id)
+    checkRolePosition(client, client.users[userID].id, client.channels[event.d.channel_id].guild_id, true, false) >=
+    checkRolePosition(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, true, false)
   ) {
     sendResponse('You cannot unmute this person! People nowadays.')
     return
