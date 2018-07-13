@@ -2,7 +2,7 @@ import * as fetch from 'isomorphic-unfetch'
 import { getArguments, zeroWidthSpace } from '../imports/tools'
 import * as moment from 'moment'
 // Typings.
-import { client } from '../imports/types'
+import { client, event } from '../imports/types'
 // Get the NASA API token.
 import 'json5/lib/require'
 const { NASAtoken, weatherAPIkey, fixerAPIkey, oxfordAPI } = require('../../config.json5')
@@ -250,7 +250,7 @@ export function handleCurrency (message: string, sendResponse: Function) {
   // Whee, currency conversion!
   const from = getArguments(message).split(' ')[0].toUpperCase()
   if (from === 'LIST') {
-    sendResponse('**List of symbols:**\n' + Object.keys(exchangeRates.rates).toString())
+    sendResponse('**List of symbols:**\n' + Object.keys(exchangeRates.rates).toString().split(',').join(', '))
     return
   }
   const to = getArguments(message).split(' ')[1].toUpperCase()
@@ -321,4 +321,242 @@ ${history}
           })
         })
     })
+}
+
+type fifaData = { /* eslint-disable camelcase,no-undef */
+  home_team: { goals: number, country: string, penalties: number },
+  away_team: { goals: number, country: string, penalties: number },
+  home_team_statistics: {
+    yellow_cards: number, red_cards: number, fouls_committed: number,
+    attempts_on_goal: number, on_target: number, num_passes: number, pass_accuracy: number,
+    ball_possession: number, corners: number, offsides: number
+  },
+  away_team_statistics: {
+    yellow_cards: number, red_cards: number, fouls_committed: number,
+    attempts_on_goal: number, on_target: number, num_passes: number, pass_accuracy: number,
+    ball_possession: number, corners: number, offsides: number
+  },
+  winner: string,
+  fifa_id: string,
+  datetime: string,
+  status: 'completed'|string
+} /* eslint-enable camelcase,no-undef */
+export function handleFifalist (message: string, sendResponse: Function, client: client, event: event) {
+  // Check for date.
+  let when = getArguments(message).length
+    ? getArguments(message).split(' ')[0] : 'today'
+  if (when !== 'all' && when !== 'today') {
+    sendResponse('Invalid usage: /fifalist (all|today)')
+  }
+  if (when === 'today') {
+    fetch('https://worldcup.sfg.io/matches/today?by_date=DESC').then((a: { json: Function }) => a.json())
+      .catch(() => sendResponse(`There are no matches scheduled today.`))
+      .then((json: Array<fifaData>) => sendResponse('⚽ FIFA World Cup 2018 matches **today**:', () => {}, {
+        fields: json.map(i => ({
+          name: `${i.home_team.country} v. ${i.away_team.country} on ${moment(i.datetime).format('DD-MM-Y hh:mm A')}`,
+          value: `**Winner: ${
+            i.winner ? i.winner : 'TBD'
+          } ${i.home_team.goals}-${i.away_team.goals}** | FIFA ID: ${i.fifa_id}`
+        })),
+        title: 'FIFA matches today',
+        footer: { text: 'Tip: Use /fifaboard for stats.' },
+        color: 0x010fff
+      }))
+  } else if (when === 'all') {
+    fetch('https://worldcup.sfg.io/matches?by_date=DESC').then((a: { json: Function }) => a.json())
+      .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
+      .then((json: Array<fifaData>) => {
+        client.sendMessage({
+          to: event.d.author.id,
+          embed: {
+            fields: json.map(i => ({
+              name: `${i.home_team.country} v. ${i.away_team.country} on ${moment(i.datetime).format('DD-MM-Y hh:mm A')}`,
+              value: `**Winner: ${
+                i.winner ? i.winner : 'TBD'
+              } ${i.home_team.goals}-${i.away_team.goals}** | FIFA ID: ${i.fifa_id}`
+            })),
+            title: 'Last 25 FIFA matches',
+            footer: { text: 'Tip: Use /fifaboard for stats.' },
+            color: 0x010fff
+          }
+        })
+        sendResponse('⚽ **Last 25** FIFA World Cup 2018 matches DMed.')
+      }).catch(() => {})
+  }
+}
+export async function handleFifaboard (message: string, sendResponse: Function, client: client, event: event) {
+  try {
+    let initFetch: fifaData = (await (await fetch('https://worldcup.sfg.io/matches/current')).json())[0]
+    if (!initFetch && !getArguments(message)) {
+      sendResponse('There are no matches in progress, use /fifalist to check..'); return
+    } else if (getArguments(message)) {
+      initFetch = (await (await fetch('https://worldcup.sfg.io/matches?by_date=DESC')).json()).find(
+        (i: fifaData) => i.fifa_id === getArguments(message) ||
+          (i.home_team.country + '|' + i.away_team.country).toLowerCase() === getArguments(message).toLowerCase() ||
+          (i.away_team.country + '|' + i.home_team.country).toLowerCase() === getArguments(message).toLowerCase()
+      )
+    }
+    if (!initFetch) {
+      sendResponse('Incorrect match provided, provide FIFA ID or Team1|Team2 e.g. Spain|Russia')
+      return
+    } else if (!initFetch.away_team_statistics && !initFetch.home_team_statistics) {
+      initFetch.away_team_statistics = {
+        yellow_cards: 0,
+        red_cards: 0,
+        fouls_committed: 0,
+        attempts_on_goal: 0,
+        on_target: 0,
+        num_passes: 0,
+        pass_accuracy: 0,
+        ball_possession: 0,
+        corners: 0,
+        offsides: 0
+      }
+      initFetch.home_team_statistics = {
+        yellow_cards: 0,
+        red_cards: 0,
+        fouls_committed: 0,
+        attempts_on_goal: 0,
+        on_target: 0,
+        num_passes: 0,
+        pass_accuracy: 0,
+        ball_possession: 0,
+        corners: 0,
+        offsides: 0
+      }
+    }
+    client.sendMessage({
+      to: event.d.channel_id,
+      // Content for match.
+      embed: {
+        color: 0xFF0000,
+        title: `${initFetch.home_team.country} v. ${initFetch.away_team.country}`,
+        fields: [{ name: '🏆 Winner', value: initFetch.winner || 'TBD' }, {
+          name: `Score (${initFetch.home_team.country} - ${initFetch.away_team.country})`,
+          value: `${initFetch.home_team.goals} - ${initFetch.away_team.goals}`,
+          inline: true
+        }, {
+          name: 'Penalty shoot-out',
+          value: initFetch.home_team.penalties && initFetch.away_team.penalties
+            ? `${initFetch.home_team.penalties} - ${initFetch.away_team.penalties}` : 'None',
+          inline: true
+        }, {
+          name: 'Fouls',
+          value: `${initFetch.home_team_statistics.fouls_committed} - ${initFetch.away_team_statistics.fouls_committed}`,
+          inline: true
+        }, {
+          name: 'Yellow Cards',
+          value: `${initFetch.home_team_statistics.yellow_cards} - ${initFetch.away_team_statistics.yellow_cards}`,
+          inline: true
+        }, {
+          name: 'Red Cards',
+          value: `${initFetch.home_team_statistics.red_cards} - ${initFetch.away_team_statistics.red_cards}`,
+          inline: true
+        }, {
+          name: `Shots`,
+          value: `${initFetch.home_team_statistics.attempts_on_goal} - ${initFetch.away_team_statistics.attempts_on_goal}`,
+          inline: true
+        }, {
+          name: `Shots On Target`,
+          value: `${initFetch.home_team_statistics.on_target} - ${initFetch.away_team_statistics.on_target}`,
+          inline: true
+        }, {
+          name: `Possesion`,
+          value: `${initFetch.home_team_statistics.ball_possession}% - ${initFetch.away_team_statistics.ball_possession}%`,
+          inline: true
+        }, {
+          name: `Passes`,
+          value: `${initFetch.home_team_statistics.num_passes} - ${initFetch.away_team_statistics.num_passes}`,
+          inline: true
+        }, {
+          name: `Pass Accuracy`,
+          value: `${initFetch.home_team_statistics.pass_accuracy}% - ${initFetch.away_team_statistics.pass_accuracy}%`,
+          inline: true
+        }, {
+          name: `Offsides`,
+          value: `${initFetch.home_team_statistics.offsides} - ${initFetch.away_team_statistics.offsides}`,
+          inline: true
+        }, {
+          name: `Corners`,
+          value: `${initFetch.home_team_statistics.corners} - ${initFetch.away_team_statistics.corners}`,
+          inline: true
+        }],
+        description: initFetch.status === 'completed'
+          ? '⚽ FIFA match' : initFetch.status === 'future'
+            ? '⚽ Future FIFA match' : '⚽ Live FIFA match 👏',
+        footer: { text: 'FIFA ID: ' + initFetch.fifa_id }
+      }
+    }, async (err: string, res: { id: string, channel_id: string }) => {
+      if (err) sendResponse(`Something went wrong 👾 Error: ${err}`)
+      else if (initFetch.status === 'completed' || initFetch.status === 'future') return
+      // Edits till full-time..
+      for (let i = 0; i < 10; i++) {
+        await new Promise(resolve => setTimeout(resolve, 30000))
+        initFetch = (await (await fetch('https://worldcup.sfg.io/matches/current')).json())[0]
+        if (initFetch.status === 'completed' || initFetch.status === 'future') break
+        client.editMessage({
+          messageID: res.id,
+          channelID: res.channel_id,
+          embed: {
+            color: 0xFF0000,
+            title: `${initFetch.home_team.country} v. ${initFetch.away_team.country}`,
+            fields: [{ name: '🏆 Winner', value: initFetch.winner || 'TBD' }, {
+              name: `Score (${initFetch.home_team.country} - ${initFetch.away_team.country})`,
+              value: `${initFetch.home_team.goals} - ${initFetch.away_team.goals}`,
+              inline: true
+            }, {
+              name: 'Penalty shoot-out',
+              value: initFetch.home_team.penalties && initFetch.away_team.penalties
+                ? `${initFetch.home_team.penalties} - ${initFetch.away_team.penalties}` : 'None',
+              inline: true
+            }, {
+              name: 'Fouls',
+              value: `${initFetch.home_team_statistics.fouls_committed} - ${initFetch.away_team_statistics.fouls_committed}`,
+              inline: true
+            }, {
+              name: 'Yellow Cards',
+              value: `${initFetch.home_team_statistics.yellow_cards} - ${initFetch.away_team_statistics.yellow_cards}`,
+              inline: true
+            }, {
+              name: 'Red Cards',
+              value: `${initFetch.home_team_statistics.red_cards} - ${initFetch.away_team_statistics.red_cards}`,
+              inline: true
+            }, {
+              name: `Shots`,
+              value: `${initFetch.home_team_statistics.attempts_on_goal} - ${initFetch.away_team_statistics.attempts_on_goal}`,
+              inline: true
+            }, {
+              name: `Shots On Target`,
+              value: `${initFetch.home_team_statistics.on_target} - ${initFetch.away_team_statistics.on_target}`,
+              inline: true
+            }, {
+              name: `Possesion`,
+              value: `${initFetch.home_team_statistics.ball_possession}% - ${initFetch.away_team_statistics.ball_possession}%`,
+              inline: true
+            }, {
+              name: `Passes`,
+              value: `${initFetch.home_team_statistics.num_passes} - ${initFetch.away_team_statistics.num_passes}`,
+              inline: true
+            }, {
+              name: `Pass Accuracy`,
+              value: `${initFetch.home_team_statistics.pass_accuracy}% - ${initFetch.away_team_statistics.pass_accuracy}%`,
+              inline: true
+            }, {
+              name: `Offsides`,
+              value: `${initFetch.home_team_statistics.offsides} - ${initFetch.away_team_statistics.offsides}`,
+              inline: true
+            }, {
+              name: `Corners`,
+              value: `${initFetch.home_team_statistics.corners} - ${initFetch.away_team_statistics.corners}`,
+              inline: true
+            }],
+            description: initFetch.status === 'completed'
+              ? '⚽ FIFA match' : initFetch.status === 'future'
+                ? '⚽ Future FIFA match' : '⚽ Live FIFA match 👏',
+            footer: { text: 'FIFA ID: ' + initFetch.fifa_id }
+          }
+        })
+      }
+    })
+  } catch (e) { sendResponse(`Something went wrong 👾 Error: ${e}`) }
 }

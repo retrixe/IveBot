@@ -20,7 +20,8 @@ import {
 import {
   handleUrban, handleCat, handleDog, handleRobohash, handleApod, handleWeather, handleNamemc,
   handleCurrency,
-  handleDefine
+  handleDefine,
+  handleFifalist, handleFifaboard
 } from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
 import {
@@ -49,6 +50,9 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (e
 
 // All commands which take (message, sendResponse) as args and can be appended and interpreted.
 const appendableCommandMaps: { [index: string]: Function } = {
+  // FIFA.
+  '/fifalist': handleFifalist,
+  '/fifaboard': handleFifaboard,
   // Choose.
   '/choose': handleChoose,
   '/cho': handleChoose,
@@ -303,7 +307,9 @@ For noobs, this bot is licensed and protected by law. Copy code and I will sue y
   // Check for the commands in appendableCommandMaps.
   for (let i = 0; i < Object.keys(appendableCommandMaps).length; i++) {
     if (command.split(' ')[0] === Object.keys(appendableCommandMaps)[i]) {
-      appendableCommandMaps[Object.keys(appendableCommandMaps)[i]](message, sendResponse)
+      appendableCommandMaps[Object.keys(appendableCommandMaps)[i]](
+        message, sendResponse, client, event
+      )
       break
     }
   }
