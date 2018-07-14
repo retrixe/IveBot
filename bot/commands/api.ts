@@ -490,10 +490,9 @@ export async function handleFifaboard (message: string, sendResponse: Function, 
       if (err) sendResponse(`Something went wrong 👾 Error: ${err}`)
       else if (initFetch.status === 'completed' || initFetch.status === 'future') return
       // Edits till full-time..
-      for (let i = 0; i < 10; i++) {
-        await new Promise(resolve => setTimeout(resolve, 30000))
+      while (true) {
+        await new Promise(resolve => setTimeout(resolve, 45000))
         initFetch = (await (await fetch('https://worldcup.sfg.io/matches/current')).json())[0]
-        if (initFetch.status === 'completed' || initFetch.status === 'future') break
         client.editMessage({
           messageID: res.id,
           channelID: res.channel_id,
@@ -556,6 +555,7 @@ export async function handleFifaboard (message: string, sendResponse: Function, 
             footer: { text: 'FIFA ID: ' + initFetch.fifa_id }
           }
         })
+        if (initFetch.status === 'completed' || initFetch.status === 'future') break
       }
     })
   } catch (e) { sendResponse(`Something went wrong 👾 Error: ${e}`) }
