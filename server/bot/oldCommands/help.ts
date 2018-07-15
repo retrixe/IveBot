@@ -118,10 +118,10 @@ const commandDocs: { [index: string]: any } = {
   'changeserverregion': b('/changeserverregion <server region>', 'Changes the voice region of the server.', '/changeserverregion russia', '/csr'),
   'listserverregions': b('/listserverregions', 'List available voice regions.', '/listserverregions', '/lsr'),
   'warnings': b('/warnings (user by ID/username/mention)', 'Find out about a person\'s warnings.', '/warnings voldemort', '/warns'),
-  'clearwarns': b('/clearwarns <user by ID/username/mention>', 'Clear all warnings a person has.', '/clearwarns voldemort', '/cw'),
+  'clearwarns': b('/clearwarns <user by ID/username/mention>', 'Clear all warnings a person has.', '/clearwarns voldemort', '/clearw, /cw'),
   'removewarn': b(
     '/removewarn <user by ID/username/mention> <warning ID>',
-    'Remove a single warning from a person.', '/removewarn voldemort 5adf7a0e825aa7005a4e7be2', '/rw'
+    'Remove a single warning from a person.', '/removewarn voldemort 5adf7a0e825aa7005a4e7be2', '/removew, /rw'
   ),
   'remoteexec': b('/remoteexec <command>', 'Execute a command on the host. Owner only command.', '/remoteexec killall node'),
   'mute': b('/mute <user by ID/username/mention> (time limit) (reason)', 'Mute someone. Compatible with Dyno.', '/mute voldemort 1h bored'),
