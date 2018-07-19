@@ -55,7 +55,9 @@ client.connect()
 
 // Create a MongoDB instance.
 let db: Db
-MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (err, mongoDB) => {
+MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, {
+  useNewUrlParser: true
+}, (err, mongoDB) => {
   if (err) throw new Error('Error:\n' + err)
   console.log('Bot connected successfully to MongoDB.')
   db = mongoDB.db('ivebot')

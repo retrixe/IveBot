@@ -6,7 +6,7 @@ import * as moment from 'moment'
 import { zeroWidthSpace } from '../imports/tools'
 // Get the NASA API token.
 import 'json5/lib/require'
-import { NASAtoken } from '../../../config.json5'
+import { NASAtoken, fixerAPIkey } from '../../../config.json5'
 
 export const handleCat: IveBotCommand = () => ({
   name: 'cat',
@@ -200,5 +200,40 @@ export const handleNamemc: IveBotCommand = (client) => ({
         }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
     } catch (e) { return `Enter a valid Minecraft username (account must be premium)` }
+  }
+})
+
+// Initialize cache.
+let currency: { timestamp: number, rates: { [index: string]: number } }
+export const handleCurrency: IveBotCommand = () => ({
+  name: 'currency',
+  opts: {
+    description: 'Convert a currency from one currency to another.',
+    fullDescription: 'Convert a currency from one currency to another.',
+    usage: '/currency (list) <currency symbol to convert from> <currency symbol to convert to> (amount, default: 1)',
+    aliases: ['cur']
+  },
+  generator: async (message, args) => {
+    // Check cache if old, and refresh accordingly.
+    if (!currency || Date.now() - currency.timestamp > 3600000) {
+      currency = await ( // This just fetches the data and parses it to JSON.
+        await fetch(`http://data.fixer.io/api/latest?access_key=${fixerAPIkey}`)
+      ).json()
+      currency.timestamp = Date.now() // To set the timestamp to the current time of the system.
+    }
+    // Calculate the currencies to conver from and to, as well as the amount.
+    if (args.length < 2) return 'Invalid usage, use /help currency for proper usage.'
+    const from = args[0].toUpperCase()
+    const to = args[1].toUpperCase()
+    // Check if everything is in order.
+    if (from.length !== 3 || !currency.rates[from]) return 'Invalid currency to convert from.'
+    else if (to.length !== 3 || !currency.rates[to]) return 'Invalid currency to convert to.'
+    else if (!args[2]) args[2] = '1' // If no amount was provided, the amount should be one.
+    else if (args.length > 3) return 'Enter a single number for currency conversion.'
+    else if (isNaN(+args[2])) return 'Enter a proper number to convert.'
+    // Now we convert the amount.
+    const convertedAmount = ((currency.rates[to] / currency.rates[from]) * +args[2])
+    const roundedOffAmount = Math.ceil(convertedAmount * Math.pow(10, 4)) / Math.pow(10, 4)
+    return `**${from}** ${args[2]} = **${to}** ${roundedOffAmount}`
   }
 })

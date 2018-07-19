@@ -1,5 +1,5 @@
 // Legacy commands.
-import { handleWeather, handleCurrency, handleDefine } from './oldCommands/api'
+import { handleWeather, handleDefine } from './oldCommands/api'
 import help from './oldCommands/help'
 
 // We need types.
@@ -9,8 +9,6 @@ import { getServerSettings } from './imports/tools'
 // All commands which take (message, sendResponse) as args and can be appended and interpreted.
 const appendableCommandMaps: { [index: string]: Function } = {
   // Currency conversion.
-  '/currency': handleCurrency,
-  '/cur': handleCurrency,
   // Define.
   '/define': handleDefine,
   '/def': handleDefine

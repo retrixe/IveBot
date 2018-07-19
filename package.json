@@ -54,7 +54,7 @@
     "husky": "^1.0.0-rc.13",
     "nodemon": "^1.12.1",
     "tap-nyan": "^1.1.0",
-    "ts-node": "^7.0.0",
+    "ts-node": "6.2.0",
     "typescript": "^2.9.2",
     "typescript-eslint-parser": "^16.0.1"
   },

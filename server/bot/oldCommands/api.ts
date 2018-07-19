@@ -4,7 +4,7 @@ import { getArguments, zeroWidthSpace } from '../imports/tools'
 import { client } from '../imports/types'
 // Get the NASA API token.
 import 'json5/lib/require'
-import { weatherAPIkey, fixerAPIkey, oxfordAPI } from '../../../config.json5'
+import { weatherAPIkey, oxfordAPI } from '../../../config.json5'
 
 export function handleDefine (message: string, sendResponse: Function) {
   if (!getArguments(message)) {
@@ -128,49 +128,4 @@ export function handleWeather (message: string, sendResponse: Function, client: 
         })
       }
     })
-}
-
-fetch(`http://data.fixer.io/api/latest?access_key=${fixerAPIkey}`)
-  .then((res: { json: Function }) => res.json())
-  .catch((err: string) => console.log(`Something went wrong 👾 Error: ${err}`))
-  .then((json: { rates: { [index: string]: number }, timestamp: number }) => {
-    exchangeRates = json
-    exchangeRates.timestamp = Date.now()
-  })
-let exchangeRates: { timestamp: number, rates: { [index: string]: number } }
-// Currency.
-export function handleCurrency (message: string, sendResponse: Function) {
-  if (!exchangeRates || Date.now() - exchangeRates.timestamp > 3600000) {
-    fetch(`http://data.fixer.io/api/latest?access_key=${fixerAPIkey}`)
-      .then((res: { json: Function }) => res.json())
-      .catch((err: string) => sendResponse(`Something went wrong 👾 Error: ${err}`))
-      .then((json: { rates: { [index: string]: number }, timestamp: number }) => {
-        exchangeRates = json
-        exchangeRates.timestamp = Date.now()
-      })
-  }
-  // Whee, currency conversion!
-  const from = getArguments(message).split(' ')[0].toUpperCase()
-  const to = getArguments(message).split(' ')[1].toUpperCase()
-  let amount = getArguments(getArguments(getArguments(message))).trim()
-  if (from.length !== 3 || !exchangeRates.rates[from]) {
-    sendResponse('Invalid currency to convert from.')
-    return
-  } else if (!to || to.length !== 3 || !exchangeRates.rates[to]) {
-    sendResponse('Invalid currency to convert to.')
-    return
-  } else if (!amount) {
-    amount = '1'
-  } else if (amount && amount.split(' ').length !== 1) {
-    sendResponse('Enter a single number for currency conversion.')
-    return
-  } else if (amount && isNaN(+amount)) {
-    sendResponse('Enter a proper number to convert.')
-    return
-  }
-  let converted: string|Array<string> =
-    ((exchangeRates.rates[to] / exchangeRates.rates[from]) * +amount).toString().split('.')
-  if (converted[1]) converted[1] = converted[1].substr(0, 4)
-  converted = converted.join('.')
-  sendResponse(`**${from}** ${amount} = **${to}** ${converted}`)
 }
