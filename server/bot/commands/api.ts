@@ -6,7 +6,7 @@ import * as moment from 'moment'
 import { zeroWidthSpace } from '../imports/tools'
 // Get the NASA API token.
 import 'json5/lib/require'
-import { NASAtoken, fixerAPIkey } from '../../../config.json5'
+import { NASAtoken, fixerAPIkey, weatherAPIkey } from '../../../config.json5'
 
 export const handleCat: IveBotCommand = () => ({
   name: 'cat',
@@ -235,5 +235,86 @@ export const handleCurrency: IveBotCommand = () => ({
     const convertedAmount = ((currency.rates[to] / currency.rates[from]) * +args[2])
     const roundedOffAmount = Math.ceil(convertedAmount * Math.pow(10, 4)) / Math.pow(10, 4)
     return `**${from}** ${args[2]} = **${to}** ${roundedOffAmount}`
+  }
+})
+
+// Our weather types.
+/* eslint-disable no-undef,no-use-before-define,camelcase */
+type Weather = { cod: string, coord: { lon: number, lat: number }, weather: Array<{
+  main: string,
+  description: string,
+  icon: string
+}>, main: { temp: number, temp_min: number, temp_max: number, humidity: number, pressure: number },
+  visibility: number, wind: { speed: number, deg: number },
+  clouds: { all: number }, rain: { '3h': number }, snow: { '3h': number }
+} /* eslint-enable */
+export const handleWeather: IveBotCommand = () => ({
+  name: 'weather',
+  opts: {
+    description: 'It\'s really cloudy here..',
+    fullDescription: 'What\'s the weather like at your place?',
+    usage: '/weather <city name> (country code) (--fahrenheit or -f)',
+    aliases: ['wt', 'test']
+  },
+  generator: async (message, args) => {
+    const farhenheit = args.includes('--fahrenheit') || args.includes('-f')
+    if (farhenheit) args.splice(args.includes('-f') ? args.indexOf('-f') : args.indexOf('--fahrenheit'), 1)
+    // Get the response from our API.
+    const weather: Weather = await (await fetch(
+      `http://api.openweathermap.org/data/2.5/weather?q=${args.join(',')}&appid=${weatherAPIkey}${
+        farhenheit ? '&units=imperial' : '&units=metric'
+      }`
+    )).json()
+    const temp = farhenheit ? '°F' : '°C'
+    // If the place doesn't exist..
+    if (weather.cod === '404') return 'Enter a valid city >_<'
+    // We generate the entire embed.
+    return {
+      content: `**🌇🌃🌁🌆 The weather for ${args.join(', ')}:**`,
+      embed: {
+        title: 'Weather at ' + args.join(', '),
+        color: 0x6D6BEA,
+        description: `**Description:** ${weather.weather[0].main} - ${weather.weather[0].description}`,
+        thumbnail: { url: `http://openweathermap.org/img/w/${weather.weather[0].icon}.png` },
+        footer: { text: 'Weather data from https://openweathermap.org' },
+        fields: [{
+          name: 'Co-ordinates 🗺',
+          value: `${Math.abs(weather.coord.lat)}${weather.coord.lat >= 0 ? '°N' : '°S'} /\
+ ${Math.abs(weather.coord.lon)}${weather.coord.lon >= 0 ? '°E' : '°W'}
+**(Latitude/Longitude)**`,
+          inline: true
+        }, {
+          name: 'Temperature 🌡',
+          value: `
+${weather.main.temp}${temp}/${weather.main.temp_max}${temp}/${weather.main.temp_min}${temp}
+**(avg/max/min)**`,
+          inline: true // Description goes here
+        }, {
+          name: 'Wind 🎐',
+          value: `${weather.wind.speed} m/s | ${weather.wind.deg}°
+**(speed | direction)**`,
+          inline: true
+        }, { name: 'Pressure 🍃', value: weather.main.pressure + ' millibars', inline: true },
+        { name: 'Humidity 💧', value: weather.main.humidity + '%', inline: true },
+        {
+          name: 'Cloud cover 🌥',
+          value: weather.clouds ? `${weather.clouds.all}% of sky` : 'N/A',
+          inline: true
+        },
+        {
+          name: 'Visibility 🌫',
+          value: weather.visibility ? `${weather.visibility} meters` : 'N/A',
+          inline: true
+        }, {
+          name: 'Rain, past 3h 🌧',
+          value: weather.rain ? `${weather.rain['3h']}mm` : 'N/A',
+          inline: true
+        }, {
+          name: 'Snow, past 3h 🌨❄',
+          value: weather.snow ? `${weather.snow['3h']}mm` : 'N/A',
+          inline: true
+        }]
+      }
+    }
   }
 })

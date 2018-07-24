@@ -1,5 +1,5 @@
 // Legacy commands.
-import { handleWeather, handleDefine } from './oldCommands/api'
+import { handleDefine } from './oldCommands/api'
 import help from './oldCommands/help'
 
 // We need types.
@@ -80,8 +80,6 @@ export default (client: client, tempDB: DB, db: mongoDB) => async (event: messag
   // Non-appendable commands which have to be re-defined on all callbacks. Taxing and waste of RAM.
   const commandMaps: { [index: string]: Function } = {
     // Weather.
-    '/weather': () => handleWeather(message, sendResponse, client, channelID),
-    '/wt': () => handleWeather(message, sendResponse, client, channelID)
     // Administrative commands.
     // Version, about, ping, uptime, remoteexec for remote command line.
     // Role system.

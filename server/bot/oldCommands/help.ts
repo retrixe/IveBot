@@ -126,7 +126,7 @@ const commandDocs: { [index: string]: any } = {
   'remoteexec': b('/remoteexec <command>', 'Execute a command on the host. Owner only command.', '/remoteexec killall node'),
   'mute': b('/mute <user by ID/username/mention> (time limit) (reason)', 'Mute someone. Compatible with Dyno.', '/mute voldemort 1h bored'),
   'unmute': b('/unmute <user by ID/username/mention> (reason)', 'Unmute someone. Compatible with Dyno.', '/unmute voldemort wrong person'),
-  'weather': b('/weather <city name>(,country name)', 'What\'s the weather like at your place?', '/weather Shanghai,CN', '/wt'),
+  'weather': b('/weather <city name> (country name) (--fahrenheit or -f)', 'What\'s the weather like at your place?', '/weather Shanghai,CN', '/wt'),
   'leave': b('/leave', 'This kicks you from the server, essentially making you leave.', '/leave'),
   'token': b('/token', 'Links your Discord to IveBot Web (use in DM only, or your account may be hacked)', '/token'),
   'namemc': b('/namemc <premium Minecraft username>', 'Displays previous usernames and skins of a Minecraft player.', '/namemc voldemort', '/nmc'),
