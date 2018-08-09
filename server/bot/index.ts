@@ -1,18 +1,9 @@
 // Legacy commands.
-import { handleDefine } from './oldCommands/api'
-import help from './oldCommands/help'
+import help from './help'
 
 // We need types.
 import { client, DB, member, message, mongoDB } from './imports/types'
 import { getServerSettings } from './imports/tools'
-
-// All commands which take (message, sendResponse) as args and can be appended and interpreted.
-const appendableCommandMaps: { [index: string]: Function } = {
-  // Currency conversion.
-  // Define.
-  '/define': handleDefine,
-  '/def': handleDefine
-}
 
 // When client gains/loses a member, it will callback.
 export const guildMemberEditCallback = (client: client, event: string, db: mongoDB) => async (
@@ -77,28 +68,6 @@ export default (client: client, tempDB: DB, db: mongoDB) => async (event: messag
   const userID = event.author.id
   const message = event.content
   const command = event.content.toLowerCase()
-  // Non-appendable commands which have to be re-defined on all callbacks. Taxing and waste of RAM.
-  const commandMaps: { [index: string]: Function } = {
-    // Weather.
-    // Administrative commands.
-    // Version, about, ping, uptime, remoteexec for remote command line.
-    // Role system.
-    // Certain commands rely on server settings. I hope we can await for them.
-  }
-  // Check for the commands in appendableCommandMaps.
-  for (let i = 0; i < Object.keys(appendableCommandMaps).length; i++) {
-    if (command.split(' ')[0] === Object.keys(appendableCommandMaps)[i]) {
-      appendableCommandMaps[Object.keys(appendableCommandMaps)[i]](message, sendResponse)
-      break
-    }
-  }
-  // Check for the commands in commandMaps.
-  for (let i = 0; i < Object.keys(commandMaps).length; i++) {
-    if (command.split(' ')[0] === Object.keys(commandMaps)[i]) {
-      commandMaps[Object.keys(commandMaps)[i]]()
-      break
-    }
-  }
   // Help command.
   if (command.startsWith('/help') || command.startsWith('/halp')) help(command, client, channelID, userID)
   // Auto responses and easter eggs.

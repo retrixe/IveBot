@@ -6,7 +6,7 @@ import * as moment from 'moment'
 import { zeroWidthSpace } from '../imports/tools'
 // Get the NASA API token.
 import 'json5/lib/require'
-import { NASAtoken, fixerAPIkey, weatherAPIkey } from '../../../config.json5'
+import { NASAtoken, fixerAPIkey, weatherAPIkey, oxfordAPI } from '../../../config.json5'
 
 export const handleCat: IveBotCommand = () => ({
   name: 'cat',
@@ -238,7 +238,7 @@ export const handleCurrency: IveBotCommand = () => ({
   }
 })
 
-// Our weather types.
+// Our weather and define types.
 /* eslint-disable no-undef,no-use-before-define,camelcase */
 type Weather = { cod: string, coord: { lon: number, lat: number }, weather: Array<{
   main: string,
@@ -247,14 +247,25 @@ type Weather = { cod: string, coord: { lon: number, lat: number }, weather: Arra
 }>, main: { temp: number, temp_min: number, temp_max: number, humidity: number, pressure: number },
   visibility: number, wind: { speed: number, deg: number },
   clouds: { all: number }, rain: { '3h': number }, snow: { '3h': number }
-} /* eslint-enable */
+}
+type Categories = Array<{
+  lexicalCategory: string,
+  entries: Array<{
+    senses: Array<{
+      definitions: Array<string>,
+      short_definitions: Array<string>,
+      examples: Array<{ text: string }>,
+      registers: Array<string>
+    }>
+  }>
+}> /* eslint-enable */
 export const handleWeather: IveBotCommand = () => ({
   name: 'weather',
   opts: {
     description: 'It\'s really cloudy here..',
     fullDescription: 'What\'s the weather like at your place?',
     usage: '/weather <city name> (country code) (--fahrenheit or -f)',
-    aliases: ['wt', 'test']
+    aliases: ['wt']
   },
   generator: async (message, args) => {
     const farhenheit = args.includes('--fahrenheit') || args.includes('-f')
@@ -316,5 +327,81 @@ ${weather.main.temp}${temp}/${weather.main.temp_max}${temp}/${weather.main.temp_
         }]
       }
     }
+  }
+})
+
+export const handleDefine: IveBotCommand = () => ({
+  name: 'define',
+  opts: {
+    description: 'Define a word in the Oxford Dictionary.',
+    fullDescription: 'Define a word in the Oxford Dictionary.',
+    usage: '/define <term>',
+    aliases: ['def', 'test']
+  },
+  generator: async (message, args) => {
+    // Setup request to find word.
+    const headers = { 'app_id': oxfordAPI.appId, 'app_key': oxfordAPI.appKey, Accept: 'application/json' }
+    // Search for the word, destructure for results, and then pass them on to our second request.
+    try {
+      const r = await (await fetch(
+        `https://od-api.oxforddictionaries.com/api/v1/inflections/en/${args.join(' ')}`, { headers }
+      )).json()
+      try {
+        // Here we get the dictionary entries for the specified word.
+        const { results } = await (await fetch(
+          `https://od-api.oxforddictionaries.com/api/v1/entries/en/${r.results[0].id}`, { headers }
+        )).json()
+        // Our super filter to remove what we don't need.
+        const categories: Categories = results[0].lexicalEntries
+        // Now we create an embed based on the 1st entry.
+        const fields: Array<{ name: string, value: string, inline?: boolean }> = []
+        // Function to check for maximum number of fields in an embed, then push.
+        const safePush = (object: { name: string, value: string }) => {
+          if (fields.length < 24) fields.push(object)
+          else if (fields.length === 24) fields.push({ name: '...too many definitions.', value: zeroWidthSpace })
+        }
+        categories.forEach(
+          // The function run on each category.
+          category => {
+            // If our field doesn't have the category name, we push the category name to it.
+            if (!fields.includes({
+              name: '**' + category.lexicalCategory + '**', value: zeroWidthSpace
+            })) {
+              // We don't push an empty field for the first element, else we do.
+              if (fields.length !== 0) safePush({ name: zeroWidthSpace, value: zeroWidthSpace })
+              safePush({ name: '**' + category.lexicalCategory + '**', value: zeroWidthSpace })
+            }
+            // Here we add every definition and example to the fields.
+            category.entries.forEach(({ senses }) => {
+              // Iterate over every definition.
+              senses.forEach((sense, i) => {
+                // Check if there is a definition.
+                if (!sense.short_definitions && !sense.definitions) return
+                // Then safely push the definition to the array.
+                safePush({
+                  name: sense.short_definitions
+                    ? (sense.registers ? `**${i + 1}.** (${sense.registers[0]}) ` : `**${i}.** `) +
+                      sense.short_definitions[0]
+                    : (sense.registers ? `**${i + 1}.** (${sense.registers[0]}) ` : `**${i}.** `) +
+                      sense.definitions[0],
+                  value: sense.examples && sense.examples[0].text
+                    ? `e.g. ${sense.examples[0].text}` : 'No example is available.'
+                })
+              })
+            })
+          }
+        )
+        return {
+          content: `📕 **|** Definition of **${args.join(' ')}**:`,
+          embed: {
+            color: 0x7289DA,
+            type: 'rich',
+            title: results[0].word,
+            footer: { text: 'Powered by Oxford Dictionary \\o/' },
+            fields
+          }
+        }
+      } catch (err) { return `Something went wrong 👾 Error: ${err}` }
+    } catch (e) { return 'Did you enter a valid word? 👾' }
   }
 })

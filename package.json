@@ -21,7 +21,7 @@
     "@material-ui/core": "^1.2.0",
     "@material-ui/icons": "^1.1.0",
     "apollo-boost": "^0.1.4",
-    "eris": "abalabahaha/eris#dev",
+    "eris": "^0.9.0",
     "graphql": "^0.13.2",
     "graphql-yoga": "^1.8.5",
     "isomorphic-unfetch": "^2.0.0",
@@ -55,8 +55,8 @@
     "nodemon": "^1.12.1",
     "tap-nyan": "^1.1.0",
     "ts-node": "6.2.0",
-    "typescript": "^2.9.2",
-    "typescript-eslint-parser": "^16.0.1"
+    "typescript": "^3.0.1",
+    "typescript-eslint-parser": "^18.0.0"
   },
   "husky": {
     "hooks": {
