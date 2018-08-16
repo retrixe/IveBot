@@ -10,6 +10,7 @@ export const handleWarn: IveBotCommand = ({ createMessage, getDMChannel }, tempD
     description: 'Warn someone.',
     fullDescription: 'Warn someone.',
     usage: '/warn <user by ID/username/mention> <reason>',
+    example: '/warn voldemort you is suck',
     guildOnly: true,
     requirements: { permissions: { 'manageMessages': true } }
   },
@@ -62,6 +63,7 @@ export const handleWarnings: IveBotCommand = (client, tempDB, db) => ({
     description: 'Find out about a person\'s warnings.',
     fullDescription: 'Find out about a person\'s warnings.',
     usage: '/warnings (user by ID/username/mention)',
+    example: '/warnings voldemort',
     aliases: ['warns'],
     guildOnly: true,
     requirements: {
@@ -116,6 +118,7 @@ export const handleClearwarns: IveBotCommand = ({ createMessage, getDMChannel },
     fullDescription: 'Clear all warnings a person has.',
     usage: '/clearwarns <user by ID/username/mention>',
     guildOnly: true,
+    example: '/clearwarns voldemort',
     aliases: ['cw', 'clearw'],
     requirements: { permissions: { 'manageMessages': true } }
   },
@@ -150,6 +153,7 @@ export const handleRemovewarn: IveBotCommand = ({ createMessage, getDMChannel },
     fullDescription: 'Remove a single warning from a person.',
     usage: '/removewarn <user by ID/username/mention> <warning ID>',
     guildOnly: true,
+    example: '/removewarn voldemort 5adf7a0e825aa7005a4e7be2',
     aliases: ['rw', 'removew'],
     requirements: { permissions: { 'manageMessages': true } }
   },

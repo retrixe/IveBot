@@ -10,8 +10,9 @@ export const handleToken: IveBotCommand = (client, tempDB) => ({
   name: 'token',
   opts: {
     description: 'Links your Discord to IveBot Web.',
-    fullDescription: 'Links your Discord to IveBot Web (use in DM only, or your account may be hacked)',
+    fullDescription: 'Links your Discord to IveBot Web (do not share, or your account may be hacked)',
     usage: '/token',
+    example: '/token',
     argsRequired: false,
     hooks: {
       postCommand: (a, b, sent) => {
@@ -44,6 +45,7 @@ export const handleVersion: IveBotCommand = () => ({
     description: 'Current running version of IveBot.',
     fullDescription: 'Current running version of IveBot.',
     usage: '/version',
+    example: '/version',
     argsRequired: false
   },
   generator: `**IveBot ${version}**`
@@ -55,6 +57,7 @@ export const handleAbout: IveBotCommand = () => ({
     description: 'About IveBot.',
     fullDescription: 'About IveBot.',
     usage: '/about',
+    example: '/about',
     argsRequired: false
   },
   generator: `**IveBot ${version}**
@@ -73,6 +76,7 @@ export const handleUptime: IveBotCommand = (client) => ({
     description: 'How long was IveBot on?',
     fullDescription: 'How long was IveBot on?',
     usage: '/uptime',
+    example: '/uptime',
     argsRequired: false
   },
   generator: () => ms(client.uptime, { long: true })
@@ -84,6 +88,7 @@ export const handleRemoteexec: IveBotCommand = (client) => ({
     description: 'Execute a command on the host.',
     fullDescription: 'Execute a command on the host. Owner only command.',
     usage: '/remoteexec <command>',
+    example: '/remoteexec killall node',
     requirements: {
       userIDs: [host]
     }
@@ -97,6 +102,7 @@ export const handlePing: IveBotCommand = (client) => ({
     description: 'IveBot\'s latency.',
     fullDescription: 'Latency of IveBot\'s connection to your server.',
     usage: '/ping',
+    example: '/ping',
     argsRequired: false,
     hooks: {
       postCommand: (message, args, sent) => {

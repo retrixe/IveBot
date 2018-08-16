@@ -1,5 +1,5 @@
 import { getArguments } from './imports/tools'
-import { client } from './imports/types'
+import CommandClient, { Command } from './imports/CustomClient'
 
 let generalHelp = `   ** Jony Ive can do many commands 📡**
 \`/halp\` and \`/help\` - The most innovative help.
@@ -66,6 +66,9 @@ Arguments in () are optional :P
 Arguments in () are optional :P
   `
 }
+const compatLayer = (command: Command) => (
+  b(command.usage, command.fullDescription, command.example, command.aliases.map(i => '/' + i).join(', '))
+)
 
 const commandDocs: { [index: string]: any } = {
   'help': b('/help (command name)', 'The most innovative halp.', '/help zalgo', '/halp'),
@@ -76,7 +79,7 @@ const commandDocs: { [index: string]: any } = {
   'choose': b('/choose <option 1>|(option 2)|(option 3)...', 'Choose between multiple options.',
     '/choose cake|ice cream|pasta', '/cho'),
   'reverse': b('/reverse <text>', 'Reverse a sentence.', '/reverse hello', '/rev'),
-  '8ball': b('/8ball (question)', 'Random answers to random questions.', '/8ball Will I flunk my exam?'),
+  '8ball': b('/8ball <question>', 'Random answers to random questions.', '/8ball Will I flunk my exam?'),
   'repeat': b('/repeat <number of times> <string to repeat>', 'Repeat a string.', '/repeat 10 a', '/rep'),
   'urban': b('/urban <term>', 'Get an Urban Dictionary definition ;)', '/urban nub', '/urb'),
   'define': b('/define <term>', 'Define a word in the Oxford Dictionary.', '/define cyclone', '/def'),
@@ -95,7 +98,7 @@ const commandDocs: { [index: string]: any } = {
     '/astronomy-picture-of-the-day 2nd March 2017', '/apod'
   ),
   'apod': b('/apod (date)', 'The astronomy picture of the day. Truly beautiful. Usually.', '/apod 2nd March 2017', '/astronomy-picture-of-the-day'),
-  'request': b('/request <something>', 'Request a feature. Only available to test pilots.', '/request a /userinfo command.', '/req'),
+  'request': b('/request <suggestion>', 'Request a feature. Only available to test pilots.', '/request a /userinfo command.', '/req'),
   'say': b('/say (channel) <text>', 'Say something. Test pilots and admins/mods only.', '/say #general heyo'),
   'type': b('/type (channel) <text>', 'Type something. Test pilots and admins/mods only.', '/type #general heyo'),
   'editLastSay': b('/editLastSay (channel) <new text>', 'Edits the last say in a channel.', '/editLastSay #general hey', '/els'),
@@ -126,35 +129,37 @@ const commandDocs: { [index: string]: any } = {
   'remoteexec': b('/remoteexec <command>', 'Execute a command on the host. Owner only command.', '/remoteexec killall node'),
   'mute': b('/mute <user by ID/username/mention> (time limit) (reason)', 'Mute someone. Compatible with Dyno.', '/mute voldemort 1h bored'),
   'unmute': b('/unmute <user by ID/username/mention> (reason)', 'Unmute someone. Compatible with Dyno.', '/unmute voldemort wrong person'),
-  'weather': b('/weather <city name> (country name) (--fahrenheit or -f)', 'What\'s the weather like at your place?', '/weather Shanghai,CN', '/wt'),
+  'weather': b('/weather <city name> (country code) (--fahrenheit or -f)', 'What\'s the weather like at your place?', '/weather Shanghai CN', '/wt'),
   'leave': b('/leave', 'This kicks you from the server, essentially making you leave.', '/leave'),
-  'token': b('/token', 'Links your Discord to IveBot Web (use in DM only, or your account may be hacked)', '/token'),
+  'token': b('/token', 'Links your Discord to IveBot Web (do not share, or your account may be hacked)', '/token'),
   'namemc': b('/namemc <premium Minecraft username>', 'Displays previous usernames and skins of a Minecraft player.', '/namemc voldemort', '/nmc'),
-  'calculate': b('/calculate <expression>', 'Calculate the value of an expression.', '/calculate 2 + 2', '/calc')
+  'calculate': b('/calculate <expression>', 'Calculate the value of an expression.', '/calculate 2 + 2', '/calc, /cal')
 }
 
-export default function help (message: string, client: client, c: string, u: string) {
-  if (getArguments(message).trim().split('/').join('') in commandDocs) {
+export default function help (message: string, client: CommandClient, c: string, u: string) {
+  if (message === '/help test') {
+    client.createMessage(c, 'Different examples: ' + Object.keys(client.commands).map(i => {
+      if (commandDocs[i]) return client.commands[i].example === commandDocs[i].example ? false : i
+    }).filter(i => i).join(', '))
+    return
+  }
+  if (getArguments(message).split('/').join('') in client.commands) {
     client.createMessage(
-      c, generateDocs(commandDocs[getArguments(message).trim().split('/').join('')])
+      c, generateDocs(compatLayer(client.commands[getArguments(message).split('/').join('')]))
     )
     return
     // Alias support.
-  } else if (Object.keys(commandDocs).find((element: string) => (
-    commandDocs[element].aliases
-      ? commandDocs[element].aliases.split('/').join('').split(', ').includes(
-        getArguments(message).trim().split('/').join('')
-      )
-      : undefined
+  } else if (Object.keys(client.commands).find((element: string) => (
+    client.commands[element].aliases
+      ? client.commands[element].aliases.includes(getArguments(message).split('/').join(''))
+      : false
   ))) {
-    const command = Object.keys(commandDocs).find((element: string) => (
-      commandDocs[element].aliases
-        ? commandDocs[element].aliases.split('/').join('').split(', ').includes(
-          getArguments(message).trim().split('/').join('')
-        )
-        : undefined
+    const command = Object.keys(client.commands).find((element: string) => (
+      client.commands[element].aliases
+        ? client.commands[element].aliases.includes(getArguments(message).split('/').join(''))
+        : false
     ))
-    client.createMessage(c, generateDocs(commandDocs[command]))
+    client.createMessage(c, generateDocs(compatLayer(client.commands[command])))
     return
   } else if (getArguments(message)) {
     client.createMessage(c, 'Incorrect parameters. Run /help for general help.')

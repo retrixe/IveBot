@@ -12,7 +12,7 @@ import { DB, IveBotCommand } from './bot/imports/types'
 /* SERVER CODE ENDS HERE */
 
 // Tokens and stuff.
-import { CommandClient } from 'eris'
+import CommandClient from './bot/imports/CustomClient'
 // Get MongoDB.
 import { MongoClient, Db } from 'mongodb'
 // Import fs.

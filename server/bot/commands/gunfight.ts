@@ -10,6 +10,7 @@ export const handleGunfight: IveBotCommand = (client, db) => ({
     description: 'For that good ol\' fight bro.',
     fullDescription: 'Challenge someone to a gunfight showdown.',
     usage: '/gunfight <user>',
+    example: '/gunfight @voldemort#6931',
     guildOnly: true
   },
   generator: (message, args) => {
@@ -65,13 +66,14 @@ export const handleAccept: IveBotCommand = (client, db) => ({
   name: 'accept',
   opts: {
     description: 'For that good ol\' fight bro.',
-    fullDescription: 'Challenge someone to a gunfight showdown.',
-    usage: '/gunfight <user>',
+    fullDescription: 'Accept a gunfight showdown.',
+    usage: '/accept',
+    example: '/accept',
     guildOnly: true,
     hidden: true,
     argsRequired: false
   },
-  generator: (message, args) => {
+  generator: (message) => {
     // Find the gunfight, if exists.
     const gunfightToAccept = db.gunfight.find((gunfight) => (
       gunfight.challenged === message.author.id && !gunfight.accepted

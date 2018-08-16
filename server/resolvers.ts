@@ -1,15 +1,16 @@
 // Import permission checks and function to retrieve server settings.
 import { getServerSettings } from './bot/imports/tools'
 // Get types.
-import { mongoDB, DB, client } from './bot/imports/types'
+import { DB } from './bot/imports/types'
+import CommandClient from './bot/imports/CustomClient'
 // Get MongoDB.
-import { MongoClient } from 'mongodb'
+import { MongoClient, Db } from 'mongodb'
 // Who's the host? He gets special permission.
 import 'json5/lib/require'
 import { host, mongoURL } from '../config.json5'
 
 // Create a MongoDB instance.
-let db: mongoDB
+let db: Db
 MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (err, client) => {
   if (err) throw new Error('Error:\n' + err)
   console.log('GraphQL server connected successfully to MongoDB.')
@@ -17,7 +18,7 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (e
 })
 
 // Set up resolvers.
-export default (ctx: { tempDB: DB, client: client }) => ({
+export default (ctx: { tempDB: DB, client: CommandClient }) => ({
   // Queries.
   Query: {
     serverSettings: async (

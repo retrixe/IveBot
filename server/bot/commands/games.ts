@@ -29,6 +29,7 @@ export const handleChoose: IveBotCommand = (client) => ({
     aliases: ['cho'],
     description: 'Choose between multiple options.',
     fullDescription: 'Choose between multiple options.',
+    example: '/choose cake|ice cream|pasta',
     usage: '/choose <option 1>|(option 2)|(option 3)...'
   },
   generator: (message) => {
@@ -45,6 +46,7 @@ export const handleReverse: IveBotCommand = (client) => ({
     aliases: ['rev'],
     description: 'Reverse a sentence.',
     fullDescription: 'Reverse a sentence.',
+    example: '/reverse hello',
     usage: '/reverse <text>'
   },
   generator: (message) => getDesc(message).split('').reverse().join('')
@@ -56,6 +58,7 @@ export const handle8ball: IveBotCommand = (client) => ({
     description: 'Random answers to random questions.',
     fullDescription: 'Random answers to random questions.',
     usage: '/8ball <question>',
+    example: '/8ball Will I flunk my exam?',
     invalidUsageMessage: 'Please ask the 8ball a question.'
   },
   generator: (message) => {
@@ -77,11 +80,12 @@ export const handleZalgo: IveBotCommand = (client) => ({
   opts: {
     aliases: ['zgo'],
     description: 'The zalgo demon\'s writing.',
-    fullDescription: 'The zalgo demon\'s writing.',
-    usage: '/zalgo <text>'
+    fullDescription: 'The zalgo demon\'s handwriting.',
+    usage: '/zalgo <text>',
+    example: '/zalgo sup'
   },
-  generator: (message) => {
-    let textToZalgo = getDesc(message).split('')
+  generator: (message, args) => {
+    let textToZalgo = args.join(' ').split('')
     let newMessage = ''
     textToZalgo.forEach(element => {
       newMessage += element
@@ -89,7 +93,7 @@ export const handleZalgo: IveBotCommand = (client) => ({
         newMessage += characters[Math.floor(Math.random() * characters.length)]
       }
     })
-    return newMessage
+    return newMessage.length >= 2000 ? args.join(' ') : newMessage
   }
 })
 
@@ -99,7 +103,8 @@ export const handleDezalgo: IveBotCommand = (client) => ({
     aliases: ['dzgo'],
     description: 'The zalgo demon\'s writing.',
     fullDescription: 'Read the zalgo demon\'s writing.',
-    usage: '/dezalgo <text>'
+    usage: '/dezalgo <text>',
+    example: '/dezalgo ḥ̛̓e̖l̽͞҉lͦͅoͥ'
   },
   generator: (message) => {
     let textToZalgo = getDesc(message).split('')
@@ -117,7 +122,8 @@ export const handleRepeat: IveBotCommand = (client) => ({
     description: 'Repeat a string.',
     fullDescription: 'Repeat a string.',
     usage: '/repeat <number of times> <string to repeat>',
-    aliases: ['rep']
+    aliases: ['rep'],
+    example: '/repeat 10 a'
   },
   generator: (message, args) => {
     // All arguments.
@@ -141,7 +147,8 @@ export const handleRandom: IveBotCommand = (client) => ({
     description: 'Return a random number.',
     fullDescription: 'Returns a random number, by default between 0 and 10.',
     usage: '/random (starting number) (ending number)',
-    aliases: ['rand']
+    aliases: ['rand'],
+    example: '/random 1 69'
   },
   generator: (message, args) => {
     // If argument length is 1 and the argument is a number..
@@ -167,6 +174,7 @@ export const handleCalculate: IveBotCommand = (client) => ({
     fullDescription: 'Calculate the value of an expression.',
     usage: '/calculate <expression>',
     aliases: ['calc', 'cal'],
+    example: '/calculate 2 + 2',
     invalidUsageMessage: 'Specify an expression >_<'
   },
   generator: (message, args) => {

@@ -13,6 +13,7 @@ export const handlePurge: IveBotCommand = (client) => ({
     description: 'Bulk delete a set of messages.',
     fullDescription: 'Bulk delete messages newer than 2 weeks.',
     usage: '/purge <number greater than 0 and less than 100>',
+    example: '/purge 10',
     guildOnly: true,
     deleteCommand: true,
     requirements: {
@@ -48,6 +49,7 @@ export const handleKick: IveBotCommand = (client) => ({
     fullDescription: 'Kick someone.',
     usage: '/kick <user by ID/username/mention> (reason)',
     guildOnly: true,
+    example: '/kick voldemort you is suck',
     requirements: { permissions: { 'kickMembers': true } }
   },
   generator: async (message, args) => {

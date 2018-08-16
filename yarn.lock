@@ -2700,9 +2700,9 @@ equal-length@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/equal-length/-/equal-length-1.0.1.tgz#21ca112d48ab24b4e1e7ffc0e5339d31fdfc274c"
 
-eris@^0.9.0:
+eris@retrixe/eris:
   version "0.9.0"
-  resolved "https://registry.yarnpkg.com/eris/-/eris-0.9.0.tgz#a2796839f7768cd40645c2c6b1bf0c86ba3147f3"
+  resolved "https://codeload.github.com/retrixe/eris/tar.gz/a90ce00855cb2005ec44631c4975f4db48369e87"
   dependencies:
     ws "^6.0.0"
   optionalDependencies:

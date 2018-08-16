@@ -11,6 +11,7 @@ export const handleBan: IveBotCommand = (client) => ({
     usage: '/ban <user by ID/username/mention> (reason)',
     aliases: ['banana', 'nuke'],
     guildOnly: true,
+    example: '/ban voldemort you is suck',
     requirements: { permissions: { 'banMembers': true } }
   },
   generator: async (message, args) => {
@@ -56,7 +57,8 @@ export const handleUnban: IveBotCommand = (client) => ({
   opts: {
     description: 'Unban someone.',
     fullDescription: 'Unban someone.',
-    usage: '/unban <user by ID/username> (reason)',
+    usage: '/unban <user by ID/username/mention> (reason)',
+    example: '/unban voldemort wrong person',
     guildOnly: true,
     requirements: { permissions: { 'banMembers': true } }
   },

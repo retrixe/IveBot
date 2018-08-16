@@ -14,7 +14,8 @@ export const handleRequest: IveBotCommand = (client, db) => ({
     requirements: { userIDs: [...testPilots, host] },
     description: 'Request a specific feature.',
     fullDescription: 'Request a feature. Only available to test pilots.',
-    usage: '/request <suggestion>'
+    usage: '/request <suggestion>',
+    example: '/request a /userinfo command.'
   },
   generator: async ({ author, content, channel }, args) => {
     client.createMessage(
@@ -34,6 +35,7 @@ export const handleSay: IveBotCommand = (client, db) => ({
     description: 'Say something, even in another channel.',
     fullDescription: 'Say something. Test pilots and admins/mods only.',
     usage: '/say (channel) <text>',
+    example: '/say #general heyo',
     deleteCommand: true,
     hooks: { postCommand: (message, args, sent) => { if (sent) db.say[sent.channel.id] = sent.id } }
   },
@@ -61,6 +63,7 @@ export const handleType: IveBotCommand = (client, db) => ({
     description: 'Type something, even in another channel.',
     fullDescription: 'Type something. Test pilots and admins/mods only.',
     usage: '/type (channel) <text>',
+    example: '/type #general heyo',
     deleteCommand: true,
     hooks: { postCommand: (message, args, sent) => { if (sent) db.say[sent.channel.id] = sent.id } }
   },
@@ -95,6 +98,7 @@ export const handleRemindme: IveBotCommand = (client) => ({
     fullDescription: 'Remind you of something.',
     description: 'Reminders.',
     usage: '/remindme <time in 1d|1h|1m|1s> <description>',
+    example: '/remindme 1h do your homework',
     aliases: ['rm']
   },
   name: 'remindme',
@@ -117,6 +121,7 @@ export const handleAvatar: IveBotCommand = (client) => ({
     fullDescription: 'Get a large-sized link to the avatar of a user.',
     description: 'Avatar of a user.',
     usage: '/avatar <user>',
+    example: '/avatar @voldemort#6931',
     aliases: ['av'],
     argsRequired: false
   },
@@ -133,6 +138,7 @@ export const handleLeave: IveBotCommand = (client, db) => ({
     description: 'Makes you leave the server.',
     fullDescription: 'This kicks you from the server, essentially making you leave.',
     usage: '/leave',
+    example: '/leave',
     errorMessage: 'There was an error processing your request.',
     guildOnly: true,
     argsRequired: false
@@ -168,6 +174,7 @@ export const handleListserverregions: IveBotCommand = (client) => ({
     fullDescription: 'List available voice regions.',
     description: 'List available voice regions.',
     usage: '/listserverregions',
+    example: '/listserverregions',
     aliases: ['lsr'],
     guildOnly: true,
     argsRequired: false
@@ -183,6 +190,7 @@ export const handleChangeserverregion: IveBotCommand = (client) => ({
     fullDescription: 'Changes the voice region of the server.',
     description: 'Changes the voice region of the server.',
     usage: '/changeserverregion <server region>',
+    example: '/changeserverregion russia',
     aliases: ['csr'],
     guildOnly: true,
     requirements: {
@@ -211,6 +219,7 @@ export const handleEdit: IveBotCommand = (client, db) => ({
     description: 'Edits a single message.',
     fullDescription: 'Edits a single message. Owner only command.',
     usage: '/edit (channel) <message ID> <new text>',
+    example: '/edit #general 123456789012345678 hi',
     deleteCommand: true
   },
   name: 'edit',
@@ -239,6 +248,7 @@ export const handleEditLastSay: IveBotCommand = (client, db) => ({
     description: 'Edits the last say in a channel.',
     fullDescription: 'Edits the last say in a channel. Test pilots and admins/mods only.',
     usage: '/editLastSay (channel) <new text>',
+    example: '/editLastSay #general hey',
     deleteCommand: true,
     aliases: ['els']
   },

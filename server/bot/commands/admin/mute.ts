@@ -10,6 +10,7 @@ export const handleMute: IveBotCommand = (client) => ({
     description: 'Mute someone.',
     fullDescription: 'Mute someone. Compatible with Dyno.',
     usage: '/mute <user by ID/username/mention> (time limit) (reason)',
+    example: '/mute voldemort 1h bored',
     guildOnly: true,
     requirements: { permissions: { 'manageMessages': true } }
   },
@@ -136,6 +137,7 @@ export const handleUnmute: IveBotCommand = (client) => ({
     fullDescription: 'Unmute someone. Compatible with Dyno.',
     usage: '/unmute <user by ID/username/mention> (reason)',
     guildOnly: true,
+    example: '/unmute voldemort wrong person',
     requirements: { permissions: { 'manageMessages': true } }
   },
   generator: (message, args) => {

@@ -14,6 +14,7 @@ export const handleCat: IveBotCommand = () => ({
     description: 'Random cat from <https://random.cat>',
     fullDescription: 'Random cat from <https://random.cat>',
     usage: '/cat',
+    example: '/cat',
     argsRequired: false
   },
   generator: async () => {
@@ -34,6 +35,7 @@ export const handleRobohash: IveBotCommand = () => ({
     description: 'Take some text, make it a robot/monster/head/cat.',
     fullDescription: 'Takes some text and hashes it in the form of an image :P',
     usage: '/robohash <cat/robot/monster/head> <text to hash>',
+    example: '/robohash cat voldemort#6931',
     aliases: ['robo', 'rh']
   },
   generator: (message, args) => {
@@ -57,6 +59,7 @@ export const handleApod: IveBotCommand = (client) => ({
     description: 'The astronomy picture of the day.',
     fullDescription: 'The astronomy picture of the day. Truly beautiful. Usually.',
     usage: '/astronomy-picture-of-the-day (date)',
+    example: '/astronomy-picture-of-the-day 2nd March 2017',
     aliases: ['apod'],
     argsRequired: false
   },
@@ -100,6 +103,7 @@ export const handleDog: IveBotCommand = (client) => ({
     description: 'Random dog from <https://dog.ceo>',
     fullDescription: 'Random dog from <https://dog.ceo>',
     usage: '/dog (breed)',
+    example: '/dog labrador',
     argsRequired: false
   },
   generator: async (message, args) => {
@@ -126,6 +130,7 @@ export const handleUrban: IveBotCommand = () => ({
     description: 'Get an Urban Dictionary definition ;)',
     fullDescription: 'Get an Urban Dictionary definition ;)',
     usage: '/urban <term>',
+    example: '/urban nub',
     aliases: ['urb'],
     argsRequired: false // this is fun.
   },
@@ -168,6 +173,7 @@ export const handleNamemc: IveBotCommand = (client) => ({
     description: 'A Minecraft user\'s previous usernames and skin.',
     fullDescription: 'Displays previous usernames and skins of a Minecraft player.',
     usage: '/namemc <premium Minecraft username>',
+    example: '/namemc voldemort',
     aliases: ['nmc']
   },
   generator: async (message, args) => {
@@ -210,8 +216,9 @@ export const handleCurrency: IveBotCommand = () => ({
   opts: {
     description: 'Convert a currency from one currency to another.',
     fullDescription: 'Convert a currency from one currency to another.',
-    usage: '/currency (list) <currency symbol to convert from> <currency symbol to convert to> (amount, default: 1)',
-    aliases: ['cur']
+    usage: '/currency <currency symbol to convert from> <currency symbol to convert to> (amount, default: 1)',
+    aliases: ['cur'],
+    example: '/cur EUR USD 40'
   },
   generator: async (message, args) => {
     // Check cache if old, and refresh accordingly.
@@ -265,6 +272,7 @@ export const handleWeather: IveBotCommand = () => ({
     description: 'It\'s really cloudy here..',
     fullDescription: 'What\'s the weather like at your place?',
     usage: '/weather <city name> (country code) (--fahrenheit or -f)',
+    example: '/weather Shanghai CN',
     aliases: ['wt']
   },
   generator: async (message, args) => {
@@ -336,7 +344,8 @@ export const handleDefine: IveBotCommand = () => ({
     description: 'Define a word in the Oxford Dictionary.',
     fullDescription: 'Define a word in the Oxford Dictionary.',
     usage: '/define <term>',
-    aliases: ['def', 'test']
+    example: '/define cyclone',
+    aliases: ['def']
   },
   generator: async (message, args) => {
     // Setup request to find word.

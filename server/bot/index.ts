@@ -2,12 +2,17 @@
 import help from './help'
 
 // We need types.
-import { client, DB, member, message, mongoDB } from './imports/types'
+import { DB } from './imports/types'
+import { Member, Message } from 'eris'
+import CommandClient from './imports/CustomClient'
+import { Db } from 'mongodb'
+
+// Database reading function.
 import { getServerSettings } from './imports/tools'
 
 // When client gains/loses a member, it will callback.
-export const guildMemberEditCallback = (client: client, event: string, db: mongoDB) => async (
-  guild: { id: string }, member: member
+export const guildMemberEditCallback = (client: CommandClient, event: string, db: Db) => async (
+  guild: { id: string }, member: Member
 ) => { // eslint-disable-line indent
   // WeChill specific configuration.
   if (guild.id === '402423671551164416' && event === 'guildMemberRemove') {
@@ -51,23 +56,22 @@ export const guildMemberEditCallback = (client: client, event: string, db: mongo
 }
 
 // When client recieves a message, it will callback.
-export default (client: client, tempDB: DB, db: mongoDB) => async (event: message) => {
+export default (client: CommandClient, tempDB: DB, db: Db) => async (message: Message) => {
   // Disable bots and webhooks from being responded to.
-  try { if (event.author.bot) return } catch (e) { return }
+  try { if (message.author.bot) return } catch (e) { return }
   try {
     if (
-      !event.member.guild.channels.find(i => i.id === event.channel.id)
+      !message.member.guild.channels.find(i => i.id === message.channel.id)
         .permissionsOf(client.user.id).has('sendMessages')
     ) return
   } catch (e) {}
   // Content of message and sendResponse.
   const sendResponse = (content: string, embed?: {}) => client.createMessage(
-    event.channel.id, embed ? content : { content, embed }
+    message.channel.id, embed ? content : { content, embed }
   )
-  const channelID = event.channel.id
-  const userID = event.author.id
-  const message = event.content
-  const command = event.content.toLowerCase()
+  const channelID = message.channel.id
+  const userID = message.author.id
+  const command = message.content.toLowerCase()
   // Help command.
   if (command.startsWith('/help') || command.startsWith('/halp')) help(command, client, channelID, userID)
   // Auto responses and easter eggs.

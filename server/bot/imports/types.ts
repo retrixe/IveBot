@@ -1,21 +1,17 @@
 // Flow our types.
 /* eslint-disable no-undef */
-import { CommandClient, Member, Message, CommandOptions, CommandGenerator } from 'eris'
-import { Db } from 'mongodb' // eslint-disable-line no-unused-vars
+import { CommandGenerator } from 'eris'
+import IveBotCommandClient, { IveBotCommandOptions } from './CustomClient'
+import { Db } from 'mongodb'
 
 // eslint-disable-next-line no-use-before-define
-export type IveBotCommand = (client: CommandClient, db?: DB, mongoDB?: Db) => {
+export type IveBotCommand = (client: IveBotCommandClient, db?: DB, mongoDB?: Db) => {
   generator: CommandGenerator,
-  opts: CommandOptions,
+  opts: IveBotCommandOptions,
   name: string
 }
 
 export type FalseUser = { id: string, username: string, discriminator: string }
-
-export class client extends CommandClient {}
-export class member extends Member {}
-export class message extends Message {}
-export class event extends message {}
 export type DB = {
   gunfight: Array<{
     challenged: string,
@@ -33,5 +29,4 @@ export type DB = {
   },
   leave: Array<string>
 }
-export type mongoDB = Db
 /* eslint-enable no-undef */
