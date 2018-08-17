@@ -218,7 +218,7 @@ export const handleCurrency: IveBotCommand = () => ({
     fullDescription: 'Convert a currency from one currency to another.',
     usage: '/currency <currency symbol to convert from> <currency symbol to convert to> (amount, default: 1)',
     aliases: ['cur'],
-    example: '/cur EUR USD 40'
+    example: '/currency EUR USD 40'
   },
   generator: async (message, args) => {
     // Check cache if old, and refresh accordingly.

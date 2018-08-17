@@ -75,7 +75,8 @@ mutation variables($server: String!, $token: String!, $role: Boolean, $joinAutor
               roles by giving a person a high role.'}
             </Typography>
             <Typography gutterBottom>
-              {'Use | to separate roles. If a role contains |, it will not be added.'}
+              {'Use | to separate roles. If a role contains |, it will not be added. \
+              Prefix role names with bot- for adding roles to bots automatically.'}
             </Typography>
             <FormControl>
               <InputLabel>Role Names</InputLabel>

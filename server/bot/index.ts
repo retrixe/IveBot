@@ -1,6 +1,3 @@
-// Legacy commands.
-import help from './help'
-
 // We need types.
 import { DB } from './imports/types'
 import { Member, Message } from 'eris'
@@ -25,32 +22,23 @@ export const guildMemberEditCallback = (client: CommandClient, event: string, db
     return // Why wait.
   }
   const serverSettings = await getServerSettings(db, guild.id)
-  /* if (event.t === 'GUILD_MEMBER_REMOVE' && serverSettings.joinLeaveMessages[2]) {
-    const channelID = Object.keys(client.servers[member.guild_id].channels).find(
-      element => client.servers[member.guild_id].channels[element].name ===
-        serverSettings.joinLeaveMessages[0]
-    )
-    client.sendMessage({
-      to: client.servers[member.guild_id].channels[channelID].name,
-      message: serverSettings.joinLeaveMessages[2]
-    })
-  } else if (event.t === 'GUILD_MEMBER_ADD' && serverSettings.joinLeaveMessages[1]) {
-    const channelID = Object.keys(client.servers[member.guild_id].channels).find(
-      element => client.servers[member.guild_id].channels[element].name ===
-        serverSettings.joinLeaveMessages[0]
-    )
-    client.sendMessage({
-      to: client.servers[member.guild_id].channels[channelID].name,
-      message: serverSettings.joinLeaveMessages[1]
-    })
+  /* if (event === 'guildMemberRemove' && serverSettings.joinLeaveMessages[2]) {
+    const channelID = member.guild.channels.find(
+      i => i.name === serverSettings.joinLeaveMessages[0]
+    ).id
+    client.createMessage(channelID, serverSettings.joinLeaveMessages[2])
+  } else if (event === 'guildMemberAdd' && serverSettings.joinLeaveMessages[1]) {
+    const channelID = member.guild.channels.find(
+      i => i.name === serverSettings.joinLeaveMessages[0]
+    ).id
+    client.createMessage(channelID, serverSettings.joinLeaveMessages[1])
   } */
-  if (event === 'guildMemberAdd' && serverSettings.joinAutorole && !member.user.bot) {
+  if (event === 'guildMemberAdd' && serverSettings.joinAutorole) {
     const roles = serverSettings.joinAutorole.split('|')
     for (let x = 0; x < roles.length; x++) {
-      const roleID = client.guilds.find(a => a.id === guild.id).roles.find(
-        element => element.name === roles[x]
-      ).id
-      client.addGuildMemberRole(guild.id, member.id, roleID)
+      const roleID = member.guild.roles.find(element => element.name === roles[x]).id
+      if (roles[x].startsWith('bot-') && member.user.bot) member.addRole(roleID)
+      else if (!roles[x].startsWith('bot-') && !member.user.bot) member.addRole(roleID)
     }
   }
 }
@@ -66,16 +54,11 @@ export default (client: CommandClient, tempDB: DB, db: Db) => async (message: Me
     ) return
   } catch (e) {}
   // Content of message and sendResponse.
-  const sendResponse = (content: string, embed?: {}) => client.createMessage(
-    message.channel.id, embed ? content : { content, embed }
-  )
-  const channelID = message.channel.id
-  const userID = message.author.id
+  const sendResponse = message.channel.createMessage
   const command = message.content.toLowerCase()
   // Help command.
-  if (command.startsWith('/help') || command.startsWith('/halp')) help(command, client, channelID, userID)
   // Auto responses and easter eggs.
-  else if (command.startsWith('is dot a good boy')) sendResponse('Shame on you. He\'s undefined.')
+  if (command.startsWith('is dot a good boy')) sendResponse('Shame on you. He\'s undefined.')
   else if (command.startsWith('iphone x')) sendResponse(`You don't deserve it. 😎`)
   else if (command.startsWith('triggered')) sendResponse('Ah, pathetic people again.')
   else if (command.startsWith('ayy')) sendResponse('lmao')
