@@ -78,7 +78,7 @@ const commandDocs: { [index: string]: any } = {
   'choose': b('/choose <option 1>|(option 2)|(option 3)...', 'Choose between multiple options.',
     '/choose cake|ice cream|pasta', '/cho'),
   'reverse': b('/reverse <text>', 'Reverse a sentence.', '/reverse hello', '/rev'),
-  '8ball': b('/8ball (question)', 'Random answers to random questions.', '/8ball Will I flunk my exam?'),
+  '8ball': b('/8ball <question></question>', 'Random answers to random questions.', '/8ball Will I flunk my exam?'),
   'repeat': b('/repeat <number of times> <string to repeat>', 'Repeat a string.', '/repeat 10 a', '/rep'),
   'urban': b('/urban <term>', 'Get an Urban Dictionary definition ;)', '/urban nub', '/urb'),
   'define': b('/define <term>', 'Define a word in the Oxford Dictionary.', '/define cyclone', '/def'),
@@ -97,7 +97,7 @@ const commandDocs: { [index: string]: any } = {
     '/astronomy-picture-of-the-day 2nd March 2017', '/apod'
   ),
   'apod': b('/apod (date)', 'The astronomy picture of the day. Truly beautiful. Usually.', '/apod 2nd March 2017', '/astronomy-picture-of-the-day'),
-  'request': b('/request <something>', 'Request a feature. Only available to test pilots.', '/request a /userinfo command.', '/req'),
+  'request': b('/request <suggestion>', 'Request a feature. Only available to test pilots.', '/request a /userinfo command.', '/req'),
   'say': b('/say (channel) <text>', 'Say something. Test pilots and admins/mods only.', '/say #general heyo'),
   'type': b('/type (channel) <text>', 'Type something. Test pilots and admins/mods only.', '/type #general heyo'),
   'editLastSay': b('/editLastSay (channel) <new text>', 'Edits the last say in a channel.', '/editLastSay #general hey', '/els'),

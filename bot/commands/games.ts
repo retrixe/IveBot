@@ -90,7 +90,7 @@ export function handleZalgo (message: string, sendResponse: Function) {
       newMessage += characters[Math.floor(Math.random() * characters.length)]
     }
   })
-  sendResponse(newMessage)
+  sendResponse(newMessage.length > 2000 ? getArguments(message) : newMessage)
 }
 
 export function handleDezalgo (message: string, sendResponse: Function) {
