@@ -179,7 +179,7 @@ export const handleCalculate: IveBotCommand = (client) => ({
   },
   generator: (message, args) => {
     try {
-      return `:3 result: ${eva(args.join(' ').split(',').join('.').split('÷').join('/'))}`
+      return `${eva(args.join(' ').split(',').join('.').split('÷').join('/'))}`
     } catch (e) {
       return 'Invalid expression >_<'
     }
