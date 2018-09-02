@@ -70,7 +70,11 @@ export const handleHelp: IveBotCommand = (client) => ({
   generator: async (message, args) => {
     const aliasCheck = (
       i: string
-    ) => client.commands[i].aliases && client.commands[i].aliases.includes(args.join(' '))
+    ) => (
+      client.commands[i].aliases && client.commands[i].aliases.includes(
+        args.join(' ').split('/').join('')
+      )
+    )
     if (
       args.join(' ').split('/').join('') in client.commands
     ) return generateDocs(client.commands[args.join(' ').split('/').join('')])
