@@ -1,4 +1,4 @@
-import * as fetch from 'isomorphic-unfetch'
+import fetch from 'node-fetch'
 import { getArguments } from '../imports/tools'
 // Get the NASA API token.
 import 'json5/lib/require'
