@@ -2,7 +2,7 @@
 import { getServerSettings } from './bot/imports/tools'
 // Get types.
 import { DB } from './bot/imports/types'
-import CommandClient from './bot/imports/CustomClient'
+import { Client } from 'eris'
 // Get MongoDB.
 import { MongoClient, Db } from 'mongodb'
 // Who's the host? He gets special permission.
@@ -18,7 +18,7 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (e
 })
 
 // Set up resolvers.
-export default (ctx: { tempDB: DB, client: CommandClient }) => ({
+export default (ctx: { tempDB: DB, client: Client }) => ({
   // Queries.
   Query: {
     serverSettings: async (

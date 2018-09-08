@@ -1,5 +1,5 @@
-import { IveBotCommand } from '../imports/types'
-import { Command } from '../imports/CustomClient'
+import { Command as IveBotCommand } from '../imports/types'
+import { Command } from '../client'
 
 let generalHelp = `   ** Jony Ive can do many commands 📡**
 \`/halp\` and \`/help\` - The most innovative help.
@@ -58,28 +58,28 @@ Arguments in () are optional :P
   `
 }
 
-export const handleHelp: IveBotCommand = (client) => ({
+export const handleHelp: IveBotCommand = {
   name: 'help',
+  aliases: ['halp'],
   opts: {
     description: 'The most innovative help.',
     fullDescription: 'The most innovative halp.',
-    aliases: ['halp'],
     usage: '/help (command name)',
     example: '/help zalgo'
   },
-  generator: async (message, args) => {
+  generator: (client, tempDB, db, { commands }) => async (message, args) => {
     const aliasCheck = (
       i: string
     ) => (
-      client.commands[i].aliases && client.commands[i].aliases.includes(
+      commands[i].aliases && commands[i].aliases.includes(
         args.join(' ').split('/').join('')
       )
     )
     if (
-      args.join(' ').split('/').join('') in client.commands
-    ) return generateDocs(client.commands[args.join(' ').split('/').join('')])
-    else if (Object.keys(client.commands).find(aliasCheck)) {
-      return generateDocs(client.commands[Object.keys(client.commands).find(aliasCheck)])
+      args.join(' ').split('/').join('') in commands
+    ) return generateDocs(commands[args.join(' ').split('/').join('')])
+    else if (Object.keys(commands).find(aliasCheck)) {
+      return generateDocs(commands[Object.keys(commands).find(aliasCheck)])
     } else if (args.join(' ')) return 'Incorrect parameters. Run /help for general help.'
     const channel = await message.author.getDMChannel()
     channel.createMessage({
@@ -93,4 +93,4 @@ export const handleHelp: IveBotCommand = (client) => ({
     })
     return 'newbie, help has been direct messaged to you ✅'
   }
-})
+}

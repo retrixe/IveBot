@@ -1,10 +1,10 @@
-import { IveBotCommand } from '../../imports/types'
+import { Command } from '../../imports/types'
 import { checkRolePosition } from '../../imports/permissions'
 import { getInsult, getUser } from '../../imports/tools'
 import { Constants } from 'eris'
 import * as ms from 'ms'
 
-export const handleMute: IveBotCommand = (client) => ({
+export const handleMute: Command = {
   name: 'mute',
   opts: {
     description: 'Mute someone.',
@@ -14,7 +14,7 @@ export const handleMute: IveBotCommand = (client) => ({
     guildOnly: true,
     requirements: { permissions: { 'manageMessages': true } }
   },
-  generator: async (message, args) => {
+  generator: (client) => async (message, args) => {
     // Find the user ID.
     let user = getUser(message, args.shift())
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
@@ -128,9 +128,9 @@ export const handleMute: IveBotCommand = (client) => ({
       return 'Muted.'
     }
   }
-})
+}
 
-export const handleUnmute: IveBotCommand = (client) => ({
+export const handleUnmute: Command = {
   name: 'unmute',
   opts: {
     description: 'Unmute someone.',
@@ -140,7 +140,7 @@ export const handleUnmute: IveBotCommand = (client) => ({
     example: '/unmute voldemort wrong person',
     requirements: { permissions: { 'manageMessages': true } }
   },
-  generator: (message, args) => {
+  generator: (client) => (message, args) => {
     // Find the user ID.
     let user = getUser(message, args.shift())
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
@@ -165,4 +165,4 @@ export const handleUnmute: IveBotCommand = (client) => ({
     }
     return `That person is not muted, you ${getInsult()}.`
   }
-})
+}

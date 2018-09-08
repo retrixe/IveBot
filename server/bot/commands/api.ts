@@ -1,5 +1,5 @@
 // All the types!
-import { IveBotCommand } from '../imports/types'
+import { Command } from '../imports/types'
 // All the tools!
 import * as fetch from 'isomorphic-unfetch'
 import * as moment from 'moment'
@@ -8,7 +8,7 @@ import { zeroWidthSpace } from '../imports/tools'
 import 'json5/lib/require'
 import { NASAtoken, fixerAPIkey, weatherAPIkey, oxfordAPI } from '../../../config.json5'
 
-export const handleCat: IveBotCommand = () => ({
+export const handleCat: Command = {
   name: 'cat',
   opts: {
     description: 'Random cat from <https://random.cat>',
@@ -17,7 +17,7 @@ export const handleCat: IveBotCommand = () => ({
     example: '/cat',
     argsRequired: false
   },
-  generator: async () => {
+  generator: () => async () => {
     try {
       // Fetch a cat and process it (this sounds funny to me idk why)
       const { file } = await (await fetch(`http://aws.random.cat/meow`)).json()
@@ -27,18 +27,18 @@ export const handleCat: IveBotCommand = () => ({
       return `Something went wrong 👾 Error: ${e}`
     }
   }
-})
+}
 
-export const handleRobohash: IveBotCommand = () => ({
+export const handleRobohash: Command = {
   name: 'robohash',
+  aliases: ['robo', 'rh'],
   opts: {
     description: 'Take some text, make it a robot/monster/head/cat.',
     fullDescription: 'Takes some text and hashes it in the form of an image :P',
     usage: '/robohash <cat/robot/monster/head> <text to hash>',
-    example: '/robohash cat voldemort#6931',
-    aliases: ['robo', 'rh']
+    example: '/robohash cat voldemort#6931'
   },
-  generator: (message, args) => {
+  generator: () => (message, args) => {
     // Get text to hash.
     const target = args.shift()
     const text = args.join('%20')
@@ -51,19 +51,19 @@ export const handleRobohash: IveBotCommand = () => ({
       return 'Proper usage: /robohash <robot, monster, head, cat> <text to robohash>'
     }
   }
-})
+}
 
-export const handleApod: IveBotCommand = (client) => ({
+export const handleApod: Command = {
   name: 'astronomy-picture-of-the-day',
+  aliases: ['apod'],
   opts: {
     description: 'The astronomy picture of the day.',
     fullDescription: 'The astronomy picture of the day. Truly beautiful. Usually.',
     usage: '/astronomy-picture-of-the-day (date)',
     example: '/astronomy-picture-of-the-day 2nd March 2017',
-    aliases: ['apod'],
     argsRequired: false
   },
-  generator: async (message, args) => {
+  generator: () => async (message, args) => {
     // Check for date.
     const date = moment(args.join(' '), [
       moment.ISO_8601, moment.RFC_2822, 'Do M YYYY', 'Do MM YYYY', 'Do MMM YYYY',
@@ -95,9 +95,9 @@ export const handleApod: IveBotCommand = (client) => ({
       }
     } catch (err) { return `Something went wrong 👾 Error: ${err}` }
   }
-})
+}
 
-export const handleDog: IveBotCommand = (client) => ({
+export const handleDog: Command = {
   name: 'dog',
   opts: {
     description: 'Random dog from <https://dog.ceo>',
@@ -106,7 +106,7 @@ export const handleDog: IveBotCommand = (client) => ({
     example: '/dog labrador',
     argsRequired: false
   },
-  generator: async (message, args) => {
+  generator: () => async (message, args) => {
     if (args.length) {
       // Fetch a picture.
       try {
@@ -122,19 +122,19 @@ export const handleDog: IveBotCommand = (client) => ({
       return message
     } catch (err) { return `Something went wrong 👾 Error: ${err}` }
   }
-})
+}
 
-export const handleUrban: IveBotCommand = () => ({
+export const handleUrban: Command = {
   name: 'urban',
+  aliases: ['urb'],
   opts: {
     description: 'Get an Urban Dictionary definition ;)',
     fullDescription: 'Get an Urban Dictionary definition ;)',
     usage: '/urban <term>',
     example: '/urban nub',
-    aliases: ['urb'],
     argsRequired: false // this is fun.
   },
-  generator: async (message, args) => {
+  generator: () => async (message, args) => {
     try {
       // Fetch the definition and parse it to JSON.
       const { list } = await (await fetch(
@@ -165,18 +165,18 @@ export const handleUrban: IveBotCommand = () => ({
       return `Something went wrong 👾 Error: ${e}`
     }
   }
-})
+}
 
-export const handleNamemc: IveBotCommand = (client) => ({
+export const handleNamemc: Command = {
   name: 'namemc',
+  aliases: ['nmc'],
   opts: {
     description: 'A Minecraft user\'s previous usernames and skin.',
     fullDescription: 'Displays previous usernames and skins of a Minecraft player.',
     usage: '/namemc <premium Minecraft username>',
-    example: '/namemc voldemort',
-    aliases: ['nmc']
+    example: '/namemc voldemort'
   },
-  generator: async (message, args) => {
+  generator: () => async (message, args) => {
     if (args.length > 1) return 'Minecraft users cannot have spaces in their name.'
     try {
       // Fetch the UUID and name of the user and parse it to JSON.
@@ -207,20 +207,20 @@ export const handleNamemc: IveBotCommand = (client) => ({
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
     } catch (e) { return `Enter a valid Minecraft username (account must be premium)` }
   }
-})
+}
 
 // Initialize cache.
 let currency: { timestamp: number, rates: { [index: string]: number } }
-export const handleCurrency: IveBotCommand = () => ({
+export const handleCurrency: Command = {
   name: 'currency',
+  aliases: ['cur'],
   opts: {
     description: 'Convert a currency from one currency to another.',
     fullDescription: 'Convert a currency from one currency to another.',
     usage: '/currency <currency symbol to convert from> <currency symbol to convert to> (amount, default: 1)',
-    aliases: ['cur'],
     example: '/currency EUR USD 40'
   },
-  generator: async (message, args) => {
+  generator: () => async (message, args) => {
     // Check cache if old, and refresh accordingly.
     if (!currency || Date.now() - currency.timestamp > 3600000) {
       currency = await ( // This just fetches the data and parses it to JSON.
@@ -243,7 +243,7 @@ export const handleCurrency: IveBotCommand = () => ({
     const roundedOffAmount = Math.ceil(convertedAmount * Math.pow(10, 4)) / Math.pow(10, 4)
     return `**${from}** ${args[2]} = **${to}** ${roundedOffAmount}`
   }
-})
+}
 
 // Our weather and define types.
 /* eslint-disable no-undef,no-use-before-define,camelcase */
@@ -266,16 +266,16 @@ type Categories = Array<{
     }>
   }>
 }> /* eslint-enable */
-export const handleWeather: IveBotCommand = () => ({
+export const handleWeather: Command = {
   name: 'weather',
+  aliases: ['wt'],
   opts: {
     description: 'It\'s really cloudy here..',
     fullDescription: 'What\'s the weather like at your place?',
     usage: '/weather <city name> (country code) (--fahrenheit or -f)',
-    example: '/weather Shanghai CN',
-    aliases: ['wt']
+    example: '/weather Shanghai CN'
   },
-  generator: async (message, args) => {
+  generator: () => async (message, args) => {
     const farhenheit = args.includes('--fahrenheit') || args.includes('-f')
     if (farhenheit) args.splice(args.includes('-f') ? args.indexOf('-f') : args.indexOf('--fahrenheit'), 1)
     // Get the response from our API.
@@ -336,18 +336,18 @@ ${weather.main.temp}${temp}/${weather.main.temp_max}${temp}/${weather.main.temp_
       }
     }
   }
-})
+}
 
-export const handleDefine: IveBotCommand = () => ({
+export const handleDefine: Command = {
   name: 'define',
+  aliases: ['def'],
   opts: {
     description: 'Define a word in the Oxford Dictionary.',
     fullDescription: 'Define a word in the Oxford Dictionary.',
     usage: '/define <term>',
-    example: '/define cyclone',
-    aliases: ['def']
+    example: '/define cyclone'
   },
-  generator: async (message, args) => {
+  generator: () => async (message, args) => {
     // Setup request to find word.
     const headers = { 'app_id': oxfordAPI.appId, 'app_key': oxfordAPI.appKey, Accept: 'application/json' }
     // Search for the word, destructure for results, and then pass them on to our second request.
@@ -387,11 +387,12 @@ export const handleDefine: IveBotCommand = () => ({
                 // Check if there is a definition.
                 if (!sense.short_definitions && !sense.definitions) return
                 // Then safely push the definition to the array.
+                const a = i + 1 // Index for the definition.
                 safePush({
                   name: sense.short_definitions
-                    ? (sense.registers ? `**${i + 1}.** (${sense.registers[0]}) ` : `**${i}.** `) +
+                    ? (sense.registers ? `**${a}.** (${sense.registers[0]}) ` : `**${a}.** `) +
                       sense.short_definitions[0]
-                    : (sense.registers ? `**${i + 1}.** (${sense.registers[0]}) ` : `**${i}.** `) +
+                    : (sense.registers ? `**${a}.** (${sense.registers[0]}) ` : `**${a}.** `) +
                       sense.definitions[0],
                   value: sense.examples && sense.examples[0].text
                     ? `e.g. ${sense.examples[0].text}` : 'No example is available.'
@@ -413,4 +414,4 @@ export const handleDefine: IveBotCommand = () => ({
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
     } catch (e) { return 'Did you enter a valid word? 👾' }
   }
-})
+}

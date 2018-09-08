@@ -1,22 +1,18 @@
 // Flow our types.
 /* eslint-disable no-undef */
-import { CommandGenerator, Client, Message, MessageContent, CommandGeneratorFunction } from 'eris'
-import IveBotCommandClient, { IveBotCommandOptions } from './CustomClient'
+import { Client, Message, MessageContent, CommandGeneratorFunction } from 'eris'
+import CommandParser from '../client'
 import { Db } from 'mongodb'
 
-// eslint-disable-next-line no-use-before-define
-export type IveBotCommand = (client: IveBotCommandClient, db?: DB, mongoDB?: Db) => {
-  generator: CommandGenerator,
-  opts: IveBotCommandOptions,
-  name: string
-}
 export type IveBotCommandGenerator = MessageContent|CommandGeneratorFunction|MessageContent[]
 export type Command = {
   // eslint-disable-next-line no-use-before-define
   opts: CommandOptions,
   aliases?: string[],
   name: string,
-  generator: (client: Client, db?: DB, mongoDB?: Db) => IveBotCommandGenerator,
+  generator: (
+    client: Client, db?: DB, mongoDB?: Db, commandParser?: CommandParser
+  ) => IveBotCommandGenerator,
   postGenerator?: (client: Client, db?: DB, mongoDB?: Db) => (
     message: Message, args: string[], sent?: Message
   ) => void
@@ -25,6 +21,7 @@ export type CommandOptions = {
   argsRequired?: boolean
   caseInsensitive?: boolean
   deleteCommand?: boolean
+  errorMessage?: string
   invalidUsageMessage?: string
   guildOnly?: boolean
   dmOnly?: boolean

@@ -1,18 +1,18 @@
-import { IveBotCommand } from '../../imports/types'
+import { Command } from '../../imports/types'
 import { checkRolePosition } from '../../imports/permissions'
 import { getInsult, getUser, getServerSettings } from '../../imports/tools'
 
-export const handleGiverole: IveBotCommand = (client, tempDB, db) => ({
+export const handleGiverole: Command = {
   name: 'giverole',
+  aliases: ['gr'],
   opts: {
     description: 'Give role to yourself/user.',
     fullDescription: 'Give role to yourself/user. Manager/Mod only unless Public Roles are on.',
     usage: '/giverole (user) <role>',
     example: '/giverole @voldemort#6931 Helper',
-    aliases: ['gr'],
     guildOnly: true
   },
-  generator: async (message, args) => {
+  generator: (client, tempDB, db) => async (message, args) => {
     // Check user for permissions.
     if (
       !message.member.permission.has('manageRoles') ||
@@ -50,19 +50,19 @@ export const handleGiverole: IveBotCommand = (client, tempDB, db) => ({
     return user.id === message.author.id // Ternary statement.
       ? `Gave you the role **${role.name}**.` : `Gave role **${role.name}** to ${user.mention}.`
   }
-})
+}
 
-export const handleTakerole: IveBotCommand = (client, tempDB, db) => ({
+export const handleTakerole: Command = {
   name: 'takerole',
+  aliases: ['tr'],
   opts: {
     description: 'Take role from yourself/user.',
     fullDescription: 'Take role from yourself/user. Manager/Mod only unless Public Roles are on.',
     usage: '/takerole (user) <role>',
     example: '/takerole @voldemort#6931 Helper',
-    guildOnly: true,
-    aliases: ['tr']
+    guildOnly: true
   },
-  generator: async (message, args) => {
+  generator: (client, tempDB, db) => async (message, args) => {
     // Check user for permissions.
     if (
       !message.member.permission.has('manageRoles') ||
@@ -100,4 +100,4 @@ export const handleTakerole: IveBotCommand = (client, tempDB, db) => ({
     return user.id === message.author.id // Ternary statement.
       ? `Took the role **${role.name}** from you.` : `Took role **${role.name}** from ${user.mention}.`
   }
-})
+}

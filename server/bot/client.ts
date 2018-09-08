@@ -1,8 +1,7 @@
 // eslint-disable-next-line standard/object-curly-even-spacing
-import { Message, MessageContent, CommandGeneratorFunction } from 'eris'
+import { Message, MessageContent, CommandGeneratorFunction, Client } from 'eris'
 import { DB, Command as IveBotCommand, IveBotCommandGenerator } from './imports/types'
 import { Db } from 'mongodb'
-import Client from './imports/CustomClient'
 import { getInsult } from './imports/tools'
 import botCallback from '.'
 
@@ -26,33 +25,35 @@ function isEquivalent (a: { [index: string]: boolean }, b: { [index: string]: bo
 }
 
 export class Command {
-  name: string // eslint-disable-next-line no-undef
-  aliases: string[] // eslint-disable-next-line no-undef
-  // eslint-disable-next-line no-undef
-  generator: (client: Client, db?: DB, mongoDB?: Db) => IveBotCommandGenerator
-  // eslint-disable-next-line no-undef
+  /* eslint-disable no-undef */
+  name: string
+  aliases: string[]
+  generator: (
+    client: Client, db?: DB, mongoDB?: Db, commandParser?: CommandParser
+  ) => IveBotCommandGenerator
   postGenerator?: (client: Client, db?: DB, mongoDB?: Db) => (
-    message: Message, args: string[], sent?: Message // eslint-disable-line no-undef
+    message: Message, args: string[], sent?: Message
   ) => void
-  argsRequired: boolean // eslint-disable-line no-undef
-  caseInsensitive: boolean // eslint-disable-line no-undef
-  deleteCommand: boolean // eslint-disable-line no-undef
-  guildOnly: boolean // eslint-disable-line no-undef
-  dmOnly: boolean // eslint-disable-line no-undef
-  description: string // eslint-disable-line no-undef
-  fullDescription: string // eslint-disable-line no-undef
-  usage: string // eslint-disable-line no-undef
-  example: string // eslint-disable-line no-undef
-  invalidUsageMessage: string // eslint-disable-line no-undef
-  hidden: boolean // eslint-disable-line no-undef
-  // eslint-disable-next-line no-undef
-  requirements: { // eslint-disable-next-line no-undef
-    userIDs?: string[] // eslint-disable-next-line no-undef
-    roleNames?: string[], // eslint-disable-next-line no-undef
-    custom?: (message: Message) => boolean, // eslint-disable-next-line no-undef
-    permissions?: {}, // eslint-disable-next-line no-undef
+  argsRequired: boolean
+  caseInsensitive: boolean
+  deleteCommand: boolean
+  guildOnly: boolean
+  dmOnly: boolean
+  description: string
+  fullDescription: string
+  usage: string
+  example: string
+  invalidUsageMessage: string
+  errorMessage: string
+  hidden: boolean
+  requirements: {
+    userIDs?: string[]
+    roleNames?: string[],
+    custom?: (message: Message) => boolean,
+    permissions?: {},
     roleIDs?: string[]
   }
+  /* eslint-enable no-undef */
 
   constructor (command: IveBotCommand) {
     // Key functions.
@@ -63,6 +64,7 @@ export class Command {
     // Options.
     this.argsRequired = command.opts.argsRequired === undefined || command.opts.argsRequired
     this.invalidUsageMessage = command.opts.invalidUsageMessage || 'Invalid usage.'
+    this.errorMessage = command.opts.errorMessage || 'IveBot has experienced an internal error.'
     // No impl for next.
     this.caseInsensitive = command.opts.caseInsensitive === undefined || command.opts.caseInsensitive
     this.deleteCommand = command.opts.deleteCommand
@@ -138,7 +140,7 @@ export default class CommandParser {
   async executeCommand (command: Command, message: Message) {
     // We give our generators what they need.
     const session = {
-      generator: command.generator(this.client, this.tempDB, this.db),
+      generator: command.generator(this.client, this.tempDB, this.db, this),
       postGenerator: command.postGenerator
         ? command.postGenerator(this.client, this.tempDB, this.db) : undefined
     }
@@ -184,7 +186,7 @@ export default class CommandParser {
         // Execute command.
         try {
           this.executeCommand(this.commands[keys[i]], message)
-        } catch (e) { message.channel.createMessage('IveBot has experienced an internal error.') }
+        } catch (e) { message.channel.createMessage(this.commands[keys[i]].errorMessage) }
         return
       } else if (
         this.commands[keys[i]].aliases && this.commands[keys[i]].aliases.includes(commandExec)

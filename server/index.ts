@@ -8,11 +8,11 @@ import { GraphQLServer } from 'graphql-yoga'
 // Import our resolvers.
 import resolvers from './resolvers'
 // Import types.
-import { DB, IveBotCommand, Command } from './bot/imports/types'
+import { DB, Command } from './bot/imports/types'
 /* SERVER CODE ENDS HERE */
 
 // Tokens and stuff.
-import CommandClient from './bot/imports/CustomClient'
+import { Client } from 'eris'
 import CommandParser from './bot/client'
 // Get MongoDB.
 import { MongoClient } from 'mongodb'
@@ -20,11 +20,9 @@ import { MongoClient } from 'mongodb'
 import { readdir, statSync } from 'fs'
 // Import the bot.
 import { guildMemberEditCallback } from './bot'
-// Import insults.
-import { getInsult } from './bot/imports/tools'
 // Get the token needed.
 import 'json5/lib/require'
-import { token, host, mongoURL } from '../config.json5'
+import { token, mongoURL } from '../config.json5'
 
 // If production is explicitly specified via flag..
 if (process.argv[2] === '--production') process.env.NODE_ENV = 'production'
@@ -33,22 +31,8 @@ const dev = process.env.NODE_ENV !== 'production'
 const port = parseInt(process.env.PORT, 10) || 3000 // If port variable has been set.
 
 // Create a client to connect to Discord API Gateway.
-const client = new CommandClient(token === 'dotenv' ? process.env.IVEBOT_TOKEN : token, {
+const client = new Client(token === 'dotenv' ? process.env.IVEBOT_TOKEN : token, {
   autoreconnect: true
-}, {
-  description: 'The bot that created the iPhone X.',
-  owner: host,
-  prefix: '/',
-  name: 'IveBot',
-  defaultHelpCommand: false,
-  defaultCommandOptions: {
-    argsRequired: true,
-    caseInsensitive: true,
-    errorMessage: 'IveBot experienced an internal error.',
-    permissionMessage: (
-      () => `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
-    )()
-  }
 })
 
 // Connect ASAP, hopefully before the server starts.
@@ -68,26 +52,6 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, {
   // client.on('messageCreate', botCallback(client, tempDB, db))
   const commandParser = new CommandParser(client, tempDB, db)
   client.on('messageCreate', commandParser.onMessage)
-  // Register all commands in bot/oldCommands onto the CommandClient.
-  readdir('./server/bot/oldCommands', (err, commandFiles) => {
-    // Handle any errors.
-    if (err) { console.error(err); throw new Error('Commands could not be retrieved.') }
-    // This only supports two levels of files, one including files inside commands, and one in..
-    // a subfolder.
-    commandFiles.forEach(commandFile => {
-      // If it's a file..
-      if (statSync('./server/bot/oldCommands/' + commandFile).isFile() && commandFile.endsWith('.ts')) {
-        const commands: { [index: string]: IveBotCommand } = require('./bot/oldCommands/' + commandFile)
-        // ..and there are commands..
-        if (!Object.keys(commands).length) return
-        // ..register the commands.
-        Object.keys(commands).forEach((commandName: string) => {
-          const command = commands[commandName](client, tempDB, db)
-          client.registerCommand(command.name, command.generator, command.opts)
-        })
-      }
-    })
-  })
   // Register all commands in bot/commands onto the CommandParser.
   readdir('./server/bot/commands', (err, commandFiles) => {
     // Handle any errors.

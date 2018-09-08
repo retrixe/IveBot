@@ -1,14 +1,13 @@
 // We need types.
 import { DB } from './imports/types'
-import { Member, Message } from 'eris'
-import CommandClient from './imports/CustomClient'
+import { Member, Message, Client } from 'eris'
 import { Db } from 'mongodb'
 
 // Database reading function.
 import { getServerSettings } from './imports/tools'
 
 // When client gains/loses a member, it will callback.
-export const guildMemberEditCallback = (client: CommandClient, event: string, db: Db) => async (
+export const guildMemberEditCallback = (client: Client, event: string, db: Db) => async (
   guild: { id: string }, member: Member
 ) => { // eslint-disable-line indent
   // WeChill specific configuration.
@@ -44,7 +43,7 @@ export const guildMemberEditCallback = (client: CommandClient, event: string, db
 }
 
 // When client recieves a message, it will callback.
-export default async (message: Message, client: CommandClient, tempDB: DB, db: Db) => {
+export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
   try {
     if ( // If there are no permissions do not do anything.
       !message.member.guild.channels.find(i => i.id === message.channel.id)
