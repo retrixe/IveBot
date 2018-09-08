@@ -1,19 +1,19 @@
 // All the types!
-import { IveBotCommand } from '../imports/types'
+import { Command } from '../imports/types'
 // All the tools!
 import { getIdFromMention } from '../imports/tools'
 
-export const handleGunfight: IveBotCommand = (client, db) => ({
+export const handleGunfight: Command = {
   name: 'gunfight',
+  aliases: ['gfi'],
   opts: {
-    aliases: ['gfi'],
     description: 'For that good ol\' fight bro.',
     fullDescription: 'Challenge someone to a gunfight showdown.',
     usage: '/gunfight <user>',
     example: '/gunfight @voldemort#6931',
     guildOnly: true
   },
-  generator: (message, args) => {
+  generator: (client, db) => (message, args) => {
     // Get challenged mention and ID.
     const challengedID = getIdFromMention(args[0])
     // Confirm an argument was passed including one mention.
@@ -60,9 +60,9 @@ export const handleGunfight: IveBotCommand = (client, db) => ({
       db.gunfight.splice(db.gunfight.indexOf(gunfightPushed), 1)
     }, 30000)
   }
-})
+}
 
-export const handleAccept: IveBotCommand = (client, db) => ({
+export const handleAccept: Command = {
   name: 'accept',
   opts: {
     description: 'For that good ol\' fight bro.',
@@ -73,7 +73,7 @@ export const handleAccept: IveBotCommand = (client, db) => ({
     hidden: true,
     argsRequired: false
   },
-  generator: (message) => {
+  generator: (client, db) => (message) => {
     // Find the gunfight, if exists.
     const gunfightToAccept = db.gunfight.find((gunfight) => (
       gunfight.challenged === message.author.id && !gunfight.accepted
@@ -105,4 +105,4 @@ export const handleAccept: IveBotCommand = (client, db) => ({
       Math.floor(Math.random() * 20000 + 1000)
     )
   }
-})
+}

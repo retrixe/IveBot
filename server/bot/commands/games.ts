@@ -1,4 +1,4 @@
-import { IveBotCommand } from '../imports/types'
+import { Command } from '../imports/types'
 import { getDesc } from '../imports/tools'
 import { eval as eva } from 'mathjs'
 
@@ -23,36 +23,36 @@ const characters = [ // TODO de adaugat u0e49
   '\u0356', '\u0359', '\u035a', '\u0323'
 ]
 
-export const handleChoose: IveBotCommand = (client) => ({
+export const handleChoose: Command = {
   name: 'choose',
+  aliases: ['cho'],
   opts: {
-    aliases: ['cho'],
     description: 'Choose between multiple options.',
     fullDescription: 'Choose between multiple options.',
     example: '/choose cake|ice cream|pasta',
     usage: '/choose <option 1>|(option 2)|(option 3)...'
   },
-  generator: (message) => {
+  generator: () => (message) => {
     // Is it used correctly?
     if (message.content.split('|').length === 1) return 'Correct usage: /choose item1|item2|...'
     const choices = getDesc(message).split('|')
     return `I choose: ${choices[Math.floor(Math.random() * choices.length)]}`
   }
-})
+}
 
-export const handleReverse: IveBotCommand = (client) => ({
+export const handleReverse: Command = {
   name: 'reverse',
+  aliases: ['rev'],
   opts: {
-    aliases: ['rev'],
     description: 'Reverse a sentence.',
     fullDescription: 'Reverse a sentence.',
     example: '/reverse hello',
     usage: '/reverse <text>'
   },
-  generator: (message) => getDesc(message).split('').reverse().join('')
-})
+  generator: () => (message) => getDesc(message).split('').reverse().join('')
+}
 
-export const handle8ball: IveBotCommand = (client) => ({
+export const handle8ball: Command = {
   name: '8ball',
   opts: {
     description: 'Random answers to random questions.',
@@ -61,7 +61,7 @@ export const handle8ball: IveBotCommand = (client) => ({
     example: '/8ball Will I flunk my exam?',
     invalidUsageMessage: 'Please ask the 8ball a question.'
   },
-  generator: (message) => {
+  generator: () => {
     // Possible responses, taken from Diary Of A Wimpy Kid: Hard Luck.
     const responses = [
       'It is certain.', 'It is decidedly so.', 'Better not tell you now.',
@@ -73,18 +73,18 @@ export const handle8ball: IveBotCommand = (client) => ({
     return `The 🎱 has spoken.
 8ball: ${responses[Math.floor(Math.random() * responses.length)]}`
   }
-})
+}
 
-export const handleZalgo: IveBotCommand = (client) => ({
+export const handleZalgo: Command = {
   name: 'zalgo',
+  aliases: ['zgo'],
   opts: {
-    aliases: ['zgo'],
     description: 'The zalgo demon\'s writing.',
     fullDescription: 'The zalgo demon\'s handwriting.',
     usage: '/zalgo <text>',
     example: '/zalgo sup'
   },
-  generator: (message, args) => {
+  generator: () => (message, args) => {
     let textToZalgo = args.join(' ').split('')
     let newMessage = ''
     textToZalgo.forEach(element => {
@@ -95,18 +95,18 @@ export const handleZalgo: IveBotCommand = (client) => ({
     })
     return newMessage.length >= 2000 ? args.join(' ') : newMessage
   }
-})
+}
 
-export const handleDezalgo: IveBotCommand = (client) => ({
+export const handleDezalgo: Command = {
   name: 'dezalgo',
+  aliases: ['dzgo'],
   opts: {
-    aliases: ['dzgo'],
     description: 'The zalgo demon\'s writing.',
     fullDescription: 'Read the zalgo demon\'s writing.',
     usage: '/dezalgo <text>',
     example: '/dezalgo ḥ̛̓e̖l̽͞҉lͦͅoͥ'
   },
-  generator: (message) => {
+  generator: () => (message) => {
     let textToZalgo = getDesc(message).split('')
     let newMessage = ''
     textToZalgo.forEach(element => {
@@ -114,18 +114,18 @@ export const handleDezalgo: IveBotCommand = (client) => ({
     })
     return newMessage
   }
-})
+}
 
-export const handleRepeat: IveBotCommand = (client) => ({
+export const handleRepeat: Command = {
   name: 'repeat',
+  aliases: ['rep'],
   opts: {
     description: 'Repeat a string.',
     fullDescription: 'Repeat a string.',
     usage: '/repeat <number of times> <string to repeat>',
-    aliases: ['rep'],
     example: '/repeat 10 a'
   },
-  generator: (message, args) => {
+  generator: () => (message, args) => {
     // All arguments.
     if (+args[1] * message.content.substring(8 + args[1].length + 1).length >= 2001) {
       return 'To prevent spam, your excessive message has not been repeated.'
@@ -139,18 +139,18 @@ export const handleRepeat: IveBotCommand = (client) => ({
     }
     return generatedMessage
   }
-})
+}
 
-export const handleRandom: IveBotCommand = (client) => ({
+export const handleRandom: Command = {
   name: 'random',
+  aliases: ['rand'],
   opts: {
     description: 'Return a random number.',
     fullDescription: 'Returns a random number, by default between 0 and 10.',
     usage: '/random (starting number) (ending number)',
-    aliases: ['rand'],
     example: '/random 1 69'
   },
-  generator: (message, args) => {
+  generator: () => (message, args) => {
     // If argument length is 1 and the argument is a number..
     if (args.length === 1 && !isNaN(+args[0])) {
       const number = +args[0]
@@ -165,23 +165,23 @@ export const handleRandom: IveBotCommand = (client) => ({
     }
     return `The number.. is.. ${Math.floor(Math.random() * 10)}`
   }
-})
+}
 
-export const handleCalculate: IveBotCommand = (client) => ({
+export const handleCalculate: Command = {
   name: 'calculate',
+  aliases: ['calc', 'cal'],
   opts: {
     description: 'Calculate an expression.',
     fullDescription: 'Calculate the value of an expression.',
     usage: '/calculate <expression>',
-    aliases: ['calc', 'cal'],
     example: '/calculate 2 + 2',
     invalidUsageMessage: 'Specify an expression >_<'
   },
-  generator: (message, args) => {
+  generator: () => (message, args) => {
     try {
       return `${eva(args.join(' ').split(',').join('.').split('÷').join('/'))}`
     } catch (e) {
       return 'Invalid expression >_<'
     }
   }
-})
+}

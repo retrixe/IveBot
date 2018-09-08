@@ -28,11 +28,12 @@ function isEquivalent (a: { [index: string]: boolean }, b: { [index: string]: bo
 export class Command {
   name: string // eslint-disable-next-line no-undef
   aliases: string[] // eslint-disable-next-line no-undef
-  generators: (client: Client, db?: DB, mongoDB?: Db) => ({ // eslint-disable-next-line no-undef
-    generator: IveBotCommandGenerator,
-    // eslint-disable-next-line no-undef
-    postGenerator?: (message: Message, args: string[], sent?: Message) => void
-  })
+  // eslint-disable-next-line no-undef
+  generator: (client: Client, db?: DB, mongoDB?: Db) => IveBotCommandGenerator
+  // eslint-disable-next-line no-undef
+  postGenerator?: (client: Client, db?: DB, mongoDB?: Db) => (
+    message: Message, args: string[], sent?: Message // eslint-disable-line no-undef
+  ) => void
   argsRequired: boolean // eslint-disable-line no-undef
   caseInsensitive: boolean // eslint-disable-line no-undef
   deleteCommand: boolean // eslint-disable-line no-undef
@@ -42,6 +43,7 @@ export class Command {
   fullDescription: string // eslint-disable-line no-undef
   usage: string // eslint-disable-line no-undef
   example: string // eslint-disable-line no-undef
+  invalidUsageMessage: string // eslint-disable-line no-undef
   hidden: boolean // eslint-disable-line no-undef
   // eslint-disable-next-line no-undef
   requirements: { // eslint-disable-next-line no-undef
@@ -56,9 +58,11 @@ export class Command {
     // Key functions.
     this.name = command.name
     this.aliases = command.aliases
-    this.generators = command.generators
+    this.generator = command.generator
+    this.postGenerator = command.postGenerator
     // Options.
     this.argsRequired = command.opts.argsRequired === undefined || command.opts.argsRequired
+    this.invalidUsageMessage = command.opts.invalidUsageMessage || 'Invalid usage.'
     // No impl for next.
     this.caseInsensitive = command.opts.caseInsensitive === undefined || command.opts.caseInsensitive
     this.deleteCommand = command.opts.deleteCommand
@@ -133,7 +137,11 @@ export default class CommandParser {
 
   async executeCommand (command: Command, message: Message) {
     // We give our generators what they need.
-    const session = command.generators(this.client, this.tempDB, this.db)
+    const session = {
+      generator: command.generator(this.client, this.tempDB, this.db),
+      postGenerator: command.postGenerator
+        ? command.postGenerator(this.client, this.tempDB, this.db) : undefined
+    }
     const args = message.content.split(' ')
     args.shift()
     // We check for requirements and arguments.
@@ -143,7 +151,7 @@ export default class CommandParser {
       )
       return
     } else if (args.length === 0 && command.argsRequired) {
-      message.channel.createMessage('Invalid usage.')
+      message.channel.createMessage(command.invalidUsageMessage)
       return
       // Guild and DM only.
     } else if (command.guildOnly && message.channel.type !== 0) return
@@ -162,7 +170,10 @@ export default class CommandParser {
   }
 
   onMessage (message: Message) {
-    if (!message.content.split(' ')[0].startsWith('/')) return // Don't process it if it's not a command.
+    if (!message.content.split(' ')[0].startsWith('/')) {
+      botCallback(message, this.client, this.tempDB, this.db)
+      return // Don't process it if it's not a command.
+    }
     const commandExec = message.content.split(' ')[0].substr(1).toLowerCase()
     // Webhook and bot protection.
     try { if (message.author.bot) return } catch (e) { return }

@@ -16,15 +16,16 @@ export type Command = {
   opts: CommandOptions,
   aliases?: string[],
   name: string,
-  generators: (client: Client, db?: DB, mongoDB?: Db) => ({
-    generator: IveBotCommandGenerator,
-    postGenerator?: (message: Message, args: string[], sent?: Message) => void
-  })
+  generator: (client: Client, db?: DB, mongoDB?: Db) => IveBotCommandGenerator,
+  postGenerator?: (client: Client, db?: DB, mongoDB?: Db) => (
+    message: Message, args: string[], sent?: Message
+  ) => void
 }
 export type CommandOptions = {
   argsRequired?: boolean
   caseInsensitive?: boolean
   deleteCommand?: boolean
+  invalidUsageMessage?: string
   guildOnly?: boolean
   dmOnly?: boolean
   description: string

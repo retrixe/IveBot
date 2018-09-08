@@ -45,16 +45,14 @@ export const guildMemberEditCallback = (client: CommandClient, event: string, db
 
 // When client recieves a message, it will callback.
 export default async (message: Message, client: CommandClient, tempDB: DB, db: Db) => {
-  // Disable bots and webhooks from being responded to.
-  try { if (message.author.bot) return } catch (e) { return }
   try {
-    if (
+    if ( // If there are no permissions do not do anything.
       !message.member.guild.channels.find(i => i.id === message.channel.id)
         .permissionsOf(client.user.id).has('sendMessages')
     ) return
   } catch (e) {}
   // Content of message and sendResponse.
-  const sendResponse = message.channel.createMessage
+  const sendResponse = (m: string) => client.createMessage(message.channel.id, m)
   const command = message.content.toLowerCase()
   // Help command.
   // Auto responses and easter eggs.
