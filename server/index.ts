@@ -8,17 +8,18 @@ import { GraphQLServer } from 'graphql-yoga'
 // Import our resolvers.
 import resolvers from './resolvers'
 // Import types.
-import { DB, IveBotCommand } from './bot/imports/types'
+import { DB, IveBotCommand, Command } from './bot/imports/types'
 /* SERVER CODE ENDS HERE */
 
 // Tokens and stuff.
 import CommandClient from './bot/imports/CustomClient'
+import CommandParser from './bot/client'
 // Get MongoDB.
-import { MongoClient, Db } from 'mongodb'
+import { MongoClient } from 'mongodb'
 // Import fs.
 import { readdir, statSync } from 'fs'
 // Import the bot.
-import botCallback, { guildMemberEditCallback } from './bot'
+import { guildMemberEditCallback } from './bot'
 // Import insults.
 import { getInsult } from './bot/imports/tools'
 // Get the token needed.
@@ -54,21 +55,20 @@ const client = new CommandClient(token === 'dotenv' ? process.env.IVEBOT_TOKEN :
 client.connect()
 
 // Create a MongoDB instance.
-let db: Db
 MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, {
   useNewUrlParser: true
 }, (err, mongoDB) => {
   if (err) throw new Error('Error:\n' + err)
   console.log('Bot connected successfully to MongoDB.')
-  db = mongoDB.db('ivebot')
+  const db = mongoDB.db('ivebot')
   // When a server loses a member, it will callback.
   client.on('guildMemberAdd', guildMemberEditCallback(client, 'guildMemberAdd', db))
   client.on('guildMemberRemove', guildMemberEditCallback(client, 'guildMemberRemove', db))
   // When a message is sent, the function should be called.
-  // This is here for temporary compatibility with older commands which have not been re-written.
-  // Avoid usage, submit PRs to bot/commands and not bot/index and bot/oldCommands.
-  client.on('messageCreate', botCallback(client, tempDB, db))
-  // Register all commands in bot/commands onto the CommandClient.
+  // client.on('messageCreate', botCallback(client, tempDB, db))
+  const commandParser = new CommandParser(client, tempDB, db)
+  client.on('messageCreate', commandParser.onMessage)
+  // Register all commands in bot/oldCommands onto the CommandClient.
   readdir('./server/bot/oldCommands', (err, commandFiles) => {
     // Handle any errors.
     if (err) { console.error(err); throw new Error('Commands could not be retrieved.') }
@@ -84,6 +84,26 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, {
         Object.keys(commands).forEach((commandName: string) => {
           const command = commands[commandName](client, tempDB, db)
           client.registerCommand(command.name, command.generator, command.opts)
+        })
+      }
+    })
+  })
+  // Register all commands in bot/commands onto the CommandParser.
+  readdir('./server/bot/commands', (err, commandFiles) => {
+    // Handle any errors.
+    if (err) { console.error(err); throw new Error('Commands could not be retrieved.') }
+    // This only supports two levels of files, one including files inside commands, and one in..
+    // a subfolder.
+    commandFiles.forEach(commandFile => {
+      // If it's a file..
+      if (statSync('./server/bot/commands/' + commandFile).isFile() && commandFile.endsWith('.ts')) {
+        const commands: { [index: string]: Command } = require('./bot/commands/' + commandFile)
+        // ..and there are commands..
+        if (!Object.keys(commands).length) return
+        // ..register the commands.
+        Object.keys(commands).forEach((commandName: string) => {
+          const command = commands[commandName]
+          commandParser.registerCommand(command)
         })
       }
     })

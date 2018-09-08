@@ -44,7 +44,7 @@ export const guildMemberEditCallback = (client: CommandClient, event: string, db
 }
 
 // When client recieves a message, it will callback.
-export default (client: CommandClient, tempDB: DB, db: Db) => async (message: Message) => {
+export default async (message: Message, client: CommandClient, tempDB: DB, db: Db) => {
   // Disable bots and webhooks from being responded to.
   try { if (message.author.bot) return } catch (e) { return }
   try {

@@ -14,26 +14,30 @@ export type IveBotCommandGenerator = MessageContent|CommandGeneratorFunction|Mes
 export type Command = {
   // eslint-disable-next-line no-use-before-define
   opts: CommandOptions,
-  aliases: string[],
+  aliases?: string[],
   name: string,
   generators: (client: Client, db?: DB, mongoDB?: Db) => ({
     generator: IveBotCommandGenerator,
-    postGenerator: (message: Message, args: string[], sent?: Message) => void
+    postGenerator?: (message: Message, args: string[], sent?: Message) => void
   })
 }
 export type CommandOptions = {
-  argsRequired: boolean
-  caseInsensitive: boolean
-  deleteCommand: boolean
-  guildOnly: boolean
-  dmOnly: boolean
+  argsRequired?: boolean
+  caseInsensitive?: boolean
+  deleteCommand?: boolean
+  guildOnly?: boolean
+  dmOnly?: boolean
   description: string
   fullDescription: string
   usage: string
   example: string
-  hidden: boolean
-  requirements: {
-    userIDs: string[], roleNames: string[], custom: Function, permissions: {}, roleIDs: string[]
+  hidden?: boolean
+  requirements?: {
+    userIDs?: string[],
+    roleNames?: string[],
+    custom?: (message: Message) => boolean,
+    permissions?: {},
+    roleIDs?: string[]
   }
 }
 
