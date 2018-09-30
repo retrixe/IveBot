@@ -1,11 +1,8 @@
 import * as React from 'react'
-import Typography from 'material-ui/Typography'
-import Button from 'material-ui/Button'
-import { LinearProgress } from 'material-ui/Progress'
-import Divider from 'material-ui/Divider'
-import Input, { InputLabel } from 'material-ui/Input'
-import { FormGroup, FormControlLabel, FormControl, FormHelperText } from 'material-ui/Form'
-import Switch from 'material-ui/Switch'
+import {
+  Typography, Button, LinearProgress, Divider, Input, InputLabel, FormGroup, FormControlLabel,
+  FormControl, FormHelperText, Switch
+} from '@material-ui/core'
 import { Mutation } from 'react-apollo'
 import { gql } from 'apollo-boost'
 // import TextField from 'material-ui/TextField'

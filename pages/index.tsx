@@ -1,9 +1,8 @@
 import * as React from 'react'
-import { AppBar, Toolbar, Button } from 'material-ui'
-import Dialog, { DialogTitle, DialogActions, DialogContent, DialogContentText } from 'material-ui/Dialog'
-import Typography from 'material-ui/Typography'
-import TextField from 'material-ui/TextField'
-import { LinearProgress } from 'material-ui/Progress'
+import {
+  AppBar, Toolbar, Button, DialogTitle, DialogActions, DialogContent, DialogContentText, Dialog,
+  Typography, TextField, LinearProgress
+} from '@material-ui/core'
 import Link from 'next/link'
 import ApolloClient, { gql } from 'apollo-boost'
 import { ApolloProvider, Query } from 'react-apollo'
