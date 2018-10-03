@@ -91,7 +91,7 @@ client.on('error', (err: string, id: string) => {
 })
 
 // Create a database to handle certain stuff.
-const tempDB: DB = {gunfight: [], say: {}, link: {}, leave: []}
+const tempDB: DB = { gunfight: [], say: {}, link: {}, leave: [] }
 
 /* SERVER CODE STARTS HERE */
 // Initialize Next.js app.
