@@ -25,7 +25,7 @@ import {
 } from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
 import {
-  handleKick, handleBan, handleUnban, handleMute, handleUnmute, handleWarn,
+  handleKick, handleBan, handleUnban, handleMute, handleUnmute, handleWarn, handleSlowmode,
   handleGiverole, handleTakerole, handleWarnings, handleClearwarns, handleRemovewarn, handlePurge
 } from './commands/admin'
 
@@ -243,6 +243,8 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
     '/unban': () => handleUnban(client, event, sendResponse, message),
     '/kick': () => handleKick(client, event, sendResponse, message),
     '/purge': () => handlePurge(client, event, sendResponse, message),
+    '/slowmode': () => handleSlowmode(client, event, sendResponse, message),
+    '/sm': () => handleSlowmode(client, event, sendResponse, message),
     '/mute': () => handleMute(client, event, sendResponse, message),
     '/unmute': () => handleUnmute(client, event, sendResponse, message),
     '/warn': () => handleWarn(client, event, sendResponse, message, db),

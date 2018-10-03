@@ -35,6 +35,25 @@ export function handlePurge (client: client, event: event, sendResponse: Functio
   })
 }
 
+// Slowmode!
+export function handleSlowmode (client: client, event: event, sendResponse: Function, message: string) {
+  // Check user for permissions.
+  const arg = getArguments(message)
+  if (!checkUserForPermission(client, event.d.author.id, client.channels[event.d.channel_id].guild_id, 'GENERAL_MANAGE_CHANNELS')) {
+    sendResponse('**Thankfully, you don\'t have enough permissions for that, you ungrateful bastard.**')
+    return
+  } else if (
+    (isNaN(+arg) && arg !== 'off') || !arg || +arg < 0 || +arg > 120
+  ) { sendResponse('Correct usage: /slowmode <number in seconds, max: 120 or off>'); return }
+  // Set slowmode.
+  client._req('patch', 'https://discordapp.com/api/channels/' + event.d.channel_id, {
+    rate_limit_per_user: isNaN(+arg) ? 0 : +arg
+  }, (err: boolean) => {
+    if (err) sendResponse('I cannot use slowmode >_<')
+    else sendResponse(`Successfully set slowmode to ${isNaN(+arg) || +arg === 0 ? 'off' : `${+arg} seconds`} 👌`)
+  })
+}
+
 // Kick!
 export function handleKick (client: client, event: event, sendResponse: Function, message: string) {
   // Check user for permissions.

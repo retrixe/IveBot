@@ -15,9 +15,17 @@
       "type": "node",
       "request": "launch",
       "name": "Next: Node",
-      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/nodemon",
       "runtimeArgs": [
-        "--inspect",
+        "--inspect", "-r", "ts-node/register", "${workspaceFolder}/server/index.ts"
+      ],
+      "port": 9229
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Next: Node (Integrated Terminal)",
+      "runtimeArgs": [
+        "--inspect", "-r", "ts-node/register", "${workspaceFolder}/server/index.ts"
       ],
       "port": 9229,
       "console": "integratedTerminal"

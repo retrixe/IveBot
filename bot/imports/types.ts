@@ -44,7 +44,8 @@ export type client = {
   editMessage: Function,
   getMessages: Function,
   simulateTyping: Function,
-  joinVoiceChannel: Function
+  joinVoiceChannel: Function,
+  _req: Function
 }
 export type event = {
   d: {
