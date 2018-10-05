@@ -12,6 +12,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/8ball\` - Random answers to random questions.
     \`/repeat\` - Repeat a string.
     \`/calculate\` - Calculate an expression.
+    \`/distort\` - Pretty distorted text.
 **Random searches.**
     \`/fifalist\` and \`/fifaboard\` - FIFA stats ⚽
     Shows list of FIFA matches and live stats of a match :O
@@ -134,6 +135,7 @@ const commandDocs: { [index: string]: any } = {
   'token': b('/token', 'Links your Discord to IveBot Web (use in DM only, or your account may be hacked)', '/token'),
   'leave': b('/leave', 'This kicks you from the server, essentially making you leave.', '/leave'),
   'namemc': b('/namemc <premium Minecraft username>', 'Displays previous usernames and skins of a Minecraft player.', '/namemc voldemort', '/nmc'),
+  'distort': b('/distort <text>', 'Pretty distorted text.', '/distort lol'),
   'calculate': b('/calculate <expression>', 'Calculate the value of an expression.', '/calculate 2 + 2', '/calc, /cal'),
   'fifaboard': b('/fifaboard <team 1>|<team 2> OR <match ID>', 'Stats board of a FIFA World Cup 2018 match.', '/fifaboard Russia|Saudi Arabia'),
   'fifalist': b('/fifalist (all|today)', 'List of FIFA World Cup 2018 matches. Shows today by default.', '/fifalist today')

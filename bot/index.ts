@@ -11,17 +11,12 @@ import {
   handleEdit, handleType, handleRemindme, handleChangeserverregion, handleLeave
 } from './commands/utilities'
 import {
-  handleChoose,
-  handleReverse,
-  handle8Ball,
-  handleRepeat, handleRandom,
-  handleZalgo, handleDezalgo, handleCalculate
+  handleChoose, handleReverse, handle8Ball, handleRepeat, handleRandom,
+  handleZalgo, handleDezalgo, handleCalculate, handleDistort
 } from './commands/games'
 import {
   handleUrban, handleCat, handleDog, handleRobohash, handleApod, handleWeather, handleNamemc,
-  handleCurrency,
-  handleDefine,
-  handleFifalist, handleFifaboard
+  handleCurrency, handleDefine, handleFifalist, handleFifaboard
 } from './commands/api'
 import { handleGunfight, handleAccept } from './commands/gunfight'
 import {
@@ -99,7 +94,9 @@ const appendableCommandMaps: { [index: string]: Function } = {
   '/cal': handleCalculate,
   // List available server regions.
   '/listserverregions': handleListserverregions,
-  '/lsr': handleListserverregions
+  '/lsr': handleListserverregions,
+  // Distort.
+  '/distort': handleDistort
 }
 
 // When client gains/loses a member, it will callback.
@@ -252,8 +249,11 @@ export default (client: client, tempDB: DB, onlineSince: number) => async (
     '/clearw': () => handleClearwarns(client, event, sendResponse, message, db),
     '/cw': () => handleClearwarns(client, event, sendResponse, message, db),
     '/removewarn': () => handleRemovewarn(client, event, sendResponse, message, db),
+    '/deletewarn': () => handleRemovewarn(client, event, sendResponse, message, db),
     '/removew': () => handleRemovewarn(client, event, sendResponse, message, db),
+    '/deletew': () => handleRemovewarn(client, event, sendResponse, message, db),
     '/rw': () => handleRemovewarn(client, event, sendResponse, message, db),
+    '/dw': () => handleRemovewarn(client, event, sendResponse, message, db),
     '/warnings': () => handleWarnings(client, event, sendResponse, message, db),
     '/warns': () => handleWarnings(client, event, sendResponse, message, db),
     // Version, about, ping, uptime, remoteexec for remote command line.

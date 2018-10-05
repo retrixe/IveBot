@@ -139,3 +139,13 @@ export function handleCalculate (message: string, sendResponse: Function) {
     sendResponse('Invalid expression >_<')
   }
 }
+
+export function handleDistort (message: string, sendResponse: Function) {
+  if (message.split(' ').length < 1) {
+    sendResponse('Provide text to distort >_<')
+    return
+  }
+  sendResponse(getArguments(message).split(' ').map(i => (
+    i.split('').join('*') + (i.length % 2 === 0 ? '*' : '')
+  )).join(' '))
+}
