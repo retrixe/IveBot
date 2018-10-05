@@ -148,7 +148,7 @@ export const handleClearwarns: Command = {
 
 export const handleRemovewarn: Command = {
   name: 'removewarn',
-  aliases: ['rw', 'removew'],
+  aliases: ['rw', 'removew', 'deletewarn', 'deletew', 'dw'],
   opts: {
     description: 'Remove a single warning from a person.',
     fullDescription: 'Remove a single warning from a person.',

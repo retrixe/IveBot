@@ -221,6 +221,10 @@ export const handleCurrency: Command = {
     example: '/currency EUR USD 40'
   },
   generator: () => async (message, args) => {
+    // For /currency list
+    if (args.length === 1 && args[0].toLowerCase() === 'list') {
+      return '**List of symbols:**\n' + Object.keys(currency.rates).toString().split(',').join(', ')
+    }
     // Check cache if old, and refresh accordingly.
     if (!currency || Date.now() - currency.timestamp > 3600000) {
       currency = await ( // This just fetches the data and parses it to JSON.
