@@ -39,7 +39,6 @@ export type CommandOptions = {
   }
 }
 
-export type FalseUser = { id: string, username: string, discriminator: string }
 export type DB = {
   gunfight: Array<{
     challenged: string,

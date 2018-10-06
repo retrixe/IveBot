@@ -32,7 +32,7 @@ const port = parseInt(process.env.PORT, 10) || 3000 // If port variable has been
 
 // Create a client to connect to Discord API Gateway.
 const client = new Client(token === 'dotenv' ? process.env.IVEBOT_TOKEN : token, {
-  autoreconnect: true
+  autoreconnect: true, restMode: true
 })
 
 // Connect ASAP, hopefully before the server starts.

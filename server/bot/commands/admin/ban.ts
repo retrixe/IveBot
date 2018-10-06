@@ -1,5 +1,5 @@
 import { User } from 'eris'
-import { Command, FalseUser } from '../../imports/types'
+import { Command } from '../../imports/types'
 import { checkRolePosition } from '../../imports/permissions'
 import { getInsult, getUser } from '../../imports/tools'
 
@@ -17,17 +17,18 @@ export const handleBan: Command = {
   generator: (client) => async (message, args) => {
     // Find the user ID.
     const userSpecified = args.shift()
-    let user: FalseUser|User = getUser(message, userSpecified)
+    let user: User = getUser(message, userSpecified)
     if (!user && client.users.find(i => i.username === userSpecified)) {
       user = client.users.find(i => i.username === userSpecified)
     } else if (!user && client.users.find(i => i.id === userSpecified)) {
       user = client.users.find(i => i.id === userSpecified)
-    } else if (!user && userSpecified.length === 18 && !isNaN(+userSpecified)) {
-      user = { id: userSpecified, username: 'Unknown', discriminator: 'user' }
+    } else if (!user && [18, 17].includes(userSpecified.length) && !isNaN(+userSpecified)) {
+      user = await client.getRESTUser(userSpecified)
     } else return 'I cannot find that user.'
-    if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
+    if (!user) return `Specify a valid user, ${getInsult()}.`
     // If the user cannot ban the person..
     if (
+      message.member.guild.members.find(i => i.user === user) &&
       checkRolePosition(message.member.guild.members.find(i => i.user === user)) >=
       checkRolePosition(message.member)
     ) {
@@ -37,10 +38,12 @@ export const handleBan: Command = {
     try {
       await client.banGuildMember(message.member.guild.id, user.id, 0, args.join(' '))
     } catch (e) { return 'That person could not be banned.' }
-    client.createMessage((await client.getDMChannel(user.id)).id, args.length !== 0
-      ? `You have been banned from ${message.member.guild.name} for ${args.join(' ')}.`
-      : `You have been banned from ${message.member.guild.name}.`
-    )
+    try {
+      await client.createMessage((await client.getDMChannel(user.id)).id, args.length !== 0
+        ? `You have been banned from ${message.member.guild.name} for ${args.join(' ')}.`
+        : `You have been banned from ${message.member.guild.name}.`
+      )
+    } catch (e) {}
     // WeChill
     if (message.member.guild.id === '402423671551164416') {
       client.createMessage('402437089557217290', args.length !== 0
@@ -70,7 +73,8 @@ export const handleUnban: Command = {
       user = client.users.find(i => i.username === userSpecified)
     } else if (client.users.find(i => i.id === userSpecified)) {
       user = client.users.find(i => i.id === userSpecified)
-    } else return 'I cannot find that user.'
+    } else user = await client.getRESTUser(userSpecified)
+    if (!user) return 'I cannot find that user.'
     // Now we unban the person.
     try {
       await client.unbanGuildMember(message.member.guild.id, user.id, args.join(' '))
