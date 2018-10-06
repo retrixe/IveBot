@@ -48,8 +48,8 @@ export function handleSlowmode (client: client, event: event, sendResponse: Func
   // Set slowmode.
   client._req('patch', 'https://discordapp.com/api/channels/' + event.d.channel_id, {
     rate_limit_per_user: isNaN(+arg) ? 0 : +arg
-  }, (err: boolean) => {
-    if (err) sendResponse('I cannot use slowmode >_<')
+  }, (err: boolean, res: { body: { code: number } }) => {
+    if (err || res.body.code === 50013) sendResponse('I cannot use slowmode >_<')
     else sendResponse(`Successfully set slowmode to ${isNaN(+arg) || +arg === 0 ? 'off' : `${+arg} seconds`} 👌`)
   })
 }
