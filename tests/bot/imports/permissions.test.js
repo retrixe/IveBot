@@ -39,5 +39,5 @@ test('checkRolePosition works as expected', t => {
   t.is(crp(client, '13579', '123456789'), 3)
   t.is(crp(client, '24681', '123456789'), 2)
   t.is(crp(client, '24680', '123456789'), 1)
-  t.is(crp(client, '12345', '123456789'), 1)
+  t.is(crp(client, '12345', '123456789'), 9999)
 })
