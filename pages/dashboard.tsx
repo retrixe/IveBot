@@ -32,6 +32,7 @@ query getAllCommonServers($token: String!) {
     return (
       <ApolloProvider client={client}>
       <>
+        <title>IveBot</title>
         {/* login dialog. */}
         <Dialog open={this.state.open} onClose={this.closeDialog}>
           <DialogTitle>Log In</DialogTitle>
