@@ -22,7 +22,7 @@
     "@material-ui/icons": "^3.0.1",
     "apollo-boost": "^0.1.4",
     "discord.io": "woor/discord.io#gateway_v6",
-    "graphql": "^0.13.2",
+    "graphql": "https://cdn.discordapp.com/attachments/415150079050252308/498798226166775818/graphql.tgz",
     "graphql-yoga": "^1.8.5",
     "isomorphic-unfetch": "^2.0.0",
     "json5": "^0.5.1",
