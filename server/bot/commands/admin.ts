@@ -4,7 +4,7 @@ import { checkRolePosition } from '../imports/permissions'
 import { Message } from 'eris'
 export { handleGiverole, handleTakerole } from './admin/roles'
 export { handleWarn, handleWarnings, handleClearwarns, handleRemovewarn } from './admin/warn'
-// export { handleMute, handleUnmute } from './admin/mute'
+export { handleMute, handleUnmute } from './admin/mute'
 export { handleBan, handleUnban } from './admin/ban'
 
 export const handlePurge: Command = {

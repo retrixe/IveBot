@@ -1,4 +1,3 @@
-// eslint-disable-next-line standard/object-curly-even-spacing
 import { Message, MessageContent, CommandGeneratorFunction, Client } from 'eris'
 import { DB, Command as IveBotCommand, IveBotCommandGenerator } from './imports/types'
 import { Db } from 'mongodb'
