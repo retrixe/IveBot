@@ -15,10 +15,10 @@ export const handleToken: Command = {
     example: '/token',
     argsRequired: false
   },
-  postGenerator: () => (a, b, sent) => {
+  postGenerator: (a, b, sent) => {
     setTimeout(() => { sent.delete() }, 30000)
   },
-  generator: (client, tempDB) => async (message) => {
+  generator: async (message, args, { tempDB, client }) => {
     let secureToken = randomBytes(3).toString('hex')
     tempDB.link[secureToken] = message.author.id
     // The DM part.
@@ -78,7 +78,7 @@ export const handleUptime: Command = {
     example: '/uptime',
     argsRequired: false
   },
-  generator: (client) => () => ms(client.uptime, { long: true })
+  generator: (message, args, { client }) => ms(client.uptime, { long: true })
 }
 
 export const handleRemoteexec: Command = {
@@ -92,7 +92,7 @@ export const handleRemoteexec: Command = {
       userIDs: [host]
     }
   },
-  generator: () => (message, args) => execSync(args.join(' '), { encoding: 'utf8' })
+  generator: (message, args) => execSync(args.join(' '), { encoding: 'utf8' })
 }
 
 export const handlePing: Command = {
@@ -104,8 +104,8 @@ export const handlePing: Command = {
     example: '/ping',
     argsRequired: false
   },
-  generator: () => 'Ping?',
-  postGenerator: () => (message, args, sent) => {
+  generator: 'Ping?',
+  postGenerator: (message, args, sent) => {
     const startTime = sent.timestamp
     // Latency (unrealistic, this can be negative or positive)
     const fl = startTime - new Date().getTime()

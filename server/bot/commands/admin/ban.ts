@@ -14,7 +14,7 @@ export const handleBan: Command = {
     requirements: { permissions: { 'banMembers': true } }
   },
   aliases: ['banana', 'nuke'],
-  generator: (client) => async (message, args) => {
+  generator: async (message, args, { client }) => {
     // Find the user ID.
     const userSpecified = args.shift()
     let user: User = getUser(message, userSpecified)
@@ -65,7 +65,7 @@ export const handleUnban: Command = {
     guildOnly: true,
     requirements: { permissions: { 'banMembers': true } }
   },
-  generator: (client) => async (message, args) => {
+  generator: async (message, args, { client }) => {
     // Find the user ID.
     const userSpecified = args.shift()
     let user: User

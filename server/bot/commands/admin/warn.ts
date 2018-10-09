@@ -14,7 +14,7 @@ export const handleWarn: Command = {
     guildOnly: true,
     requirements: { permissions: { 'manageMessages': true } }
   },
-  generator: ({ createMessage, getDMChannel }, tempDB, db) => async (message, args) => {
+  generator: async (message, args, { client, db }) => {
     // If improper arguments were provided, then we must inform the user.
     if (args.length < 2) return 'Correct usage: /warn <user> <reason>'
     // Now find the user ID.
@@ -36,12 +36,12 @@ export const handleWarn: Command = {
       serverID: message.member.guild.id,
       date: new Date().toUTCString()
     })
-    createMessage(
-      (await getDMChannel(user.id)).id,
+    client.createMessage(
+      (await client.getDMChannel(user.id)).id,
       `You have been warned in ${message.member.guild.name} for: ${args.join(' ')}.`
     )
     if (message.member.guild.id === '402423671551164416') {
-      createMessage('402435742925848578', {
+      client.createMessage('402435742925848578', {
         content: `**${user.username}#${user.discriminator}** has been warned:`,
         embed: {
           color: 0x00AE86,
@@ -74,7 +74,7 @@ export const handleWarnings: Command = {
       )
     }
   },
-  generator: (client, tempDB, db) => async (message, args) => {
+  generator: async (message, args, { client, db }) => {
     // If improper arguments were provided, then we must inform the user.
     if (args.length > 1) return 'Correct usage: /warnings (user by ID/username/mention)'
     // Now find the user ID.
@@ -122,7 +122,7 @@ export const handleClearwarns: Command = {
     example: '/clearwarns voldemort',
     requirements: { permissions: { 'manageMessages': true } }
   },
-  generator: ({ createMessage, getDMChannel }, tempDB, db) => async (message, args) => {
+  generator: async (message, args, { db }) => {
     // If improper arguments were provided, then we must inform the user.
     if (args.length !== 1) return 'Correct usage: /clearwarns <user>'
     // Now find the user ID.
@@ -157,7 +157,7 @@ export const handleRemovewarn: Command = {
     example: '/removewarn voldemort 5adf7a0e825aa7005a4e7be2',
     requirements: { permissions: { 'manageMessages': true } }
   },
-  generator: ({ createMessage, getDMChannel }, tempDB, db) => async (message, args) => {
+  generator: async (message, args, { db }) => {
     // If improper arguments were provided, then we must inform the user.
     if (args.length !== 2) return 'Correct usage: /removewarn <user> <warning ID>'
     // Now find the user ID.

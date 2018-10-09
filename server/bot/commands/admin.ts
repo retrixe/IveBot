@@ -24,7 +24,7 @@ export const handlePurge: Command = {
       )
     }
   },
-  generator: (client) => async (message, args) => {
+  generator: async (message, args, { client }) => {
     // Check if usage is correct.
     if (
       isNaN(+args[0]) || args.length !== 1 || +args[0] <= 0 || +args[0] > 100
@@ -52,7 +52,7 @@ export const handleKick: Command = {
     example: '/kick voldemort you is suck',
     requirements: { permissions: { 'kickMembers': true } }
   },
-  generator: (client) => async (message, args) => {
+  generator: async (message, args, { client }) => {
     // Find the user ID.
     let user = getUser(message, args.shift())
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`

@@ -17,7 +17,7 @@ export const handleCat: Command = {
     example: '/cat',
     argsRequired: false
   },
-  generator: () => async () => {
+  generator: async () => {
     try {
       // Fetch a cat and process it (this sounds funny to me idk why)
       const { file } = await (await fetch(`http://aws.random.cat/meow`)).json()
@@ -38,7 +38,7 @@ export const handleRobohash: Command = {
     usage: '/robohash <cat/robot/monster/head> <text to hash>',
     example: '/robohash cat voldemort#6931'
   },
-  generator: () => (message, args) => {
+  generator: (message, args) => {
     // Get text to hash.
     const target = args.shift()
     const text = args.join('%20')
@@ -63,7 +63,7 @@ export const handleApod: Command = {
     example: '/astronomy-picture-of-the-day 2nd March 2017',
     argsRequired: false
   },
-  generator: () => async (message, args) => {
+  generator: async (message, args) => {
     // Check for date.
     const date = moment(args.join(' '), [
       moment.ISO_8601, moment.RFC_2822, 'Do M YYYY', 'Do MM YYYY', 'Do MMM YYYY',
@@ -106,7 +106,7 @@ export const handleDog: Command = {
     example: '/dog labrador',
     argsRequired: false
   },
-  generator: () => async (message, args) => {
+  generator: async (message, args) => {
     if (args.length) {
       // Fetch a picture.
       try {
@@ -134,7 +134,7 @@ export const handleUrban: Command = {
     example: '/urban nub',
     argsRequired: false // this is fun.
   },
-  generator: () => async (message, args) => {
+  generator: async (message, args) => {
     try {
       // Fetch the definition and parse it to JSON.
       const { list } = await (await fetch(
@@ -176,7 +176,7 @@ export const handleNamemc: Command = {
     usage: '/namemc <premium Minecraft username>',
     example: '/namemc voldemort'
   },
-  generator: () => async (message, args) => {
+  generator: async (message, args) => {
     if (args.length > 1) return 'Minecraft users cannot have spaces in their name.'
     try {
       // Fetch the UUID and name of the user and parse it to JSON.
@@ -220,7 +220,7 @@ export const handleCurrency: Command = {
     usage: '/currency <currency symbol to convert from> <currency symbol to convert to> (amount, default: 1)',
     example: '/currency EUR USD 40'
   },
-  generator: () => async (message, args) => {
+  generator: async (message, args) => {
     // For /currency list
     if (args.length === 1 && args[0].toLowerCase() === 'list') {
       return '**List of symbols:**\n' + Object.keys(currency.rates).toString().split(',').join(', ')
@@ -279,7 +279,7 @@ export const handleWeather: Command = {
     usage: '/weather <city name> (country code) (--fahrenheit or -f)',
     example: '/weather Shanghai CN'
   },
-  generator: () => async (message, args) => {
+  generator: async (message, args) => {
     const farhenheit = args.includes('--fahrenheit') || args.includes('-f')
     if (farhenheit) args.splice(args.includes('-f') ? args.indexOf('-f') : args.indexOf('--fahrenheit'), 1)
     // Get the response from our API.
@@ -351,7 +351,7 @@ export const handleDefine: Command = {
     usage: '/define <term>',
     example: '/define cyclone'
   },
-  generator: () => async (message, args) => {
+  generator: async (message, args) => {
     // Setup request to find word.
     const headers = { 'app_id': oxfordAPI.appId, 'app_key': oxfordAPI.appKey, Accept: 'application/json' }
     // Search for the word, destructure for results, and then pass them on to our second request.

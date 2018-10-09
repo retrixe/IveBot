@@ -67,13 +67,10 @@ export const handleHelp: IveBotCommand = {
     usage: '/help (command name)',
     example: '/help zalgo'
   },
-  generator: (client, tempDB, db, { commands }) => async (message, args) => {
-    const aliasCheck = (
-      i: string
-    ) => (
-      commands[i].aliases && commands[i].aliases.includes(
-        args.join(' ').split('/').join('')
-      )
+  generator: async (message, args, { commandParser }) => {
+    const commands = commandParser.commands
+    const aliasCheck = (i: string) => (
+      commands[i].aliases && commands[i].aliases.includes(args.join(' ').split('/').join(''))
     )
     if (
       args.join(' ').split('/').join('') in commands

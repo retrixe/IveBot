@@ -13,7 +13,7 @@ export const handleGunfight: Command = {
     example: '/gunfight @voldemort#6931',
     guildOnly: true
   },
-  generator: (client, db) => (message, args) => {
+  generator: (message, args, { client, tempDB }) => {
     // Get challenged mention and ID.
     const challengedID = getIdFromMention(args[0])
     // Confirm an argument was passed including one mention.
@@ -32,10 +32,10 @@ export const handleGunfight: Command = {
 
     // Do not challenge someone already in a gunfight.
     // Possible gunfights.
-    const possibleGunfight = db.gunfight.find((gunfight) => gunfight.challenged === challengedID)
+    const possibleGunfight = tempDB.gunfight.find((gunfight) => gunfight.challenged === challengedID)
     if (possibleGunfight) return 'This user is already in a fight!'
     // Push to database.
-    db.gunfight.push({
+    tempDB.gunfight.push({
       accepted: false,
       challenged: challengedID,
       challenger: message.author.id,
@@ -48,7 +48,7 @@ export const handleGunfight: Command = {
     // The following will delete the gunfight if unaccepted within 30 seconds.
     setTimeout(() => {
       // Find the gunfight we pushed.
-      const gunfightPushed = db.gunfight.find((gunfight) => gunfight.challenged === challengedID)
+      const gunfightPushed = tempDB.gunfight.find((gunfight) => gunfight.challenged === challengedID)
       // Remove the object and send a response.
       if (!gunfightPushed.accepted) {
         const mention = message.author.mention
@@ -57,7 +57,7 @@ export const handleGunfight: Command = {
           `${mention}, your challenge to ${message.mentions[0].mention} has been cancelled.`
         )
       }
-      db.gunfight.splice(db.gunfight.indexOf(gunfightPushed), 1)
+      tempDB.gunfight.splice(tempDB.gunfight.indexOf(gunfightPushed), 1)
     }, 30000)
   }
 }
@@ -73,9 +73,9 @@ export const handleAccept: Command = {
     hidden: true,
     argsRequired: false
   },
-  generator: (client, db) => (message) => {
+  generator: (message, args, { client, tempDB }) => {
     // Find the gunfight, if exists.
-    const gunfightToAccept = db.gunfight.find((gunfight) => (
+    const gunfightToAccept = tempDB.gunfight.find((gunfight) => (
       gunfight.challenged === message.author.id && !gunfight.accepted
     ))
     if (gunfightToAccept === undefined) return // Insert checks.
@@ -84,23 +84,23 @@ export const handleAccept: Command = {
       return 'Please accept any challenges in the same channel.'
     }
     // Accept only if person is not in another gunfight.
-    if (db.gunfight.find((gunfight) => (
+    if (tempDB.gunfight.find((gunfight) => (
       gunfight.challenged === message.author.id
     )) !== gunfightToAccept) {
       return 'You are already in a gunfight!'
     }
     // Accept the challenge.
-    const indexOfGunfight = db.gunfight.indexOf(gunfightToAccept)
+    const indexOfGunfight = tempDB.gunfight.indexOf(gunfightToAccept)
     const words = ['fire', 'water', 'gun', 'dot']
-    db.gunfight[indexOfGunfight].accepted = true
-    db.gunfight[indexOfGunfight].randomWord = words[Math.floor(Math.random() * words.length)]
+    tempDB.gunfight[indexOfGunfight].accepted = true
+    tempDB.gunfight[indexOfGunfight].randomWord = words[Math.floor(Math.random() * words.length)]
     client.createMessage(
       message.channel.id, `Within 20 seconds, you will be asked to say a random word.`
     )
     // Let's wait for random amount under 20s and call a random word.
     setTimeout(
       () => client.createMessage(
-        message.channel.id, 'Say `' + db.gunfight[indexOfGunfight].randomWord + '`!'
+        message.channel.id, 'Say `' + tempDB.gunfight[indexOfGunfight].randomWord + '`!'
       ),
       Math.floor(Math.random() * 20000 + 1000)
     )

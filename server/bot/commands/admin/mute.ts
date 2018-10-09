@@ -14,7 +14,7 @@ export const handleMute: Command = {
     guildOnly: true,
     requirements: { permissions: { 'manageMessages': true } }
   },
-  generator: (client) => async (message, args) => {
+  generator: async (message, args, { client }) => {
     // Find the user ID.
     let user = getUser(message, args.shift())
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
@@ -140,7 +140,7 @@ export const handleUnmute: Command = {
     example: '/unmute voldemort wrong person',
     requirements: { permissions: { 'manageMessages': true } }
   },
-  generator: (client) => (message, args) => {
+  generator: (message, args, { client }) => {
     // Find the user ID.
     let user = getUser(message, args.shift())
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`

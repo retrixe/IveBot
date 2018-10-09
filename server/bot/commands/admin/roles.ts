@@ -12,7 +12,7 @@ export const handleGiverole: Command = {
     example: '/giverole @voldemort#6931 Helper',
     guildOnly: true
   },
-  generator: (client, tempDB, db) => async (message, args) => {
+  generator: async (message, args, { db, client }) => {
     // Check user for permissions.
     if (
       !message.member.permission.has('manageRoles') ||
@@ -62,7 +62,7 @@ export const handleTakerole: Command = {
     example: '/takerole @voldemort#6931 Helper',
     guildOnly: true
   },
-  generator: (client, tempDB, db) => async (message, args) => {
+  generator: async (message, args, { db, client }) => {
     // Check user for permissions.
     if (
       !message.member.permission.has('manageRoles') ||

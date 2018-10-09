@@ -17,7 +17,7 @@ export const handleRequest: Command = {
     usage: '/request <suggestion>',
     example: '/request a /userinfo command.'
   },
-  generator: (client) => async ({ author, content, channel }, args) => {
+  generator: async ({ author, content, channel }, args, { client }) => {
     client.createMessage(
       (await client.getDMChannel(host)).id,
       `${author.username}#${author.discriminator} with ID ${author.id}: ${args.join(' ')}`
@@ -39,16 +39,16 @@ export const handleSay: Command = {
     example: '/say #general heyo',
     deleteCommand: true
   },
-  postGenerator: (client, db) => (message, args, sent) => {
-    if (sent) db.say[sent.channel.id] = sent.id
+  postGenerator: (message, args, sent, { tempDB }) => {
+    if (sent) tempDB.say[sent.channel.id] = sent.id
   },
-  generator: (client, db) => async (message, args) => {
+  generator: async (message, args, { client, tempDB }) => {
     // Should it be sent in another channel?
     const possibleChannel = getIdFromMention(args[0])
     if (message.channelMentions[0] === possibleChannel) {
       args.shift()
       if (args.join(' ') === 'pls adim me') args = ['no']
-      db.say[message.channelMentions[0]] = (
+      tempDB.say[message.channelMentions[0]] = (
         await client.createMessage(message.channelMentions[0], args.join(' '))
       ).id
       return
@@ -69,10 +69,10 @@ export const handleType: Command = {
     example: '/type #general heyo',
     deleteCommand: true
   },
-  postGenerator: (client, db) => (message, args, sent) => {
-    if (sent) db.say[sent.channel.id] = sent.id
+  postGenerator: (message, args, sent, { tempDB }) => {
+    if (sent) tempDB.say[sent.channel.id] = sent.id
   },
-  generator: (client, db) => async (message, args) => {
+  generator: async (message, args, { tempDB, client }) => {
     // Should it be sent in another channel?
     const possibleChannel = getIdFromMention(args[0])
     if (message.channelMentions[0] === possibleChannel) {
@@ -82,7 +82,7 @@ export const handleType: Command = {
       await (ms => new Promise(resolve => setTimeout(resolve, ms)))(
         args.join(' ').length * 120 > 8000 ? 8000 : args.join(' ').length * 120
       )
-      db.say[message.channelMentions[0]] = (
+      tempDB.say[message.channelMentions[0]] = (
         await client.createMessage(message.channelMentions[0], args.join(' '))
       ).id
       return
@@ -106,7 +106,7 @@ export const handleRemindme: Command = {
     usage: '/remindme <time in 1d|1h|1m|1s> <description>',
     example: '/remindme 1h do your homework'
   },
-  generator: () => (message, args) => {
+  generator: (message, args) => {
     if (args.length < 2 || !ms(args[0])) {
       return 'Correct usage: /remindme <time in 1d|1h|1m|1s> <description>'
     }
@@ -129,7 +129,7 @@ export const handleAvatar: Command = {
     example: '/avatar @voldemort#6931',
     argsRequired: false
   },
-  generator: () => (message, args) => {
+  generator: (message, args) => {
     let user: Message['author'] = message.author
     if (message.mentions.length !== 0) user = message.mentions[0]
     return 'Link: ' + user.avatarURL.split('128').join('') + '2048'
@@ -147,21 +147,21 @@ export const handleLeave: Command = {
     argsRequired: false
   },
   name: 'leave',
-  generator: (client, db) => (message) => {
-    if (!db.leave.includes(message.author.id)) {
+  generator: (message, args, { tempDB, client }) => {
+    if (!tempDB.leave.includes(message.author.id)) {
       client.createMessage(
         message.channel.id,
         'Are you sure you want to leave the server? ' +
         'You will require an invite link to join back. Type /leave to confirm.'
       )
-      db.leave.push(message.author.id)
+      tempDB.leave.push(message.author.id)
       setTimeout(() => {
-        if (db.leave.findIndex(i => i === message.author.id) === -1) return
+        if (tempDB.leave.findIndex(i => i === message.author.id) === -1) return
         client.createMessage(message.channel.id, 'Your leave request has timed out.')
-        db.leave.splice(db.leave.findIndex(i => i === message.author.id), 1)
+        tempDB.leave.splice(tempDB.leave.findIndex(i => i === message.author.id), 1)
       }, 30000)
-    } else if (db.leave.includes(message.author.id)) {
-      db.leave.splice(db.leave.findIndex(i => i === message.author.id), 1)
+    } else if (tempDB.leave.includes(message.author.id)) {
+      tempDB.leave.splice(tempDB.leave.findIndex(i => i === message.author.id), 1)
       try {
         client.kickGuildMember(message.member.guild.id, message.author.id, 'Used /leave.')
       } catch (e) {
@@ -183,7 +183,7 @@ export const handleListserverregions: Command = ({
     guildOnly: true,
     argsRequired: false
   },
-  generator: (client) => async (message) => 'Available server regions: `' + (
+  generator: async (message, args, { client }) => 'Available server regions: `' + (
     await client.getVoiceRegions(message.member.guild.id)
   ).map((value) => value.id).join('`, `') + '`'
 })
@@ -202,7 +202,7 @@ export const handleChangeserverregion: Command = {
     },
     invalidUsageMessage: 'Correct usage: /changeserverregion <valid server region, /listserverregion>'
   },
-  generator: (client) => async (message, args) => {
+  generator: async (message, args, { client }) => {
     if (!message.member.guild.members.find(a => a.id === client.user.id).permission.has('manageGuild')) {
       return 'I require the Manage Server permission to do that..'
     }
@@ -226,7 +226,7 @@ export const handleEdit: Command = {
     example: '/edit #general 123456789012345678 hi',
     deleteCommand: true
   },
-  generator: (client) => async (message, args) => {
+  generator: async (message, args, { client }) => {
     // Should it be edited in another channel?
     const possibleChannel = getIdFromMention(args[0])
     if (message.channelMentions[0] === possibleChannel) {
@@ -256,20 +256,20 @@ export const handleEditLastSay: Command = {
     example: '/editLastSay #general hey',
     deleteCommand: true
   },
-  generator: (client, db) => async (message, args) => {
+  generator: async (message, args, { tempDB, client }) => {
     // Is the edit for another channel?
     const possibleChannel = getIdFromMention(args[0])
     if (message.channelMentions[0] === possibleChannel) {
       // Edit the message.
       try {
         args.shift()
-        client.editMessage(possibleChannel, db.say[possibleChannel], args.join(' '))
+        client.editMessage(possibleChannel, tempDB.say[possibleChannel], args.join(' '))
       } catch (e) { return 'Nothing to edit.' }
       return
     }
     // Edit the message.
     try {
-      client.editMessage(message.channel.id, db.say[message.channel.id], args.join(' '))
+      client.editMessage(message.channel.id, tempDB.say[message.channel.id], args.join(' '))
     } catch (e) { return 'Nothing to edit.' }
   }
 }

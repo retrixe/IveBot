@@ -32,7 +32,7 @@ export const handleChoose: Command = {
     example: '/choose cake|ice cream|pasta',
     usage: '/choose <option 1>|(option 2)|(option 3)...'
   },
-  generator: () => (message) => {
+  generator: (message) => {
     // Is it used correctly?
     if (message.content.split('|').length === 1) return 'Correct usage: /choose item1|item2|...'
     const choices = getDesc(message).split('|')
@@ -49,7 +49,7 @@ export const handleReverse: Command = {
     example: '/reverse hello',
     usage: '/reverse <text>'
   },
-  generator: () => (message) => getDesc(message).split('').reverse().join('')
+  generator: (message) => getDesc(message).split('').reverse().join('')
 }
 
 export const handle8ball: Command = {
@@ -84,7 +84,7 @@ export const handleZalgo: Command = {
     usage: '/zalgo <text>',
     example: '/zalgo sup'
   },
-  generator: () => (message, args) => {
+  generator: (message, args) => {
     let textToZalgo = args.join(' ').split('')
     let newMessage = ''
     textToZalgo.forEach(element => {
@@ -106,7 +106,7 @@ export const handleDezalgo: Command = {
     usage: '/dezalgo <text>',
     example: '/dezalgo ḥ̛̓e̖l̽͞҉lͦͅoͥ'
   },
-  generator: () => (message) => {
+  generator: (message) => {
     let textToZalgo = getDesc(message).split('')
     let newMessage = ''
     textToZalgo.forEach(element => {
@@ -125,7 +125,7 @@ export const handleRepeat: Command = {
     usage: '/repeat <number of times> <string to repeat>',
     example: '/repeat 10 a'
   },
-  generator: () => (message, args) => {
+  generator: (message, args) => {
     // All arguments.
     if (+args[1] * message.content.substring(8 + args[1].length + 1).length >= 2001) {
       return 'To prevent spam, your excessive message has not been repeated.'
@@ -150,7 +150,7 @@ export const handleRandom: Command = {
     usage: '/random (starting number) (ending number)',
     example: '/random 1 69'
   },
-  generator: () => (message, args) => {
+  generator: (message, args) => {
     // If argument length is 1 and the argument is a number..
     if (args.length === 1 && !isNaN(+args[0])) {
       const number = +args[0]
@@ -177,7 +177,7 @@ export const handleCalculate: Command = {
     example: '/calculate 2 + 2',
     invalidUsageMessage: 'Specify an expression >_<'
   },
-  generator: () => (message, args) => {
+  generator: (message, args) => {
     try {
       return `${eva(args.join(' ').split(',').join('.').split('÷').join('/'))}`
     } catch (e) {

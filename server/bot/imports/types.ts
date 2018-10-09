@@ -1,21 +1,42 @@
 // Flow our types.
 /* eslint-disable no-undef */
-import { Client, Message, MessageContent, CommandGeneratorFunction } from 'eris'
+import { Client, Message, MessageContent, EmbedOptions } from 'eris'
 import CommandParser from '../client'
 import { Db } from 'mongodb'
 
-export type IveBotCommandGenerator = MessageContent|CommandGeneratorFunction|MessageContent[]
+export type DB = {
+  gunfight: Array<{
+    challenged: string,
+    challenger: string,
+    accepted: boolean,
+    randomWord: string,
+    channelID: string
+  }>,
+  say: {
+    // Channels.
+    [index: string]: string
+  },
+  link: {
+    [index: string]: string
+  },
+  leave: Array<string>
+}
+
+export type Context = { tempDB: DB, db: Db, commandParser: CommandParser, client: Client }
+export type IveBotCommandGeneratorFunction = (msg: Message, args: string[], ctx: Context) => string | void | {
+    content?: string;
+    tts?: boolean;
+    disableEveryone?: boolean;
+    embed?: EmbedOptions;
+} | Promise<MessageContent> | Promise<void>
+export type IveBotCommandGenerator = IveBotCommandGeneratorFunction|MessageContent
 export type Command = {
   // eslint-disable-next-line no-use-before-define
   opts: CommandOptions,
   aliases?: string[],
   name: string,
-  generator: (
-    client: Client, db?: DB, mongoDB?: Db, commandParser?: CommandParser
-  ) => IveBotCommandGenerator,
-  postGenerator?: (client: Client, db?: DB, mongoDB?: Db) => (
-    message: Message, args: string[], sent?: Message
-  ) => void
+  generator: IveBotCommandGenerator,
+  postGenerator?: (message: Message, args: string[], sent?: Message, ctx?: Context) => void
 }
 export type CommandOptions = {
   argsRequired?: boolean
@@ -37,23 +58,5 @@ export type CommandOptions = {
     permissions?: {},
     roleIDs?: string[]
   }
-}
-
-export type DB = {
-  gunfight: Array<{
-    challenged: string,
-    challenger: string,
-    accepted: boolean,
-    randomWord: string,
-    channelID: string
-  }>,
-  say: {
-    // Channels.
-    [index: string]: string
-  },
-  link: {
-    [index: string]: string
-  },
-  leave: Array<string>
 }
 /* eslint-enable no-undef */
