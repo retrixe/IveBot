@@ -116,3 +116,30 @@ export const handlePing: Command = {
     sent.edit(`Aha! IveBot ${version} is connected to your server with a ${e}`)
   }
 }
+
+export const handleEval: Command = {
+  name: 'eval',
+  opts: {
+    description: 'Runs JavaScript. Owner only.',
+    fullDescription: 'Runs JavaScript. Owner only.',
+    usage: '/eval <code in codeblock or not>',
+    example: '/eval ```js\nconsole.log(\'ji\')\n```',
+    requirements: { userIDs: [host] }
+  },
+  generator: async (message, args, context) => {
+    try {
+      let toEval = args.join(' ')
+      if (toEval.startsWith('```js')) toEval = toEval.substring(5)
+      if (toEval.endsWith('```')) toEval = toEval.substring(0, toEval.length - 3)
+      // eslint-disable-next-line no-eval
+      const res = eval(toEval.split('```').join(''))
+      message.addReaction('✅')
+      return res || undefined
+    } catch (e) {
+      const channel = await context.client.getDMChannel(host)
+      message.addReaction('❌')
+      channel.createMessage(`**Error:**
+${e}`)
+    }
+  }
+}

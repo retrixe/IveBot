@@ -96,7 +96,15 @@ export class Command {
   }
 
   async execute (context: Context, message: Message, args: string[]) { // eslint-disable-line indent
-    if (!this.requirementsCheck(message)) {
+    // We check for arguments.
+    if (args.length === 0 && this.argsRequired) {
+      message.channel.createMessage(this.invalidUsageMessage)
+      return
+      // Guild and DM only.
+    } else if (this.guildOnly && message.channel.type !== 0) return
+    else if (this.dmOnly && message.channel.type !== 1) return
+    // Check for permissions.
+    else if (!this.requirementsCheck(message)) {
       message.channel.createMessage(
         `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
       )
@@ -137,13 +145,6 @@ export default class CommandParser {
     }
     const args = message.content.split(' ')
     args.shift()
-    // We check for arguments.
-    if (args.length === 0 && command.argsRequired) {
-      message.channel.createMessage(command.invalidUsageMessage)
-      return
-      // Guild and DM only.
-    } else if (command.guildOnly && message.channel.type !== 0) return
-    else if (command.dmOnly && message.channel.type !== 1) return
     // We get the exact content to send.
     const messageToSend = await command.execute(context, message, args)
     // We define a sent variable to keep track.
