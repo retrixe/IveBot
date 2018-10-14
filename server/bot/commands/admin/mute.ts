@@ -6,6 +6,7 @@ import * as ms from 'ms'
 
 export const handleMute: Command = {
   name: 'mute',
+  aliases: ['shutup'],
   opts: {
     description: 'Mute someone.',
     fullDescription: 'Mute someone. Compatible with Dyno.',

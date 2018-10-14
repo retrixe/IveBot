@@ -155,7 +155,9 @@ export default class CommandParser {
         .permissionsOf(this.client.user.id).has('sendMessages')
     ) sent = await message.channel.createMessage(messageToSend)
     if (command.postGenerator) command.postGenerator(message, args, sent, context)
-    if (command.deleteCommand) message.delete('Automatically deleted by IveBot.')
+    try {
+      if (command.deleteCommand) message.delete('Automatically deleted by IveBot.')
+    } catch (e) {}
   }
 
   onMessage (message: Message) {

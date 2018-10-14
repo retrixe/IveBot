@@ -66,6 +66,7 @@ export const handleWarnings: Command = {
     usage: '/warnings (user by ID/username/mention)',
     example: '/warnings voldemort',
     guildOnly: true,
+    argsRequired: false,
     requirements: {
       permissions: { 'manageMessages': true },
       custom: (message) => (
@@ -80,7 +81,7 @@ export const handleWarnings: Command = {
     // Now find the user ID.
     let user = getUser(message, args[0])
     if (!user && args.length) return `Specify a valid member of this guild, ${getInsult()}.`
-    else user = message.author
+    else if (!user) user = message.author
     // Get a list of warnings.
     const warns = await db.collection('warnings').find({
       warnedID: user.id, serverID: message.member.guild.id

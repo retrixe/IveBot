@@ -77,7 +77,7 @@ export const handleToken: Command = {
     argsRequired: false
   },
   postGenerator: (a, b, sent) => {
-    setTimeout(() => { sent.delete() }, 30000)
+    setTimeout(() => { try { sent.delete() } catch (e) {} }, 30000)
   },
   generator: async (message, args, { tempDB, client }) => {
     let secureToken = randomBytes(3).toString('hex')
