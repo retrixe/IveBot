@@ -29,6 +29,12 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
       let {
         addRoleForAll, joinLeaveMessages, joinAutorole
       } = await getServerSettings(db, serverId)
+      joinLeaveMessages = joinLeaveMessages || {}
+      joinLeaveMessages = {
+        channelName: joinLeaveMessages.channelName || '',
+        joinMessage: joinLeaveMessages.joinMessage || '',
+        leaveMessage: joinLeaveMessages.leaveMessage || ''
+      }
       if (
         member.permission.has('manageGuild') || host === ctx.tempDB.link[linkToken]
       ) return { serverId, addRoleForAll, joinLeaveMessages, joinAutorole }
@@ -59,10 +65,12 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
   Mutation: {
     editServerSettings: async (
       _: string, { input }: { input: { // eslint-disable-next-line indent
-        serverId: string, linkToken: string, addRoleForAll: string, joinAutorole: string
+        serverId: string, linkToken: string, addRoleForAll: string, joinAutorole: string,
+      // eslint-disable-next-line indent
+        joinLeaveMessages: { channelName: string, joinMessage: string, leaveMessage: string }
       } }
     ) => {
-      const { serverId, linkToken, addRoleForAll, joinAutorole } = input
+      const { serverId, linkToken, addRoleForAll, joinAutorole, joinLeaveMessages } = input
       const member = ctx.client.guilds
         .find(t => t.id === serverId).members.find(t => t.id === ctx.tempDB.link[linkToken])
       if (
@@ -72,7 +80,10 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
         await db.collection('servers').updateOne({ serverID: serverId }, { $set: {
           /* eslint-disable no-unneeded-ternary */
           addRoleForAll: addRoleForAll ? addRoleForAll : undefined,
-          joinAutorole: joinAutorole ? joinAutorole : undefined
+          joinAutorole: joinAutorole ? joinAutorole : undefined,
+          joinLeaveMessages: {
+            channelName: null, joinMessage: null, leaveMessage: null, ...joinLeaveMessages
+          }
           /* eslint-enable no-unneeded-ternary */
         } })
         return getServerSettings(db, serverId)

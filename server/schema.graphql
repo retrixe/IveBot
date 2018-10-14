@@ -1,3 +1,13 @@
+# Joining and leaving servers.
+type JoinLeaveMessages {
+  # Name of channel.
+  channelName: String
+  # What to post when joining.
+  joinMessage: String
+  # What to post when leaving.
+  leaveMessage: String
+}
+
 # Server specific settings.
 type ServerSetting {
   # Server ID.
@@ -5,7 +15,7 @@ type ServerSetting {
   # If add role is enabled for everyone.
   addRoleForAll: Boolean
   # If join/leave messages are enabled, and if so, what message and channel.
-  joinLeaveMessages: [String]
+  joinLeaveMessages: JoinLeaveMessages
   # If join autorole is enabled, and if so, what role.
   joinAutorole: String
 }
@@ -32,6 +42,16 @@ type Query {
   getBotId: String!
 }
 
+# Input for modifying join/leave messages.
+input JoinLeaveMessagesInput {
+  # Name of channel.
+  channelName: String!
+  # What to post when joining.
+  joinMessage: String
+  # What to post when leaving.
+  leaveMessage: String
+}
+
 # Input for editServerSettings mutation.
 input EditServerSettingsInput {
   # Server ID of the server.
@@ -42,6 +62,8 @@ input EditServerSettingsInput {
   addRoleForAll: Boolean
   # Edit join autorole through this setting.
   joinAutorole: String
+  # Edit join leave messages through this setting.
+  joinLeaveMessages: JoinLeaveMessagesInput
 }
 
 # Enable mutations.

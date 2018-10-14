@@ -30,6 +30,11 @@ query getServerSettings($server: String!, $token: String!) {
   serverSettings(serverId: $server, linkToken: $token) {
     addRoleForAll
     joinAutorole
+    joinLeaveMessages {
+      channelName
+      joinMessage
+      leaveMessage
+    }
   }
 }
     `

@@ -53,7 +53,6 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
   // Content of message and sendResponse.
   const sendResponse = (m: string) => client.createMessage(message.channel.id, m)
   const command = message.content.toLowerCase()
-  // Help command.
   // Auto responses and easter eggs.
   if (command.startsWith('is dot a good boy')) sendResponse('Shame on you. He\'s undefined.')
   else if (command.startsWith('iphone x')) sendResponse(`You don't deserve it. 😎`)

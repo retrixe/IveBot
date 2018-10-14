@@ -56,7 +56,7 @@
     "tap-nyan": "^1.1.0",
     "ts-node": "6.2.0",
     "typescript": "^3.0.1",
-    "typescript-eslint-parser": "^19.0.2"
+    "typescript-eslint-parser": "^20.0.0"
   },
   "husky": {
     "hooks": {
