@@ -29,6 +29,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/remindme\` - Reminders.
     \`/leave\` - Makes you leave the server.
     \`/avatar\` - Avatar of a user.
+    \`/userinfo\` - User info.
     \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
     \`/giverole\` and \`/takerole\` - Edit roles.
 **Administrative commands.**

@@ -4,7 +4,68 @@ import * as ms from 'ms'
 import { version } from '../../../package.json'
 import { execSync } from 'child_process'
 import 'json5/lib/require'
+import * as moment from 'moment'
 import { host } from '../../../config.json5'
+import { getUser, getInsult } from '../imports/tools'
+
+export const handleUserinfo: Command = {
+  name: 'userinfo',
+  aliases: ['useri', 'uinfo', 'ui'],
+  opts: {
+    description: 'Displays info on a particular user.',
+    fullDescription: 'Displays info on a particular user.',
+    example: '/userinfo voldemort#6931',
+    usage: '/userinfo <user by ID/mention/username>',
+    argsRequired: false
+  },
+  generator: async (message, args, { client }) => {
+    // Find the user ID.
+    const toGet = args.length === 0 ? message.author.id : args.shift()
+    let user = getUser(message, toGet)
+    if (!user && message.author.id === host && [18, 17].includes(toGet.length) && !isNaN(+toGet)) {
+      try { user = await client.getRESTUser(toGet) } catch (e) {}
+    }
+    if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
+    // Display information.
+    const member = message.member.guild.members.find(i => i.user.id === user.id)
+    const color = member
+      ? member.roles.map(i => member.guild.roles.get(i)).sort(
+        (a, b) => a.position > b.position ? 0 : 1
+      ).shift().color : 0
+    return {
+      content: `👥 **Userinfo on ${user.username}:**`,
+      embed: {
+        author: { name: `User info`, icon_url: user.avatarURL },
+        title: `${user.username}#${user.discriminator}`,
+        description: user.mention,
+        thumbnail: { url: user.avatarURL },
+        color,
+        fields: [
+          { name: 'Status', value: member ? member.status : 'N/A', inline: true },
+          // { name: 'Join Position }
+          // { name: 'Name', value: user.username, inline: true },
+          // { name: 'Discriminator', value: user.discriminator, inline: true },
+          {
+            name: 'Joined server at',
+            value: member ? moment(member.joinedAt).format('DD/MM/YYYY, hh:mm:ss A') : 'N/A',
+            inline: true
+          },
+          { name: 'User ID', value: user.id, inline: true },
+          {
+            name: 'Registered at',
+            value: moment(user.createdAt).format('DD/MM/YYYY, hh:mm:ss A'),
+            inline: true
+          },
+          {
+            name: `Roles (${member ? member.roles.length : 'N/A'})`,
+            value: member ? member.roles.map(i => `<@&${i}>`).join(' ') : 'N/A'
+          }
+          // { name: 'Permissions' }
+        ]
+      }
+    }
+  }
+}
 
 export const handleToken: Command = {
   name: 'token',

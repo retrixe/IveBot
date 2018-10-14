@@ -1,11 +1,11 @@
-import { Command } from '../imports/types'
-import { getInsult, getUser } from '../imports/tools'
-import { checkRolePosition } from '../imports/permissions'
+import { Command } from '../../imports/types'
+import { getInsult, getUser } from '../../imports/tools'
+import { checkRolePosition } from '../../imports/permissions'
 import { Message } from 'eris'
-export { handleGiverole, handleTakerole } from './admin/roles'
-export { handleWarn, handleWarnings, handleClearwarns, handleRemovewarn } from './admin/warn'
-export { handleMute, handleUnmute } from './admin/mute'
-export { handleBan, handleUnban } from './admin/ban'
+export { handleGiverole, handleTakerole } from './roles'
+export { handleWarn, handleWarnings, handleClearwarns, handleRemovewarn } from './warn'
+export { handleMute, handleUnmute } from './mute'
+export { handleBan, handleUnban } from './ban'
 
 export const handlePurge: Command = {
   name: 'purge',

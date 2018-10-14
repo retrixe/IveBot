@@ -34,6 +34,12 @@ export const getUser = (message: Message, arg: string) => {
   else if (mentions.length && mentions[0].id === getIdFromMention(arg)) return mentions[0]
   else if (guild.members.find(i => i.username.toLowerCase() === arg.toLowerCase())) {
     return guild.members.find(i => i.username.toLowerCase() === arg.toLowerCase()).user
+  } else if (guild.members.find(
+    i => i.username.toLowerCase() + '#' + i.discriminator === arg.toLowerCase()
+  )) {
+    return guild.members.find(
+      i => i.username.toLowerCase() + '#' + i.discriminator === arg.toLowerCase()
+    ).user
   }
 }
 

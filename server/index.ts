@@ -58,6 +58,7 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, {
     if (err) { console.error(err); throw new Error('Commands could not be retrieved.') }
     // This only supports two levels of files, one including files inside commands, and one in..
     // a subfolder.
+    commandFiles.push('admin/index.ts')
     commandFiles.forEach(commandFile => {
       // If it's a file..
       if (statSync('./server/bot/commands/' + commandFile).isFile() && commandFile.endsWith('.ts')) {

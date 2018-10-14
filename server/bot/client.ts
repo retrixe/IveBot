@@ -96,20 +96,6 @@ export class Command {
   }
 
   async execute (context: Context, message: Message, args: string[]) { // eslint-disable-line indent
-    // We check for arguments.
-    if (args.length === 0 && this.argsRequired) {
-      message.channel.createMessage(this.invalidUsageMessage)
-      return
-      // Guild and DM only.
-    } else if (this.guildOnly && message.channel.type !== 0) return
-    else if (this.dmOnly && message.channel.type !== 1) return
-    // Check for permissions.
-    else if (!this.requirementsCheck(message)) {
-      message.channel.createMessage(
-        `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
-      )
-      return
-    }
     // Define 2 vars.
     let messageToSend: MessageContent | void | Promise<MessageContent> | Promise<void>
     // If it's a function, we call it first.
@@ -145,6 +131,20 @@ export default class CommandParser {
     }
     const args = message.content.split(' ')
     args.shift()
+    // We check for arguments.
+    if (args.length === 0 && command.argsRequired) {
+      message.channel.createMessage(command.invalidUsageMessage)
+      return
+      // Guild and DM only.
+    } else if (command.guildOnly && message.channel.type !== 0) return
+    else if (command.dmOnly && message.channel.type !== 1) return
+    // Check for permissions.
+    else if (!command.requirementsCheck(message)) {
+      message.channel.createMessage(
+        `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
+      )
+      return
+    }
     // We get the exact content to send.
     const messageToSend = await command.execute(context, message, args)
     // We define a sent variable to keep track.
@@ -154,7 +154,7 @@ export default class CommandParser {
       message.member.guild.channels.find(i => i.id === message.channel.id)
         .permissionsOf(this.client.user.id).has('sendMessages')
     ) sent = await message.channel.createMessage(messageToSend)
-    if (command.postGenerator) command.postGenerator(message, args, sent)
+    if (command.postGenerator) command.postGenerator(message, args, sent, context)
     if (command.deleteCommand) message.delete('Automatically deleted by IveBot.')
   }
 

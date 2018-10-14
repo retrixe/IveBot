@@ -23,7 +23,9 @@ export const handleBan: Command = {
     } else if (!user && client.users.find(i => i.id === userSpecified)) {
       user = client.users.find(i => i.id === userSpecified)
     } else if (!user && [18, 17].includes(userSpecified.length) && !isNaN(+userSpecified)) {
-      user = await client.getRESTUser(userSpecified)
+      try { user = await client.getRESTUser(userSpecified) } catch (e) {
+        return 'I cannot find that user.'
+      }
     } else return 'I cannot find that user.'
     if (!user) return `Specify a valid user, ${getInsult()}.`
     // If the user cannot ban the person..
