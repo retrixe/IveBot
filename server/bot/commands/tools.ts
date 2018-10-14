@@ -8,6 +8,71 @@ import * as moment from 'moment'
 import { host } from '../../../config.json5'
 import { getUser, getInsult } from '../imports/tools'
 
+export const handleServerinfo: Command = {
+  name: 'serverinfo',
+  aliases: ['serveri', 'guildinfo', 'si'],
+  opts: {
+    description: 'Displays info on the current servers.',
+    fullDescription: 'Displays info on the current servers (or other mutual servers).',
+    example: '/serverinfo',
+    usage: '/serverinfo (mutual server ID)',
+    argsRequired: false
+  },
+
+  generator: async (message, args, { client }) => {
+    // Check if a guild was specified.
+    let guild = args.length ? client.guilds.find(
+      i => i.members.find(f => f.id === message.author.id) && i.id === args[0]
+    ) : message.member.guild
+    if (!guild) return `Specify a valid mutual guild, ${getInsult()}.`
+    // Owner.
+    const owner = guild.members.find(i => i.id === guild.ownerID)
+    // Display information.
+    return {
+      content: `⌨ **Server info on ${guild.name}:**`,
+      embed: {
+        author: { name: guild.name, icon_url: guild.iconURL },
+        thumbnail: { url: guild.iconURL },
+        color: Math.floor(Math.random() * 1000000 - 1),
+        footer: { text: `ID: ${guild.id}` },
+        timestamp: new Date().toISOString(),
+        fields: [
+          { name: 'Owner', value: `${owner.username}#${owner.discriminator}`, inline: true },
+          { name: 'Owner ID', value: guild.ownerID, inline: true },
+          { name: 'Region', value: guild.region, inline: true },
+          {
+            name: 'Channel Categories',
+            inline: true,
+            value: guild.channels.filter(i => i.type === 4).length.toString()
+          },
+          {
+            name: 'Text Channels',
+            inline: true,
+            value: guild.channels.filter(i => i.type === 0).length.toString()
+          },
+          {
+            name: 'Voice Channels',
+            inline: true,
+            value: guild.channels.filter(i => i.type === 2).length.toString()
+          },
+          { name: 'Members', inline: true, value: guild.memberCount.toString() },
+          {
+            name: 'Humans',
+            inline: true,
+            value: guild.members.filter(i => !i.bot).length.toString()
+          },
+          {
+            name: 'Bots',
+            inline: true,
+            value: guild.members.filter(i => i.bot).length.toString()
+          },
+          { name: 'Roles', inline: true, value: guild.roles.size.toString() }
+        ]
+      }
+    }
+  }
+}
+
 export const handleUserinfo: Command = {
   name: 'userinfo',
   aliases: ['useri', 'uinfo', 'ui'],
@@ -15,7 +80,7 @@ export const handleUserinfo: Command = {
     description: 'Displays info on a particular user.',
     fullDescription: 'Displays info on a particular user.',
     example: '/userinfo voldemort#6931',
-    usage: '/userinfo <user by ID/mention/username>',
+    usage: '/userinfo (user by ID/mention/username)',
     argsRequired: false
   },
   generator: async (message, args, { client }) => {

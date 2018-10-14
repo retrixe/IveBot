@@ -30,6 +30,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/leave\` - Makes you leave the server.
     \`/avatar\` - Avatar of a user.
     \`/userinfo\` - User info.
+    \`/serverinfo\` - Server info 🤔
     \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
     \`/giverole\` and \`/takerole\` - Edit roles.
 **Administrative commands.**
