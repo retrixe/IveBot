@@ -19,7 +19,7 @@ import { MongoClient } from 'mongodb'
 // Import fs.
 import { readdir, statSync } from 'fs'
 // Import the bot.
-import { guildMemberEditCallback } from './bot'
+import { guildMemberAdd, guildMemberRemove } from './bot'
 // Get the token needed.
 import 'json5/lib/require'
 import { token, mongoURL } from '../config.json5'
@@ -46,8 +46,8 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, {
   console.log('Bot connected successfully to MongoDB.')
   const db = mongoDB.db('ivebot')
   // When a server loses a member, it will callback.
-  client.on('guildMemberAdd', guildMemberEditCallback(client, 'guildMemberAdd', db))
-  client.on('guildMemberRemove', guildMemberEditCallback(client, 'guildMemberRemove', db))
+  client.on('guildMemberAdd', guildMemberAdd(client, db))
+  client.on('guildMemberRemove', guildMemberRemove(client, db))
   // When a message is sent, the function should be called.
   // client.on('messageCreate', botCallback(client, tempDB, db))
   const commandParser = new CommandParser(client, tempDB, db)

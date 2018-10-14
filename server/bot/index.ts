@@ -1,45 +1,58 @@
 // We need types.
 import { DB } from './imports/types'
-import { Member, Message, Client } from 'eris'
+import { Member, Message, Client, User, Guild } from 'eris'
 import { Db } from 'mongodb'
 
 // Database reading function.
 import { getServerSettings } from './imports/tools'
 
-// When client gains/loses a member, it will callback.
-export const guildMemberEditCallback = (client: Client, event: string, db: Db) => async (
-  guild: { id: string }, member: Member
-) => { // eslint-disable-line indent
-  // WeChill specific configuration.
-  if (guild.id === '402423671551164416' && event === 'guildMemberRemove') {
-    const message = `Well ${member.user.username}#${member.user.discriminator} left us.`
-    client.createMessage('402437089557217290', message)
-    return // Why wait.
-  } else if (guild.id === '402423671551164416' && event === 'guildMemberAdd') {
-    const message = `Yoyo <@${member.id}> welcome to WeChill, stay chill.`
-    client.createMessage('402437089557217290', message)
-    return // Why wait.
-  }
+// When a server gains a member, this function will be called.
+export const guildMemberAdd = (client: Client, db: Db) => async (
+  guild: Guild, member: Member
+) => {
+  // Get server settings.
   const serverSettings = await getServerSettings(db, guild.id)
-  /* if (event === 'guildMemberRemove' && serverSettings.joinLeaveMessages[2]) {
-    const channelID = member.guild.channels.find(
-      i => i.name === serverSettings.joinLeaveMessages[0]
-    ).id
-    client.createMessage(channelID, serverSettings.joinLeaveMessages[2])
-  } else if (event === 'guildMemberAdd' && serverSettings.joinLeaveMessages[1]) {
-    const channelID = member.guild.channels.find(
-      i => i.name === serverSettings.joinLeaveMessages[0]
-    ).id
-    client.createMessage(channelID, serverSettings.joinLeaveMessages[1])
-  } */
-  if (event === 'guildMemberAdd' && serverSettings.joinAutorole) {
-    const roles = serverSettings.joinAutorole.split('|')
-    for (let x = 0; x < roles.length; x++) {
-      const roleID = member.guild.roles.find(element => element.name === roles[x]).id
-      if (roles[x].startsWith('bot-') && member.user.bot) member.addRole(roleID)
-      else if (!roles[x].startsWith('bot-') && !member.user.bot) member.addRole(roleID)
-    }
+  // If there's autorole enabled..
+  if (serverSettings.joinAutorole) {
+    // For each role..
+    serverSettings.joinAutorole.split('|').forEach((role: string) => {
+      const roleName = role.startsWith('bot-') ? role.substr(4) : role
+      const roleID = member.guild.roles.find(element => element.name === roleName).id
+      if (!roleID) return
+      if (roleName.startsWith('bot-') && member.user.bot) member.addRole(roleID)
+      else if (!roleName.startsWith('bot-') && !member.user.bot) member.addRole(roleID)
+    })
   }
+  // If join/leave messages is not configured/improperly configured..
+  if (!serverSettings.joinLeaveMessages) return
+  const { joinMessage, channelName } = serverSettings.joinLeaveMessages
+  if (!channelName || !joinMessage) return
+  // We send a message.
+  const channelID = guild.channels.find(i => i.name === channelName).id
+  const toSend = joinMessage
+    .split('{un}').join(member.user.username) // Replace the username.
+    .split('{m}').join(member.user.mention) // Replace the mention.
+    .split('{d}').join(member.user.discriminator) // Replace the discriminator.
+  try { client.createMessage(channelID, toSend) } catch (e) { }
+}
+
+// When a server loses a member, this function will be called.
+export const guildMemberRemove = (client: Client, db: Db) => async (
+  guild: Guild, member: Member|{ id: string, user: User }
+) => {
+  // Get server settings.
+  const serverSettings = await getServerSettings(db, guild.id)
+  // If join/leave messages is not configured/improperly configured..
+  if (!serverSettings.joinLeaveMessages) return
+  const { leaveMessage, channelName } = serverSettings.joinLeaveMessages
+  if (!channelName || !leaveMessage) return
+  // We send a message.
+  const channelID = guild.channels.find(i => i.name === channelName).id
+  const toSend = leaveMessage
+    .split('{un}').join(member.user.username) // Replace the username.
+    .split('{m}').join(member.user.mention) // Replace the mention.
+    .split('{d}').join(member.user.discriminator) // Replace the discriminator.
+  try { client.createMessage(channelID, toSend) } catch (e) {}
 }
 
 // When client recieves a message, it will callback.

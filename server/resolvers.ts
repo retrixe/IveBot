@@ -36,7 +36,7 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
         leaveMessage: joinLeaveMessages.leaveMessage || ''
       }
       if (
-        member.permission.has('manageGuild') || host === ctx.tempDB.link[linkToken]
+        member && (member.permission.has('manageGuild') || host === ctx.tempDB.link[linkToken])
       ) return { serverId, addRoleForAll, joinLeaveMessages, joinAutorole }
       else return { serverId: 'Forbidden.' }
     },
