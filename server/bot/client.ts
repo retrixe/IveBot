@@ -160,7 +160,7 @@ export default class CommandParser {
     } catch (e) {}
   }
 
-  onMessage (message: Message) {
+  async onMessage (message: Message) {
     if (!message.content.split(' ')[0].startsWith('/')) {
       botCallback(message, this.client, this.tempDB, this.db)
       return // Don't process it if it's not a command.
@@ -174,7 +174,7 @@ export default class CommandParser {
       if (commandExec === keys[i]) {
         // Execute command.
         try {
-          this.executeCommand(this.commands[keys[i]], message)
+          await this.executeCommand(this.commands[keys[i]], message)
         } catch (e) { message.channel.createMessage(this.commands[keys[i]].errorMessage) }
         return
       } else if (
@@ -182,7 +182,7 @@ export default class CommandParser {
       ) {
         // Execute command.
         try {
-          this.executeCommand(this.commands[keys[i]], message)
+          await this.executeCommand(this.commands[keys[i]], message)
         } catch (e) { message.channel.createMessage('IveBot has experienced an internal error.') }
         return
       }

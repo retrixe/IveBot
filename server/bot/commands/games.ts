@@ -127,16 +127,16 @@ export const handleRepeat: Command = {
   },
   generator: (message, args) => {
     // All arguments.
-    if (+args[1] * message.content.substring(8 + args[1].length + 1).length >= 2001) {
+    const number = +args.shift()
+    if (isNaN(number)) return 'Correct usage: /repeat <number of times> <string to repeat>'
+    else if (number * args.join(' ').length >= 2001) {
       return 'To prevent spam, your excessive message has not been repeated.'
     } else if (
-      args[1] === '_' || args[1] === '*' || args[1] === '~'
+      args.join(' ') === '_' || args.join(' ') === '*' || args.join(' ') === '~'
     ) return 'This is known to lag users and is disabled.'
     // Generate the repeated string.
     let generatedMessage = ''
-    for (let x = 0; x < +args[1]; x++) {
-      generatedMessage += message.content.substring(8 + args[1].length + 1)
-    }
+    for (let x = 0; x < number; x++) { generatedMessage += args.join() }
     return generatedMessage
   }
 }

@@ -3,10 +3,62 @@ import { Command } from '../imports/types'
 // All the tools!
 import * as fetch from 'isomorphic-unfetch'
 import * as moment from 'moment'
-import { zeroWidthSpace } from '../imports/tools'
+import { zeroWidthSpace, getInsult } from '../imports/tools'
 // Get the NASA API token.
 import 'json5/lib/require'
-import { NASAtoken, fixerAPIkey, weatherAPIkey, oxfordAPI } from '../../../config.json5'
+import {
+  NASAtoken, fixerAPIkey, weatherAPIkey, oxfordAPI, cvAPIkey
+} from '../../../config.json5'
+
+export const handleOcr: Command = {
+  name: 'ocr',
+  aliases: ['textrecognition', 'itt', 'textr', 'text'],
+  opts: {
+    description: 'Get text from an image.',
+    fullDescription: 'Get text from an image. Powered by Google Cloud Vision.',
+    example: '/ocr <with uploaded image>',
+    usage: '/ocr <link to image/uploaded image>',
+    argsRequired: false
+  },
+  generator: async (message, args) => {
+    // Get the image and convert it to Base64.
+    const url = args.length ? args.join('%20') : message.attachments[0].url
+    try {
+      const image = Buffer.from(await (await fetch(url)).arrayBuffer()).toString('base64')
+      // Now send the request.
+      const res = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${cvAPIkey}`, {
+        body: JSON.stringify({
+          requests: [{
+            image: { content: image }, features: [{ type: 'TEXT_DETECTION' }]
+          }]
+        }),
+        method: 'POST'
+      })
+      // Parse the response.
+      const result = (await res.json())
+      // If no text was found.
+      if (!result.responses[0].fullTextAnnotation
+      ) return 'I was unable to get any results for the image.'
+      // Return our answer.
+      return {
+        content: '🤔 **Text recognition result:**\n' + result.responses[0].fullTextAnnotation.text,
+        embed: {
+          color: 0x666666,
+          author: {
+            name: `${message.author.username}#${message.author.discriminator}'s Image`,
+            icon_url: message.author.avatarURL
+          },
+          footer: {
+            text: 'Powered by Google Cloud Vision API',
+            icon_url: 'https://cloud.google.com' +
+            '/_static/7e8fbbc4f5/images/cloud/icons/favicons/onecloud/favicon.ico'
+          },
+          timestamp: new Date(message.timestamp).toISOString()
+        }
+      }
+    } catch (e) { return `Invalid image URL, you ${getInsult()}.` }
+  }
+}
 
 export const handleCat: Command = {
   name: 'cat',

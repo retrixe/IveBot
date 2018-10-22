@@ -51,7 +51,8 @@ Make a file named `config.json5` in the top-level directory. It should be someth
   },
   "host": "<your user ID to give you certain privileges like /remoteexec>",
   "weatherAPIkey": "<an http://openweathermap.org API key to enable /weather>",
-  "fixerAPIkey": "<an http://fixer.io API key to enable /currencyconvert>",
+  "fixerAPIkey": "<an http://fixer.io API key to enable /currency>",
+  "cvAPIkey": "<a http://cloud.google.com/vision API key for /ocr and text recognition>",
   "mongoURL": "<the link to your MongoDB database instance>"
 }
 ```
