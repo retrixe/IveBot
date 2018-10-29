@@ -4,7 +4,8 @@ import * as ms from 'ms'
 import { version } from '../../../package.json'
 import { execSync } from 'child_process'
 import 'json5/lib/require'
-import { host } from '../../../config.json5'
+import { host, testPilots } from '../../../config.json5'
+import { runInNewContext } from 'vm'
 
 export const handleToken: Command = {
   name: 'token',
@@ -139,6 +140,35 @@ export const handleEval: Command = {
       const channel = await context.client.getDMChannel(host)
       message.addReaction('❌')
       channel.createMessage(`**Error:**
+${e}`)
+    }
+  }
+}
+
+export const handleSafeeval: Command = {
+  name: 'safeEval',
+  aliases: ['se'],
+  opts: {
+    description: 'Runs JavaScript in a highly sandboxed environment.',
+    fullDescription: 'Runs JavaScript in a highly sandboxed environment.',
+    usage: '/safeEval <code in codeblock or not>',
+    example: '/safeEval ```js\ncreateMessage(\'You sent: \' + content)\n```',
+    requirements: { userIDs: testPilots }
+  },
+  generator: async (message, args, context) => {
+    try {
+      let toEval = args.join(' ')
+      if (toEval.startsWith('```js')) toEval = toEval.substring(5)
+      if (toEval.endsWith('```')) toEval = toEval.substring(0, toEval.length - 3)
+      const res = runInNewContext(toEval.split('```').join(''), {
+        createMessage: (co: string) => context.client.createMessage(message.channel.id, co),
+        content: message.content
+      })
+      message.addReaction('✅')
+      return res.toString() || undefined
+    } catch (e) {
+      message.addReaction('❌')
+      message.channel.createMessage(`**Error:**
 ${e}`)
     }
   }
