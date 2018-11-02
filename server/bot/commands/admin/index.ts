@@ -2,6 +2,7 @@ import { Command } from '../../imports/types'
 import { getInsult, getUser } from '../../imports/tools'
 import { checkRolePosition } from '../../imports/permissions'
 import { Message } from 'eris'
+import * as RequestHandler from 'eris/lib/rest/RequestHandler'
 export { handleGiverole, handleTakerole } from './roles'
 export { handleWarn, handleWarnings, handleClearwarns, handleRemovewarn } from './warn'
 export { handleMute, handleUnmute } from './mute'
@@ -79,5 +80,38 @@ export const handleKick: Command = {
       )
     }
     return `**${user.username}#${user.discriminator}** has been kicked. **rip.**`
+  }
+}
+
+export const handleSlowmode: Command = {
+  name: 'slowmode',
+  aliases: ['sm'],
+  opts: {
+    description: 'When you must slow down chat.',
+    fullDescription: 'When you must slow down chat.',
+    usage: '/slowmode <number in seconds, max: 120 or off>',
+    guildOnly: true,
+    example: '/slowmode off',
+    requirements: {
+      permissions: { 'manageChannels': true },
+      custom: (message) => (
+        message.member.guild.channels.find(i => i.id === message.channel.id)
+          .permissionsOf(message.author.id).has('manageChannels')
+      )
+    }
+  },
+  generator: async (message, args, { client }) => {
+    // Check user for permissions.
+    const t = +args[0]
+    if (
+      (isNaN(t) && args[0] !== 'off') || !args[0] || t < 0 || t > 120 || args.length > 1
+    ) { return 'Correct usage: /slowmode <number in seconds, max: 120 or off>' }
+    // Set slowmode.
+    try {
+      await new RequestHandler(client).request(
+        'PATCH', '/channels/' + message.channel.id, true, { rate_limit_per_user: isNaN(t) ? 0 : t }
+      )
+    } catch (e) { return 'I cannot use slowmode >_<' }
+    return `Successfully set slowmode to ${isNaN(t) || t === 0 ? 'off' : `${t} seconds`} 👌`
   }
 }

@@ -38,6 +38,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/warn\` and \`/warnings\` | \`/clearwarns\` and \`/removewarn\`
     \`/changeserverregion\` and \`/listserverregions\`
     \`/purge\` - Bulk delete a set of messages.
+    \`/slowmode\` - When you must slow down chat.
 
 **There are some easter egg auto responses.**
 **Commands with TP are test pilot only.**`

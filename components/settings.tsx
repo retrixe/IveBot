@@ -10,7 +10,7 @@ import { gql } from 'apollo-boost'
 /* eslint-disable quotes, no-multi-str, no-undef */
 interface Props {
   data: {
-    addRoleForAll: boolean, joinAutorole: string, joinLeaveMessages: {
+    addRoleForAll: boolean, joinAutorole: string, ocrOnSend: boolean, joinLeaveMessages: {
       channelName: string,
       joinMessage: string,
       leaveMessage: string
@@ -23,6 +23,7 @@ interface Props {
 interface State {
   role: boolean,
   joinAutorole: string,
+  ocrOnSend: boolean,
   joinLeaveMessages: {
     channelName: string,
     joinMessage: string,
@@ -34,6 +35,7 @@ export default class Settings extends React.Component<Props, State> {
     super(props); this.state = {
       role: this.props.data.addRoleForAll,
       joinAutorole: this.props.data.joinAutorole,
+      ocrOnSend: this.props.data.ocrOnSend,
       joinLeaveMessages: {
         channelName: this.props.data.joinLeaveMessages.channelName,
         joinMessage: this.props.data.joinLeaveMessages.joinMessage,
@@ -46,14 +48,15 @@ export default class Settings extends React.Component<Props, State> {
     const mutation = gql`
 mutation variables(
   $server: String!, $token: String!, $role: Boolean, $joinAutorole: String,
-  $joinLeaveMessages: JoinLeaveMessagesInput
+  $joinLeaveMessages: JoinLeaveMessagesInput, $ocrOnSend: Boolean
 ) {
   editServerSettings(input: {
     serverId: $server, linkToken: $token, addRoleForAll: $role, joinAutorole: $joinAutorole,
-    joinLeaveMessages: $joinLeaveMessages
+    joinLeaveMessages: $joinLeaveMessages, ocrOnSend: $ocrOnSend
   }) {
     addRoleForAll
     joinAutorole
+    ocrOnSend
     joinLeaveMessages {
       channelName
       joinMessage
@@ -68,7 +71,8 @@ mutation variables(
         role: this.state.role,
         server: this.props.server,
         joinAutorole: this.state.joinAutorole,
-        joinLeaveMessages: this.state.joinLeaveMessages
+        joinLeaveMessages: this.state.joinLeaveMessages,
+        ocrOnSend: this.state.ocrOnSend
       }}>
         {(updateSettings, { loading, error }) => (
           <>
@@ -149,6 +153,23 @@ mutation variables(
                   ...this.state.joinLeaveMessages, leaveMessage: e.target.value
                 } })} margin='dense' />
             </FormControl>
+            <br /><br />
+            <Typography variant='title' gutterBottom>Text Recognition on Image Send</Typography>
+            <Divider />
+            <FormGroup row>
+              <FormControlLabel
+                control={
+                  <Switch color='secondary' checked={this.state.ocrOnSend}
+                    onChange={() => this.setState({ ocrOnSend: !this.state.ocrOnSend })}
+                  />
+                }
+                label='Enable OCR on Send'
+              />
+            </FormGroup>
+            <Typography gutterBottom>
+              {'This option is disabled by default and recognizes text from any image whenever \
+              an image is sent in any channel and posts the result using /ocr.'}
+            </Typography>
             <div style={{ height: 10 }} />
             <Button size='small'>Cancel</Button>
             <Button size='small' onClick={async () => {

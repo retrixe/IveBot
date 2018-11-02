@@ -35,6 +35,7 @@ query getServerSettings($server: String!, $token: String!) {
       joinMessage
       leaveMessage
     }
+    ocrOnSend
   }
 }
     `

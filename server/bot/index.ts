@@ -5,6 +5,8 @@ import { Db } from 'mongodb'
 
 // Database reading function.
 import { getServerSettings } from './imports/tools'
+// Tokens and stuffs.
+import { cvAPIkey } from '../../config.json5'
 
 // When a server gains a member, this function will be called.
 export const guildMemberAdd = (client: Client, db: Db) => async (
@@ -73,4 +75,32 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
   else if (command.startsWith('ayy')) sendResponse('lmao')
   // Handle answers to gunfight.
   // else if (command in ['fire', 'water', 'gun', 'dot']) return
+
+  // Get settings, server specific from now on.
+  if (!message.member) return
+  const serverSettings = await getServerSettings(db, message.member.guild.id)
+  // Text recognition on image send \o/
+  if (message.attachments.length && serverSettings.ocrOnSend) {
+    // Get the image and convert it to Base64.
+    try {
+      const image = Buffer.from(await (await fetch(
+        message.attachments[0].url
+      )).arrayBuffer()).toString('base64')
+      // Now send the request.
+      const res = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${cvAPIkey}`, {
+        body: JSON.stringify({
+          requests: [{ image: { content: image }, features: [{ type: 'TEXT_DETECTION' }] }]
+        }),
+        method: 'POST'
+      })
+      // Parse the response.
+      const result = (await res.json())
+      // If no text was found.
+      if (!result.responses[0].fullTextAnnotation) return
+      // Return our answer.
+      message.channel.createMessage({
+        content: '**Text recognition result:**\n' + result.responses[0].fullTextAnnotation.text
+      })
+    } catch (e) {}
+  }
 }

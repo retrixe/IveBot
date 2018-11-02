@@ -27,7 +27,7 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
       const member = ctx.client.guilds
         .find(t => t.id === serverId).members.find(t => t.id === ctx.tempDB.link[linkToken])
       let {
-        addRoleForAll, joinLeaveMessages, joinAutorole
+        addRoleForAll, joinLeaveMessages, joinAutorole, ocrOnSend
       } = await getServerSettings(db, serverId)
       joinLeaveMessages = joinLeaveMessages || {}
       joinLeaveMessages = {
@@ -37,7 +37,7 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
       }
       if (
         member && (member.permission.has('manageGuild') || host === ctx.tempDB.link[linkToken])
-      ) return { serverId, addRoleForAll, joinLeaveMessages, joinAutorole }
+      ) return { serverId, addRoleForAll, joinLeaveMessages, joinAutorole, ocrOnSend }
       else return { serverId: 'Forbidden.' }
     },
     getUserInfo: (_: string, { linkToken }: { linkToken: string }) => {
@@ -67,10 +67,14 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
       _: string, { input }: { input: { // eslint-disable-next-line indent
         serverId: string, linkToken: string, addRoleForAll: string, joinAutorole: string,
       // eslint-disable-next-line indent
-        joinLeaveMessages: { channelName: string, joinMessage: string, leaveMessage: string }
+        joinLeaveMessages: { channelName: string, joinMessage: string, leaveMessage: string },
+      // eslint-disable-next-line indent
+        ocrOnSend: boolean
       } }
     ) => {
-      const { serverId, linkToken, addRoleForAll, joinAutorole, joinLeaveMessages } = input
+      const {
+        serverId, linkToken, addRoleForAll, joinAutorole, joinLeaveMessages, ocrOnSend
+      } = input
       const member = ctx.client.guilds
         .find(t => t.id === serverId).members.find(t => t.id === ctx.tempDB.link[linkToken])
       if (
@@ -81,6 +85,7 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
           /* eslint-disable no-unneeded-ternary */
           addRoleForAll: addRoleForAll ? addRoleForAll : undefined,
           joinAutorole: joinAutorole ? joinAutorole : undefined,
+          ocrOnSend,
           joinLeaveMessages: {
             channelName: null, joinMessage: null, leaveMessage: null, ...joinLeaveMessages
           }

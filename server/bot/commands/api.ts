@@ -22,8 +22,8 @@ export const handleOcr: Command = {
   },
   generator: async (message, args) => {
     // Get the image and convert it to Base64.
-    const url = args.length ? args.join('%20') : message.attachments[0].url
     try {
+      const url = args.length ? args.join('%20') : message.attachments[0].url
       const image = Buffer.from(await (await fetch(url)).arrayBuffer()).toString('base64')
       // Now send the request.
       const res = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${cvAPIkey}`, {

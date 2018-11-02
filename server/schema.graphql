@@ -1,13 +1,3 @@
-# Joining and leaving servers.
-type JoinLeaveMessages {
-  # Name of channel.
-  channelName: String
-  # What to post when joining.
-  joinMessage: String
-  # What to post when leaving.
-  leaveMessage: String
-}
-
 # Server specific settings.
 type ServerSetting {
   # Server ID.
@@ -18,6 +8,8 @@ type ServerSetting {
   joinLeaveMessages: JoinLeaveMessages
   # If join autorole is enabled, and if so, what role.
   joinAutorole: String
+  # If text recognition on image send is enabled.
+  ocrOnSend: Boolean
 }
 
 # Server type.
@@ -30,6 +22,16 @@ type Server {
   icon: String
   # Name of server.
   name: String
+}
+
+# Joining and leaving servers.
+type JoinLeaveMessages {
+  # Name of channel.
+  channelName: String
+  # What to post when joining.
+  joinMessage: String
+  # What to post when leaving.
+  leaveMessage: String
 }
 
 # Enable queries.
@@ -64,6 +66,8 @@ input EditServerSettingsInput {
   joinAutorole: String
   # Edit join leave messages through this setting.
   joinLeaveMessages: JoinLeaveMessagesInput
+  # Edit text recognition on image send through this setting.
+  ocrOnSend: Boolean
 }
 
 # Enable mutations.
