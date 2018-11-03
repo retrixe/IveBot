@@ -9,9 +9,15 @@ import { getServerSettings } from './imports/tools'
 import { cvAPIkey } from '../../config.json5'
 
 // When a server gains a member, this function will be called.
-export const guildMemberAdd = (client: Client, db: Db) => async (
+export const guildMemberAdd = (client: Client, db: Db, tempDB: DB) => async (
   guild: Guild, member: Member
 ) => {
+  // Mute persist.
+  try {
+    if (tempDB.mute[guild.id].includes(member.id)) {
+      member.addRole(guild.roles.find((role) => role.name === 'Muted').id, 'Persisting mute.')
+    }
+  } catch (e) {}
   // Get server settings.
   const serverSettings = await getServerSettings(db, guild.id)
   // If there's autorole enabled..

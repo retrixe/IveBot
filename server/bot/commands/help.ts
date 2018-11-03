@@ -28,6 +28,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/editLastSay\` - Even if it was another channel.
     \`/remindme\` - Reminders.
     \`/leave\` - Makes you leave the server.
+    \`/ocr\` - Get text from an image.
     \`/avatar\` - Avatar of a user.
     \`/userinfo\` - User info.
     \`/serverinfo\` - Server info 🤔

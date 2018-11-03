@@ -16,6 +16,10 @@ export type DB = {
     // Channels.
     [index: string]: string
   },
+  mute: {
+    // Servers with userIDs contained.
+    [index: string]: string[]
+  },
   link: {
     [index: string]: string
   },

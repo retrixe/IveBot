@@ -46,10 +46,9 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, {
   console.log('Bot connected successfully to MongoDB.')
   const db = mongoDB.db('ivebot')
   // When a server loses a member, it will callback.
-  client.on('guildMemberAdd', guildMemberAdd(client, db))
+  client.on('guildMemberAdd', guildMemberAdd(client, db, tempDB))
   client.on('guildMemberRemove', guildMemberRemove(client, db))
-  // When a message is sent, the function should be called.
-  // client.on('messageCreate', botCallback(client, tempDB, db))
+  // Register the commandParser.
   const commandParser = new CommandParser(client, tempDB, db)
   client.on('messageCreate', commandParser.onMessage)
   // Register all commands in bot/commands onto the CommandParser.
@@ -92,7 +91,7 @@ client.on('error', (err: string, id: string) => {
 })
 
 // Create a database to handle certain stuff.
-const tempDB: DB = { gunfight: [], say: {}, link: {}, leave: [] }
+const tempDB: DB = { gunfight: [], say: {}, link: {}, leave: [], mute: {} }
 
 /* SERVER CODE STARTS HERE */
 // Initialize Next.js app.

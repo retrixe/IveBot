@@ -175,7 +175,10 @@ export default class CommandParser {
         // Execute command.
         try {
           await this.executeCommand(this.commands[keys[i]], message)
-        } catch (e) { message.channel.createMessage(this.commands[keys[i]].errorMessage) }
+        } catch (e) {
+          message.channel.createMessage(this.commands[keys[i]].errorMessage)
+          console.error(e)
+        }
         return
       } else if (
         this.commands[keys[i]].aliases && this.commands[keys[i]].aliases.includes(commandExec)
@@ -183,7 +186,10 @@ export default class CommandParser {
         // Execute command.
         try {
           await this.executeCommand(this.commands[keys[i]], message)
-        } catch (e) { message.channel.createMessage('IveBot has experienced an internal error.') }
+        } catch (e) {
+          message.channel.createMessage(this.commands[keys[i]].errorMessage)
+          console.error(e)
+        }
         return
       }
     }

@@ -15,7 +15,7 @@ export const handleMute: Command = {
     guildOnly: true,
     requirements: { permissions: { 'manageMessages': true } }
   },
-  generator: async (message, args, { client }) => {
+  generator: async (message, args, { client, tempDB }) => {
     // Find the user ID.
     let user = getUser(message, args.shift())
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
@@ -63,19 +63,6 @@ export const handleMute: Command = {
           )
         }
       })
-      // Mute person.
-      try {
-        client.addGuildMemberRole(message.member.guild.id, user.id, role.id, args.join(' '))
-      } catch (e) { return 'Could not mute that person.' }
-      // If time given, set timeout.
-      try {
-        if (ms(args[0])) {
-          setTimeout(() => {
-            client.removeGuildMemberRole(message.member.guild.id, user.id, role.id)
-          }, ms(args[0]))
-        }
-      } catch (e) { }
-      return 'Muted.'
       // If no role, make a Muted role.
     } else if (!role) {
       try {
@@ -100,34 +87,29 @@ export const handleMute: Command = {
           )
         }
       })
-      // Then mute the person.
-      try {
-        client.addGuildMemberRole(message.member.guild.id, user.id, role.id, args.join(' '))
-      } catch (e) { return 'Could not mute that person.' }
-      // If time given, set timeout.
-      try {
-        if (ms(args[0])) {
-          setTimeout(() => {
-            client.removeGuildMemberRole(message.member.guild.id, user.id, role.id)
-          }, ms(args[0]))
-        }
-      } catch (e) { }
-      return 'Muted.'
-    } else {
-      // Mute person.
-      try {
-        client.addGuildMemberRole(message.member.guild.id, user.id, role.id, args.join(' '))
-      } catch (e) { return 'Could not mute that person.' }
-      // If time given, set timeout.
-      try {
-        if (ms(args[0])) {
-          setTimeout(() => {
-            client.removeGuildMemberRole(message.member.guild.id, user.id, role.id)
-          }, ms(args[0]))
-        }
-      } catch (e) {}
-      return 'Muted.'
     }
+    // Mute person.
+    try {
+      client.addGuildMemberRole(message.member.guild.id, user.id, role.id, args.join(' '))
+    } catch (e) { return 'Could not mute that person.' }
+    // Persist the mute.
+    const guildID = message.member.guild.id
+    if (!tempDB.mute[guildID]) tempDB.mute[guildID] = []
+    tempDB.mute[guildID].push(user.id)
+    // If time given, set timeout.
+    try {
+      if (ms(args[0])) {
+        setTimeout(() => {
+          try {
+            // Remove the mute persist.
+            tempDB.mute[guildID].splice(tempDB.mute[guildID].findIndex((i) => i === user.id), 1)
+            // Take the role.
+            client.removeGuildMemberRole(message.member.guild.id, user.id, role.id)
+          } catch (e) {}
+        }, ms(args[0]))
+      }
+    } catch (e) {}
+    return 'Muted.'
   }
 }
 
@@ -141,7 +123,7 @@ export const handleUnmute: Command = {
     example: '/unmute voldemort wrong person',
     requirements: { permissions: { 'manageMessages': true } }
   },
-  generator: (message, args, { client }) => {
+  generator: (message, args, { client, tempDB }) => {
     // Find the user ID.
     let user = getUser(message, args.shift())
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
@@ -155,9 +137,15 @@ export const handleUnmute: Command = {
     // All roles of user.
     const roles = message.member.guild.members.find(i => i.id === user.id).roles
     const rolesOfServer = message.member.guild.roles
+    const guildID = message.member.guild.id
     // Iterate over the roles.
     for (let roleIndex in roles) {
       if (rolesOfServer.find(i => i.id === roles[roleIndex]).name === 'Muted') {
+        // Remove the mute persist.
+        if (tempDB.mute[guildID] && tempDB.mute[guildID].includes(user.id)) {
+          tempDB.mute[guildID].splice(tempDB.mute[guildID].findIndex((i) => i === user.id), 1)
+        }
+        // Take the role.
         client.removeGuildMemberRole(
           message.member.guild.id, user.id, roles[roleIndex], args.join(' ')
         )
