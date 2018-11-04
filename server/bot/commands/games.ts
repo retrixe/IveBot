@@ -185,3 +185,16 @@ export const handleCalculate: Command = {
     }
   }
 }
+
+export const handleDistort: Command = {
+  name: 'distort',
+  opts: {
+    description: 'Pretty distorted text.',
+    fullDescription: 'Pretty distorted text.',
+    usage: '/distort <text>',
+    example: '/distort lol'
+  },
+  generator: (message, args) => args.map(i => (
+    i.split('').join('*') + (i.length % 2 === 0 ? '*' : '')
+  )).join(' ')
+}

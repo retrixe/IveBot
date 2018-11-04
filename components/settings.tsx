@@ -167,8 +167,8 @@ mutation variables(
               />
             </FormGroup>
             <Typography gutterBottom>
-              {'This option is disabled by default and recognizes text from any image whenever \
-              an image is sent in any channel and posts the result using /ocr.'}
+              {'This option recognizes text from any image whenever an image is sent in any \
+              channel and posts the result using /ocr.'}
             </Typography>
             <div style={{ height: 10 }} />
             <Button size='small'>Cancel</Button>

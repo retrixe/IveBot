@@ -12,6 +12,7 @@ let generalHelp = `   ** Jony Ive can do many commands 📡**
     \`/8ball\` - Random answers to random questions.
     \`/repeat\` - Repeat a string.
     \`/calculate\` - Calculate an expression.
+    \`/distort\` - Pretty distorted text.
 **Random searches.**
     \`/urban\` - Get an Urban Dictionary definition ;)
     \`/cat\` and \`/dog\` - Random cats and dogs from <https://random.cat> and <https://dog.ceo>

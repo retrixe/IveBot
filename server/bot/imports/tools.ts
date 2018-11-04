@@ -19,7 +19,7 @@ export const getServerSettings = async (db: Db, serverID: string) => {
   let serverSettings = await db.collection('servers').find({ serverID }).toArray()
   if (serverSettings.length === 0) {
     // Initialize server settings.
-    await db.collection('servers').insertOne({ serverID, ocrOnSend: true })
+    await db.collection('servers').insertOne({ serverID })
     serverSettings = await db.collection('servers').find({ serverID }).toArray()
   }
   return serverSettings[0]
