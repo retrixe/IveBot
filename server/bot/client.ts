@@ -165,7 +165,7 @@ export default class CommandParser {
   }
 
   async onMessage (message: Message) {
-    if (!message.content.startsWith('/')) {
+    if (message.content && !message.content.startsWith('/')) {
       botCallback(message, this.client, this.tempDB, this.db)
       return // Don't process it if it's not a command.
     }
@@ -198,7 +198,7 @@ export default class CommandParser {
   // For evaluating messages which weren't evaluated.
   async onMessageUpdate (message: Message, oldMessage?: Message) {
     // We won't bother with a lot of messages..
-    if (!message.content.startsWith('/')) return
+    if (message.content && !message.content.startsWith('/')) return
     else if (this.evaluatedMessages.includes(message.id)) return
     else if (!oldMessage || Date.now() - message.timestamp > 30000) return
     else if (message.editedTimestamp - message.timestamp > 30000) return

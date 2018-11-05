@@ -26,7 +26,7 @@ export const handleBan: Command = {
       try { user = await client.getRESTUser(userSpecified) } catch (e) {
         return 'I cannot find that user.'
       }
-    } else return 'I cannot find that user.'
+    }
     if (!user) return `Specify a valid user, ${getInsult()}.`
     // If the user cannot ban the person..
     if (
@@ -75,7 +75,9 @@ export const handleUnban: Command = {
       user = client.users.find(i => i.username === userSpecified)
     } else if (client.users.find(i => i.id === userSpecified)) {
       user = client.users.find(i => i.id === userSpecified)
-    } else user = await client.getRESTUser(userSpecified)
+    } else {
+      try { user = await client.getRESTUser(userSpecified) } catch (e) {}
+    }
     if (!user) return 'I cannot find that user.'
     // Now we unban the person.
     try {
