@@ -51,6 +51,7 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, {
   // Register the commandParser.
   const commandParser = new CommandParser(client, tempDB, db)
   client.on('messageCreate', commandParser.onMessage)
+  client.on('messageUpdate', commandParser.onMessageUpdate)
   // Register all commands in bot/commands onto the CommandParser.
   readdir('./server/bot/commands', (err, commandFiles) => {
     // Handle any errors.

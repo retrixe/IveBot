@@ -123,28 +123,32 @@ export const handleApod: Command = {
     ])
     if (date.isValid()) {
       const dateStr = date.format('YYYY-MM-DD')
-      // Fetch a picture.
-      try {
-        const { url, title, explanation } = await (await fetch(
+      // Fetch a picture or video.
+      try { // eslint-disable-next-line camelcase
+        const { media_type, url, title, explanation } = await (await fetch(
           `https://api.nasa.gov/planetary/apod?api_key=${NASAtoken}&date=${dateStr}`
-        )).json()
-        return {
-          content: '**' + title + '**\n' + explanation,
-          embed: { image: { url }, color: 0x2361BE }
-        }
+        )).json() // eslint-disable-next-line camelcase
+        return media_type === 'video'
+          ? `**${title}**\n${explanation}\n${url.split('embed/').join('watch?v=')}`
+          : {
+            content: `**${title}**\n${explanation}`,
+            embed: { image: { url }, color: 0x2361BE }
+          }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
     } else if (args.length) {
       return 'Invalid date.'
     }
-    // Fetch a picture.
-    try {
-      const { hdurl, title, explanation } = await (await fetch(
+    // Fetch a picture or video.
+    try { // eslint-disable-next-line camelcase
+      const { media_type, url, hdurl, title, explanation } = await (await fetch(
         `https://api.nasa.gov/planetary/apod?api_key=${NASAtoken}`
-      )).json()
-      return {
-        content: '**' + title + '**\n' + explanation,
-        embed: { image: { url: hdurl }, color: 0x2361BE }
-      }
+      )).json() // eslint-disable-next-line camelcase
+      return media_type === 'video'
+        ? `**${title}**\n${explanation}\n${url.split('embed/').join('watch?v=')}`
+        : {
+          content: `**${title}**\n${explanation}`,
+          embed: { image: { url: hdurl }, color: 0x2361BE }
+        }
     } catch (err) { return `Something went wrong 👾 Error: ${err}` }
   }
 }

@@ -112,12 +112,16 @@ export default class CommandParser {
   client: Client // eslint-disable-line no-undef
   tempDB: DB // eslint-disable-line no-undef
   db: Db // eslint-disable-line no-undef
+  evaluatedMessages: string[] // eslint-disable-line no-undef
+
   constructor (client: Client, tempDB: DB, db: Db) {
     this.commands = {}
     this.client = client
     this.tempDB = tempDB
     this.db = db
+    this.evaluatedMessages = []
     this.onMessage = this.onMessage.bind(this)
+    this.onMessageUpdate = this.onMessageUpdate.bind(this)
   }
 
   registerCommand = (command: IveBotCommand) => { // eslint-disable-line no-undef
@@ -161,32 +165,27 @@ export default class CommandParser {
   }
 
   async onMessage (message: Message) {
-    if (!message.content.split(' ')[0].startsWith('/')) {
+    if (!message.content.startsWith('/')) {
       botCallback(message, this.client, this.tempDB, this.db)
       return // Don't process it if it's not a command.
     }
     const commandExec = message.content.split(' ')[0].substr(1).toLowerCase()
     // Webhook and bot protection.
     try { if (message.author.bot) return } catch (e) { return }
-    // Check for the commands in this.commands.
+    // Check for the command in this.commands.
     const keys = Object.keys(this.commands)
     for (let i = 0; i < keys.length; i++) {
-      if (commandExec === keys[i]) {
-        // Execute command.
-        try {
-          await this.executeCommand(this.commands[keys[i]], message)
-        } catch (e) {
-          message.channel.createMessage(this.commands[keys[i]].errorMessage)
-          console.error(e)
-        }
-        return
-      } else if (
+      if (commandExec === keys[i] || (
         this.commands[keys[i]].aliases && this.commands[keys[i]].aliases.includes(commandExec)
-      ) {
+      )) {
+        // We mark the command as evaluated and schedule a removal of the ID in 30 seconds.
+        this.evaluatedMessages.push(message.id)
+        setTimeout(() => {
+          this.evaluatedMessages.splice(this.evaluatedMessages.findIndex(i => i === message.id), 1)
+        }, 30000)
         // Execute command.
-        try {
-          await this.executeCommand(this.commands[keys[i]], message)
-        } catch (e) {
+        try { await this.executeCommand(this.commands[keys[i]], message) } catch (e) {
+          // On error, we tell the user of an unknown error and log it for our reference.
           message.channel.createMessage(this.commands[keys[i]].errorMessage)
           console.error(e)
         }
@@ -194,5 +193,38 @@ export default class CommandParser {
       }
     }
     botCallback(message, this.client, this.tempDB, this.db)
+  }
+
+  // For evaluating messages which weren't evaluated.
+  async onMessageUpdate (message: Message, oldMessage?: Message) {
+    // We won't bother with a lot of messages..
+    if (!message.content.startsWith('/')) return
+    else if (this.evaluatedMessages.includes(message.id)) return
+    else if (!oldMessage || Date.now() - message.timestamp > 30000) return
+    else if (message.editedTimestamp - message.timestamp > 30000) return
+    // Proceed to evaluate.
+    const commandExec = message.content.split(' ')[0].substr(1).toLowerCase()
+    // Webhook and bot protection.
+    try { if (message.author.bot) return } catch (e) { return }
+    // Check for the command in this.commands.
+    const keys = Object.keys(this.commands)
+    for (let i = 0; i < keys.length; i++) {
+      if (commandExec === keys[i] || (
+        this.commands[keys[i]].aliases && this.commands[keys[i]].aliases.includes(commandExec)
+      )) {
+        // We mark the command as evaluated and schedule a removal of the ID in 30 seconds.
+        this.evaluatedMessages.push(message.id)
+        setTimeout(() => {
+          this.evaluatedMessages.splice(this.evaluatedMessages.findIndex(i => i === message.id), 1)
+        }, 30000)
+        // Execute command.
+        try { await this.executeCommand(this.commands[keys[i]], message) } catch (e) {
+          // On error, we tell the user of an unknown error and log it for our reference.
+          message.channel.createMessage(this.commands[keys[i]].errorMessage)
+          console.error(e)
+        }
+        return
+      }
+    }
   }
 }
