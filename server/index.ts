@@ -53,15 +53,16 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, {
   client.on('messageCreate', commandParser.onMessage)
   client.on('messageUpdate', commandParser.onMessageUpdate)
   // Register all commands in bot/commands onto the CommandParser.
-  readdir('./server/bot/commands', (err, commandFiles) => {
+  const toRead = dev ? './server/bot/commands/' : './lib/bot/commands/'
+  readdir(toRead, (err, commandFiles) => {
     // Handle any errors.
     if (err) { console.error(err); throw new Error('Commands could not be retrieved.') }
     // This only supports two levels of files, one including files inside commands, and one in..
     // a subfolder.
-    commandFiles.push('admin/index.ts')
+    commandFiles.push(dev ? 'admin/index.ts' : 'admin/index.js')
     commandFiles.forEach(commandFile => {
       // If it's a file..
-      if (statSync('./server/bot/commands/' + commandFile).isFile() && commandFile.endsWith('.ts')) {
+      if (statSync(toRead + commandFile).isFile() && (commandFile.endsWith('.ts') || commandFile.endsWith('.js'))) {
         const commands: { [index: string]: Command } = require('./bot/commands/' + commandFile)
         // ..and there are commands..
         if (!Object.keys(commands).length) return
