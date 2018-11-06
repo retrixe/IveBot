@@ -80,7 +80,16 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
   else if (command.startsWith('triggered')) sendResponse('Ah, pathetic people again.')
   else if (command.startsWith('ayy')) sendResponse('lmao')
   // Handle answers to gunfight.
-  // else if (command in ['fire', 'water', 'gun', 'dot']) return
+  /* else if (['fire', 'water', 'gun', 'dot'].includes(command)) {
+    const gunfight = tempDB.gunfight.find(i => i.randomWord === command && (
+      i.challenged === message.author.id || i.challenger === message.author.id
+    ) && i.wordSaid)
+    if (!gunfight) return
+    sendResponse(`${message.author.mention} won!`)
+    tempDB.gunfight.splice(tempDB.gunfight.findIndex(i => i.randomWord === command && (
+      i.challenged === message.author.id || i.challenger === message.author.id
+    )), 1)
+  } */
 
   // Get settings, server specific from now on.
   if (!message.member) return

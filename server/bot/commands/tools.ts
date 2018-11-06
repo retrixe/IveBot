@@ -127,7 +127,7 @@ export const handleEval: Command = {
     example: '/eval ```js\nconsole.log(\'ji\')\n```',
     requirements: { userIDs: [host] }
   },
-  generator: async (message, args, context) => {
+  generator: async (message, args, { client, tempDB, db }) => {
     try {
       let toEval = args.join(' ')
       if (toEval.startsWith('```js')) toEval = toEval.substring(5)
@@ -137,7 +137,7 @@ export const handleEval: Command = {
       message.addReaction('✅')
       return res || undefined
     } catch (e) {
-      const channel = await context.client.getDMChannel(host)
+      const channel = await client.getDMChannel(host)
       message.addReaction('❌')
       channel.createMessage(`**Error:**
 ${e}`)

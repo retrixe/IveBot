@@ -95,7 +95,7 @@ export const handleUserinfo: Command = {
     const member = message.member.guild.members.find(i => i.user.id === user.id)
     const color = member
       ? member.roles.map(i => member.guild.roles.get(i)).sort(
-        (a, b) => a.position > b.position ? 0 : 1
+        (a, b) => a.position > b.position ? -1 : 1
       ).shift().color : 0
     return {
       content: `👥 **Userinfo on ${user.username}:**`,
@@ -123,7 +123,9 @@ export const handleUserinfo: Command = {
           },
           {
             name: `Roles (${member ? member.roles.length : 'N/A'})`,
-            value: member ? member.roles.map(i => `<@&${i}>`).join(' ') : 'N/A'
+            value: member ? member.roles.map(i => member.guild.roles.get(i)).sort(
+              (a, b) => a.position > b.position ? -1 : 1
+            ).map(i => `<@&${i.id}>`).join(' ') : 'N/A'
           }
           // { name: 'Permissions' }
         ]
