@@ -1,11 +1,10 @@
 import * as React from 'react'
 import {
   Typography, Button, LinearProgress, Divider, Input, InputLabel, FormGroup, FormControlLabel,
-  FormControl, FormHelperText, Switch
+  FormControl, FormHelperText, Switch, Select, MenuItem
 } from '@material-ui/core'
 import { Mutation } from 'react-apollo'
 import { gql } from 'apollo-boost'
-// import TextField from 'material-ui/TextField'
 
 /* eslint-disable quotes, no-multi-str, no-undef */
 interface Props {
@@ -17,7 +16,7 @@ interface Props {
     }
   },
   token: string,
-  server: string,
+  server: { perms: boolean, icon: string, serverId: string, name: string, channels: string[] },
   refetch: Function
 }
 interface State {
@@ -69,7 +68,7 @@ mutation variables(
       <Mutation mutation={mutation} variables={{
         token: this.props.token,
         role: this.state.role,
-        server: this.props.server,
+        server: this.props.server.serverId,
         joinAutorole: this.state.joinAutorole,
         joinLeaveMessages: this.state.joinLeaveMessages,
         ocrOnSend: this.state.ocrOnSend
@@ -124,11 +123,16 @@ mutation variables(
             <Typography gutterBottom>Ensure the channel name is correct.</Typography>
             <FormControl fullWidth>
               <InputLabel>Channel Name</InputLabel>
-              <Input
-                value={this.state.joinLeaveMessages.channelName} fullWidth
-                onChange={e => this.setState({ joinLeaveMessages: {
-                  ...this.state.joinLeaveMessages, channelName: e.target.value
-                } })} margin='dense' />
+              <Select value={this.state.joinLeaveMessages.channelName} fullWidth margin='dense'
+                onChange={e => this.setState({
+                  joinLeaveMessages: {
+                    ...this.state.joinLeaveMessages, channelName: e.target.value
+                  }
+                })}
+              >
+                <MenuItem value=''><em>None</em></MenuItem>
+                {this.props.server.channels.map(i => (<MenuItem value={i} key={i}>{i}</MenuItem>))}
+              </Select>
               <FormHelperText>Leave blank to disable join/leave messages</FormHelperText>
             </FormControl>
             <div style={{ height: 10 }} />

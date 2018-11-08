@@ -5,10 +5,10 @@ import {
 } from '@material-ui/core'
 import Link from 'next/link'
 import fetch from 'isomorphic-unfetch'
+import withRoot from '../components/withRoot'
+import Dashboard from '../components/dashboard'
 import ApolloClient, { gql } from 'apollo-boost'
 import { ApolloProvider, Query } from 'react-apollo'
-import Dashboard from '../components/dashboard'
-import withRoot from '../components/withRoot'
 
 // Apollo Client definition.
 const client = new ApolloClient({ uri: `/graphql`, fetchOptions: { fetch } })
@@ -26,13 +26,17 @@ query getAllCommonServers($token: String!) {
     name
     perms
     icon
+    channels
   }
 }
     `
     return (
       <ApolloProvider client={client}>
       <>
-        <title>IveBot</title>
+        <head>
+          <title>IveBot</title>
+          <meta name='Description' content={'IveBot\'s dashboard for managing settings.'} />
+        </head>
         {/* login dialog. */}
         <Dialog open={this.state.open} onClose={this.closeDialog}>
           <DialogTitle>Log In</DialogTitle>

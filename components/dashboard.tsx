@@ -10,11 +10,15 @@ import { gql } from 'apollo-boost'
 
 /* eslint-disable quotes, no-multi-str, no-undef */
 interface Props {
-  data: Array<{ perms: boolean, icon: string, serverId: string, name: string }>,
+  data: Array<{
+    perms: boolean, icon: string, serverId: string, name: string, channels: string[]
+  }>,
   token: string
 }
 interface State {
-  selected: boolean | { perms: boolean, icon: string, serverId: string, name: string }
+  selected: boolean | {
+    perms: boolean, icon: string, serverId: string, name: string, channels: string[]
+  }
 }
 class DashboardIndex extends React.Component<Props, State> {
   constructor (props) {
@@ -41,20 +45,21 @@ query getServerSettings($server: String!, $token: String!) {
     `
     let settings
     if (!this.state.selected) {
-      settings = <List>{this.props.data.map(element => {
-        let nameOfServer = element.name ? element.name : ''
-        if (nameOfServer.length >= 32) nameOfServer = element.name.substr(0, 29) + '...'
-        return (
-          <ListItem disabled={!element.perms}
-            divider button key={element.serverId} onClick={() => this.setState({ selected: element })}>
-            {element.icon === 'no icon'
-              ? ''
-              : <Avatar src={element.icon} />
-            }
-            <ListItemText primary={nameOfServer} secondary={element.serverId} />
-          </ListItem>
-        )
-      })}</List>
+      settings = (
+        <List>{this.props.data.map(element => {
+          let nameOfServer = element.name ? element.name : ''
+          if (nameOfServer.length >= 32) nameOfServer = element.name.substr(0, 29) + '...'
+          return (
+            <ListItem
+              disabled={!element.perms} divider button key={element.serverId}
+              onClick={() => this.setState({ selected: element })}
+            >
+              {element.icon === 'no icon' ? '' : <Avatar src={element.icon} />}
+              <ListItemText primary={nameOfServer} secondary={element.serverId} />
+            </ListItem>
+          )
+        })}</List>
+      )
     } else if (typeof this.state.selected === 'object') {
       const element = this.state.selected
       let nameOfServer = element.name
@@ -90,7 +95,7 @@ query getServerSettings($server: String!, $token: String!) {
                 refetch={refetch}
                 data={data.serverSettings}
                 token={this.props.token}
-                server={element.serverId}
+                server={element}
               />
             }}
           </Query>

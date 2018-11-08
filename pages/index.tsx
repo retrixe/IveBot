@@ -26,7 +26,10 @@ class Index extends React.Component {
   render () {
     return (
       <div style={{ marginRight: 16, marginLeft: 16 }}>
-        <title>IveBot</title>
+        <head>
+          <title>IveBot</title>
+          <meta name='Description' content='IveBot is a multi-purpose Discord bot.' />
+        </head>
         <AppBar>
           <Toolbar>
             <Typography variant='title' color='inherit' style={{ flex: 1 }}>IveBot</Typography>

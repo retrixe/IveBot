@@ -42,7 +42,9 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
     },
     getUserInfo: (_: string, { linkToken }: { linkToken: string }) => {
       if (ctx.tempDB.link[linkToken]) {
-        let servers: Array<{ perms: boolean, icon: string, serverId: string, name: string }> = []
+        let servers: Array<{ /* eslint-disable indent */
+          perms: boolean, icon: string, serverId: string, name: string, channels: string[]
+        }> = [] /* eslint-enable indent */
         ctx.client.guilds.forEach(server => {
           ctx.client.guilds.find(a => a.id === server.id).members.forEach(member => {
             if (member.id === ctx.tempDB.link[linkToken]) {
@@ -50,6 +52,7 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
                 serverId: server.id,
                 name: server.name,
                 icon: server.iconURL || 'no icon',
+                channels: server.channels.filter(i => i.type === 0).map(i => i.name),
                 perms: host === ctx.tempDB.link[linkToken]
                   ? true : member.permission.has('manageGuild')
               })

@@ -1,15 +1,11 @@
-# Server specific settings.
-type ServerSetting {
-  # Server ID.
-  serverId: String!
-  # If add role is enabled for everyone.
-  addRoleForAll: Boolean
-  # If join/leave messages are enabled, and if so, what message and channel.
-  joinLeaveMessages: JoinLeaveMessages
-  # If join autorole is enabled, and if so, what role.
-  joinAutorole: String
-  # If text recognition on image send is enabled.
-  ocrOnSend: Boolean
+# Joining and leaving servers.
+type JoinLeaveMessages {
+  # Name of channel.
+  channelName: String
+  # What to post when joining.
+  joinMessage: String
+  # What to post when leaving.
+  leaveMessage: String
 }
 
 # Server type.
@@ -22,16 +18,22 @@ type Server {
   icon: String
   # Name of server.
   name: String
+  # Channels in server.
+  channels: [String]
 }
 
-# Joining and leaving servers.
-type JoinLeaveMessages {
-  # Name of channel.
-  channelName: String
-  # What to post when joining.
-  joinMessage: String
-  # What to post when leaving.
-  leaveMessage: String
+# Server specific settings.
+type ServerSetting {
+  # Server ID.
+  serverId: String!
+  # If add role is enabled for everyone.
+  addRoleForAll: Boolean
+  # If join/leave messages are enabled, and if so, what message and channel.
+  joinLeaveMessages: JoinLeaveMessages
+  # If join autorole is enabled, and if so, what role.
+  joinAutorole: String
+  # If text recognition on image send is enabled.
+  ocrOnSend: Boolean
 }
 
 # Enable queries.
@@ -76,7 +78,10 @@ type Mutation {
   editServerSettings(input: EditServerSettingsInput!): ServerSetting!
 }
 
+# Final schema.
 schema {
+  # Mutations to modify data.
   mutation: Mutation
+  # Queries to query data.
   query: Query
 }
