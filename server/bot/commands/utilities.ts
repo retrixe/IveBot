@@ -259,12 +259,16 @@ export const handleAvatar: Command = {
   generator: (message, args) => {
     let user: Message['author'] = getUser(message, args[0]) || message.author
     if (!user && message.mentions.length !== 0) user = message.mentions[0]
+    const member = message.member.guild.members.get(user.id)
     return {
       content: 'Avatar:',
       embed: {
         author: { name: `${user.username}#${user.discriminator}`, icon_url: user.avatarURL },
         image: { url: user.avatarURL.split('128').join('') + '2048' },
-        fields: [{ name: 'Link', value: user.avatarURL }]
+        fields: [{ name: 'Link', value: user.avatarURL }],
+        color: member.roles.map(i => member.guild.roles.get(i)).sort(
+          (a, b) => a.position > b.position ? -1 : 1
+        ).shift().color
       }
     }
   }

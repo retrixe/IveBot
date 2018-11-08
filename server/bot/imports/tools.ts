@@ -40,6 +40,8 @@ export const getUser = (message: Message, arg: string) => {
     return guild.members.find(
       i => i.username.toLowerCase() + '#' + i.discriminator === arg.toLowerCase()
     ).user
+  } else if (guild.members.find(i => i.nick && i.nick.toLowerCase() === arg.toLowerCase())) {
+    return guild.members.find(i => i.nick && i.nick.toLowerCase() === arg.toLowerCase()).user
   }
 }
 
