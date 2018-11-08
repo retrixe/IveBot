@@ -257,9 +257,16 @@ export const handleAvatar: Command = {
     argsRequired: false
   },
   generator: (message, args) => {
-    let user: Message['author'] = message.author
-    if (message.mentions.length !== 0) user = message.mentions[0]
-    return 'Link: ' + user.avatarURL.split('128').join('') + '2048'
+    let user: Message['author'] = getUser(message, args[0]) || message.author
+    if (!user && message.mentions.length !== 0) user = message.mentions[0]
+    return {
+      content: 'Avatar:',
+      embed: {
+        author: { name: `${user.username}#${user.discriminator}`, icon_url: user.avatarURL },
+        image: { url: user.avatarURL.split('128').join('') + '2048' },
+        fields: [{ name: 'Link', value: user.avatarURL }]
+      }
+    }
   }
 }
 

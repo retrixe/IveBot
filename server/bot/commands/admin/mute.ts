@@ -45,52 +45,56 @@ export const handleMute: Command = {
       })
     }
     if (hasPerms && role) {
-      message.member.guild.channels.forEach((a) => {
-        if (a.type === 0) {
-          client.editChannelPermission(
-            a.id, role.id, 0,
-            Constants.Permissions.sendMessages | Constants.Permissions.addReactions,
-            'role'
-          )
-        } else if (a.type === 2) {
-          client.editChannelPermission(a.id, role.id, 0, Constants.Permissions.voiceSpeak, 'role')
-        } else if (a.type === 4) {
-          client.editChannelPermission(
-            a.id, role.id, 0,
-            Constants.Permissions.sendMessages |
-            Constants.Permissions.addReactions | Constants.Permissions.voiceSpeak,
-            'role'
-          )
-        }
-      })
+      try {
+        message.member.guild.channels.forEach((a) => {
+          if (a.type === 0) {
+            client.editChannelPermission(
+              a.id, role.id, 0,
+              Constants.Permissions.sendMessages | Constants.Permissions.addReactions,
+              'role'
+            )
+          } else if (a.type === 2) {
+            client.editChannelPermission(a.id, role.id, 0, Constants.Permissions.voiceSpeak, 'role')
+          } else if (a.type === 4) {
+            client.editChannelPermission(
+              a.id, role.id, 0,
+              Constants.Permissions.sendMessages |
+              Constants.Permissions.addReactions | Constants.Permissions.voiceSpeak,
+              'role'
+            )
+          }
+        })
+      } catch (e) { return 'I cannot set permissions for the Muted role.' }
       // If no role, make a Muted role.
     } else if (!role) {
       try {
         role = await client.createRole(message.member.guild.id, { name: 'Muted', color: 0x444444 })
       } catch (e) { return 'I could not find a Muted role and cannot create a new one.' }
       // Modify channel permissions.
-      message.member.guild.channels.forEach((a) => {
-        if (a.type === 0) {
-          client.editChannelPermission(
-            a.id, role.id, 0,
-            Constants.Permissions.sendMessages | Constants.Permissions.addReactions,
-            'role'
-          )
-        } else if (a.type === 2) {
-          client.editChannelPermission(a.id, role.id, 0, Constants.Permissions.voiceSpeak, 'role')
-        } else if (a.type === 4) {
-          client.editChannelPermission(
-            a.id, role.id, 0,
-            Constants.Permissions.sendMessages |
-            Constants.Permissions.addReactions | Constants.Permissions.voiceSpeak,
-            'role'
-          )
-        }
-      })
+      try {
+        message.member.guild.channels.forEach((a) => {
+          if (a.type === 0) {
+            client.editChannelPermission(
+              a.id, role.id, 0,
+              Constants.Permissions.sendMessages | Constants.Permissions.addReactions,
+              'role'
+            )
+          } else if (a.type === 2) {
+            client.editChannelPermission(a.id, role.id, 0, Constants.Permissions.voiceSpeak, 'role')
+          } else if (a.type === 4) {
+            client.editChannelPermission(
+              a.id, role.id, 0,
+              Constants.Permissions.sendMessages |
+              Constants.Permissions.addReactions | Constants.Permissions.voiceSpeak,
+              'role'
+            )
+          }
+        })
+      } catch (e) { return 'I cannot set permissions for the Muted role.' }
     }
     // Mute person.
     try {
-      client.addGuildMemberRole(message.member.guild.id, user.id, role.id, args.join(' '))
+      await client.addGuildMemberRole(message.member.guild.id, user.id, role.id, args.join(' '))
     } catch (e) { return 'Could not mute that person.' }
     // Persist the mute.
     const guildID = message.member.guild.id
