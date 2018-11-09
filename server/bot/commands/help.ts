@@ -1,7 +1,7 @@
 import { Command as IveBotCommand } from '../imports/types'
 import { Command } from '../client'
 
-let generalHelp = `   ** Jony Ive can do many commands 📡**
+let generalHelp = `**Jony Ive can do many commands 📡**
 \`/halp\` and \`/help\` - The most innovative help.
 **Games.**
     \`/gunfight\` - For that good ol' fight bro.
@@ -70,7 +70,8 @@ export const handleHelp: IveBotCommand = {
     description: 'The most innovative help.',
     fullDescription: 'The most innovative halp.',
     usage: '/help (command name)',
-    example: '/help zalgo'
+    example: '/help zalgo',
+    argsRequired: false
   },
   generator: async (message, args, { commandParser }) => {
     const commands = commandParser.commands

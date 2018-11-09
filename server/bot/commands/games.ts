@@ -148,7 +148,8 @@ export const handleRandom: Command = {
     description: 'Return a random number.',
     fullDescription: 'Returns a random number, by default between 0 and 10.',
     usage: '/random (starting number) (ending number)',
-    example: '/random 1 69'
+    example: '/random 1 69',
+    argsRequired: false
   },
   generator: (message, args) => {
     // If argument length is 1 and the argument is a number..

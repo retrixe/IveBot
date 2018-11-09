@@ -26,10 +26,11 @@ export const handleToken: Command = {
     try {
       const dm = await client.getDMChannel(message.author.id)
       try {
-        const message = await client.createMessage(
-          dm.id, 'Your token is: **' + secureToken + '** | **DO NOT SHARE THIS WITH ANYONE >_<**'
+        const dmMessage = await dm.createMessage(
+          '**DO NOT SHARE THIS WITH ANYONE >_<** | Your token is:'
         )
-        setTimeout(() => { client.deleteMessage(dm.id, message.id) }, 30000)
+        const tokenMessage = await dm.createMessage(`**${secureToken}**`)
+        setTimeout(() => { dmMessage.delete(); tokenMessage.delete() }, 30000)
       } catch (e) { return 'There was an error processing your request (unable to DM token)' }
     } catch (e) { return 'There was an error processing your request (unable to DM)' }
     // The non-DM part.
@@ -105,15 +106,18 @@ export const handlePing: Command = {
     example: '/ping',
     argsRequired: false
   },
-  generator: 'Ping?',
-  postGenerator: (message, args, sent) => {
-    const startTime = sent.timestamp
+  generator: async (message) => {
+    // Get the time before sending the message.
+    const startTime = new Date().getTime()
+    // Send the message.
+    const sent = await message.channel.createMessage('Ping?')
     // Latency (unrealistic, this can be negative or positive)
     const fl = startTime - new Date().getTime()
     // Divide latency by 2 to get more realistic latency and get absolute value (positive)
     const l = Math.abs(fl) / 2
     // Get latency.
     const e = l < 200 ? `latency of **${l}ms** 🚅🔃` : `latency of **${l}ms** 🔃`
+    // Edit the message with the latency.
     sent.edit(`Aha! IveBot ${version} is connected to your server with a ${e}`)
   }
 }
