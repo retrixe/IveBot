@@ -149,6 +149,10 @@ export default class CommandParser {
       )
       return
     }
+    // Delete the message if needed.
+    try {
+      if (command.deleteCommand) message.delete('Automatically deleted by IveBot.')
+    } catch (e) {}
     // We get the exact content to send.
     const messageToSend = await command.execute(context, message, args)
     // We define a sent variable to keep track.
@@ -159,9 +163,6 @@ export default class CommandParser {
         .permissionsOf(this.client.user.id).has('sendMessages')
     ) sent = await message.channel.createMessage(messageToSend)
     if (command.postGenerator) command.postGenerator(message, args, sent, context)
-    try {
-      if (command.deleteCommand) message.delete('Automatically deleted by IveBot.')
-    } catch (e) {}
   }
 
   async onMessage (message: Message) {

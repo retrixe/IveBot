@@ -15,8 +15,8 @@ export const handleGiverole: Command = {
   generator: async (message, args, { db, client }) => {
     // Check user for permissions.
     if (
-      !message.member.permission.has('manageRoles') ||
-      (await getServerSettings(db, message.member.guild.id)).addRoleForAll
+      !message.member.permission.has('manageRoles') &&
+      !(await getServerSettings(db, message.member.guild.id)).addRoleForAll
     ) return `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
     // Now find the user ID.
     let user = getUser(message, args[0])
@@ -65,8 +65,8 @@ export const handleTakerole: Command = {
   generator: async (message, args, { db, client }) => {
     // Check user for permissions.
     if (
-      !message.member.permission.has('manageRoles') ||
-      (await getServerSettings(db, message.member.guild.id)).addRoleForAll
+      !message.member.permission.has('manageRoles') &&
+      !(await getServerSettings(db, message.member.guild.id)).addRoleForAll
     ) return `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
     // Now find the user ID.
     let user = getUser(message, args[0])
