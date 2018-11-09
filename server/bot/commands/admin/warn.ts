@@ -79,7 +79,7 @@ export const handleWarnings: Command = {
     // If improper arguments were provided, then we must inform the user.
     if (args.length > 1) return 'Correct usage: /warnings (user by ID/username/mention)'
     // Now find the user ID.
-    let user = getUser(message, args[0])
+    let user = args[0] && getUser(message, args[0])
     if (!user && args.length) return `Specify a valid member of this guild, ${getInsult()}.`
     else if (!user) user = message.author
     // Get a list of warnings.
