@@ -93,9 +93,9 @@ export const handleAccept: Command = {
     )
     // Let's wait for random amount under 20s and call a random word.
     setTimeout(() => {
-      client.createMessage(
-        message.channel.id, 'Say ' + tempDB.gunfight[indexOfGunfight].randomWord + '!'
-      )
+      try {
+        message.channel.createMessage('Say ' + tempDB.gunfight[indexOfGunfight].randomWord + '!')
+      } catch (e) {}
       /* tempDB.gunfight[tempDB.gunfight.indexOf(gunfightToAccept)].wordSaid = true
       setTimeout(() => {
         if (tempDB.gunfight.find(

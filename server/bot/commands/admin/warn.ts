@@ -69,10 +69,10 @@ export const handleWarnings: Command = {
     argsRequired: false,
     requirements: {
       permissions: { 'manageMessages': true },
-      custom: (message) => (
-        getUser(message, message.content.split(' ')[1]).id === message.author.id ||
-        message.content.split(' ').length === 1
-      )
+      custom: (message) => {
+        const user = getUser(message, message.content.split(' ')[1])
+        return user ? user.id === message.author.id : message.content.split(' ').length === 1
+      }
     }
   },
   generator: async (message, args, { client, db }) => {
@@ -91,7 +91,7 @@ export const handleWarnings: Command = {
     // Generate the response.
     const format = 'dddd, MMMM Do YYYY, h:mm:ss A' // Date format.
     return {
-      content: `🛃 **Warnings for ${message.member.username}#${message.member.discriminator}:**`,
+      content: `🛃 **Warnings for ${user.username}#${user.discriminator}:**`,
       embed: {
         color: 0x00AE86,
         type: 'rich',

@@ -74,7 +74,7 @@ export const handleCat: Command = {
       // Fetch a cat and process it (this sounds funny to me idk why)
       const { file } = await (await fetch(`http://aws.random.cat/meow`)).json()
       // Send it.
-      return file
+      return { embed: { image: { url: file }, color: 0x123456 }, content: '🐈' }
     } catch (e) {
       return `Something went wrong 👾 Error: ${e}`
     }
@@ -95,11 +95,15 @@ export const handleRobohash: Command = {
     const target = args.shift()
     const text = args.join('%20')
     // Send a robohash.
-    if (target === 'robot') return `https://robohash.org/${text}.png`
-    else if (target === 'monster') return `https://robohash.org/${text}.png?set=set2`
-    else if (target === 'head') return `https://robohash.org/${text}.png?set=set3`
-    else if (target === 'cat') return `https://robohash.org/${text}.png?set=set4`
-    else {
+    if (target === 'robot') {
+      return { embed: { image: { url: `https://robohash.org/${text}.png` } }, content: '🤖' }
+    } else if (target === 'monster') {
+      return { embed: { image: { url: `https://robohash.org/${text}.png?set=set2` } }, content: '👾' }
+    } else if (target === 'head') {
+      return { embed: { image: { url: `https://robohash.org/${text}.png?set=set3` } } }
+    } else if (target === 'cat') {
+      return { embed: { image: { url: `https://robohash.org/${text}.png?set=set4` } } }
+    } else {
       return 'Proper usage: /robohash <robot, monster, head, cat> <text to robohash>'
     }
   }
@@ -169,13 +173,13 @@ export const handleDog: Command = {
         const { message } = await (await fetch(
           `http://dog.ceo/api/breed/${args[0]}/images/random`
         )).json()
-        return message
+        return { embed: { image: { url: message }, color: 0x654321 }, content: '🐕' }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
     }
     // Fetch a picture.
     try {
       const { message } = await (await fetch(`http://dog.ceo/api/breeds/image/random`)).json()
-      return message
+      return { embed: { image: { url: message }, color: 0x654321 }, content: '🐕' }
     } catch (err) { return `Something went wrong 👾 Error: ${err}` }
   }
 }

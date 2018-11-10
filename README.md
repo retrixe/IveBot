@@ -6,30 +6,60 @@ The bot that created the iPhone X. It's strictly private. You may run it locally
 
 It's planned to have some nifty commands like /assistant which directly communicates with the Google Assistant gRPC API. You heard that, Google Assistant in a Discord bot.
 
-2.0 is built upon Next.js and coming with administrative commands and a web dashboard. 1.0 is still supported and recommended because of its stability.
+2.0 is built upon Next.js with administrative commands and a web dashboard. 3.0 in development uses Eris and is a rewritten and refined codebase focused on stability and a framework for further enhancements.
 
 <hr />
 <details><summary>Commands</summary>
 
 <br />
 
-- `/help` and `/halp`
-- `/gunfight`
-- `/choose`
-- `/reverse`
-- `/8ball`
-- `/robohash`
-- `/zalgo`
-- `/repeat`
-- `/request` for test pilots
-- `/urban`
-- `/cat` and `/dog`
-- `/astronomy-picture-of-the-day` or `/apod`
-- `/say`
-- `/avatar`
-- `/version`, `/ping` and `/about`
-- `/ban`, `/unban`, `/kick`, `/mute` and `/unmute`
-- `/addrole` and `/removerole`
+\`/halp\` and \`/help\` - The most innovative help.
+
+**Games.**
+
+- \`/gunfight\`
+- \`/random\`
+- \`/randomword\`
+- \`/choose\`
+- \`/reverse\`
+- \`/8ball\`
+- \`/repeat\`
+- \`/calculate\`
+- \`/distort\`
+
+**Random searches.**
+
+- \`/urban\`
+- \`/cat\` and \`/dog\`
+- \`/robohash\`
+- \`/zalgo\` \`/dezalgo\`
+- \`/namemc\`
+- \`/astronomy-picture-of-the-day\` or \`/apod\`
+- \`/currency\`
+
+**Utilities.**
+
+- \`/request\` (for test pilots)
+- \`/token\`
+- \`/weather\`
+- \`/say\` | \`/type\`
+- \`/editLastSay\`
+- \`/remindme\`
+- \`/leave\`
+- \`/ocr\`
+- \`/avatar\`
+- \`/userinfo\`
+- \`/serverinfo\`
+- \`/about\`, \`/ping\`, \`/uptime\` and \`/version\`
+- \`/giverole\` and \`/takerole\`
+
+**Administrative commands.**
+
+- \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
+- \`/warn\` and \`/warnings\` | \`/clearwarns\` and \`/removewarn\`
+- \`/changeserverregion\` and \`/listserverregions\`
+- \`/purge\`
+- \`/slowmode\`
 
 </details>
 <hr />

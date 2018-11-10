@@ -20,7 +20,9 @@ export const handleGiverole: Command = {
     ) return `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
     // Now find the user ID.
     let user = getUser(message, args[0])
-    if (!user) user = message.author
+    if (!message.member.permission.has('manageRoles') && user) {
+      return `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
+    } else if (!user) user = message.author
     else args.shift()
     // Now find the role.
     let role = message.member.guild.roles.find(
@@ -70,7 +72,9 @@ export const handleTakerole: Command = {
     ) return `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
     // Now find the user ID.
     let user = getUser(message, args[0])
-    if (!user) user = message.author
+    if (!message.member.permission.has('manageRoles') && user) {
+      return `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
+    } else if (!user) user = message.author
     else args.shift()
     // Now find the role.
     let role = message.member.guild.roles.find(
