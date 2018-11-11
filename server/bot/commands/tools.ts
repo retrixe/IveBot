@@ -169,7 +169,7 @@ export const handleSafeeval: Command = {
         content: message.content
       })
       message.addReaction('✅')
-      return res.toString() || undefined
+      return res ? res.toString() : undefined
     } catch (e) {
       message.addReaction('❌')
       message.channel.createMessage(`**Error:**
