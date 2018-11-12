@@ -74,7 +74,7 @@ export const handleCat: Command = {
       // Fetch a cat and process it (this sounds funny to me idk why)
       const { file } = await (await fetch(`http://aws.random.cat/meow`)).json()
       // Send it.
-      return { embed: { image: { url: file }, color: 0x123456 }, content: '🐈' }
+      return { embed: { image: { url: file }, color: 0x123456 }, content: '🐱' }
     } catch (e) {
       return `Something went wrong 👾 Error: ${e}`
     }
@@ -95,14 +95,23 @@ export const handleRobohash: Command = {
     const target = args.shift()
     const text = args.join('%20')
     // Send a robohash.
+    const color = 0xcf1c1c
     if (target === 'robot') {
-      return { embed: { image: { url: `https://robohash.org/${text}.png` } }, content: '🤖' }
+      return {
+        embed: { image: { url: `https://robohash.org/${text}.png` }, color }, content: '🤖'
+      }
     } else if (target === 'monster') {
-      return { embed: { image: { url: `https://robohash.org/${text}.png?set=set2` } }, content: '👾' }
+      return {
+        embed: { image: { url: `https://robohash.org/${text}.png?set=set2`, color } }, content: '👾'
+      }
     } else if (target === 'head') {
-      return { embed: { image: { url: `https://robohash.org/${text}.png?set=set3` } } }
+      return {
+        embed: { image: { url: `https://robohash.org/${text}.png?set=set3`, color } }
+      }
     } else if (target === 'cat') {
-      return { embed: { image: { url: `https://robohash.org/${text}.png?set=set4` } } }
+      return {
+        embed: { image: { url: `https://robohash.org/${text}.png?set=set4`, color } }
+      }
     } else {
       return 'Proper usage: /robohash <robot, monster, head, cat> <text to robohash>'
     }

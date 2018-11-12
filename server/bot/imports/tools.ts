@@ -28,6 +28,7 @@ export const getServerSettings = async (db: Db, serverID: string) => {
 export const zeroWidthSpace = '​'
 
 export const getUser = (message: Message, arg: string) => {
+  if (!arg || typeof arg !== 'string') return
   const mentions = message.mentions
   const guild = message.member.guild
   if (guild.members.find(i => i.id === arg)) return guild.members.find(i => i.id === arg).user

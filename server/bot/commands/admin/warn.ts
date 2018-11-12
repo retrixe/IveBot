@@ -69,11 +69,10 @@ export const handleWarnings: Command = {
     argsRequired: false,
     requirements: {
       permissions: { 'manageMessages': true },
-      custom: (message) => {
-        return message.content.split(' ')[1]
-          ? getUser(message, message.content.split(' ')[1]).id === message.author.id
-          : message.content.split(' ').length === 1
-      }
+      custom: (message) => (
+        getUser(message, message.content.split(' ')[1]).id === message.author.id ||
+        message.content.split(' ').length === 1
+      )
     }
   },
   generator: async (message, args, { client, db }) => {
