@@ -99,10 +99,10 @@ export const handleMute: Command = {
     // Persist the mute.
     const guildID = message.member.guild.id
     if (!tempDB.mute[guildID]) tempDB.mute[guildID] = []
-    tempDB.mute[guildID].push(user.id)
+    if (!tempDB.mute[guildID].includes(user.id)) tempDB.mute[guildID].push(user.id)
     // If time given, set timeout.
     try {
-      if (ms(args[0])) {
+      if (ms(args[0]) && ms(args[0]) <= 2073600000) {
         setTimeout(() => {
           try {
             // Remove the mute persist.

@@ -131,7 +131,7 @@ export const handleEval: Command = {
     example: '/eval ```js\nconsole.log(\'ji\')\n```',
     requirements: { userIDs: [host] }
   },
-  generator: async (message, args, { client, tempDB, db }) => {
+  generator: async (message, args, { client, tempDB, db, commandParser }) => {
     try {
       let toEval = args.join(' ')
       if (toEval.startsWith('```js')) toEval = toEval.substring(5)
