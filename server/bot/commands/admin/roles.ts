@@ -14,23 +14,22 @@ export const handleGiverole: Command = {
   },
   generator: async (message, args, { db, client }) => {
     // Check user for permissions.
-    if (
-      !message.member.permission.has('manageRoles') &&
-      !(await getServerSettings(db, message.member.guild.id)).addRoleForAll
-    ) return `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
+    const insult = `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
+    const publicRoles = (await getServerSettings(db, message.member.guild.id)).addRoleForAll
+    if (!message.member.permission.has('manageRoles') && !publicRoles) return insult
     // Now find the user ID.
     let user = getUser(message, args[0])
-    if (!message.member.permission.has('manageRoles') && user) {
-      return `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
-    } else if (!user) user = message.author
+    if (!message.member.permission.has('manageRoles') && user) return insult // Permission check.
+    else if (!user) user = message.author
     else args.shift()
     // Now find the role.
     let role = message.member.guild.roles.find(
       a => a.name.toLowerCase() === args.join(' ').toLowerCase() || args.join(' ') === a.id
     )
     if (!role) return 'You have provided an invalid role name/ID, you ' + getInsult() + '.'
+    else if (!publicRoles.split('|').includes(role.name)) return insult // Permission check.
     // Can the user manage this role?
-    if (role.position > checkRolePosition(message.member)
+    if (role.position >= checkRolePosition(message.member)
     ) return `You cannot give this role. Pfft, overestimating their own powers now.`
     // Give the role.
     const rolesOfMember = user.id !== message.author.id // Ternary statement.
@@ -66,23 +65,22 @@ export const handleTakerole: Command = {
   },
   generator: async (message, args, { db, client }) => {
     // Check user for permissions.
-    if (
-      !message.member.permission.has('manageRoles') &&
-      !(await getServerSettings(db, message.member.guild.id)).addRoleForAll
-    ) return `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
+    const insult = `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
+    const publicRoles = (await getServerSettings(db, message.member.guild.id)).addRoleForAll
+    if (!message.member.permission.has('manageRoles') && !publicRoles) return insult
     // Now find the user ID.
     let user = getUser(message, args[0])
-    if (!message.member.permission.has('manageRoles') && user) {
-      return `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
-    } else if (!user) user = message.author
+    if (!message.member.permission.has('manageRoles') && user) return insult // Permission check.
+    else if (!user) user = message.author
     else args.shift()
     // Now find the role.
     let role = message.member.guild.roles.find(
       a => a.name.toLowerCase() === args.join(' ').toLowerCase() || args.join(' ') === a.id
     )
     if (!role) return 'You have provided an invalid role name/ID, you ' + getInsult() + '.'
+    else if (!publicRoles.split('|').includes(role.name)) return insult // Permission check.
     // Can the user manage this role?
-    if (role.position > checkRolePosition(message.member)
+    if (role.position >= checkRolePosition(message.member)
     ) return `You cannot take this role. Pfft, overestimating their own powers now.`
     // Give the role.
     const rolesOfMember = user.id !== message.author.id // Ternary statement.

@@ -27,7 +27,7 @@ type ServerSetting {
   # Server ID.
   serverId: String!
   # If add role is enabled for everyone.
-  addRoleForAll: Boolean
+  addRoleForAll: String
   # If join/leave messages are enabled, and if so, what message and channel.
   joinLeaveMessages: JoinLeaveMessages
   # If join autorole is enabled, and if so, what role.
@@ -63,7 +63,7 @@ input EditServerSettingsInput {
   # Token of the user by whom the operation is performed.
   linkToken: String!
   # Enable public roles through this setting.
-  addRoleForAll: Boolean
+  addRoleForAll: String
   # Edit join autorole through this setting.
   joinAutorole: String
   # Edit join leave messages through this setting.

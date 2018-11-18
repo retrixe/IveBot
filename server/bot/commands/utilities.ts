@@ -265,7 +265,7 @@ export const handleAvatar: Command = {
       embed: {
         author: { name: `${user.username}#${user.discriminator}`, icon_url: user.avatarURL },
         image: { url: user.avatarURL.split('128').join('') + '2048' },
-        fields: [{ name: 'Link', value: user.avatarURL }],
+        description: `**[Link](${user.avatarURL})**`,
         color: member.roles.map(i => member.guild.roles.get(i)).sort(
           (a, b) => a.position > b.position ? -1 : 1
         ).shift().color

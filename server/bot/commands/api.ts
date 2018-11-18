@@ -102,15 +102,15 @@ export const handleRobohash: Command = {
       }
     } else if (target === 'monster') {
       return {
-        embed: { image: { url: `https://robohash.org/${text}.png?set=set2`, color } }, content: '👾'
+        embed: { image: { url: `https://robohash.org/${text}.png?set=set2` }, color }, content: '👾'
       }
     } else if (target === 'head') {
       return {
-        embed: { image: { url: `https://robohash.org/${text}.png?set=set3`, color } }
+        embed: { image: { url: `https://robohash.org/${text}.png?set=set3` }, color }
       }
     } else if (target === 'cat') {
       return {
-        embed: { image: { url: `https://robohash.org/${text}.png?set=set4`, color } }
+        embed: { image: { url: `https://robohash.org/${text}.png?set=set4` }, color }
       }
     } else {
       return 'Proper usage: /robohash <robot, monster, head, cat> <text to robohash>'
@@ -177,7 +177,7 @@ export const handleDog: Command = {
   },
   generator: async (message, args) => {
     // List of breeds.
-    if (args[0] === 'list' && !args[1]) {
+    if (args[0] === 'list') {
       try {
         const { message } = await (await fetch('https://dog.ceo/api/breeds/list/all')).json()
         // If only list of breeds was asked.

@@ -9,7 +9,7 @@ import { gql } from 'apollo-boost'
 /* eslint-disable quotes, no-multi-str, no-undef */
 interface Props {
   data: {
-    addRoleForAll: boolean, joinAutorole: string, ocrOnSend: boolean, joinLeaveMessages: {
+    addRoleForAll: string, joinAutorole: string, ocrOnSend: boolean, joinLeaveMessages: {
       channelName: string,
       joinMessage: string,
       leaveMessage: string
@@ -20,7 +20,7 @@ interface Props {
   refetch: Function
 }
 interface State {
-  role: boolean,
+  role: string,
   joinAutorole: string,
   ocrOnSend: boolean,
   joinLeaveMessages: {
@@ -46,7 +46,7 @@ export default class Settings extends React.Component<Props, State> {
   render () {
     const mutation = gql`
 mutation variables(
-  $server: String!, $token: String!, $role: Boolean, $joinAutorole: String,
+  $server: String!, $token: String!, $role: String, $joinAutorole: String,
   $joinLeaveMessages: JoinLeaveMessagesInput, $ocrOnSend: Boolean
 ) {
   editServerSettings(input: {
@@ -78,22 +78,20 @@ mutation variables(
             <br />
             <Typography variant='title' gutterBottom>Public Roles</Typography>
             <Divider />
-            <FormGroup row>
-              <FormControlLabel
-                control={
-                  <Switch color='secondary' checked={this.state.role}
-                    onChange={() => this.setState({ role: !this.state.role })}
-                  />
-                }
-                label='Enable Public Roles'
-              />
-            </FormGroup>
-            <Typography gutterBottom>
-              {'Public roles enable members to add roles to themselves as long as \
-              the roles remain below their highest role. This enables features such as \
-              colored roles in addition to auto roles.'}
-            </Typography>
             <br />
+            <Typography gutterBottom>
+              {'Public roles enable members to add the roles listed to themselves without any \
+              necessary permissions. This enables features such as colored roles or announcement \
+              pings.'}
+            </Typography>
+            <FormControl fullWidth>
+              <InputLabel>Role Names</InputLabel>
+              <Input
+                value={this.state.role} fullWidth
+                onChange={e => this.setState({ role: e.target.value })} margin='dense' />
+              <FormHelperText>Leave blank to disable public roles</FormHelperText>
+            </FormControl>
+            <br /><br />
             <Typography variant='title' gutterBottom>Join/Leave Actions</Typography>
             <Divider />
             <br />

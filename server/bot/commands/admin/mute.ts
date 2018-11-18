@@ -102,7 +102,7 @@ export const handleMute: Command = {
     if (!tempDB.mute[guildID].includes(user.id)) tempDB.mute[guildID].push(user.id)
     // If time given, set timeout.
     try {
-      if (ms(args[0]) && ms(args[0]) <= 2073600000) return 'Mute limit is 24 days.'
+      if (ms(args[0]) && ms(args[0]) >= 2073600000) return 'Mute limit is 24 days.'
       else if (ms(args[0])) {
         setTimeout(() => {
           try {
