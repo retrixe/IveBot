@@ -135,18 +135,18 @@ export default class CommandParser {
     }
     const args = message.content.split(' ')
     args.shift()
-    // We check for arguments.
-    if (args.length === 0 && command.argsRequired) {
-      message.channel.createMessage(command.invalidUsageMessage)
-      return
-      // Guild and DM only.
-    } else if (command.guildOnly && message.channel.type !== 0) return
+    // Guild and DM only.
+    if (command.guildOnly && message.channel.type !== 0) return
     else if (command.dmOnly && message.channel.type !== 1) return
     // Check for permissions.
     else if (!command.requirementsCheck(message)) {
       message.channel.createMessage(
         `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
       )
+      return
+      // We check for arguments.
+    } else if (args.length === 0 && command.argsRequired) {
+      message.channel.createMessage(command.invalidUsageMessage)
       return
     }
     // Delete the message if needed.

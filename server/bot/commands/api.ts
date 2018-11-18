@@ -171,21 +171,43 @@ export const handleDog: Command = {
   opts: {
     description: 'Random dog from <https://dog.ceo>',
     fullDescription: 'Random dog from <https://dog.ceo>',
-    usage: '/dog (breed)',
-    example: '/dog labrador',
+    usage: '/dog (list) (breed, works with random image AND list) (sub-breed ONLY without list)',
+    example: '/dog list | /dog labrador | /dog',
     argsRequired: false
   },
   generator: async (message, args) => {
-    if (args.length) {
-      // Fetch a picture.
+    // List of breeds.
+    if (args[0] === 'list' && !args[1]) {
+      try {
+        const { message } = await (await fetch('https://dog.ceo/api/breeds/list/all')).json()
+        // If only list of breeds was asked.
+        if (!args[1]) return `**List of breeds:** ${Object.keys(message).join(', ')}`
+        // If list of sub-breeds was asked.
+        if (!message[args[1]]) return 'This breed does not exist!'
+        else if (message[args[1]].length === 0) return 'This breed has no sub-breeds!'
+        return `**List of sub-breeds:** ${message[args[1]].join(', ')}`
+      } catch (err) { return `Something went wrong 👾 Error: ${err}` }
+      // Fetch a random picture for a sub-breed.
+    } else if (args[0] && args[1]) {
       try {
         const { message } = await (await fetch(
-          `http://dog.ceo/api/breed/${args[0]}/images/random`
+          `http://dog.ceo/api/breed/${args[0].toLowerCase()}/${args[1].toLowerCase()}/images/random`
         )).json()
-        return { embed: { image: { url: message }, color: 0x654321 }, content: '🐕' }
+        return {
+          embed: { image: { url: message }, color: 0x654321 },
+          content: `🐕 ${args[0]} ${args[1]}`
+        }
+      } catch (err) { return `Something went wrong 👾 Error: ${err}` }
+    } else if (args[0]) {
+      // Fetch a random picture for a breed.
+      try {
+        const { message } = await (await fetch(
+          `http://dog.ceo/api/breed/${args[0].toLowerCase()}/images/random`
+        )).json()
+        return { embed: { image: { url: message }, color: 0x654321 }, content: '🐕 ' + args[0] }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
     }
-    // Fetch a picture.
+    // Fetch a random picture.
     try {
       const { message } = await (await fetch(`http://dog.ceo/api/breeds/image/random`)).json()
       return { embed: { image: { url: message }, color: 0x654321 }, content: '🐕' }
@@ -286,7 +308,7 @@ export const handleCurrency: Command = {
   opts: {
     description: 'Convert a currency from one currency to another.',
     fullDescription: 'Convert a currency from one currency to another.',
-    usage: '/currency <currency symbol to convert from> <currency symbol to convert to> (amount, default: 1)',
+    usage: '/currency (list) <currency symbol to convert from> <currency symbol to convert to> (amount, default: 1)',
     example: '/currency EUR USD 40'
   },
   generator: async (message, args) => {

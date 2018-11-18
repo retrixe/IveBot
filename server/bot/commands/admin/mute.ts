@@ -102,14 +102,15 @@ export const handleMute: Command = {
     if (!tempDB.mute[guildID].includes(user.id)) tempDB.mute[guildID].push(user.id)
     // If time given, set timeout.
     try {
-      if (ms(args[0]) && ms(args[0]) <= 2073600000) {
+      if (ms(args[0]) && ms(args[0]) <= 2073600000) return 'Mute limit is 24 days.'
+      else if (ms(args[0])) {
         setTimeout(() => {
           try {
             // Remove the mute persist.
             tempDB.mute[guildID].splice(tempDB.mute[guildID].findIndex((i) => i === user.id), 1)
             // Take the role.
             client.removeGuildMemberRole(message.member.guild.id, user.id, role.id)
-          } catch (e) {}
+          } catch (e) { message.channel.createMessage('Unable to unmute user.') }
         }, ms(args[0]))
       }
     } catch (e) {}
