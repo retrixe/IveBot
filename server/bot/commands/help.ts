@@ -34,9 +34,11 @@ let generalHelp = `**Jony Ive can do many commands 📡**
     \`/userinfo\` - User info.
     \`/serverinfo\` - Server info 🤔
     \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
+    \`/emojiImage\` - Image of an emoji.
     \`/giverole\` and \`/takerole\` - Edit roles.
 **Administrative commands.**
     \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
+    \`/addEmoji\`, \`/deleteEmoji\` and \`/editEmoji\`
     \`/warn\` and \`/warnings\` | \`/clearwarns\` and \`/removewarn\`
     \`/changeserverregion\` and \`/listserverregions\`
     \`/purge\` - Bulk delete a set of messages.

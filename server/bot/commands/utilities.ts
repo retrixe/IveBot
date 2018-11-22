@@ -261,7 +261,7 @@ export const handleAvatar: Command = {
     if (!user && message.mentions.length !== 0) user = message.mentions[0]
     const member = message.member.guild.members.get(user.id)
     return {
-      content: 'Avatar:',
+      content: '**Avatar:**',
       embed: {
         author: { name: `${user.username}#${user.discriminator}`, icon_url: user.avatarURL },
         image: { url: user.avatarURL.split('128').join('') + '2048' },

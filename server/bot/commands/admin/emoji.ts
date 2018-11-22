@@ -1,0 +1,130 @@
+import { Command } from '../../imports/types'
+import { getInsult, getIdFromMention } from '../../imports/tools'
+import * as fetch from 'isomorphic-unfetch'
+
+export const handleAddemoji: Command = {
+  name: 'addemoji',
+  aliases: ['ae', 'createemoji'],
+  opts: {
+    description: 'Add an emoji to the server.',
+    fullDescription: 'Add an emoji to the server.',
+    usage: '/addemoji <name> <link or attached image>',
+    example: '/addemoji whateverURLmeh',
+    guildOnly: true,
+    requirements: { permissions: { 'manageEmojis': true } }
+  },
+  generator: async (message, args) => {
+    // Get the URL.
+    const url = args.length > 1 ? args.splice(1).join('%20') : message.attachments[0].url
+    // Fetch the emoji.
+    let image
+    try {
+      image = Buffer.from(await (await fetch(url)).arrayBuffer()).toString('base64')
+    } catch (e) { return `Invalid image URL, you ${getInsult()}` }
+    // Try adding it, else throw an error.
+    try {
+      const emoji = await message.member.guild.createEmoji({
+        name: args[0], image: `data:image;base64,${image}`
+      })
+      let mention = ''
+      if (emoji.animated) mention = `<a:${emoji.name}:${emoji.id}>`
+      else mention = `<:${emoji.name}:${emoji.id}>`
+      return `Emoji successfully added \\o/ (${mention})`
+    } catch (e) {
+      return `Emoji could not be added. Is the emoji larger than 256 kB? Perms?!
+I recommend using <https://picresize.com/> if the emoji is JPG and too large.
+Set step 2 to No Change, set Max Filesize to 255 in step 4 and set to Best quality.
+After checking image format as JPG, resize, View Image and use the URL to the image here.`
+    }
+  }
+}
+
+export const handleDeleteemoji: Command = {
+  name: 'deleteemoji',
+  aliases: ['de', 'removeemoji'],
+  opts: {
+    description: 'Remove an emoji from the server.',
+    fullDescription: 'Remove an emoji from the server.',
+    usage: '/deleteEmoji <custom emoji by ID/mention/name>',
+    example: '/deleteEmoji <:tom:402567029963489281>',
+    guildOnly: true,
+    requirements: { permissions: { 'manageEmojis': true } }
+  },
+  generator: async (message, args) => {
+    // Try deleting it, else throw an error.
+    try {
+      const emoji = message.member.guild.emojis.find(
+        i => (i.name === args[0] || i.id === args[0] || i.id === getIdFromMention(args[0]))
+      )
+      // If emoji doesn't exist.
+      if (!emoji) return `Invalid emoji, you ${getInsult()}.`
+      await message.member.guild.deleteEmoji(emoji.id)
+      return 'Emoji successfully deleted \\o/'
+    } catch (e) {
+      return 'Emoji could not be deleted.'
+    }
+  }
+}
+
+export const handleEditemoji: Command = {
+  name: 'editemoji',
+  aliases: ['ee'],
+  opts: {
+    description: 'Edit an emoji name in the server.',
+    fullDescription: 'Edit an emoji name in the server.',
+    usage: '/editEmoji <custom emoji by ID/mention/name> <new name>',
+    example: '/editEmoji tim tim2',
+    guildOnly: true,
+    requirements: { permissions: { 'manageEmojis': true } }
+  },
+  generator: async (message, args) => {
+    // Check if enough arguments were provided.
+    if (args.length !== 2) return 'Correct usage: /editEmoji <emoji by ID/mention/name> <new name>'
+    // Try editing it, else throw an error.
+    try {
+      const emoji = message.member.guild.emojis.find(
+        i => (i.name === args[0] || i.id === args[0] || i.id === getIdFromMention(args[0]))
+      )
+      // If emoji doesn't exist.
+      if (!emoji) return `Invalid emoji, you ${getInsult()}.`
+      const newEmoji = await message.member.guild.editEmoji(emoji.id, { name: args[1] })
+      let mention = ''
+      if (newEmoji.animated) mention = `<a:${newEmoji.name}:${newEmoji.id}>`
+      else mention = `<:${newEmoji.name}:${newEmoji.id}>`
+      return `Emoji successfully edited \\o/ ${mention}`
+    } catch (e) {
+      return 'Emoji could not be edited.'
+    }
+  }
+}
+
+export const handleEmojiimage: Command = {
+  name: 'emojiimage',
+  aliases: ['ei', 'emojimage'],
+  opts: {
+    description: 'Get the image of a custom emoji.',
+    fullDescription: 'Get the image of a custom emoji.',
+    usage: '/emojiImage <custom emoji by ID/mention/name>',
+    example: '/emojiImage <:tom:402567029963489281>',
+    guildOnly: true
+  },
+  generator: async (message, args) => {
+    // Get emoji ID.
+    const found = message.member.guild.emojis.find(i => (i.name === args[0] || i.id === args[0]))
+    const emoji = args[0].startsWith('<') ? getIdFromMention(args[0]) : (found ? found.id : undefined)
+    // If emoji doesn't exist.
+    if (!emoji || ![17, 18].includes(emoji.length)) return `Invalid custom emoji, you ${getInsult()}.`
+    // Get image extension.
+    const ext = args[0].split(':')[0] === '<a' || (found && found.animated) ? 'gif' : 'png'
+    // Return emoji.
+    return {
+      content: '<:tom:402567029963489281> **| Emoji image:**',
+      embed: {
+        color: 0x696969,
+        title: found ? found.name : args[0].split(':')[1],
+        description: `**[Link](https://cdn.discordapp.com/emojis/${emoji}.${ext})**`,
+        image: { url: `https://cdn.discordapp.com/emojis/${emoji}.${ext}` }
+      }
+    }
+  }
+}
