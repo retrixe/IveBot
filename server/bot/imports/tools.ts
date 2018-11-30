@@ -41,8 +41,18 @@ export const getUser = (message: Message, arg: string) => {
     return guild.members.find(
       i => i.username.toLowerCase() + '#' + i.discriminator === arg.toLowerCase()
     ).user
-  } else if (guild.members.find(i => i.nick && i.nick.toLowerCase() === arg.toLowerCase())) {
-    return guild.members.find(i => i.nick && i.nick.toLowerCase() === arg.toLowerCase()).user
+  }
+}
+
+export const getChannel = (message: Message, arg: string) => {
+  if (!arg || typeof arg !== 'string') return
+  const mentions = message.channelMentions
+  const guild = message.member.guild
+  if (guild.channels.find(i => i.id === arg)) return guild.channels.find(i => i.id === arg)
+  else if (mentions.length && mentions[0] === getIdFromMention(arg)) {
+    return guild.channels.find(i => i.id === mentions[0])
+  } else if (guild.channels.find(i => i.name.toLowerCase() === arg.toLowerCase())) {
+    return guild.channels.find(i => i.name.toLowerCase() === arg.toLowerCase())
   }
 }
 

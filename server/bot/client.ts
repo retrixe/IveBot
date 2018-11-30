@@ -176,7 +176,7 @@ export default class CommandParser {
     // Check for the command in this.commands.
     const keys = Object.keys(this.commands)
     for (let i = 0; i < keys.length; i++) {
-      if (commandExec === keys[i] || (
+      if (commandExec === keys[i].toLowerCase() || (
         this.commands[keys[i]].aliases && this.commands[keys[i]].aliases.includes(commandExec)
       )) {
         // We mark the command as evaluated and schedule a removal of the ID in 30 seconds.

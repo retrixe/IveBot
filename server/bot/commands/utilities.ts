@@ -101,7 +101,7 @@ export const handleUserinfo: Command = {
       content: `👥 **Userinfo on ${user.username}:**`,
       embed: {
         author: { name: `User info`, icon_url: user.avatarURL },
-        title: `${user.username}#${user.discriminator}`,
+        title: `${user.username}#${user.discriminator}` + (user.bot ? ' (Bot account)' : ''),
         description: user.mention,
         thumbnail: { url: user.avatarURL },
         color,
