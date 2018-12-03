@@ -25,6 +25,10 @@ class MyDocument extends Document {
           />
           {/* PWA primary color */}
           <meta name='theme-color' content={pageContext.theme.palette.primary.main} />
+          {/* Open Graph Protocol support. */}
+          <meta property='og:title' content='IveBot' />
+          <meta property='og:type' content='website' />
+          <meta property='og:image' content={ico} />
           <link
             rel='stylesheet'
             href='https://fonts.googleapis.com/css?family=Roboto:300,400,500'

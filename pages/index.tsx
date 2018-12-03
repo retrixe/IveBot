@@ -3,6 +3,7 @@ import {
   AppBar, Toolbar, Button, Typography, SvgIcon, IconButton
 } from '@material-ui/core'
 import Link from 'next/link'
+import { rootURL } from '../config.json5'
 import { request } from 'graphql-request'
 import withRoot from '../components/withRoot'
 
@@ -28,6 +29,8 @@ class Index extends React.Component {
       <div style={{ marginRight: 16, marginLeft: 16 }}>
         <head>
           <title>IveBot</title>
+          <meta property='og:url' content={`${rootURL || 'https://ivebot.now.sh'}/`} />
+          <meta property='og:description' content='IveBot is a multi-purpose Discord bot.' />
           <meta name='Description' content='IveBot is a multi-purpose Discord bot.' />
         </head>
         <AppBar>

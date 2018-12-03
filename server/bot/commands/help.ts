@@ -1,4 +1,5 @@
 import { Command as IveBotCommand } from '../imports/types'
+import { rootURL } from '../../../config.json5'
 import { Command } from '../client'
 
 let generalHelp = `**Jony Ive can do many commands 📡**
@@ -88,7 +89,7 @@ export const handleHelp: IveBotCommand = {
     } else if (args.join(' ')) return 'Incorrect parameters. Run /help for general help.'
     const channel = await message.author.getDMChannel()
     channel.createMessage({
-      content: `**IveBot's dashboard**: https://ivebot.now.sh/
+      content: `**IveBot's dashboard**: ${rootURL || 'https://ivebot.now.sh'}/
 (Manage Server required to manage a server)`,
       embed: {
         color: 0x00AE86,

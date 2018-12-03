@@ -5,6 +5,7 @@ import {
 } from '@material-ui/core'
 import Link from 'next/link'
 import fetch from 'isomorphic-unfetch'
+import { rootURL } from '../config.json5'
 import withRoot from '../components/withRoot'
 import Dashboard from '../components/dashboard'
 import ApolloClient, { gql } from 'apollo-boost'
@@ -35,6 +36,8 @@ query getAllCommonServers($token: String!) {
       <>
         <head>
           <title>IveBot</title>
+          <meta property='og:url' content={`${rootURL || 'https://ivebot.now.sh'}/dashboard`} />
+          <meta property='og:description' content={'IveBot\'s dashboard for managing settings.'} />
           <meta name='Description' content={'IveBot\'s dashboard for managing settings.'} />
         </head>
         {/* login dialog. */}
