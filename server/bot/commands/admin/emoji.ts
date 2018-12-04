@@ -3,7 +3,7 @@ import { getInsult, getIdFromMention } from '../../imports/tools'
 import * as fetch from 'isomorphic-unfetch'
 
 export const handleAddemoji: Command = {
-  name: 'addemoji',
+  name: 'addEmoji',
   aliases: ['ae', 'createemoji'],
   opts: {
     description: 'Add an emoji to the server.',
@@ -40,7 +40,7 @@ After checking image format as JPG, resize, View Image and use the URL to the im
 }
 
 export const handleDeleteemoji: Command = {
-  name: 'deleteemoji',
+  name: 'deleteEmoji',
   aliases: ['de', 'removeemoji'],
   opts: {
     description: 'Remove an emoji from the server.',
@@ -67,7 +67,7 @@ export const handleDeleteemoji: Command = {
 }
 
 export const handleEditemoji: Command = {
-  name: 'editemoji',
+  name: 'editEmoji',
   aliases: ['ee'],
   opts: {
     description: 'Edit an emoji name in the server.',
@@ -99,7 +99,7 @@ export const handleEditemoji: Command = {
 }
 
 export const handleEmojiimage: Command = {
-  name: 'emojiimage',
+  name: 'emojiImage',
   aliases: ['ei', 'emojimage'],
   opts: {
     description: 'Get the image of a custom emoji.',

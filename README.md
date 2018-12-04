@@ -55,9 +55,11 @@ It's planned to have some nifty commands like /assistant which directly communic
 
 **Administrative commands.**
 
+- \`/deleteChannel\` and \`/editChannel\`
+- \`/changeserverregion\` and \`/listserverregions\`
 - \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
 - \`/warn\` and \`/warnings\` | \`/clearwarns\` and \`/removewarn\`
-- \`/changeserverregion\` and \`/listserverregions\`
+- \`/addEmoji\`, \`/deleteEmoji\`, \`/emojiImage\` and \`/editEmoji\`
 - \`/purge\`
 - \`/slowmode\`
 
