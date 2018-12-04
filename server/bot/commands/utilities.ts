@@ -293,7 +293,7 @@ export const handleLeave: Command = {
         'You will require an invite link to join back. Type /leave to confirm.'
       )
       tempDB.leave.push(message.author.id)
-      setTimeout(() => {
+      setTimeout(async () => {
         if (tempDB.leave.findIndex(i => i === message.author.id) === -1) return
         client.createMessage(message.channel.id, 'Your leave request has timed out.')
         tempDB.leave.splice(tempDB.leave.findIndex(i => i === message.author.id), 1)

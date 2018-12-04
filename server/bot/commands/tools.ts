@@ -1,8 +1,8 @@
 import { Command } from '../imports/types'
 import { randomBytes } from 'crypto'
-import * as ms from 'ms'
 import { version } from '../../../package.json'
 import { execSync } from 'child_process'
+import * as moment from 'moment'
 import 'json5/lib/require'
 import { host, testPilots } from '../../../config.json5'
 import { runInNewContext } from 'vm'
@@ -30,7 +30,7 @@ export const handleToken: Command = {
           '**DO NOT SHARE THIS WITH ANYONE >_<** | Your token is:'
         )
         const tokenMessage = await dm.createMessage(`**${secureToken}**`)
-        setTimeout(() => { dmMessage.delete(); tokenMessage.delete() }, 30000)
+        setTimeout(async () => { dmMessage.delete(); tokenMessage.delete() }, 30000)
       } catch (e) { return 'There was an error processing your request (unable to DM token)' }
     } catch (e) { return 'There was an error processing your request (unable to DM)' }
     // The non-DM part.
@@ -80,7 +80,10 @@ export const handleUptime: Command = {
     example: '/uptime',
     argsRequired: false
   },
-  generator: (message, args, { client }) => ms(client.uptime, { long: true })
+  generator: (message, args, { client }) => {
+    const d = moment.duration(client.uptime)
+    return `${d.days()} days ${d.hours()} hours ${d.minutes()} minutes ${d.seconds()} seconds`
+  }
 }
 
 export const handleRemoteexec: Command = {
@@ -134,12 +137,16 @@ export const handleEval: Command = {
   generator: async (message, args, { client, tempDB, db, commandParser }) => {
     try {
       let toEval = args.join(' ')
-      if (toEval.startsWith('```js')) toEval = toEval.substring(5)
-      if (toEval.endsWith('```')) toEval = toEval.substring(0, toEval.length - 3)
+      // Remove extra characters.
+      if (toEval.startsWith('`')) toEval = toEval.substring(1)
+      if (toEval.startsWith('``js')) toEval = toEval.substring(4)
+      if (toEval.endsWith('`')) toEval = toEval.substring(0, toEval.length - 1)
+      if (toEval.endsWith('```')) toEval = toEval.substring(0, toEval.length - 2)
       // eslint-disable-next-line no-eval
-      const res = eval(toEval.split('```').join(''))
+      const res = await eval(toEval)
+      // const res = eval(`(async () => { const a = ${toEval}; message.channel.createMessage(a) })()`)
       message.addReaction('✅')
-      return res || undefined
+      return res ? `${'```'}${res}${'```'}` : undefined
     } catch (e) {
       const channel = await client.getDMChannel(host)
       message.addReaction('❌')
@@ -162,18 +169,21 @@ export const handleSafeeval: Command = {
   generator: async (message, args, context) => {
     try {
       let toEval = args.join(' ')
-      if (toEval.startsWith('```js')) toEval = toEval.substring(5)
-      if (toEval.endsWith('```')) toEval = toEval.substring(0, toEval.length - 3)
+      // Remove extra characters.
+      if (toEval.startsWith('`')) toEval = toEval.substring(1)
+      if (toEval.startsWith('``js')) toEval = toEval.substring(4)
+      if (toEval.endsWith('`')) toEval = toEval.substring(0, toEval.length - 1)
+      if (toEval.endsWith('```')) toEval = toEval.substring(0, toEval.length - 2)
       const res = runInNewContext(toEval.split('```').join(''), {
         createMessage: (co: string) => context.client.createMessage(message.channel.id, co),
         content: message.content
       })
       message.addReaction('✅')
-      return res ? res.toString() : undefined
+      return res ? `${'```'}${res}${'```'}` : undefined
     } catch (e) {
       message.addReaction('❌')
-      message.channel.createMessage(`**Error:**
-${e}`)
+      return `**Error:**
+${e}`
     }
   }
 }

@@ -43,7 +43,7 @@ export const handleGunfight: Command = {
       message.channel.id, `${user.mention}, say /accept to accept the challenge.`
     )
     // The following will delete the gunfight if unaccepted within 30 seconds.
-    setTimeout(() => {
+    setTimeout(async () => {
       // Find the gunfight we pushed.
       const gunfightPushed = tempDB.gunfight.find((gunfight) => gunfight.challenged === user.id)
       // Remove the object and send a response.
