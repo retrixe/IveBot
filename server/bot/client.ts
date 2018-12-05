@@ -133,7 +133,7 @@ export default class CommandParser {
     const context: Context = {
       tempDB: this.tempDB, db: this.db, commandParser: this, client: this.client
     }
-    const args = message.content.split(' ')
+    const args = message.content.trim().split(' ').filter(i => i)
     args.shift()
     // Guild and DM only.
     if (command.guildOnly && message.channel.type !== 0) return

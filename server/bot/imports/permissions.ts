@@ -16,7 +16,7 @@ export function checkRolePosition ( // eslint-disable-next-line space-infix-ops
       if (
         !considerMutedRole &&
         rolesInServer.find(e => rolesOfUser[roleIndex] === e.id).name === 'Muted'
-      ) return highestRolePosition
+      ) continue
       highestRolePosition = rolesInServer.find(e => rolesOfUser[roleIndex] === e.id).position
     }
   }

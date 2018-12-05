@@ -31,7 +31,7 @@ export const getUser = (message: Message, arg: string) => {
   if (!arg || typeof arg !== 'string') return
   const mentions = message.mentions
   const guild = message.member.guild
-  if (guild.members.find(i => i.id === arg)) return guild.members.find(i => i.id === arg).user
+  if (guild.members.has(arg)) return guild.members.get(arg).user
   else if (mentions.length && mentions[0].id === getIdFromMention(arg)) return mentions[0]
   else if (guild.members.find(i => i && i.username.toLowerCase() === arg.toLowerCase())) {
     return guild.members.find(i => i && i.username.toLowerCase() === arg.toLowerCase()).user
@@ -48,9 +48,11 @@ export const getChannel = (message: Message, arg: string) => {
   if (!arg || typeof arg !== 'string') return
   const mentions = message.channelMentions
   const guild = message.member.guild
-  if (guild.channels.find(i => i.id === arg)) return guild.channels.find(i => i.id === arg)
+  if (guild.channels.has(arg)) return guild.channels.get(arg)
   else if (mentions.length && mentions[0] === getIdFromMention(arg)) {
-    return guild.channels.find(i => i.id === mentions[0])
+    return guild.channels.get(mentions[0])
+  } else if (guild.channels.find(i => i.name === arg)) {
+    return guild.channels.find(i => i.name === arg)
   } else if (guild.channels.find(i => i.name.toLowerCase() === arg.toLowerCase())) {
     return guild.channels.find(i => i.name.toLowerCase() === arg.toLowerCase())
   }
