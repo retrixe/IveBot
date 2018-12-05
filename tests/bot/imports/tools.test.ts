@@ -1,14 +1,7 @@
 import test from 'ava'
 import {
-  getArguments, getIdFromMention, getDesc, getInsult // , getServerSettings
+  getArguments, getIdFromMention, getDesc, getInsult
 } from '../../../server/bot/imports/tools'
-// import { MongoDBServer } from 'mongomem'
-// import { MongoClient } from 'mongodb'
-
-// Test getUser.
-
-// test.before('start server', async t => { await MongoDBServer.start() }) // Start Mongo in memory
-// test.after.always('cleanup', t => MongoDBServer.tearDown()) // Cleans up temporary file storage
 
 test(
   'getArguments returns proper arguments',
@@ -34,7 +27,3 @@ test('getIdFromMention returns a correct ID for emoji', t => {
 test('getInsult works as expected', t => t.true([
   'pathetic lifeform', 'ungrateful bastard', 'idiotic slimeball', 'worthless ass', 'dumb dolt'
 ].includes(getInsult())))
-/* test('getServerSettings works on servers with no settings', async t => {
-  const db = await MongoClient.connect(await MongoDBServer.getConnectionString())
-  t.truthy(await getServerSettings(db.db('ivebot'), '402423671551164416'))
-}) */

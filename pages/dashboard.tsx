@@ -5,7 +5,6 @@ import {
 } from '@material-ui/core'
 import Link from 'next/link'
 import fetch from 'isomorphic-unfetch'
-import { rootURL } from '../config.json5'
 import withRoot from '../components/withRoot'
 import Dashboard from '../components/dashboard'
 import ApolloClient, { gql } from 'apollo-boost'
@@ -13,6 +12,7 @@ import { ApolloProvider, Query } from 'react-apollo'
 
 // Apollo Client definition.
 const client = new ApolloClient({ uri: `/graphql`, fetchOptions: { fetch } })
+const rootURL = 'https://ivebot.now.sh' // Modify when self-hosting.
 
 /* eslint-disable quotes, no-multi-str, no-undef */
 class DashboardIndex extends React.Component {
@@ -36,7 +36,7 @@ query getAllCommonServers($token: String!) {
       <>
         <head>
           <title>IveBot</title>
-          <meta property='og:url' content={`${rootURL || 'https://ivebot.now.sh'}/dashboard`} />
+          <meta property='og:url' content={`${rootURL}/dashboard`} />
           <meta property='og:description' content={'IveBot\'s dashboard for managing settings.'} />
           <meta name='Description' content={'IveBot\'s dashboard for managing settings.'} />
         </head>

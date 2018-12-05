@@ -62,7 +62,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint"
+      "pre-commit": "npm run lint && npm run test"
     }
   },
   "ava": {
@@ -73,7 +73,7 @@
       "server/**/*.ts"
     ],
     "require": [
-      "ts-node/register"
+      "ts-node/register/transpile-only"
     ],
     "babel": {
       "testOptions": {
