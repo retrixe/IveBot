@@ -93,7 +93,9 @@ client.on('error', (err: string, id: string) => {
 })
 
 // Create a database to handle certain stuff.
-const tempDB: DB = { gunfight: [], say: {}, link: {}, leave: [], mute: {} }
+const tempDB: DB = {
+  gunfight: [], say: {}, link: {}, leave: [], mute: {}, cooldowns: { request: [] }
+}
 
 /* SERVER CODE STARTS HERE */
 // Initialize Next.js app.
@@ -116,6 +118,8 @@ app.prepare().then(() => {
     console.log(`> Ready on http://localhost:${port}`)
   })
 
+  // On recieving GET on the / endpoint, render /index with Next.js instead of / for SEO.
+  server.express.get('/', (req, res) => app.render(req, res, '/', req.query))
   // On recieving GET on other endpoints, handle with Next.js.
   server.express.get('*', (req, res) => handle(req, res))
 })

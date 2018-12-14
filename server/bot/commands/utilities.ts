@@ -138,17 +138,27 @@ export const handleRequest: Command = {
   name: 'request',
   aliases: ['req'],
   opts: {
-    requirements: { userIDs: [...testPilots, host] },
     description: 'Request a specific feature.',
-    fullDescription: 'Request a feature. Only available to test pilots.',
+    fullDescription: 'Request a feature. 24 hour cooldown except for test pilots.',
     usage: '/request <suggestion>',
     example: '/request a /userinfo command.'
   },
-  generator: async ({ author, content, channel }, args, { client }) => {
-    client.createMessage(
-      (await client.getDMChannel(host)).id,
+  generator: async ({ author }, args, { client, tempDB }) => {
+    // Check for cooldown.
+    if (!testPilots.includes(author.id) &&
+      host !== author.id && tempDB.cooldowns.request.includes(author.id)
+    ) return 'This command is cooling down right now. Try again later.'
+    client.createMessage((await client.getDMChannel(host)).id,
       `${author.username}#${author.discriminator} with ID ${author.id}: ${args.join(' ')}`
     )
+    // Add cooldown.
+    if (!testPilots.includes(author.id) && host !== author.id) {
+      tempDB.cooldowns.request.push(author.id)
+      setTimeout(async () => (tempDB.cooldowns.request.splice(
+        tempDB.cooldowns.request.findIndex(i => i === author.id), 1
+      )), ms('1 day'))
+    }
+    // Confirm the request.
     return `${author.mention}, what a pathetic idea. It has been DMed to the main developer \
 and will be read shortly.
 You may recieve a response soon, and you can keep track here:

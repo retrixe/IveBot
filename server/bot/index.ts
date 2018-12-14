@@ -24,11 +24,13 @@ export const guildMemberAdd = (client: Client, db: Db, tempDB: DB) => async (
   if (serverSettings.joinAutorole) {
     // For each role..
     serverSettings.joinAutorole.split('|').forEach((role: string) => {
-      const roleName = role.startsWith('bot-') ? role.substr(4) : role
-      const roleID = member.guild.roles.find(element => element.name === roleName).id
-      if (!roleID) return
-      if (roleName.startsWith('bot-') && member.user.bot) member.addRole(roleID)
-      else if (!roleName.startsWith('bot-') && !member.user.bot) member.addRole(roleID)
+      try {
+        const roleName = role.startsWith('bot-') ? role.substr(4) : role
+        const roleID = member.guild.roles.find(element => element.name === roleName).id
+        if (!role) return
+        if (roleName.startsWith('bot-') && member.user.bot) member.addRole(roleID)
+        else if (!roleName.startsWith('bot-') && !member.user.bot) member.addRole(roleID)
+      } catch (e) {}
     })
   }
   // If join/leave messages is not configured/improperly configured..
@@ -36,12 +38,14 @@ export const guildMemberAdd = (client: Client, db: Db, tempDB: DB) => async (
   const { joinMessage, channelName } = serverSettings.joinLeaveMessages
   if (!channelName || !joinMessage) return
   // We send a message.
-  const channelID = guild.channels.find(i => i.name === channelName).id
-  const toSend = joinMessage
-    .split('{un}').join(member.user.username) // Replace the username.
-    .split('{m}').join(member.user.mention) // Replace the mention.
-    .split('{d}').join(member.user.discriminator) // Replace the discriminator.
-  try { client.createMessage(channelID, toSend) } catch (e) { }
+  try {
+    const channelID = guild.channels.find(i => i.name === channelName).id
+    const toSend = joinMessage
+      .split('{un}').join(member.user.username) // Replace the username.
+      .split('{m}').join(member.user.mention) // Replace the mention.
+      .split('{d}').join(member.user.discriminator) // Replace the discriminator.
+    client.createMessage(channelID, toSend)
+  } catch (e) {}
 }
 
 // When a server loses a member, this function will be called.
@@ -55,12 +59,14 @@ export const guildMemberRemove = (client: Client, db: Db) => async (
   const { leaveMessage, channelName } = serverSettings.joinLeaveMessages
   if (!channelName || !leaveMessage) return
   // We send a message.
-  const channelID = guild.channels.find(i => i.name === channelName).id
-  const toSend = leaveMessage
-    .split('{un}').join(member.user.username) // Replace the username.
-    .split('{m}').join(member.user.mention) // Replace the mention.
-    .split('{d}').join(member.user.discriminator) // Replace the discriminator.
-  try { client.createMessage(channelID, toSend) } catch (e) {}
+  try {
+    const channelID = guild.channels.find(i => i.name === channelName).id
+    const toSend = leaveMessage
+      .split('{un}').join(member.user.username) // Replace the username.
+      .split('{m}').join(member.user.mention) // Replace the mention.
+      .split('{d}').join(member.user.discriminator) // Replace the discriminator.
+    client.createMessage(channelID, toSend)
+  } catch (e) {}
 }
 
 // When client recieves a message, it will callback.

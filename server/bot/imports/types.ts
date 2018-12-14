@@ -23,6 +23,7 @@ export type DB = {
   link: {
     [index: string]: string
   },
+  cooldowns: { request: string[] },
   leave: Array<string>
 }
 
