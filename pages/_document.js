@@ -4,7 +4,7 @@ import JssProvider from 'react-jss/lib/JssProvider'
 import flush from 'styled-jsx/server'
 import getPageContext from '../components/getPageContext'
 
-const ico = 'https://cdn.discordapp.com/avatars/383591525944262656/c7fbf32eebc031915861d50a4846c485.png'
+const ico = 'https://cdn.discordapp.com/avatars/383591525944262656/7b826edf3e6dcb47dbbb1131aaf72710.jpg'
 
 class MyDocument extends Document {
   render () {

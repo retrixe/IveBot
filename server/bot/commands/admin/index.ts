@@ -2,13 +2,25 @@ import { Command } from '../../imports/types'
 import { getInsult, getUser } from '../../imports/tools'
 import { checkRolePosition } from '../../imports/permissions'
 import { Message } from 'eris'
-import * as RequestHandler from 'eris/lib/rest/RequestHandler'
 export { handleAddemoji, handleDeleteemoji, handleEditemoji, handleEmojiimage } from './emoji'
 export { handleWarn, handleWarnings, handleClearwarns, handleRemovewarn } from './warn'
 export { handleDeletechannel, handleEditchannel } from './channels'
 export { handleGiverole, handleTakerole } from './roles'
 export { handleMute, handleUnmute } from './mute'
 export { handleBan, handleUnban } from './ban'
+
+const parseSilentDelete = (args: string[]) => {
+  const data = { args, silent: false, delete: false }
+  if ([0, 1].includes(data.args.indexOf('--silent')) || [0, 1].includes(data.args.indexOf('-s'))) {
+    data.silent = true
+    data.args.splice(data.args.indexOf('--silent'), 1)
+  }
+  if ([0, 1].includes(data.args.indexOf('--delete')) || [0, 1].includes(data.args.indexOf('-d'))) {
+    data.delete = true
+    data.args.splice(data.args.indexOf('--delete'), 1)
+  }
+  return data
+}
 
 export const handlePurge: Command = {
   name: 'purge',
@@ -50,7 +62,7 @@ export const handleKick: Command = {
   opts: {
     description: 'Kick someone.',
     fullDescription: 'Kick someone.',
-    usage: '/kick <user by ID/username/mention> (reason)',
+    usage: '/kick <user by ID/username/mention> (--silent|-s) (--delete|-d) (reason)',
     guildOnly: true,
     example: '/kick voldemort you is suck',
     requirements: { permissions: { 'kickMembers': true } }
@@ -67,21 +79,25 @@ export const handleKick: Command = {
       return `You cannot kick this person, you ${getInsult()}.`
     }
     // Now we kick the person.
+    const f = parseSilentDelete(args)
     try {
       await client.kickGuildMember(message.member.guild.id, user.id, args.join(' '))
     } catch (e) { return 'I am unable to kick that user.' }
-    client.createMessage((await client.getDMChannel(user.id)).id, args.length !== 0
-      ? `You have been kicked from ${message.member.guild.name} for ${args.join(' ')}.`
+    if (!f.silent) {
+      client.createMessage((await client.getDMChannel(user.id)).id, f.args.length !== 0
+        ? `You have been kicked from ${message.member.guild.name} for ${f.args.join(' ')}.`
       : `You have been kicked from ${message.member.guild.name}.`
     )
+    }
     // WeChill
     if (message.member.guild.id === '402423671551164416') {
-      client.createMessage('402437089557217290', args.length !== 0
-        ? `**${user.username}#${user.discriminator}** has been kicked for **${args.join(' ')}**.`
+      client.createMessage('402437089557217290', f.args.length !== 0
+        ? `**${user.username}#${user.discriminator}** has been kicked for **${f.args.join(' ')}**.`
         : `**${user.username}#${user.discriminator}** has been kicked for not staying chill >:L `
       )
     }
-    return `**${user.username}#${user.discriminator}** has been kicked. **rip.**`
+    if (f.delete) message.delete('Deleted kick command.')
+    if (!f.silent) return `**${user.username}#${user.discriminator}** has been kicked. **rip.**`
   }
 }
 
@@ -110,9 +126,7 @@ export const handleSlowmode: Command = {
     ) { return 'Correct usage: /slowmode <number in seconds, max: 120 or off>' }
     // Set slowmode.
     try {
-      await new RequestHandler(client).request(
-        'PATCH', '/channels/' + message.channel.id, true, { rate_limit_per_user: isNaN(t) ? 0 : t }
-      )
+      client.editChannel(message.channel.id, { rateLimitPerUser: isNaN(t) ? 0 : t })
     } catch (e) { return 'I cannot use slowmode >_<' }
     return `Successfully set slowmode to ${isNaN(t) || t === 0 ? 'off' : `${t} seconds`} 👌`
   }

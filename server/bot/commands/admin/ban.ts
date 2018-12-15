@@ -3,12 +3,25 @@ import { Command } from '../../imports/types'
 import { checkRolePosition } from '../../imports/permissions'
 import { getInsult, getUser } from '../../imports/tools'
 
+const parseSilentDelete = (args: string[]) => {
+  const data = { args, silent: false, delete: false }
+  if ([0, 1].includes(data.args.indexOf('--silent')) || [0, 1].includes(data.args.indexOf('-s'))) {
+    data.silent = true
+    data.args.splice(data.args.indexOf('--silent'), 1)
+  }
+  if ([0, 1].includes(data.args.indexOf('--delete')) || [0, 1].includes(data.args.indexOf('-d'))) {
+    data.delete = true
+    data.args.splice(data.args.indexOf('--delete'), 1)
+  }
+  return data
+}
+
 export const handleBan: Command = {
   name: 'ban',
   opts: {
     description: 'Ban someone.',
     fullDescription: 'Ban someone.',
-    usage: '/ban <user by ID/username/mention> (reason)',
+    usage: '/ban <user by ID/username/mention> (--silent|-s) (--delete|-d) (reason)',
     guildOnly: true,
     example: '/ban voldemort you is suck',
     requirements: { permissions: { 'banMembers': true } }
@@ -37,23 +50,27 @@ export const handleBan: Command = {
       return `You cannot ban this person, you ${getInsult()}.`
     }
     // Now we ban the person.
+    const f = parseSilentDelete(args)
     try {
       await client.banGuildMember(message.member.guild.id, user.id, 0, args.join(' '))
     } catch (e) { return 'That person could not be banned.' }
     try {
-      await client.createMessage((await client.getDMChannel(user.id)).id, args.length !== 0
-        ? `You have been banned from ${message.member.guild.name} for ${args.join(' ')}.`
-        : `You have been banned from ${message.member.guild.name}.`
-      )
+      if (!f.silent) {
+        await client.createMessage((await client.getDMChannel(user.id)).id, f.args.length !== 0
+          ? `You have been banned from ${message.member.guild.name} for ${f.args.join(' ')}.`
+          : `You have been banned from ${message.member.guild.name}.`
+        )
+      }
     } catch (e) {}
     // WeChill
     if (message.member.guild.id === '402423671551164416') {
-      client.createMessage('402437089557217290', args.length !== 0
-        ? `**${user.username}#${user.discriminator}** has been banned for **${args.join(' ')}**.`
+      client.createMessage('402437089557217290', f.args.length !== 0
+        ? `**${user.username}#${user.discriminator}** has been banned for **${f.args.join(' ')}**.`
         : `**${user.username}#${user.discriminator}** has been banned for not staying chill >:L `
       )
     }
-    return `**${user.username}#${user.discriminator}** has been banned. **rip.**`
+    if (f.delete) message.delete()
+    if (!f.silent) return `**${user.username}#${user.discriminator}** has been banned. **rip.**`
   }
 }
 
