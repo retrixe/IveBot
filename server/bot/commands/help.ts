@@ -37,6 +37,7 @@ let generalHelp = `**Jony Ive can do many commands 📡**
     \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
     \`/emojiImage\` - Image of an emoji.
     \`/giverole\` and \`/takerole\` - Edit roles.
+    \`/notify\` - Ping a role that cannot be pinged.
 **Administrative commands.**
     \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
     \`/addEmoji\`, \`/deleteEmoji\` and \`/editEmoji\`

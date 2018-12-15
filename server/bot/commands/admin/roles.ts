@@ -103,3 +103,32 @@ export const handleTakerole: Command = {
       ? `Took the role **${role.name}** from you.` : `Took role **${role.name}** from ${user.mention}.`
   }
 }
+
+export const handleNotify: Command = {
+  name: 'notify',
+  opts: {
+    description: 'Ping a role which cannot be mentioned.',
+    fullDescription: 'Ping a role which cannot be mentioned.',
+    usage: '/notify <role by name/ID> (message)',
+    example: '/notify Helper testing',
+    guildOnly: true,
+    deleteCommand: true,
+    requirements: { permissions: { 'manageRoles': true } }
+  },
+  generator: async (message, args) => {
+    // Find the role.
+    const arg = args.shift()
+    const role = message.member.guild.roles.find(
+      a => arg === a.id || a.name.toLowerCase() === arg.toLowerCase() || arg === a.mention
+    )
+    if (!role) return `You have provided an invalid role name/ID, you ${getInsult()}.`
+    // Can the user manage this role?
+    if (role.position >= checkRolePosition(message.member) && !role.mentionable
+    ) return `You cannot notify this role, you ${getInsult()}.`
+    // Edit the role.
+    const wasMentionable = role.mentionable
+    if (!wasMentionable) await role.edit({ mentionable: true })
+    await message.channel.createMessage(`${role.mention} ${args.join(' ')}`)
+    if (!wasMentionable) await role.edit({ mentionable: false })
+  }
+}

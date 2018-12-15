@@ -113,12 +113,15 @@ export default class CommandParser {
   tempDB: DB // eslint-disable-line no-undef
   db: Db // eslint-disable-line no-undef
   evaluatedMessages: string[] // eslint-disable-line no-undef
+  // eslint-disable-next-line no-undef
+  analytics: { name: string, totalUse: number, averageExecTime: number[] }[]
 
   constructor (client: Client, tempDB: DB, db: Db) {
     this.commands = {}
     this.client = client
     this.tempDB = tempDB
     this.db = db
+    this.analytics = []
     this.evaluatedMessages = []
     this.onMessage = this.onMessage.bind(this)
     this.onMessageUpdate = this.onMessageUpdate.bind(this)
@@ -165,6 +168,23 @@ export default class CommandParser {
     if (command.postGenerator) command.postGenerator(message, args, sent, context)
   }
 
+  async saveAnalytics (timeTaken: [number, number], name: string) {
+    // Get the local command info.
+    let commandInfo = this.analytics.find(i => i.name === name)
+    // If there is no info for the command then insert an object for it.
+    if (!commandInfo) {
+      this.analytics.push({ name, averageExecTime: [0, 0], totalUse: 0 })
+      commandInfo = this.analytics.find(i => i.name === name)
+    }
+    // Calculate the average time of execution taken.
+    const averageExecTime = commandInfo.averageExecTime.map((i: number, index: number) => (
+      ((i * commandInfo.totalUse) + timeTaken[index]) / (commandInfo.totalUse + 1)
+    ))
+    // Update local cache with analytics.
+    this.analytics[this.analytics.indexOf(commandInfo)].totalUse += 1
+    this.analytics[this.analytics.indexOf(commandInfo)].averageExecTime = averageExecTime
+  }
+
   async onMessage (message: Message) {
     if (message.content && !message.content.startsWith('/')) {
       botCallback(message, this.client, this.tempDB, this.db)
@@ -185,6 +205,11 @@ export default class CommandParser {
           this.evaluatedMessages.splice(this.evaluatedMessages.findIndex(i => i === message.id), 1)
         }, 30000)
         // Execute command.
+        try {
+          const executeFirst = process.hrtime() // Initial high-precision time.
+          await this.executeCommand(this.commands[keys[i]], message)
+          const executeSecond = process.hrtime(executeFirst) // Time difference.
+          this.saveAnalytics(executeSecond, keys[i]) // Send analytics.
         try { await this.executeCommand(this.commands[keys[i]], message) } catch (e) {
           // On error, we tell the user of an unknown error and log it for our reference.
           message.channel.createMessage(this.commands[keys[i]].errorMessage)
@@ -219,7 +244,12 @@ export default class CommandParser {
           this.evaluatedMessages.splice(this.evaluatedMessages.findIndex(i => i === message.id), 1)
         }, 30000)
         // Execute command.
-        try { await this.executeCommand(this.commands[keys[i]], message) } catch (e) {
+        try {
+          const executeFirst = process.hrtime() // Initial high precision time.
+          await this.executeCommand(this.commands[keys[i]], message)
+          const executeSecond = process.hrtime(executeFirst) // Time difference.
+          this.saveAnalytics(executeSecond, keys[i]) // Send analytics.
+        } catch (e) {
           // On error, we tell the user of an unknown error and log it for our reference.
           message.channel.createMessage(this.commands[keys[i]].errorMessage)
           console.error(e)

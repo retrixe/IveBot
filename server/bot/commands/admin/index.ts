@@ -4,8 +4,8 @@ import { checkRolePosition } from '../../imports/permissions'
 import { Message } from 'eris'
 export { handleAddemoji, handleDeleteemoji, handleEditemoji, handleEmojiimage } from './emoji'
 export { handleWarn, handleWarnings, handleClearwarns, handleRemovewarn } from './warn'
+export { handleGiverole, handleTakerole, handleNotify } from './roles'
 export { handleDeletechannel, handleEditchannel } from './channels'
-export { handleGiverole, handleTakerole } from './roles'
 export { handleMute, handleUnmute } from './mute'
 export { handleBan, handleUnban } from './ban'
 
@@ -86,8 +86,8 @@ export const handleKick: Command = {
     if (!f.silent) {
       client.createMessage((await client.getDMChannel(user.id)).id, f.args.length !== 0
         ? `You have been kicked from ${message.member.guild.name} for ${f.args.join(' ')}.`
-      : `You have been kicked from ${message.member.guild.name}.`
-    )
+        : `You have been kicked from ${message.member.guild.name}.`
+      )
     }
     // WeChill
     if (message.member.guild.id === '402423671551164416') {
