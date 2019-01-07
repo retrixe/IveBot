@@ -21,7 +21,7 @@
     "@material-ui/core": "^3.0.1",
     "@material-ui/icons": "^3.0.1",
     "apollo-boost": "^0.1.4",
-    "eris": "https://codeload.github.com/abalabahaha/eris/tar.gz/bd48702f8d472c010e9b2378467c1bfca9abd5ce",
+    "eris": "https://codeload.github.com/abalabahaha/eris/tar.gz/f919f961b16b5943a794e9052a7c7f27dbb5074f",
     "graphql": "^14.0.2",
     "graphql-yoga": "^1.16.7",
     "isomorphic-unfetch": "^2.0.0",

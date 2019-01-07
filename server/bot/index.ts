@@ -69,6 +69,12 @@ export const guildMemberRemove = (client: Client, db: Db) => async (
   } catch (e) {}
 }
 
+// When the bot leaves a server, this function will be called.
+export const guildDelete = (db: Db) => async (guild: Guild) => {
+  const settings = await db.collection('servers').findOne({ serverID: guild.id })
+  if (settings) await db.collection('servers').deleteOne({ serverID: guild.id })
+}
+
 // When client recieves a message, it will callback.
 export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
   try {

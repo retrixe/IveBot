@@ -19,7 +19,7 @@ import { MongoClient } from 'mongodb'
 // Import fs.
 import { readdir, statSync } from 'fs'
 // Import the bot.
-import { guildMemberAdd, guildMemberRemove } from './bot'
+import { guildMemberAdd, guildMemberRemove, guildDelete } from './bot'
 // Get the token needed.
 import 'json5/lib/require'
 import { token, mongoURL } from '../config.json5'
@@ -48,6 +48,8 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, {
   // When a server loses a member, it will callback.
   client.on('guildMemberAdd', guildMemberAdd(client, db, tempDB))
   client.on('guildMemberRemove', guildMemberRemove(client, db))
+  // When the bot leaves a server, it will callback.
+  client.on('guildDelete', guildDelete(db))
   // Register the commandParser.
   const commandParser = new CommandParser(client, tempDB, db)
   client.on('messageCreate', commandParser.onMessage)
