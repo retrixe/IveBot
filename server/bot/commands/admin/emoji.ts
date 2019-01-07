@@ -13,25 +13,40 @@ export const handleAddemoji: Command = {
     guildOnly: true,
     requirements: { permissions: { 'manageEmojis': true } }
   },
-  generator: async (message, args) => {
+  generator: async (message, args, { client }) => {
     // Get the URL.
     const url = args.length > 1 ? args.splice(1).join('%20') : message.attachments[0].url
+    // This can check the first bits of the Buffer.
+    const check = (header: number[], buf: Buffer) => {
+      for (let i = 0; i < header.length; i++) { if (header[i] !== buf[i]) return false }
+      return true
+    }
     // Fetch the emoji.
     let image
     try {
-      image = Buffer.from(await (await fetch(url)).arrayBuffer()).toString('base64')
+      image = Buffer.from(await (await fetch(url)).arrayBuffer())
     } catch (e) { return `Invalid image URL, you ${getInsult()}` }
+    // Check the slots.
+    const isGif = check([0x47, 0x49, 0x46], image)
+    if (
+      (isGif && message.member.guild.emojis.filter(i => i.animated).length === 50) ||
+      message.member.guild.emojis.filter(i => !i.animated).length === 50
+    ) {
+      return 'Looks like all your emoji slots are used up. Use /deleteemoji on one and try again.'
+    } else if (!message.member.guild.members.get(client.user.id).permission.has('manageEmojis')) {
+      return `I don't even have permissions to do that, you ${getInsult()}.`
+    }
     // Try adding it, else throw an error.
     try {
       const emoji = await message.member.guild.createEmoji({
-        name: args[0], image: `data:image;base64,${image}`
+        name: args[0], image: `data:image;base64,${image.toString('base64')}`
       })
       let mention = ''
       if (emoji.animated) mention = `<a:${emoji.name}:${emoji.id}>`
       else mention = `<:${emoji.name}:${emoji.id}>`
       return `Emoji successfully added \\o/ (${mention})`
     } catch (e) {
-      return `Emoji could not be added. Is the emoji larger than 256 kB? Perms?!
+      return `Emoji could not be added. Is the emoji larger than 256 kB?
 I recommend using <https://picresize.com/> if the emoji is JPG and too large.
 Set step 2 to No Change, set Max Filesize to 255 in step 4 and set to Best quality.
 After checking image format as JPG, resize, View Image and use the URL to the image here.`
