@@ -148,7 +148,7 @@ export const handleEval: Command = {
       if (toEval.endsWith('`')) toEval = toEval.substring(0, toEval.length - 1)
       if (toEval.endsWith('```')) toEval = toEval.substring(0, toEval.length - 2)
       // eslint-disable-next-line no-eval
-      const res = await eval(toEval)
+      const res = eval(toEval)
       // const res = eval(`(async () => { const a = ${toEval}; message.channel.createMessage(a) })()`)
       message.addReaction('✅')
       return res ? `${'```'}${res}${'```'}` : undefined
@@ -166,7 +166,10 @@ export const handleSafeeval: Command = {
   aliases: ['se'],
   opts: {
     description: 'Runs JavaScript in a highly sandboxed environment.',
-    fullDescription: 'Runs JavaScript in a highly sandboxed environment.',
+    fullDescription: `Runs JavaScript in a highly sandboxed environment.
+Available variables: content
+Available functions:
+getContent/getCleanContent(messageID), createMessage(content), getReactions(messageID)`,
     usage: '/safeEval <code in codeblock or not>',
     example: '/safeEval ```js\ncreateMessage(\'You sent: \' + content)\n```',
     requirements: { userIDs: testPilots }
@@ -181,7 +184,10 @@ export const handleSafeeval: Command = {
       if (toEval.endsWith('```')) toEval = toEval.substring(0, toEval.length - 2)
       const res = runInNewContext(toEval.split('```').join(''), {
         createMessage: (co: string) => context.client.createMessage(message.channel.id, co),
-        content: message.content
+        content: message.content,
+        getContent: async (id: string) => (await message.channel.getMessage(id)).content,
+        getCleanContent: async (id: string) => (await message.channel.getMessage(id)).cleanContent,
+        getReactions: async (id: string) => (await message.channel.getMessage(id)).reactions
       })
       message.addReaction('✅')
       return res ? `${'```'}${res}${'```'}` : undefined

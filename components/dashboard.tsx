@@ -76,7 +76,7 @@ query getServerSettings($server: String!, $token: String!) {
             {element.icon === 'no icon' ? '' : <Avatar src={element.icon} />}
             <Typography style={{
               marginLeft: 10
-            }} variant='title' component='h1'>{nameOfServer} <Hidden mdDown>({element.serverId})</Hidden></Typography>
+            }} variant='h6' component='h1'>{nameOfServer} <Hidden mdDown>({element.serverId})</Hidden></Typography>
           </div>
           <Divider />
           <Query pollInterval={30000} query={query} variables={{ server: element.serverId, token: this.props.token }}>

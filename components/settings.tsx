@@ -76,7 +76,7 @@ mutation variables(
         {(updateSettings, { loading, error }) => (
           <>
             <br />
-            <Typography variant='title' gutterBottom>Public Roles</Typography>
+            <Typography variant='h6' gutterBottom>Public Roles</Typography>
             <Divider />
             <br />
             <Typography gutterBottom>
@@ -92,10 +92,10 @@ mutation variables(
               <FormHelperText>Leave blank to disable public roles</FormHelperText>
             </FormControl>
             <br /><br />
-            <Typography variant='title' gutterBottom>Join/Leave Actions</Typography>
+            <Typography variant='h6' gutterBottom>Join/Leave Actions</Typography>
             <Divider />
             <br />
-            <Typography variant='subheading' gutterBottom>Join Autorole</Typography>
+            <Typography variant='subtitle1' gutterBottom>Join Autorole</Typography>
             <Typography gutterBottom>
               {'Join autorole automatically gives a joining person a specified role. \
               It is useful in giving members specified colors or in combination with public \
@@ -113,7 +113,7 @@ mutation variables(
               <FormHelperText>Leave blank to disable autorole</FormHelperText>
             </FormControl>
             <br /><br /><Divider /><br />
-            <Typography variant='subheading' gutterBottom>Join/Leave Messages</Typography>
+            <Typography variant='subtitle1' gutterBottom>Join/Leave Messages</Typography>
             <Typography gutterBottom>
               {'Join/leave messages send a customized message whenever someone joins or leaves \
               \\o/'}
@@ -156,7 +156,7 @@ mutation variables(
                 } })} margin='dense' />
             </FormControl>
             <br /><br />
-            <Typography variant='title' gutterBottom>Text Recognition on Image Send</Typography>
+            <Typography variant='h6' gutterBottom>Text Recognition on Image Send</Typography>
             <Divider />
             <FormGroup row>
               <FormControlLabel

@@ -35,7 +35,7 @@ class Index extends React.Component {
         </head>
         <AppBar>
           <Toolbar>
-            <Typography variant='title' color='inherit' style={{ flex: 1 }}>IveBot</Typography>
+            <Typography variant='h6' color='inherit' style={{ flex: 1 }}>IveBot</Typography>
             <a href='https://github.com/retrixe/IveBot' target='_blank' rel='noopener noreferrer'>
               <IconButton color='default'><GitHubLogo /></IconButton>
             </a>
@@ -47,10 +47,10 @@ class Index extends React.Component {
           `https://discordapp.com/oauth2/authorize?client_id=${this.state.id}&scope=bot&permissions=8`
         } fullWidth>Add IveBot to your server</Button>
         <hr />
-        <Typography align='center' variant='display1'>
+        <Typography align='center' variant='h4'>
 IveBot is not just a multipurpose Discord bot.
         </Typography>
-        <Typography align='center' variant='display1'>
+        <Typography align='center' variant='h4'>
 It is THE multipurpose Discord bot.
         </Typography>
         <hr />

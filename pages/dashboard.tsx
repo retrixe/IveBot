@@ -59,7 +59,7 @@ query getAllCommonServers($token: String!) {
         {/* actual code starts here. */}
         <AppBar>
           <Toolbar>
-            <Typography variant='title' color='inherit' style={{ flex: 1 }}>IveBot</Typography>
+            <Typography variant='h6' color='inherit' style={{ flex: 1 }}>IveBot</Typography>
             <Link prefetch href='/'><Button color='inherit'>Home</Button></Link>
             {this.state.token.length === 6 && !this.state.open
               ? <Button color='inherit' onClick={() => this.setState({ token: '' })}>Logout</Button>

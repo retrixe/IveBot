@@ -314,16 +314,25 @@ export const handleCurrency: Command = {
     example: '/currency EUR USD 40'
   },
   generator: async (message, args) => {
-    // For /currency list
-    if (args.length === 1 && args[0].toLowerCase() === 'list') {
-      return '**List of symbols:**\n' + Object.keys(currency.rates).toString().split(',').join(', ')
-    }
     // Check cache if old, and refresh accordingly.
     if (!currency || Date.now() - currency.timestamp > 3600000) {
       currency = await ( // This just fetches the data and parses it to JSON.
         await fetch(`http://data.fixer.io/api/latest?access_key=${fixerAPIkey}`)
       ).json()
       currency.timestamp = Date.now() // To set the timestamp to the current time of the system.
+    }
+    // For /currency list
+    if (args.length === 1 && args[0].toLowerCase() === 'list') {
+      return {
+        content: '**List of symbols:**',
+        embed: {
+          description: Object.keys(currency.rates).toString().split(',').join(', '),
+          color: 0x666666,
+          title: '💲 Currency symbols',
+          fields: [{ name: 'Tip', value: `Symbols are usually (but NOT ALWAYS) the country 2 \
+letter code + the first letter of the currency name.` }]
+        }
+      }
     }
     // Calculate the currencies to conver from and to, as well as the amount.
     if (args.length < 2) return 'Invalid usage, use /help currency for proper usage.'
