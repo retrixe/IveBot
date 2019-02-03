@@ -182,7 +182,13 @@ export const handleSay: Command = {
   generator: async (message, args, { client, tempDB }) => {
     // Should it be sent in another channel?
     const possibleChannel = getIdFromMention(args[0])
-    if (message.channelMentions[0] === possibleChannel) {
+    if (
+      message.channelMentions[0] === possibleChannel ||
+      (message.member && message.member.guild.channels.has(possibleChannel))
+    ) {
+      if (message.member && !message.member.guild.channels.get(possibleChannel)
+        .permissionsOf(message.member.id).has('sendMessages')
+      ) return `**You don't have enough permissions for that, you ${getInsult()}.**`
       args.shift()
       if (args.join(' ') === 'pls adim me') args = ['no']
       tempDB.say[message.channelMentions[0]] = (
@@ -212,7 +218,13 @@ export const handleType: Command = {
   generator: async (message, args, { tempDB, client }) => {
     // Should it be sent in another channel?
     const possibleChannel = getIdFromMention(args[0])
-    if (message.channelMentions[0] === possibleChannel) {
+    if (
+      message.channelMentions[0] === possibleChannel ||
+      (message.member && message.member.guild.channels.has(possibleChannel))
+    ) {
+      if (message.member && !message.member.guild.channels.get(possibleChannel)
+        .permissionsOf(message.member.id).has('sendMessages')
+      ) return `**You don't have enough permissions for that, you ${getInsult()}.**`
       args.shift()
       if (args.join(' ') === 'pls adim me') args = ['no']
       message.channel.sendTyping()
@@ -377,11 +389,16 @@ export const handleEdit: Command = {
   generator: async (message, args, { client }) => {
     // Should it be edited in another channel?
     const possibleChannel = getIdFromMention(args[0])
-    if (message.channelMentions[0] === possibleChannel) {
-      args.shift()
-      const messageID = args.shift()
+    if (
+      message.channelMentions[0] === possibleChannel ||
+      (message.member && message.member.guild.channels.has(possibleChannel))
+    ) {
+      if (message.member && !message.member.guild.channels.get(possibleChannel)
+        .permissionsOf(message.member.id).has('sendMessages')
+      ) return `**You don't have enough permissions for that, you ${getInsult()}.**`
+      const messageID = args.slice(1).shift()
       try {
-        client.editMessage(possibleChannel, messageID, args.join(' '))
+        client.editMessage(possibleChannel, messageID, args.slice(1).join(' '))
       } catch (e) { return 'Nothing to edit.' }
       return
     }
@@ -407,11 +424,16 @@ export const handleEditLastSay: Command = {
   generator: async (message, args, { tempDB, client }) => {
     // Is the edit for another channel?
     const possibleChannel = getIdFromMention(args[0])
-    if (message.channelMentions[0] === possibleChannel) {
+    if (
+      message.channelMentions[0] === possibleChannel ||
+      (message.member && message.member.guild.channels.has(possibleChannel))
+    ) {
+      if (message.member && message.member.guild.channels.get(possibleChannel)
+        .permissionsOf(message.member.id).has('sendMessages')
+      ) return `**You don't have enough permissions for that, you ${getInsult()}.**`
       // Edit the message.
       try {
-        args.shift()
-        client.editMessage(possibleChannel, tempDB.say[possibleChannel], args.join(' '))
+        client.editMessage(possibleChannel, tempDB.say[possibleChannel], args.slice(1).join(' '))
       } catch (e) { return 'Nothing to edit.' }
       return
     }

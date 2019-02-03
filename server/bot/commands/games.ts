@@ -136,7 +136,7 @@ export const handleRepeat: Command = {
     ) return 'This is known to lag users and is disabled.'
     // Generate the repeated string.
     let generatedMessage = ''
-    for (let x = 0; x < number; x++) { generatedMessage += args.join() }
+    for (let x = 0; x < number; x++) { generatedMessage += args.join(' ') }
     return generatedMessage
   }
 }
