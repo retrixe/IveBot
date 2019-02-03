@@ -52,7 +52,8 @@ export const handlePurge: Command = {
     } catch (e) { return 'Could not retrieve messages.' }
     // Delete the messages.
     try {
-      client.deleteMessages(message.channel.id, messages.map(i => i.id), args.join(' ') || 'Purge')
+      const reason = args.join(' ') || 'Purge'
+      await client.deleteMessages(message.channel.id, messages.map(i => i.id), reason)
     } catch (e) { return 'Could not delete messages. Are the messages older than 2 weeks?' }
   }
 }
@@ -73,21 +74,36 @@ export const handleKick: Command = {
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
     // If the user cannot kick the person..
     if (
-      checkRolePosition(message.member.guild.members.find(i => i.user === user)) >=
+      checkRolePosition(message.member.guild.members.get(user.id)) >=
       checkRolePosition(message.member)
     ) {
       return `You cannot kick this person, you ${getInsult()}.`
     }
     // Now we kick the person.
     const f = parseSilentDelete(args)
+    // If we can't ban the person..
+    if (
+      message.member.guild.members.find(i => i.user === user) &&
+      (checkRolePosition(message.member.guild.members.get(user.id)) >=
+        checkRolePosition(message.member.guild.members.get(client.user.id)) ||
+        message.member.guild.members.get(client.user.id).permission.has('banMembers'))
+    ) return `I cannot kick this person, you ${getInsult()}.`
+    // Notify the user.
+    let dm
+    if (!f.silent) {
+      try {
+        dm = await client.createMessage((await client.getDMChannel(user.id)).id,
+          f.args.length !== 0
+            ? `You have been kicked from ${message.member.guild.name} for ${f.args.join(' ')}.`
+            : `You have been kicked from ${message.member.guild.name}.`
+        )
+      } catch (e) {}
+    }
     try {
       await client.kickGuildMember(message.member.guild.id, user.id, args.join(' '))
-    } catch (e) { return 'I am unable to kick that user.' }
-    if (!f.silent) {
-      client.createMessage((await client.getDMChannel(user.id)).id, f.args.length !== 0
-        ? `You have been kicked from ${message.member.guild.name} for ${f.args.join(' ')}.`
-        : `You have been kicked from ${message.member.guild.name}.`
-      )
+    } catch (e) {
+      if (dm) dm.delete()
+      return 'I am unable to kick that user.'
     }
     // WeChill
     if (message.member.guild.id === '402423671551164416') {

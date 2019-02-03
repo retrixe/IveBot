@@ -44,24 +44,34 @@ export const handleBan: Command = {
     // If the user cannot ban the person..
     if (
       message.member.guild.members.find(i => i.user === user) &&
-      checkRolePosition(message.member.guild.members.find(i => i.user === user)) >=
+      checkRolePosition(message.member.guild.members.get(user.id)) >=
       checkRolePosition(message.member)
-    ) {
-      return `You cannot ban this person, you ${getInsult()}.`
-    }
+    ) return `You cannot ban this person, you ${getInsult()}.`
     // Now we ban the person.
     const f = parseSilentDelete(args)
-    try {
-      await client.banGuildMember(message.member.guild.id, user.id, 0, args.join(' '))
-    } catch (e) { return 'That person could not be banned.' }
+    // If we can't ban the person..
+    if (
+      message.member.guild.members.find(i => i.user === user) &&
+      (checkRolePosition(message.member.guild.members.get(user.id)) >=
+      checkRolePosition(message.member.guild.members.get(client.user.id)) ||
+      message.member.guild.members.get(client.user.id).permission.has('banMembers'))
+    ) return `I cannot ban this person, you ${getInsult()}.`
+    let dm
     try {
       if (!f.silent) {
-        await client.createMessage((await client.getDMChannel(user.id)).id, f.args.length !== 0
-          ? `You have been banned from ${message.member.guild.name} for ${f.args.join(' ')}.`
-          : `You have been banned from ${message.member.guild.name}.`
+        dm = await client.createMessage((await client.getDMChannel(user.id)).id,
+          f.args.length !== 0
+            ? `You have been banned from ${message.member.guild.name} for ${f.args.join(' ')}.`
+            : `You have been banned from ${message.member.guild.name}.`
         )
       }
     } catch (e) {}
+    try {
+      await client.banGuildMember(message.member.guild.id, user.id, 0, args.join(' '))
+    } catch (e) {
+      if (dm) dm.delete()
+      return 'That person could not be banned.'
+    }
     // WeChill
     if (message.member.guild.id === '402423671551164416') {
       client.createMessage('402437089557217290', f.args.length !== 0
