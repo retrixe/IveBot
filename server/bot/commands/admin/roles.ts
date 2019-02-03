@@ -13,21 +13,22 @@ export const handleGiverole: Command = {
     guildOnly: true
   },
   generator: async (message, args, { db, client }) => {
+    const manageRoles = message.member.permission.has('manageRoles')
     // Check user for permissions.
     const insult = `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
-    const publicRoles = (await getServerSettings(db, message.member.guild.id)).addRoleForAll
-    if (!message.member.permission.has('manageRoles') && !publicRoles) return insult
+    const publicRoles = (await getServerSettings(db, message.member.guild.id)).addRoleForAll || ''
+    if (!manageRoles && !publicRoles) return insult
     // Now find the user ID.
     let user = getUser(message, args[0])
-    if (!message.member.permission.has('manageRoles') && user) return insult // Permission check.
-    else if (!user) user = message.author
+    if (!user) user = message.author
+    else if (user && !manageRoles) return insult // Permission check.
     else args.shift()
     // Now find the role.
     let role = message.member.guild.roles.find(
       a => a.name.toLowerCase() === args.join(' ').toLowerCase() || args.join(' ') === a.id
     )
     if (!role) return 'You have provided an invalid role name/ID, you ' + getInsult() + '.'
-    else if (!publicRoles.split('|').includes(role.name)) return insult // Permission check.
+    else if (!publicRoles.split('|').includes(role.name) && !manageRoles) return insult // Permission check.
     // Can the user manage this role?
     if (role.position >= checkRolePosition(message.member)
     ) return `You cannot give this role. Pfft, overestimating their own powers now.`
@@ -64,21 +65,22 @@ export const handleTakerole: Command = {
     guildOnly: true
   },
   generator: async (message, args, { db, client }) => {
+    const manageRoles = message.member.permission.has('manageRoles')
     // Check user for permissions.
     const insult = `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
-    const publicRoles = (await getServerSettings(db, message.member.guild.id)).addRoleForAll
-    if (!message.member.permission.has('manageRoles') && !publicRoles) return insult
+    const publicRoles = (await getServerSettings(db, message.member.guild.id)).addRoleForAll || ''
+    if (!manageRoles && !publicRoles) return insult
     // Now find the user ID.
     let user = getUser(message, args[0])
-    if (!message.member.permission.has('manageRoles') && user) return insult // Permission check.
-    else if (!user) user = message.author
+    if (!user) user = message.author
+    else if (!manageRoles && user) return insult // Permission check.
     else args.shift()
     // Now find the role.
     let role = message.member.guild.roles.find(
       a => a.name.toLowerCase() === args.join(' ').toLowerCase() || args.join(' ') === a.id
     )
     if (!role) return 'You have provided an invalid role name/ID, you ' + getInsult() + '.'
-    else if (!publicRoles.split('|').includes(role.name)) return insult // Permission check.
+    else if (!publicRoles.split('|').includes(role.name) && !manageRoles) return insult // Permission check.
     // Can the user manage this role?
     if (role.position >= checkRolePosition(message.member)
     ) return `You cannot take this role. Pfft, overestimating their own powers now.`
