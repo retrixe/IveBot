@@ -1,14 +1,6 @@
 import { Db } from 'mongodb'
 import { Message } from 'eris'
 
-export const getArguments = (message: string) => {
-  const splitMessage = message.split(' ')
-  splitMessage.shift()
-  return splitMessage.join(' ').trim()
-}
-
-export const getDesc = (message: { content: string }) => getArguments(message.content)
-
 export const getIdFromMention = (mention: string) => {
   const f = mention.substring(2, mention.length - 1).split('!').join('').split('&').join('').split(':')
   return f[f.length - 1]

@@ -2,7 +2,7 @@
 import { Message } from 'eris' // eslint-disable-line no-unused-vars
 import { Command } from '../imports/types'
 // All the needs!
-import { getIdFromMention, getDesc, getInsult, getUser } from '../imports/tools'
+import { getIdFromMention, getInsult, getUser } from '../imports/tools'
 import * as ms from 'ms'
 import 'json5/lib/require'
 import { host, testPilots } from '../../../config.json5'
@@ -252,19 +252,25 @@ export const handleRemindme: Command = {
   opts: {
     fullDescription: 'Remind you of something.',
     description: 'Reminders.',
-    usage: '/remindme <time in 1d|1h|1m|1s> <description>',
+    usage: '/remindme <time in 1d|1h|1m|1s> (--channel|-c) <description>',
     example: '/remindme 1h do your homework'
   },
   generator: (message, args) => {
     if (args.length < 2 || !ms(args[0])) {
       return 'Correct usage: /remindme <time in 1d|1h|1m|1s> <description>'
     }
+    let channel = false
+    if (args[1] === '-c' || args[1] === '--channel') channel = true
     setTimeout(async () => {
-      (await message.author.getDMChannel()).createMessage(
-        `⏰ ${getDesc(message)}\nReminder set ${args[0]} ago.`
-      )
+      channel
+        ? message.channel.createMessage(
+          `⏰ ${message.author.mention} ${args.slice(2).join(' ')}\nReminder set ${args[0]} ago.`
+        )
+        : (await message.author.getDMChannel()).createMessage(
+          `⏰ ${args.slice(1).join(' ')}\nReminder set ${args[0]} ago.`
+        )
     }, ms(args[0]))
-    return `You will be reminded in ${args[0]} through a DM.`
+    return `You will be reminded in ${args[0]} through a ${channel ? 'mention' : 'DM'}.`
   }
 }
 

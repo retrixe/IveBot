@@ -136,8 +136,7 @@ export default class CommandParser {
     const context: Context = {
       tempDB: this.tempDB, db: this.db, commandParser: this, client: this.client
     }
-    const args = message.content.trim().split(' ').filter(i => i)
-    args.shift()
+    const args = message.content.trim().split(' ').filter(i => i).slice(1)
     // Guild and DM only.
     if (command.guildOnly && message.channel.type !== 0) return
     else if (command.dmOnly && message.channel.type !== 1) return
@@ -161,9 +160,9 @@ export default class CommandParser {
     // We define a sent variable to keep track.
     let sent
     if ( // No permission protection is here as well.
-      messageToSend && message.member &&
+      messageToSend && ((message.member &&
       message.member.guild.channels.find(i => i.id === message.channel.id)
-        .permissionsOf(this.client.user.id).has('sendMessages')
+        .permissionsOf(this.client.user.id).has('sendMessages')) || message.channel.type === 1)
     ) sent = await message.channel.createMessage(messageToSend)
     if (command.postGenerator) command.postGenerator(message, args, sent, context)
   }

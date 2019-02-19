@@ -1,5 +1,4 @@
 import { Command } from '../imports/types'
-import { getDesc } from '../imports/tools'
 import { eval as eva } from 'mathjs'
 
 // Zalgo characters.
@@ -32,10 +31,10 @@ export const handleChoose: Command = {
     example: '/choose cake|ice cream|pasta',
     usage: '/choose <option 1>|(option 2)|(option 3)...'
   },
-  generator: (message) => {
+  generator: (message, args) => {
     // Is it used correctly?
     if (message.content.split('|').length === 1) return 'Correct usage: /choose item1|item2|...'
-    const choices = getDesc(message).split('|')
+    const choices = args.join(' ').split('|')
     return `I choose: ${choices[Math.floor(Math.random() * choices.length)]}`
   }
 }
@@ -49,7 +48,7 @@ export const handleReverse: Command = {
     example: '/reverse hello',
     usage: '/reverse <text>'
   },
-  generator: (message) => getDesc(message).split('').reverse().join('')
+  generator: (message, args) => args.join(' ').split('').reverse().join('')
 }
 
 export const handle8ball: Command = {
@@ -106,10 +105,9 @@ export const handleDezalgo: Command = {
     usage: '/dezalgo <text>',
     example: '/dezalgo ḥ̛̓e̖l̽͞҉lͦͅoͥ'
   },
-  generator: (message) => {
-    let textToZalgo = getDesc(message).split('')
+  generator: (message, args) => {
     let newMessage = ''
-    textToZalgo.forEach(element => {
+    args.join(' ').split('').forEach(element => {
       if (characters.indexOf(element) === -1) newMessage += element
     })
     return newMessage
