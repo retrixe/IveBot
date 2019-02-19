@@ -4,8 +4,6 @@
   "description": "The bot that created the iPhone X.",
   "main": "server/index.ts",
   "scripts": {
-    "test": "ava",
-    "nyan": "ava --tap | tap-nyan",
     "lint": "eslint . --ext .js,.ts,.tsx && tsc --noEmit && graphql-schema-linter server/schema.graphql",
     "start": "node lib/index.js --production",
     "build": "next build && tsc",
@@ -41,7 +39,6 @@
     "@types/node": "^8.0.53",
     "@types/react": "^16.0.36",
     "@zeit/next-typescript": "^1.1.1",
-    "ava": "^1.0.0-rc.2",
     "eslint": "^5.6.1",
     "eslint-config-standard": "^12.0.0",
     "eslint-config-standard-react": "^7.0.2",
@@ -55,42 +52,13 @@
     "graphql-schema-linter": "^0.0.28",
     "husky": "^1.0.0-rc.13",
     "nodemon": "^1.18.7",
-    "tap-nyan": "^1.1.0",
     "ts-node": "6.2.0",
     "typescript": "^3.0.1",
     "typescript-eslint-parser": "^20.0.0"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint && npm run test"
-    }
-  },
-  "ava": {
-    "files": [
-      "tests/**/*.test.ts"
-    ],
-    "sources": [
-      "server/**/*.ts"
-    ],
-    "require": [
-      "ts-node/register/transpile-only"
-    ],
-    "babel": {
-      "testOptions": {
-        "presets": [
-          [
-            "module:ava/stage-4",
-            false
-          ]
-        ],
-        "plugins": [
-          "@babel/plugin-syntax-typescript"
-        ]
-      },
-      "extensions": [
-        "js",
-        "ts"
-      ]
+      "pre-commit": "npm run lint"
     }
   }
 }
