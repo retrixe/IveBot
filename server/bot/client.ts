@@ -209,7 +209,7 @@ export default class CommandParser {
           await this.executeCommand(this.commands[keys[i]], message)
           const executeSecond = process.hrtime(executeFirst) // Time difference.
           this.saveAnalytics(executeSecond, keys[i]) // Send analytics.
-        try { await this.executeCommand(this.commands[keys[i]], message) } catch (e) {
+        } catch (e) {
           // On error, we tell the user of an unknown error and log it for our reference.
           message.channel.createMessage(this.commands[keys[i]].errorMessage)
           console.error(e)
