@@ -29,12 +29,16 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
       let {
         addRoleForAll, joinLeaveMessages, joinAutorole, ocrOnSend
       } = await getServerSettings(db, serverId)
-      joinLeaveMessages = joinLeaveMessages || {}
-      joinLeaveMessages = {
+      // Insert default values for all properties.
+      joinLeaveMessages = joinLeaveMessages ? {
         channelName: joinLeaveMessages.channelName || '',
         joinMessage: joinLeaveMessages.joinMessage || '',
         leaveMessage: joinLeaveMessages.leaveMessage || ''
-      }
+      } : { channelName: '', joinMessage: '', leaveMessage: '' }
+      addRoleForAll = addRoleForAll || ''
+      ocrOnSend = ocrOnSend || false
+      joinAutorole = joinAutorole || ''
+      // Check for permissions, and then send server settings.
       if (
         member && (member.permission.has('manageGuild') || host === ctx.tempDB.link[linkToken])
       ) return { serverId, addRoleForAll, joinLeaveMessages, joinAutorole, ocrOnSend }
@@ -85,14 +89,12 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
       ) {
         await getServerSettings(db, serverId)
         await db.collection('servers').updateOne({ serverID: serverId }, { $set: {
-          /* eslint-disable no-unneeded-ternary */
-          addRoleForAll: addRoleForAll ? addRoleForAll : undefined,
-          joinAutorole: joinAutorole ? joinAutorole : undefined,
+          addRoleForAll: addRoleForAll || undefined,
+          joinAutorole: joinAutorole || undefined,
           ocrOnSend,
-          joinLeaveMessages: {
-            channelName: null, joinMessage: null, leaveMessage: null, ...joinLeaveMessages
-          }
-          /* eslint-enable no-unneeded-ternary */
+          joinLeaveMessages: joinLeaveMessages ? {
+            channelName: '', joinMessage: '', leaveMessage: '', ...joinLeaveMessages
+          } : undefined
         } })
         return getServerSettings(db, serverId)
       } else return { serverId: 'Forbidden.' }
