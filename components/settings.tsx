@@ -10,13 +10,16 @@ import { gql } from 'apollo-boost'
 interface Props {
   data: {
     addRoleForAll: string, joinAutorole: string, ocrOnSend: boolean, joinLeaveMessages: {
-      channelName: string,
+      channelID: string,
       joinMessage: string,
-      leaveMessage: string
+      leaveMessage: string,
+      banMessage: string
     }
   },
   token: string,
-  server: { perms: boolean, icon: string, serverId: string, name: string, channels: string[] },
+  server: { perms: boolean, icon: string, serverId: string, name: string, channels: {
+    name: string, id: string
+  }[] },
   refetch: Function
 }
 interface State {
@@ -24,9 +27,10 @@ interface State {
   joinAutorole: string,
   ocrOnSend: boolean,
   joinLeaveMessages: {
-    channelName: string,
+    channelID: string,
     joinMessage: string,
-    leaveMessage: string
+    leaveMessage: string,
+    banMessage: string
   }
 }
 export default class Settings extends React.Component<Props, State> {
@@ -36,9 +40,10 @@ export default class Settings extends React.Component<Props, State> {
       joinAutorole: this.props.data.joinAutorole,
       ocrOnSend: this.props.data.ocrOnSend,
       joinLeaveMessages: {
-        channelName: this.props.data.joinLeaveMessages.channelName,
+        channelID: this.props.data.joinLeaveMessages.channelID,
         joinMessage: this.props.data.joinLeaveMessages.joinMessage,
-        leaveMessage: this.props.data.joinLeaveMessages.leaveMessage
+        leaveMessage: this.props.data.joinLeaveMessages.leaveMessage,
+        banMessage: this.props.data.joinLeaveMessages.banMessage
       }
     }
   }
@@ -57,9 +62,10 @@ mutation variables(
     joinAutorole
     ocrOnSend
     joinLeaveMessages {
-      channelName
+      channelID
       joinMessage
       leaveMessage
+      banMessage
     }
   }
 }
@@ -121,15 +127,17 @@ mutation variables(
             <Typography gutterBottom>Ensure the channel name is correct.</Typography>
             <FormControl fullWidth>
               <InputLabel>Channel Name</InputLabel>
-              <Select value={this.state.joinLeaveMessages.channelName} fullWidth margin='dense'
+              <Select value={this.state.joinLeaveMessages.channelID} fullWidth margin='dense'
                 onChange={e => this.setState({
                   joinLeaveMessages: {
-                    ...this.state.joinLeaveMessages, channelName: e.target.value
+                    ...this.state.joinLeaveMessages, channelID: e.target.value
                   }
                 })}
               >
                 <MenuItem value=''><em>None</em></MenuItem>
-                {this.props.server.channels.map(i => (<MenuItem value={i} key={i}>{i}</MenuItem>))}
+                {this.props.server.channels.map(i => (
+                  <MenuItem value={i.id} key={i.id}>{i.name}</MenuItem>
+                ))}
               </Select>
               <FormHelperText>Leave blank to disable join/leave messages</FormHelperText>
             </FormControl>

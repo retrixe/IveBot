@@ -31,10 +31,11 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
       } = await getServerSettings(db, serverId)
       // Insert default values for all properties.
       joinLeaveMessages = joinLeaveMessages ? {
-        channelName: joinLeaveMessages.channelName || '',
+        channelID: joinLeaveMessages.channelID || '',
         joinMessage: joinLeaveMessages.joinMessage || '',
-        leaveMessage: joinLeaveMessages.leaveMessage || ''
-      } : { channelName: '', joinMessage: '', leaveMessage: '' }
+        leaveMessage: joinLeaveMessages.leaveMessage || '',
+        banMessage: joinLeaveMessages.banMessage || ''
+      } : { channelID: '', joinMessage: '', leaveMessage: '', banMessage: '' }
       addRoleForAll = addRoleForAll || ''
       ocrOnSend = ocrOnSend || false
       joinAutorole = joinAutorole || ''
@@ -44,10 +45,12 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
       ) return { serverId, addRoleForAll, joinLeaveMessages, joinAutorole, ocrOnSend }
       else return { serverId: 'Forbidden.' }
     },
+    // Get user info.
     getUserInfo: (_: string, { linkToken }: { linkToken: string }) => {
       if (ctx.tempDB.link[linkToken]) {
         let servers: Array<{ /* eslint-disable indent */
-          perms: boolean, icon: string, serverId: string, name: string, channels: string[]
+          perms: boolean, icon: string, serverId: string, name: string,
+          channels: Array<{ id: string, name: string }>
         }> = [] /* eslint-enable indent */
         ctx.client.guilds.forEach(server => {
           ctx.client.guilds.find(a => a.id === server.id).members.forEach(member => {
@@ -56,7 +59,9 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
                 serverId: server.id,
                 name: server.name,
                 icon: server.iconURL || 'no icon',
-                channels: server.channels.filter(i => i.type === 0).map(i => i.name),
+                channels: server.channels.filter(i => i.type === 0).map(i => ({
+                  id: i.id, name: i.name
+                })),
                 perms: host === ctx.tempDB.link[linkToken]
                   ? true : member.permission.has('manageGuild')
               })
@@ -74,7 +79,7 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
       _: string, { input }: { input: { // eslint-disable-next-line indent
         serverId: string, linkToken: string, addRoleForAll: string, joinAutorole: string,
       // eslint-disable-next-line indent
-        joinLeaveMessages: { channelName: string, joinMessage: string, leaveMessage: string },
+        joinLeaveMessages: { channelID: string, joinMessage: string, leaveMessage: string },
       // eslint-disable-next-line indent
         ocrOnSend: boolean
       } }
@@ -84,16 +89,18 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
       } = input
       const member = ctx.client.guilds
         .find(t => t.id === serverId).members.find(t => t.id === ctx.tempDB.link[linkToken])
-      if (
-        member.permission.has('manageGuild') || host === ctx.tempDB.link[linkToken]
-      ) {
+      if (member.permission.has('manageGuild') || host === ctx.tempDB.link[linkToken]) {
         await getServerSettings(db, serverId)
         await db.collection('servers').updateOne({ serverID: serverId }, { $set: {
           addRoleForAll: addRoleForAll || undefined,
           joinAutorole: joinAutorole || undefined,
           ocrOnSend,
           joinLeaveMessages: joinLeaveMessages ? {
-            channelName: '', joinMessage: '', leaveMessage: '', ...joinLeaveMessages
+            channelID: '',
+            joinMessage: '',
+            leaveMessage: '',
+            banMessage: '',
+            ...joinLeaveMessages
           } : undefined
         } })
         return getServerSettings(db, serverId)

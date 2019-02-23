@@ -1,11 +1,21 @@
 # Joining and leaving servers.
 type JoinLeaveMessages {
   # Name of channel.
-  channelName: String
+  channelID: String
   # What to post when joining.
   joinMessage: String
   # What to post when leaving.
   leaveMessage: String
+  # What to post when a user is banned.
+  banMessage: String
+}
+
+# Channel type.
+type Channel {
+  # Channel name.
+  name: String!
+  # Channel ID.
+  id: String!
 }
 
 # Server type.
@@ -19,7 +29,7 @@ type Server {
   # Name of server.
   name: String
   # Channels in server.
-  channels: [String]
+  channels: [Channel]
 }
 
 # Server specific settings.
@@ -49,11 +59,13 @@ type Query {
 # Input for modifying join/leave messages.
 input JoinLeaveMessagesInput {
   # Name of channel.
-  channelName: String!
+  channelID: String!
   # What to post when joining.
   joinMessage: String
   # What to post when leaving.
   leaveMessage: String
+  # What to post when a user is banned.
+  banMessage: String
 }
 
 # Input for editServerSettings mutation.

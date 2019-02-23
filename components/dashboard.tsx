@@ -11,13 +11,17 @@ import { gql } from 'apollo-boost'
 /* eslint-disable quotes, no-multi-str, no-undef */
 interface Props {
   data: Array<{
-    perms: boolean, icon: string, serverId: string, name: string, channels: string[]
+    perms: boolean, icon: string, serverId: string, name: string, channels: {
+      name: string, id: string
+    }[]
   }>,
   token: string
 }
 interface State {
   selected: boolean | {
-    perms: boolean, icon: string, serverId: string, name: string, channels: string[]
+    perms: boolean, icon: string, serverId: string, name: string, channels: {
+      name: string, id: string
+    }[]
   }
 }
 class DashboardIndex extends React.Component<Props, State> {
@@ -35,9 +39,10 @@ query getServerSettings($server: String!, $token: String!) {
     addRoleForAll
     joinAutorole
     joinLeaveMessages {
-      channelName
+      channelID
       joinMessage
       leaveMessage
+      banMessage
     }
     ocrOnSend
   }

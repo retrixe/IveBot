@@ -56,8 +56,10 @@ export const guildMemberRemove = (client: Client, db: Db) => async (
   const serverSettings = await getServerSettings(db, guild.id)
   // If join/leave messages is not configured/improperly configured..
   if (!serverSettings.joinLeaveMessages) return
-  const { leaveMessage, channelName } = serverSettings.joinLeaveMessages
+  const { leaveMessage, channelName, banMessage } = serverSettings.joinLeaveMessages
   if (!channelName || !leaveMessage) return
+  // If there is a ban message and the user is banned.
+  if (banMessage && (await guild.getBans()).find(i => i.id === member.user.id)) return
   // We send a message.
   try {
     const channelID = guild.channels.find(i => i.name === channelName).id
@@ -67,6 +69,25 @@ export const guildMemberRemove = (client: Client, db: Db) => async (
       .split('{d}').join(member.user.discriminator) // Replace the discriminator.
     client.createMessage(channelID, toSend)
   } catch (e) {}
+}
+
+// When a server bans a member, this function will be called.
+export const guildBanAdd = (client: Client, db: Db) => async (guild: Guild, user: User) => {
+  // Get server settings.
+  const serverSettings = await getServerSettings(db, guild.id)
+  // If join/leave messages is not configured/improperly configured..
+  if (!serverSettings.joinLeaveMessages) return
+  const { channelName, banMessage } = serverSettings.joinLeaveMessages
+  if (!channelName || !banMessage) return
+  // We send a message.
+  try {
+    const channelID = guild.channels.find(i => i.name === channelName).id
+    const toSend = banMessage
+      .split('{un}').join(user.username) // Replace the username.
+      .split('{m}').join(user.mention) // Replace the mention.
+      .split('{d}').join(user.discriminator) // Replace the discriminator.
+    client.createMessage(channelID, toSend)
+  } catch (e) { }
 }
 
 // When the bot leaves a server, this function will be called.

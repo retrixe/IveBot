@@ -27,7 +27,10 @@ query getAllCommonServers($token: String!) {
     name
     perms
     icon
-    channels
+    channels {
+      id
+      name
+    }
   }
 }
     `
