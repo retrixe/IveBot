@@ -1,53 +1,64 @@
 import { Command as IveBotCommand } from '../imports/types'
+import { zeroWidthSpace } from '../imports/tools'
 import { rootURL } from '../../../config.json5'
 import { Command } from '../client'
 
-let generalHelp = `**Jony Ive can do many commands 📡**
-\`/halp\` and \`/help\` - The most innovative help.
-**Games.**
-    \`/gunfight\` - For that good ol' fight bro.
-    \`/random\` - Return a random number.
-    \`/randomword\` - Returns a random word.
-    \`/choose\` - Choose between multiple options.
-    \`/reverse\` - Reverse a sentence.
-    \`/8ball\` - Random answers to random questions.
-    \`/repeat\` - Repeat a string.
-    \`/calculate\` - Calculate an expression.
-    \`/distort\` - Pretty distorted text.
-**Random searches.**
-    \`/urban\` - Get an Urban Dictionary definition ;)
-    \`/cat\` and \`/dog\` - Random cats and dogs from <https://random.cat> and <https://dog.ceo>
-    \`/robohash\` - Take some text, make it a robot/monster/head/cat.
-    \`/zalgo\` \`/dezalgo\` - The zalgo demon's writing.
-    \`/namemc\` - A Minecraft user's previous usernames and skin.
-    \`/astronomy-picture-of-the-day\` or \`/apod\`
-    \`/currency\` - Currency conversion (\`/help currency\`)
-**Utilities.**
-    TP \`/request\` - Request a specific feature.
-    \`/token\` - Links your Discord to IveBot Web (use in DM only)
-    \`/weather\` - It's really cloudy here..
-    \`/say\` | \`/type\` - Say something, even in another channel.
-    \`/editLastSay\` - Even if it was another channel.
-    \`/remindme\` - Reminders.
-    \`/leave\` - Makes you leave the server.
-    \`/ocr\` - Get text from an image.
-    \`/avatar\` - Avatar of a user.
-    \`/userinfo\` - User info.
-    \`/serverinfo\` - Server info 🤔
-    \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
-    \`/emojiImage\` - Image of an emoji.
-    \`/giverole\` and \`/takerole\` - Edit roles.
-    \`/notify\` - Ping a role that cannot be pinged.
-**Administrative commands.**
-    \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
-    \`/addEmoji\`, \`/deleteEmoji\` and \`/editEmoji\`
-    \`/warn\` and \`/warnings\` | \`/clearwarns\` and \`/removewarn\`
-    \`/changeserverregion\` and \`/listserverregions\`
-    \`/purge\` - Bulk delete a set of messages.
-    \`/slowmode\` - When you must slow down chat.
-
-**There are some easter egg auto responses.**
+let generalHelp = {
+  description: `**Jony Ive can do many commands 📡**
+\`/halp\` and \`/help\` - The most innovative help.`,
+  fields: [
+    {
+      name: '**Games.**', value: `
+\`/gunfight\` - For that good ol' fight bro.
+\`/random\` - Return a random number.
+\`/randomword\` - Returns a random word.
+\`/choose\` - Choose between multiple options.
+\`/reverse\` - Reverse a sentence.
+\`/8ball\` - Random answers to random questions.
+\`/repeat\` - Repeat a string.
+\`/calculate\` - Calculate an expression.
+\`/distort\` - Pretty distorted text.`
+    }, {
+      name: '**Random searches.**', value: `
+\`/urban\` - Get an Urban Dictionary definition ;)
+\`/cat\` and \`/dog\` - Random cats and dogs from <https://random.cat> and <https://dog.ceo>
+\`/robohash\` - Take some text, make it a robot/monster/head/cat.
+\`/zalgo\` \`/dezalgo\` - The zalgo demon's writing.
+\`/namemc\` - A Minecraft user's previous usernames and skin.
+\`/astronomy-picture-of-the-day\` or \`/apod\`
+\`/currency\` - Currency conversion (\`/help currency\`)`
+    }, {
+      name: '**Utilities.**', value: `
+TP \`/request\` - Request a specific feature.
+\`/token\` - Links your Discord to IveBot Web (use in DM only)
+\`/weather\` - It's really cloudy here..
+\`/say\` | \`/type\` - Say something, even in another channel.
+\`/editLastSay\` - Even if it was another channel.
+\`/remindme\` - Reminders.
+\`/leave\` - Makes you leave the server.
+\`/ocr\` - Get text from an image.
+\`/avatar\` - Avatar of a user.
+\`/userinfo\` - User info.
+\`/serverinfo\` - Server info 🤔
+\`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
+\`/emojiImage\` - Image of an emoji.
+\`/giverole\` and \`/takerole\` - Edit roles.
+\`/notify\` - Ping a role that cannot be pinged.`
+    }, {
+      name: '**Administrative commands.**', value: `
+\`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
+\`/addEmoji\`, \`/deleteEmoji\` and \`/editEmoji\`
+\`/warn\` and \`/warnings\` | \`/clearwarns\` and \`/removewarn\`
+\`/changeserverregion\` and \`/listserverregions\`
+\`/purge\` - Bulk delete a set of messages.
+\`/slowmode\` - When you must slow down chat.`
+    }, {
+      name: zeroWidthSpace,
+      value: `**There are some easter egg auto responses.**
 **Commands with TP are test pilot only.**`
+    }
+  ]
+}
 
 const generateDocs = (command: Command) => {
   if (command.aliases && command.aliases.length) {
@@ -96,7 +107,7 @@ export const handleHelp: IveBotCommand = {
         color: 0x00AE86,
         type: 'rich',
         title: 'Help',
-        description: generalHelp,
+        ...generalHelp,
         footer: { text: 'For help on a specific command or aliases, run /help <command>.' }
       }
     })
