@@ -39,7 +39,7 @@ query getServerSettings($server: String!, $token: String!) {
     addRoleForAll
     joinAutorole
     joinLeaveMessages {
-      channelID
+      channel
       joinMessage
       leaveMessage
       banMessage

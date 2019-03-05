@@ -10,7 +10,7 @@ import { gql } from 'apollo-boost'
 interface Props {
   data: {
     addRoleForAll: string, joinAutorole: string, ocrOnSend: boolean, joinLeaveMessages: {
-      channelID: string,
+      channel: string,
       joinMessage: string,
       leaveMessage: string,
       banMessage: string
@@ -27,7 +27,7 @@ interface State {
   joinAutorole: string,
   ocrOnSend: boolean,
   joinLeaveMessages: {
-    channelID: string,
+    channel: string,
     joinMessage: string,
     leaveMessage: string,
     banMessage: string
@@ -40,7 +40,7 @@ export default class Settings extends React.Component<Props, State> {
       joinAutorole: this.props.data.joinAutorole,
       ocrOnSend: this.props.data.ocrOnSend,
       joinLeaveMessages: {
-        channelID: this.props.data.joinLeaveMessages.channelID,
+        channel: this.props.data.joinLeaveMessages.channel,
         joinMessage: this.props.data.joinLeaveMessages.joinMessage,
         leaveMessage: this.props.data.joinLeaveMessages.leaveMessage,
         banMessage: this.props.data.joinLeaveMessages.banMessage
@@ -62,7 +62,7 @@ mutation variables(
     joinAutorole
     ocrOnSend
     joinLeaveMessages {
-      channelID
+      channel
       joinMessage
       leaveMessage
       banMessage
@@ -127,10 +127,10 @@ mutation variables(
             <Typography gutterBottom>Ensure the channel name is correct.</Typography>
             <FormControl fullWidth>
               <InputLabel>Channel Name</InputLabel>
-              <Select value={this.state.joinLeaveMessages.channelID} fullWidth margin='dense'
+              <Select value={this.state.joinLeaveMessages.channel} fullWidth margin='dense'
                 onChange={e => this.setState({
                   joinLeaveMessages: {
-                    ...this.state.joinLeaveMessages, channelID: e.target.value
+                    ...this.state.joinLeaveMessages, channel: e.target.value
                   }
                 })}
               >

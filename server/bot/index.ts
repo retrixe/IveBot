@@ -35,16 +35,15 @@ export const guildMemberAdd = (client: Client, db: Db, tempDB: DB) => async (
   }
   // If join/leave messages is not configured/improperly configured..
   if (!serverSettings.joinLeaveMessages) return
-  const { joinMessage, channelName } = serverSettings.joinLeaveMessages
-  if (!channelName || !joinMessage) return
+  const { joinMessage, channel } = serverSettings.joinLeaveMessages
+  if (!channel || !joinMessage) return
   // We send a message.
   try {
-    const channelID = guild.channels.find(i => i.name === channelName).id
     const toSend = joinMessage
       .split('{un}').join(member.user.username) // Replace the username.
       .split('{m}').join(member.user.mention) // Replace the mention.
       .split('{d}').join(member.user.discriminator) // Replace the discriminator.
-    client.createMessage(channelID, toSend)
+    await client.createMessage(channel, toSend)
   } catch (e) {}
 }
 
@@ -56,18 +55,17 @@ export const guildMemberRemove = (client: Client, db: Db) => async (
   const serverSettings = await getServerSettings(db, guild.id)
   // If join/leave messages is not configured/improperly configured..
   if (!serverSettings.joinLeaveMessages) return
-  const { leaveMessage, channelName, banMessage } = serverSettings.joinLeaveMessages
-  if (!channelName || !leaveMessage) return
+  const { leaveMessage, channel, banMessage } = serverSettings.joinLeaveMessages
+  if (!channel || !leaveMessage) return
   // If there is a ban message and the user is banned.
   if (banMessage && (await guild.getBans()).find(i => i.id === member.user.id)) return
   // We send a message.
   try {
-    const channelID = guild.channels.find(i => i.name === channelName).id
     const toSend = leaveMessage
       .split('{un}').join(member.user.username) // Replace the username.
       .split('{m}').join(member.user.mention) // Replace the mention.
       .split('{d}').join(member.user.discriminator) // Replace the discriminator.
-    client.createMessage(channelID, toSend)
+    await client.createMessage(channel, toSend)
   } catch (e) {}
 }
 

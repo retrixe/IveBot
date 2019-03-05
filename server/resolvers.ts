@@ -31,11 +31,11 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
       } = await getServerSettings(db, serverId)
       // Insert default values for all properties.
       joinLeaveMessages = joinLeaveMessages ? {
-        channelID: joinLeaveMessages.channelID || '',
+        channel: joinLeaveMessages.channel || '',
         joinMessage: joinLeaveMessages.joinMessage || '',
         leaveMessage: joinLeaveMessages.leaveMessage || '',
         banMessage: joinLeaveMessages.banMessage || ''
-      } : { channelID: '', joinMessage: '', leaveMessage: '', banMessage: '' }
+      } : { channel: '', joinMessage: '', leaveMessage: '', banMessage: '' }
       addRoleForAll = addRoleForAll || ''
       ocrOnSend = ocrOnSend || false
       joinAutorole = joinAutorole || ''
@@ -79,7 +79,7 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
       _: string, { input }: { input: { // eslint-disable-next-line indent
         serverId: string, linkToken: string, addRoleForAll: string, joinAutorole: string,
       // eslint-disable-next-line indent
-        joinLeaveMessages: { channelID: string, joinMessage: string, leaveMessage: string },
+        joinLeaveMessages: { channel: string, joinMessage: string, leaveMessage: string },
       // eslint-disable-next-line indent
         ocrOnSend: boolean
       } }
@@ -96,7 +96,7 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
           joinAutorole: joinAutorole || undefined,
           ocrOnSend,
           joinLeaveMessages: joinLeaveMessages ? {
-            channelID: '',
+            channel: '',
             joinMessage: '',
             leaveMessage: '',
             banMessage: '',

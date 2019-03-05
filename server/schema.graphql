@@ -1,7 +1,7 @@
 # Joining and leaving servers.
 type JoinLeaveMessages {
-  # Name of channel.
-  channelID: String
+  # ID of channel.
+  channel: String
   # What to post when joining.
   joinMessage: String
   # What to post when leaving.
@@ -58,8 +58,8 @@ type Query {
 
 # Input for modifying join/leave messages.
 input JoinLeaveMessagesInput {
-  # Name of channel.
-  channelID: String!
+  # ID of channel.
+  channel: String!
   # What to post when joining.
   joinMessage: String
   # What to post when leaving.
