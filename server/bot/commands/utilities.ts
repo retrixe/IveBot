@@ -136,7 +136,7 @@ export const handleUserinfo: Command = {
 
 export const handleRequest: Command = {
   name: 'request',
-  aliases: ['req'],
+  aliases: ['req', 'suggest'],
   opts: {
     description: 'Request a specific feature.',
     fullDescription: 'Request a feature. 24 hour cooldown except for test pilots.',

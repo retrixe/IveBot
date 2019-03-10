@@ -6,6 +6,7 @@ import * as moment from 'moment'
 import 'json5/lib/require'
 import { host, testPilots } from '../../../config.json5'
 import { runInNewContext } from 'vm'
+import { inspect } from 'util'
 
 export const handleToken: Command = {
   name: 'token',
@@ -145,13 +146,15 @@ export const handleEval: Command = {
       // Remove extra characters.
       if (toEval.startsWith('`')) toEval = toEval.substring(1)
       if (toEval.startsWith('``js')) toEval = toEval.substring(4)
+      else if (toEval.startsWith('``')) toEval = toEval.substring(2)
       if (toEval.endsWith('`')) toEval = toEval.substring(0, toEval.length - 1)
       if (toEval.endsWith('```')) toEval = toEval.substring(0, toEval.length - 2)
+      // Evaluate!
       // eslint-disable-next-line no-eval
-      const res = eval(toEval)
-      // const res = eval(`(async () => { const a = ${toEval}; message.channel.createMessage(a) })()`)
+      const res = inspect(await Promise.resolve(eval(toEval)), false, 0)
+      // const res = eval(`(async () => { const a = ${toEval}; return a })()`)
       message.addReaction('✅')
-      return res ? `${'```'}${res}${'```'}` : undefined
+      return res !== 'undefined' ? `${'```'}${res}${'```'}` : undefined
     } catch (e) {
       const channel = await client.getDMChannel(host)
       message.addReaction('❌')

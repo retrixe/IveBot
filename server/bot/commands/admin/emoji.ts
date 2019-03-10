@@ -26,6 +26,13 @@ export const handleAddemoji: Command = {
     try {
       image = Buffer.from(await (await fetch(url)).arrayBuffer())
     } catch (e) { return `Invalid image URL, you ${getInsult()}` }
+    // If emoji larger than 384 bytes (in case)
+    if (image.byteLength >= 384) {
+      return `Your emoji is larger than 256 KB, resize your image!
+I recommend using <https://picresize.com/> if the emoji is JPG.
+Set step 2 to No Change, set Max Filesize to 255 in step 4 and set to Best quality.
+After checking image format as JPG, resize, View Image and use the URL to the image here.`
+    }
     // Check the slots.
     const isGif = check([0x47, 0x49, 0x46], image)
     if (
