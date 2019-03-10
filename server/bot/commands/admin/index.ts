@@ -86,7 +86,7 @@ export const handleKick: Command = {
       message.member.guild.members.find(i => i.user === user) &&
       (checkRolePosition(message.member.guild.members.get(user.id)) >=
         checkRolePosition(message.member.guild.members.get(client.user.id)) ||
-        message.member.guild.members.get(client.user.id).permission.has('banMembers'))
+        !message.member.guild.members.get(client.user.id).permission.has('banMembers'))
     ) return `I cannot kick this person, you ${getInsult()}.`
     // Notify the user.
     let dm

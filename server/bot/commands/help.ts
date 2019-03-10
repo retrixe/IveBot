@@ -90,15 +90,17 @@ export const handleHelp: IveBotCommand = {
   },
   generator: async (message, args, { commandParser }) => {
     const commands = commandParser.commands
-    const aliasCheck = (i: string) => (
-      commands[i].aliases && commands[i].aliases.includes(args.join(' ').split('/').join(''))
+    const command = args.join(' ').split('/').join('').toLowerCase()
+    const check = (i: string) => (
+      // First checks for name, 2nd for aliases.
+      commands[i].name.toLowerCase() === command ||
+      (commands[i].aliases && commands[i].aliases.includes(command))
     )
-    if (
-      args.join(' ').split('/').join('') in commands
-    ) return generateDocs(commands[args.join(' ').split('/').join('')])
-    else if (Object.keys(commands).find(aliasCheck)) {
-      return generateDocs(commands[Object.keys(commands).find(aliasCheck)])
+    // Check if requested for a specific command.
+    if (Object.keys(commands).find(check)) {
+      return generateDocs(commands[Object.keys(commands).find(check)])
     } else if (args.join(' ')) return 'Incorrect parameters. Run /help for general help.'
+    // Default help.
     const channel = await message.author.getDMChannel()
     channel.createMessage({
       content: `**IveBot's dashboard**: ${rootURL || 'https://ivebot.now.sh'}/

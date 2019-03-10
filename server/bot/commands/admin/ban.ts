@@ -54,7 +54,7 @@ export const handleBan: Command = {
       message.member.guild.members.find(i => i.user === user) &&
       (checkRolePosition(message.member.guild.members.get(user.id)) >=
       checkRolePosition(message.member.guild.members.get(client.user.id)) ||
-      message.member.guild.members.get(client.user.id).permission.has('banMembers'))
+      !message.member.guild.members.get(client.user.id).permission.has('banMembers'))
     ) return `I cannot ban this person, you ${getInsult()}.`
     let dm
     try {
