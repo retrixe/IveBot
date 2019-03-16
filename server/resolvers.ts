@@ -17,6 +17,9 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (e
   db = client.db('ivebot')
 })
 
+// A constant.
+const api = 'https://discordapp.com/api/v7'
+
 // Set up resolvers.
 export default (ctx: { tempDB: DB, client: Client }) => ({
   // Queries.
@@ -52,25 +55,52 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
           perms: boolean, icon: string, serverId: string, name: string,
           channels: Array<{ id: string, name: string }>
         }> = [] /* eslint-enable indent */
-        ctx.client.guilds.forEach(server => {
-          ctx.client.guilds.find(a => a.id === server.id).members.forEach(member => {
-            if (member.id === ctx.tempDB.link[linkToken]) {
-              servers.push({
-                serverId: server.id,
-                name: server.name,
-                icon: server.iconURL || 'no icon',
-                channels: server.channels.filter(i => i.type === 0).map(i => ({
-                  id: i.id, name: i.name
-                })),
-                perms: host === ctx.tempDB.link[linkToken]
-                  ? true : member.permission.has('manageGuild')
-              })
-            }
-          })
+        // Send back mutual servers.
+        ctx.client.guilds.forEach(guild => {
+          if (guild.members.has(ctx.tempDB.link[linkToken])) {
+            servers.push({
+              serverId: guild.id,
+              name: guild.name,
+              icon: guild.iconURL || 'no icon',
+              channels: guild.channels.filter(i => i.type === 0).map(i => ({
+                id: i.id, name: i.name
+              })),
+              perms: host === ctx.tempDB.link[linkToken]
+                ? true : guild.members.get(ctx.tempDB.link[linkToken]).permission.has('manageGuild')
+            })
+          }
         })
         return servers
       }
       return [{ serverId: 'Unavailable: invalid link token.', icon: 'no icon' }]
+    },
+    // Get user info.
+    getOAuthUserInfo: async (_: string, { token }: { token: string }) => {
+      // Get info about the user.
+      type Base = { id: string } // eslint-disable-line no-use-before-define
+      const headers = { Authorization: `Bearer ${token}` }
+      const guilds: Array<Base> = await (await fetch(`${api}/users/@me/guilds`, { headers })).json()
+      const { id }: Base = await (await fetch(`${api}/users/@me`, { headers })).json()
+      // Generate the server info.
+      let servers: Array<{ /* eslint-disable indent */
+        perms: boolean, icon: string, serverId: string, name: string,
+        channels: Array<{ id: string, name: string }>
+      }> = [] /* eslint-enable indent */
+      guilds.forEach(server => {
+        if (ctx.client.guilds.has(server.id)) {
+          const guild = ctx.client.guilds.get(server.id)
+          servers.push({
+            serverId: guild.id,
+            name: guild.name,
+            icon: guild.iconURL || 'no icon',
+            channels: guild.channels.filter(i => i.type === 0).map(i => ({
+              id: i.id, name: i.name
+            })),
+            perms: host === id || guild.members.get(id).permission.has('manageGuild')
+          })
+        }
+      })
+      return servers
     },
     getBotId: () => ctx.client.user.id
   },
