@@ -139,7 +139,7 @@ export const handleEval: Command = {
     usage: '/eval <code in codeblock or not>',
     example: '/eval ```js\nconsole.log(\'ji\')\n```',
     requirements: { userIDs: [host] }
-  },
+  }, // eslint-disable-next-line @typescript-eslint/no-unused-vars
   generator: async (message, args, { client, tempDB, db, commandParser }) => {
     try {
       let toEval = args.join(' ')

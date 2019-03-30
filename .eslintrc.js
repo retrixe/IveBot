@@ -5,8 +5,8 @@ module.exports = {
     browser: true
   },
   extends: ["plugin:react/recommended", "standard", "standard-react"],
-  plugins: ["react", "graphql", "typescript"],
-  parser: "typescript-eslint-parser",
+  plugins: ["react", "graphql", "@typescript-eslint/eslint-plugin"],
+  parser: "@typescript-eslint/parser",
   rules: {
     'graphql/template-strings': ['error', {
       env: 'apollo',
@@ -16,12 +16,12 @@ module.exports = {
       )
     }],
     // TypeScript styling.
-    "typescript/no-explicit-any": ["error"],
-    "typescript/type-annotation-spacing": ["error"],
-    "typescript/no-namespace": ["error"],
-    "typescript/interface-name-prefix": ["error"],
-    "typescript/no-angle-bracket-type-assertion": ["error"],
+    "@typescript-eslint/no-explicit-any": ["error"],
+    "@typescript-eslint/type-annotation-spacing": ["error"],
+    "@typescript-eslint/no-namespace": ["error"],
+    "@typescript-eslint/interface-name-prefix": ["error"],
+    "@typescript-eslint/no-angle-bracket-type-assertion": ["error"],
     // Fix no-unused-vars.
-    "typescript/no-unused-vars": ["error"]
+    "@typescript-eslint/no-unused-vars": ["error"]
   }
 }
