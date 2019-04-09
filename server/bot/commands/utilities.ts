@@ -93,10 +93,9 @@ export const handleUserinfo: Command = {
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
     // Display information.
     const member = message.member.guild.members.find(i => i.user.id === user.id)
-    const color = member
-      ? member.roles.map(i => member.guild.roles.get(i)).sort(
-        (a, b) => a.position > b.position ? -1 : 1
-      ).shift().color : 0
+    const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
+      (a, b) => a.position > b.position ? -1 : 1
+    ).find(i => i.color !== 0) || { color: 0 }).color : 0
     return {
       content: `👥 **Userinfo on ${user.username}:**`,
       embed: {

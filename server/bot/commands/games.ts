@@ -171,7 +171,8 @@ export const handleCalculate: Command = {
   aliases: ['calc', 'cal'],
   opts: {
     description: 'Calculate an expression.',
-    fullDescription: 'Calculate the value of an expression.',
+    fullDescription: `Calculate the value of an expression.
+More info here: https://mathjs.org/docs/expressions/syntax.html`,
     usage: '/calculate <expression>',
     example: '/calculate 2 + 2',
     invalidUsageMessage: 'Specify an expression >_<'

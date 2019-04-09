@@ -27,10 +27,11 @@ export const handleGiverole: Command = {
     let role = message.member.guild.roles.find(
       a => a.name.toLowerCase() === args.join(' ').toLowerCase() || args.join(' ') === a.id
     )
+    const isPublicRole = publicRoles.split('|').includes(role.name)
     if (!role) return 'You have provided an invalid role name/ID, you ' + getInsult() + '.'
-    else if (!publicRoles.split('|').includes(role.name) && !manageRoles) return insult // Permission check.
+    else if (!isPublicRole && !manageRoles) return insult // Permission check.
     // Can the user manage this role?
-    if (role.position >= checkRolePosition(message.member)
+    if (role.position >= checkRolePosition(message.member) && !isPublicRole
     ) return `You cannot give this role. Pfft, overestimating their own powers now.`
     // Give the role.
     const rolesOfMember = user.id !== message.author.id // Ternary statement.
@@ -79,10 +80,11 @@ export const handleTakerole: Command = {
     let role = message.member.guild.roles.find(
       a => a.name.toLowerCase() === args.join(' ').toLowerCase() || args.join(' ') === a.id
     )
+    const isPublicRole = publicRoles.split('|').includes(role.name)
     if (!role) return 'You have provided an invalid role name/ID, you ' + getInsult() + '.'
-    else if (!publicRoles.split('|').includes(role.name) && !manageRoles) return insult // Permission check.
+    else if (!isPublicRole && !manageRoles) return insult // Permission check.
     // Can the user manage this role?
-    if (role.position >= checkRolePosition(message.member)
+    if (role.position >= checkRolePosition(message.member) && !isPublicRole
     ) return `You cannot take this role. Pfft, overestimating their own powers now.`
     // Give the role.
     const rolesOfMember = user.id !== message.author.id // Ternary statement.
