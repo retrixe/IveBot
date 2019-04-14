@@ -125,6 +125,7 @@ export default class CommandParser {
     this.evaluatedMessages = []
     this.onMessage = this.onMessage.bind(this)
     this.onMessageUpdate = this.onMessageUpdate.bind(this)
+    setInterval(() => this.sendAnalytics(), 30000)
   }
 
   registerCommand = (command: IveBotCommand) => { // eslint-disable-line no-undef
@@ -182,6 +183,34 @@ export default class CommandParser {
     // Update local cache with analytics.
     this.analytics[this.analytics.indexOf(commandInfo)].totalUse += 1
     this.analytics[this.analytics.indexOf(commandInfo)].averageExecTime = averageExecTime
+  }
+
+  async sendAnalytics () {
+    const analytics = this.db.collection('analytics')
+    // Iterate over every command we have information stored locally.
+    for (let index in this.analytics) {
+      const command = this.analytics[index]
+      // Get the data for the selected command.
+      const statistics = await analytics.findOne({ name: command.name })
+      // If the command was not stored, we store our analytics directly.
+      if (!statistics) analytics.insertOne(command)
+      // Else, we update existing command data in the database.
+      else {
+        // Calculate the average execution time and update the database.
+        const averageExecTime = statistics.averageExecTime.map((i: number, index: number) => (
+          (
+            (i * statistics.totalUse) + (command.averageExecTime[index] * command.totalUse)
+          ) / (statistics.totalUse + command.totalUse)
+        ))
+        analytics.updateOne({ name: command.name }, {
+          $inc: { totalUse: command.totalUse },
+          $set: { averageExecTime }
+        })
+      }
+      // Clear analytics for the specific index.
+      this.analytics[index].totalUse = 0
+      this.analytics[index].averageExecTime = [0, 0]
+    }
   }
 
   async onMessage (message: Message) {
