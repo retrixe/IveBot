@@ -70,8 +70,8 @@ export const handleWarnings: Command = {
     requirements: {
       permissions: { 'manageMessages': true },
       custom: (message) => (
-        getUser(message, message.content.split(' ')[1]).id === message.author.id ||
-        message.content.split(' ').length === 1
+        message.content.split(' ').length === 1 ||
+        getUser(message, message.content.split(' ')[1]).id === message.author.id
       )
     }
   },

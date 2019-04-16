@@ -163,6 +163,17 @@ mutation variables(
                   ...this.state.joinLeaveMessages, leaveMessage: e.target.value
                 } })} margin='dense' />
             </FormControl>
+            <div style={{ height: 10 }} />
+            <FormControl fullWidth>
+              <InputLabel>Ban Message</InputLabel>
+              <Input
+                value={this.state.joinLeaveMessages.banMessage} fullWidth
+                onChange={e => this.setState({
+                  joinLeaveMessages: {
+                    ...this.state.joinLeaveMessages, banMessage: e.target.value
+                  }
+                })} margin='dense' />
+            </FormControl>
             <br /><br />
             <Typography variant='h6' gutterBottom>Text Recognition on Image Send</Typography>
             <Divider />
