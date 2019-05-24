@@ -102,7 +102,7 @@ export const handleUserinfo: Command = {
         author: { name: `User info`, icon_url: user.avatarURL },
         title: `${user.username}#${user.discriminator}` + (user.bot ? ' (Bot account)' : ''),
         description: user.mention,
-        thumbnail: { url: user.avatarURL },
+        thumbnail: { url: user.dynamicAvatarURL('png', 2048) },
         color,
         fields: [
           { name: 'Status', value: member ? member.status : 'N/A', inline: true },
@@ -291,8 +291,8 @@ export const handleAvatar: Command = {
       content: '**Avatar:**',
       embed: {
         author: { name: `${user.username}#${user.discriminator}`, icon_url: user.avatarURL },
-        image: { url: user.avatarURL.split('128').join('') + '2048' },
-        description: `**[Link](${user.avatarURL})**`,
+        image: { url: user.dynamicAvatarURL('png', 2048) },
+        description: `**[Link](${user.dynamicAvatarURL('png', 2048)})**`,
         color: member.roles.map(i => member.guild.roles.get(i)).sort(
           (a, b) => a.position > b.position ? -1 : 1
         ).shift().color

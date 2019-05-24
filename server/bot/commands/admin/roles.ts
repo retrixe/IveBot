@@ -27,7 +27,7 @@ export const handleGiverole: Command = {
     let role = message.member.guild.roles.find(
       a => a.name.toLowerCase() === args.join(' ').toLowerCase() || args.join(' ') === a.id
     )
-    const isPublicRole = publicRoles.split('|').includes(role.name)
+    const isPublicRole = role && publicRoles.split('|').includes(role.name)
     if (!role) return 'You have provided an invalid role name/ID, you ' + getInsult() + '.'
     else if (!isPublicRole && !manageRoles) return insult // Permission check.
     // Can the user manage this role?
@@ -80,7 +80,7 @@ export const handleTakerole: Command = {
     let role = message.member.guild.roles.find(
       a => a.name.toLowerCase() === args.join(' ').toLowerCase() || args.join(' ') === a.id
     )
-    const isPublicRole = publicRoles.split('|').includes(role.name)
+    const isPublicRole = role && publicRoles.split('|').includes(role.name)
     if (!role) return 'You have provided an invalid role name/ID, you ' + getInsult() + '.'
     else if (!isPublicRole && !manageRoles) return insult // Permission check.
     // Can the user manage this role?
