@@ -103,7 +103,13 @@ export const handleRemoteexec: Command = {
       userIDs: [host]
     }
   },
-  generator: (message, args) => execSync(args.join(' '), { encoding: 'utf8' })
+  generator: (message, args) => {
+    try {
+      return execSync(args.join(' '), { encoding: 'utf8' })
+    } catch (e) {
+      return e.toString()
+    }
+  }
 }
 
 export const handlePing: Command = {
@@ -115,7 +121,13 @@ export const handlePing: Command = {
     example: '/ping',
     argsRequired: false
   },
-  generator: async (message) => {
+  generator: async (message, args) => {
+    // Special stuff.
+    if (args.length === 1 && testPilots.includes(message.author.id)) {
+      try {
+        return execSync('ping -c 1 ' + args[0], { encoding: 'utf8' }).split('\n')[1]
+      } catch (e) { return 'Looks like pinging the website failed. Don\'t ping subdomains.' }
+    }
     // Get the time before sending the message.
     const startTime = new Date().getTime()
     // Send the message.
