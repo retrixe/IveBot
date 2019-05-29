@@ -26,7 +26,8 @@ let generalHelp = {
 \`/zalgo\` \`/dezalgo\` - The zalgo demon's writing.
 \`/namemc\` - A Minecraft user's previous usernames and skin.
 \`/astronomy-picture-of-the-day\` or \`/apod\`
-\`/currency\` - Currency conversion (\`/help currency\`)`
+\`/currency\` - Currency conversion (\`/help currency\`)
+\`/xkcd\` - Get the latest or a random xkcd comic.`
     }, {
       name: '**Utilities.**', value: `
 TP \`/request\` - Request a specific feature.

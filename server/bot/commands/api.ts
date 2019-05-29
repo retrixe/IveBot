@@ -521,3 +521,25 @@ export const handleDefine: Command = {
     } catch (e) { return 'Did you enter a valid word? 👾' }
   }
 }
+
+export const handleXkcd: Command = {
+  name: 'xkcd',
+  opts: {
+    description: 'Get the latest or a random xkcd comic.',
+    fullDescription: 'Get the latest or a random xkcd comic.',
+    usage: '/xkcd (latest (default)|random)',
+    example: '/xkcd random',
+    argsRequired: false
+  },
+  generator: async (message, args) => {
+    if (
+      args.length > 1 || (args.length === 1 && args[0] !== 'latest' && args[0] !== 'random')
+    ) return 'Correct usage: /xkcd (latest|random)'
+    // Get the latest xkcd comic.
+    try {
+      const { num } = await (await fetch('http://xkcd.com/info.0.json')).json()
+      if (args[0] === 'random') return `https://xkcd.com/${Math.floor(Math.random() * (num - 1)) + 1}`
+      else return `https://xkcd.com/${num}`
+    } catch (e) { return 'Failed to fetch an xkcd comic!\nhttps://xkcd.com/1348' }
+  }
+}
