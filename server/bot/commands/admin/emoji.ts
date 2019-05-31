@@ -1,6 +1,6 @@
 import { Command } from '../../imports/types'
 import { getInsult, getIdFromMention } from '../../imports/tools'
-import * as fetch from 'isomorphic-unfetch'
+import fetch from 'isomorphic-unfetch'
 
 export const handleAddemoji: Command = {
   name: 'addEmoji',

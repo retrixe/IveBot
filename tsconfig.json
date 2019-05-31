@@ -10,7 +10,8 @@
     "sourceMap": true,
     "outDir": "lib/",
     "pretty": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "esModuleInterop": true
   },
   "include": [
     "server/**/*.ts",

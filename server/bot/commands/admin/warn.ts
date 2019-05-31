@@ -1,4 +1,4 @@
-import * as moment from 'moment'
+import moment from 'moment'
 import { ObjectID } from 'mongodb'
 import { Command } from '../../imports/types'
 import { getUser, getInsult } from '../../imports/tools'

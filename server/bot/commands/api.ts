@@ -1,8 +1,8 @@
 // All the types!
 import { Command } from '../imports/types'
 // All the tools!
-import * as fetch from 'isomorphic-unfetch'
-import * as moment from 'moment'
+import fetch from 'isomorphic-unfetch'
+import moment from 'moment'
 import { zeroWidthSpace, getInsult } from '../imports/tools'
 // Get the NASA API token.
 import 'json5/lib/require'

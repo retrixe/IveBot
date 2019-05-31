@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import {
   Typography, Button, LinearProgress, Divider, Input, InputLabel, FormGroup, FormControlLabel,
   FormControl, FormHelperText, Switch, Select, MenuItem

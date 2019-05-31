@@ -2,7 +2,7 @@ import { Command } from '../../imports/types'
 import { checkRolePosition } from '../../imports/permissions'
 import { getInsult, getUser } from '../../imports/tools'
 import { Constants } from 'eris'
-import * as ms from 'ms'
+import ms from 'ms'
 
 export const handleMute: Command = {
   name: 'mute',

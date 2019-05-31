@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import {
   AppBar, Toolbar, Button, Dialog, DialogTitle, DialogActions, DialogContent, DialogContentText,
   Typography, TextField, LinearProgress

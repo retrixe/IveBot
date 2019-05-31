@@ -3,7 +3,7 @@ The script has been as well documented as possible. */
 
 /* SERVER CODE STARTS HERE */
 // Import our express-based GraphQL server and next.
-import * as next from 'next'
+import next from 'next'
 import { GraphQLServer } from 'graphql-yoga'
 // Import our resolvers.
 import resolvers from './resolvers'

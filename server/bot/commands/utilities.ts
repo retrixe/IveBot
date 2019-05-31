@@ -3,10 +3,10 @@ import { Message } from 'eris' // eslint-disable-line no-unused-vars
 import { Command } from '../imports/types'
 // All the needs!
 import { getIdFromMention, getInsult, getUser } from '../imports/tools'
-import * as ms from 'ms'
+import ms from 'ms'
 import 'json5/lib/require'
 import { host, testPilots } from '../../../config.json5'
-import * as moment from 'moment'
+import moment from 'moment'
 
 export const handleServerinfo: Command = {
   name: 'serverinfo',
