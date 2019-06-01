@@ -26,8 +26,8 @@ export const handleAddemoji: Command = {
     try {
       image = Buffer.from(await (await fetch(url)).arrayBuffer())
     } catch (e) { return `Invalid image URL, you ${getInsult()}` }
-    // If emoji larger than 384 bytes (in case)
-    if (image.byteLength >= 384) {
+    // If emoji larger than 384 KB (in case)
+    if ((image.byteLength / 1024) >= 384) {
       return `Your emoji is larger than 256 KB, resize your image!
 I recommend using <https://picresize.com/> if the emoji is JPG.
 Set step 2 to No Change, set Max Filesize to 255 in step 4 and set to Best quality.
@@ -38,9 +38,8 @@ After checking image format as JPG, resize, View Image and use the URL to the im
     if (
       (isGif && message.member.guild.emojis.filter(i => i.animated).length === 50) ||
       message.member.guild.emojis.filter(i => !i.animated).length === 50
-    ) {
-      return 'Looks like all your emoji slots are used up. Use /deleteemoji on one and try again.'
-    } else if (!message.member.guild.members.get(client.user.id).permission.has('manageEmojis')) {
+    ) return 'Looks like all your emoji slots are used up. Use /deleteemoji on one and try again.'
+    else if (!message.member.guild.members.get(client.user.id).permission.has('manageEmojis')) {
       return `I don't even have permissions to do that, you ${getInsult()}.`
     }
     // Try adding it, else throw an error.

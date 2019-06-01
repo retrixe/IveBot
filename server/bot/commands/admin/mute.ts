@@ -23,12 +23,10 @@ export const handleMute: Command = {
     if (
       checkRolePosition(message.member.guild.members.find(i => i.user === user), true, false) >=
       checkRolePosition(message.member, true, false)
-    ) {
-      return `You cannot mute this person, you ${getInsult()}.`
-    }
+    ) return `You cannot mute this person, you ${getInsult()}.`
+
     // Find a Muted role.
-    const roles = message.member.guild.roles
-    let role = roles.find((role) => role.name === 'Muted')
+    let role = message.member.guild.roles.find((role) => role.name === 'Muted')
     // Edit permissions of role if needed.
     let hasPerms = false
     if (role) {
@@ -43,34 +41,15 @@ export const handleMute: Command = {
           a.permissionOverwrites.find(i => i.id === role.id).has('voiceSpeak')
         ) hasPerms = true
       })
-    }
-    if (hasPerms && role) {
-      try {
-        message.member.guild.channels.forEach((a) => {
-          if (a.type === 0) {
-            client.editChannelPermission(
-              a.id, role.id, 0,
-              Constants.Permissions.sendMessages | Constants.Permissions.addReactions,
-              'role'
-            )
-          } else if (a.type === 2) {
-            client.editChannelPermission(a.id, role.id, 0, Constants.Permissions.voiceSpeak, 'role')
-          } else if (a.type === 4) {
-            client.editChannelPermission(
-              a.id, role.id, 0,
-              Constants.Permissions.sendMessages |
-              Constants.Permissions.addReactions | Constants.Permissions.voiceSpeak,
-              'role'
-            )
-          }
-        })
-      } catch (e) { return 'I cannot set permissions for the Muted role.' }
-      // If no role, make a Muted role.
+    // If the role doesn't exist, we create one.
     } else if (!role) {
       try {
         role = await client.createRole(message.member.guild.id, { name: 'Muted', color: 0x444444 })
+        hasPerms = true
       } catch (e) { return 'I could not find a Muted role and cannot create a new one.' }
-      // Modify channel permissions.
+    }
+    // Set permissions as required.
+    if (hasPerms && role) {
       try {
         message.member.guild.channels.forEach((a) => {
           if (a.type === 0) {
@@ -98,6 +77,31 @@ export const handleMute: Command = {
     } catch (e) { return 'Could not mute that person.' }
     // Persist the mute.
     const guildID = message.member.guild.id
+    /*
+    Some database stuff.
+    try {
+      const mute = await db.collection('mute').findOne({ guild: guildID, user: user.id })
+      // Figure out the time for which the user is muted.
+      let time = 0
+      try { time = ms(args[0]) || 0 } catch (e) { }
+      if (!mute && time > 0) {
+        // Insert the persisted mute.
+        await db.collection('mute').insertOne({
+          guild: guildID, user: user.id, till: Date.now() + time, time
+        })
+      } else if (!mute) await db.collection('mute').insertOne({ guild: guildID, user: user.id })
+      // If this was modifying a previous mute.
+      else if (mute && time > 0) {
+        await db.collection('mute').updateOne({ guild: guildID, user: user.id }, {
+          $set: { till: Date.now() + time, time }
+        })
+      } else if (mute) {
+        await db.collection('mute').updateOne({ guild: guildID, user: user.id }, {
+          $set: { till: 0, time: 0 }
+        })
+      }
+    } catch (e) { return 'Failed to persist mute! However, user has been muted.' }
+    */
     if (!tempDB.mute[guildID]) tempDB.mute[guildID] = []
     if (!tempDB.mute[guildID].includes(user.id)) tempDB.mute[guildID].push(user.id)
     // If time given, set timeout.

@@ -129,11 +129,11 @@ export const handlePing: Command = {
       } catch (e) { return 'Looks like pinging the website failed. Don\'t ping subdomains.' }
     }
     // Get the time before sending the message.
-    const startTime = new Date().getTime()
+    const startTime = Date.now()
     // Send the message.
     const sent = await message.channel.createMessage('Ping?')
     // Latency (unrealistic, this can be negative or positive)
-    const fl = startTime - new Date().getTime()
+    const fl = startTime - Date.now()
     // Divide latency by 2 to get more realistic latency and get absolute value (positive)
     const l = Math.abs(fl) / 2
     // Get latency.

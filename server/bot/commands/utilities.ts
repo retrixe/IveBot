@@ -322,7 +322,9 @@ export const handleLeave: Command = {
       tempDB.leave.push(message.author.id)
       setTimeout(async () => {
         if (tempDB.leave.findIndex(i => i === message.author.id) === -1) return
-        client.createMessage(message.channel.id, 'Your leave request has timed out.')
+        client.createMessage(
+          message.channel.id, message.author.mention + ' your leave request has timed out.'
+        )
         tempDB.leave.splice(tempDB.leave.findIndex(i => i === message.author.id), 1)
       }, 30000)
     } else if (tempDB.leave.includes(message.author.id)) {
