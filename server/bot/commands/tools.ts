@@ -160,7 +160,7 @@ export const handleEval: Command = {
       if (toEval.startsWith('``js')) toEval = toEval.substring(4)
       else if (toEval.startsWith('``')) toEval = toEval.substring(2)
       if (toEval.endsWith('`')) toEval = toEval.substring(0, toEval.length - 1)
-      if (toEval.endsWith('```')) toEval = toEval.substring(0, toEval.length - 2)
+      if (toEval.endsWith('``')) toEval = toEval.substring(0, toEval.length - 2)
       // Evaluate!
       // eslint-disable-next-line no-eval
       const res = inspect(await Promise.resolve(eval(toEval)), false, 0)
@@ -196,16 +196,19 @@ getContent/getCleanContent(messageID), createMessage(content), getReactions(mess
       if (toEval.startsWith('`')) toEval = toEval.substring(1)
       if (toEval.startsWith('``js')) toEval = toEval.substring(4)
       if (toEval.endsWith('`')) toEval = toEval.substring(0, toEval.length - 1)
-      if (toEval.endsWith('```')) toEval = toEval.substring(0, toEval.length - 2)
+      if (toEval.endsWith('``')) toEval = toEval.substring(0, toEval.length - 2)
+      // Evaluate!
       const res = runInNewContext(toEval.split('```').join(''), {
-        createMessage: (co: string) => context.client.createMessage(message.channel.id, co),
+        createMessage: async (co: string) => {
+          return (await context.client.createMessage(message.channel.id, co)).content
+        },
         content: message.content,
         getContent: async (id: string) => (await message.channel.getMessage(id)).content,
         getCleanContent: async (id: string) => (await message.channel.getMessage(id)).cleanContent,
         getReactions: async (id: string) => (await message.channel.getMessage(id)).reactions
       })
       message.addReaction('✅')
-      return res ? `${'```'}${res}${'```'}` : undefined
+      return res !== 'undefined' ? `${'```'}${res}${'```'}` : undefined
     } catch (e) {
       message.addReaction('❌')
       return `**Error:**

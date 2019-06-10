@@ -5,6 +5,8 @@ import { Member } from 'eris'
 export function checkRolePosition ( // eslint-disable-next-line space-infix-ops
   member: Member, considerOwnership: boolean=true, considerMutedRole: boolean=true
 ) {
+  // If owner, return.
+  if (member.guild.ownerID === member.id && considerOwnership) return 9999
   // Get roles of user.
   const rolesOfUser = member.roles
   // Get all roles in server.
@@ -12,14 +14,12 @@ export function checkRolePosition ( // eslint-disable-next-line space-infix-ops
   // Iterate over roles.
   let highestRolePosition = 0
   for (let roleIndex in rolesOfUser) {
-    if (rolesInServer.find(e => rolesOfUser[roleIndex] === e.id).position > highestRolePosition) {
+    if (rolesInServer.get(rolesOfUser[roleIndex]).position > highestRolePosition) {
       if (
-        !considerMutedRole &&
-        rolesInServer.find(e => rolesOfUser[roleIndex] === e.id).name === 'Muted'
+        !considerMutedRole && rolesInServer.get(rolesOfUser[roleIndex]).name === 'Muted'
       ) continue
       highestRolePosition = rolesInServer.find(e => rolesOfUser[roleIndex] === e.id).position
     }
   }
-  if (member.guild.ownerID === member.id && considerOwnership) highestRolePosition = 9999
   return highestRolePosition
 }
