@@ -34,11 +34,11 @@ export const handleMute: Command = {
       message.member.guild.channels.forEach((a) => {
         if (hasPerms) return // If there is a channel which let's Muted speak, we skip the rest.
         // If no such permission overwrite exists, then the user has permissions.
-        if (!a.permissionOverwrites.find(i => i.id === role.id)) hasPerms = true
+        if (!a.permissionOverwrites.get(role.id)) hasPerms = true
         else if ( // Or if a permission overwrite grants perms, then user has permissions.
-          a.permissionOverwrites.find(i => i.id === role.id).has('sendMessages') ||
-          a.permissionOverwrites.find(i => i.id === role.id).has('addReactions') ||
-          a.permissionOverwrites.find(i => i.id === role.id).has('voiceSpeak')
+          a.permissionOverwrites.get(role.id).has('sendMessages') ||
+          a.permissionOverwrites.get(role.id).has('addReactions') ||
+          a.permissionOverwrites.get(role.id).has('voiceSpeak')
         ) hasPerms = true
       })
     // If the role doesn't exist, we create one.
@@ -144,12 +144,12 @@ export const handleUnmute: Command = {
       return `You cannot mute this person, you ${getInsult()}.`
     }
     // All roles of user.
-    const roles = message.member.guild.members.find(i => i.id === user.id).roles
+    const roles = message.member.guild.members.get(user.id).roles
     const rolesOfServer = message.member.guild.roles
     const guildID = message.member.guild.id
     // Iterate over the roles.
     for (let roleIndex in roles) {
-      if (rolesOfServer.find(i => i.id === roles[roleIndex]).name === 'Muted') {
+      if (rolesOfServer.get(roles[roleIndex]).name === 'Muted') {
         // Remove the mute persist.
         if (tempDB.mute[guildID] && tempDB.mute[guildID].includes(user.id)) {
           tempDB.mute[guildID].splice(tempDB.mute[guildID].findIndex((i) => i === user.id), 1)

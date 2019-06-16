@@ -99,7 +99,7 @@ export const handleWarnings: Command = {
         // This function generates the fields.
         fields: warns.map((warning, index) => {
           // If we could find the warner then we specify his/her username+discriminator else ID.
-          const warner = client.users.find(i => i.id === warning.warnerID)
+          const warner = client.users.get(warning.warnerID)
           const mod = warner ? `${warner.username}#${warner.discriminator}` : warning.warnerID
           return {
             name: `Warning ${index + 1}`,

@@ -61,7 +61,7 @@ IveBot is 100% open source and always will be.</Typography>
         </Typography>
         <hr />
         <Typography>IveBot boasts fast ping and is highly scalable.</Typography>
-        <Typography>Also, {'it\'s'} just a pretty good bot.</Typography>
+        <Typography>Also, {'it\'s'} just a pretty good bot that does everything you want.</Typography>
       </div>
     )
   }

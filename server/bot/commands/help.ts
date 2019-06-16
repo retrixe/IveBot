@@ -3,7 +3,7 @@ import { zeroWidthSpace } from '../imports/tools'
 import { rootURL } from '../../../config.json5'
 import { Command } from '../client'
 
-let generalHelp = {
+const generalHelp = {
   description: `**Jony Ive can do many commands 📡**
 \`/halp\` and \`/help\` - The most innovative help.`,
   fields: [

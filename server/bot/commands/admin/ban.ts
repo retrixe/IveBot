@@ -33,8 +33,8 @@ export const handleBan: Command = {
     let user: User = getUser(message, userSpecified)
     if (!user && client.users.find(i => i.username === userSpecified)) {
       user = client.users.find(i => i.username === userSpecified)
-    } else if (!user && client.users.find(i => i.id === userSpecified)) {
-      user = client.users.find(i => i.id === userSpecified)
+    } else if (!user && client.users.get(userSpecified)) {
+      user = client.users.get(userSpecified)
     } else if (!user && [18, 17].includes(userSpecified.length) && !isNaN(+userSpecified)) {
       try { user = await client.getRESTUser(userSpecified) } catch (e) {
         return 'I cannot find that user.'
@@ -100,8 +100,8 @@ export const handleUnban: Command = {
     let user: User
     if (client.users.find(i => i.username === userSpecified)) {
       user = client.users.find(i => i.username === userSpecified)
-    } else if (client.users.find(i => i.id === userSpecified)) {
-      user = client.users.find(i => i.id === userSpecified)
+    } else if (client.users.get(userSpecified)) {
+      user = client.users.get(userSpecified)
     } else {
       try { user = await client.getRESTUser(userSpecified) } catch (e) {}
     }

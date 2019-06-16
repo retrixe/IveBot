@@ -26,7 +26,7 @@ export const handleServerinfo: Command = {
     ) : message.member.guild
     if (!guild) return `Specify a valid mutual guild, ${getInsult()}.`
     // Owner.
-    const owner = guild.members.find(i => i.id === guild.ownerID)
+    const owner = guild.members.get(guild.ownerID)
     // Display information.
     return {
       content: `⌨ **Server info on ${guild.name}:**`,

@@ -98,7 +98,7 @@ export const guildDelete = (db: Db) => async (guild: Guild) => {
 export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
   try {
     if ( // If there are no permissions do not do anything.
-      !message.member.guild.channels.find(i => i.id === message.channel.id)
+      !message.member.guild.channels.get(message.channel.id)
         .permissionsOf(client.user.id).has('sendMessages')
     ) return
   } catch (e) {}

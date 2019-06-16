@@ -34,7 +34,7 @@ export const handlePurge: Command = {
     requirements: {
       permissions: { 'manageMessages': true },
       custom: (message) => (
-        message.member.guild.channels.find(i => i.id === message.channel.id)
+        message.member.guild.channels.get(message.channel.id)
           .permissionsOf(message.author.id).has('manageMessages')
       )
     }
@@ -129,7 +129,7 @@ export const handleSlowmode: Command = {
     requirements: {
       permissions: { 'manageChannels': true },
       custom: (message) => (
-        message.member.guild.channels.find(i => i.id === message.channel.id)
+        message.member.guild.channels.get(message.channel.id)
           .permissionsOf(message.author.id).has('manageChannels')
       )
     }
