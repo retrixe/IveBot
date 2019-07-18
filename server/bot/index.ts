@@ -58,7 +58,7 @@ export const guildMemberRemove = (client: Client, db: Db) => async (
   const { leaveMessage, channel, banMessage } = serverSettings.joinLeaveMessages
   if (!channel || !leaveMessage) return
   // If there is a ban message and the user is banned.
-  if (banMessage && (await guild.getBans()).find(i => i.id === member.user.id)) return
+  if (banMessage && (await guild.getBans()).find(i => i.user.id === member.user.id)) return
   // We send a message.
   try {
     const toSend = leaveMessage

@@ -287,12 +287,13 @@ export const handleAvatar: Command = {
     let user: Message['author'] = getUser(message, args.join(' ')) || message.author
     if (!user && message.mentions.length !== 0) user = message.mentions[0]
     const member = message.member.guild.members.get(user.id)
+    const format = user.avatar.startsWith('a_') ? 'gif' : 'png'
     return {
       content: '**Avatar:**',
       embed: {
         author: { name: `${user.username}#${user.discriminator}`, icon_url: user.avatarURL },
-        image: { url: user.dynamicAvatarURL('png', 2048) },
-        description: `**[Link](${user.dynamicAvatarURL('png', 2048)})**`,
+        image: { url: user.dynamicAvatarURL(format, 2048) },
+        description: `**[Link](${user.dynamicAvatarURL(format, 2048)})**`,
         color: member.roles.map(i => member.guild.roles.get(i)).sort(
           (a, b) => a.position > b.position ? -1 : 1
         ).shift().color

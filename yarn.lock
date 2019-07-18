@@ -2726,10 +2726,10 @@ enhanced-resolve@^4.1.0:
     memory-fs "^0.4.0"
     tapable "^1.0.0"
 
-eris@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/eris/-/eris-0.10.0.tgz#cfc3ba5721fe3c116e4f3dac5a2bb07b00ff7558"
-  integrity sha512-xAvmD4wsE5mwuiP+wy8RiarjiuwCylSsglKqru4J4sk0/WGOnSOfEZf43YLx/TcF4J1D4B2VMTq38446Bk1x1Q==
+eris@^0.10.1:
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/eris/-/eris-0.10.1.tgz#1ecc13ff06d45edb86c344b70ec2dd2e7ef270df"
+  integrity sha512-POWCQ91xmG75U5V3i2bAvh/hco+HkgF+YJzerTcULe++AgKutA4l1adxqUrJ13Nxah/O+olkkQCufO+gQoawtA==
   dependencies:
     ws "^6.0.0"
   optionalDependencies:
