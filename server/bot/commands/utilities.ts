@@ -22,11 +22,17 @@ export const handleServerinfo: Command = {
   generator: async (message, args, { client }) => {
     // Check if a guild was specified.
     let guild = args.length ? client.guilds.find(
-      i => i.members.find(f => f.id === message.author.id) && i.id === args[0]
+      i => i.members.has(message.author.id) && i.id === args[0]
     ) : message.member.guild
     if (!guild) return `Specify a valid mutual guild, ${getInsult()}.`
     // Owner.
     const owner = guild.members.get(guild.ownerID)
+    // Nitro Boosting support.
+    const boost = guild.premiumTier ? [{
+      name: '<:boost:602100826214760452> Boost Status',
+      value: `Level ${guild.premiumTier} with ${guild.premiumSuscriptionCount} Boosts`,
+      inline: true
+    }] : []
     // Display information.
     return {
       content: `⌨ **Server info on ${guild.name}:**`,
@@ -37,6 +43,7 @@ export const handleServerinfo: Command = {
         footer: { text: `ID: ${guild.id}` },
         timestamp: new Date().toISOString(),
         fields: [
+          ...boost,
           { name: 'Owner', value: `${owner.username}#${owner.discriminator}`, inline: true },
           { name: 'Owner ID', value: guild.ownerID, inline: true },
           { name: 'Region', value: guild.region, inline: true },

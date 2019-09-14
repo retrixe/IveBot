@@ -85,9 +85,9 @@ export const handleRobohash: Command = {
   name: 'robohash',
   aliases: ['robo', 'rh'],
   opts: {
-    description: 'Take some text, make it a robot/monster/head/cat.',
+    description: 'Take some text, make it a robot/monster/head/cat/human.',
     fullDescription: 'Takes some text and hashes it in the form of an image :P',
-    usage: '/robohash <cat/robot/monster/head> <text to hash>',
+    usage: '/robohash <cat/robot/monster/head/human> <text to hash>',
     example: '/robohash cat voldemort#6931'
   },
   generator: (message, args) => {
@@ -112,8 +112,12 @@ export const handleRobohash: Command = {
       return {
         embed: { image: { url: `https://robohash.org/${text}.png?set=set4` }, color }
       }
+    } else if (target === 'human') {
+      return {
+        embed: { image: { url: `https://robohash.org/${text}.png?set=set5` }, color }, content: '🤔'
+      }
     } else {
-      return 'Proper usage: /robohash <robot, monster, head, cat> <text to robohash>'
+      return 'Proper usage: /robohash <robot, monster, head, cat, human> <text to robohash>'
     }
   }
 }
@@ -362,13 +366,13 @@ type Weather = { cod: string, coord: { lon: number, lat: number }, weather: Arra
   clouds: { all: number }, rain: { '3h': number }, snow: { '3h': number }
 }
 type Categories = Array<{
-  lexicalCategory: string,
+  lexicalCategory: { id: string, text: string },
   entries: Array<{
     senses: Array<{
       definitions: Array<string>,
-      short_definitions: Array<string>,
+      shortDefinitions?: Array<string>,
       examples: Array<{ text: string }>,
-      registers: Array<string>
+      registers: Array<{ id: string, text: string }>
     }>
   }>
 }> /* eslint-enable */
@@ -459,15 +463,19 @@ export const handleDefine: Command = {
     // Search for the word, destructure for results, and then pass them on to our second request.
     try {
       const r = await (await fetch(
-        `https://od-api.oxforddictionaries.com/api/v1/inflections/en/${args.join(' ')}`, { headers }
+        `https://od-api.oxforddictionaries.com/api/v2/lemmas/en/${args.join(' ')}`, { headers }
       )).json()
+      // If the word doesn't exist in the Oxford Dictionary..
+      if (r.error === 'No entries were found for a given inflected word') {
+        return 'Did you enter a valid word? 👾'
+      }
       try {
         // Here we get the dictionary entries for the specified word.
         const { results } = await (await fetch(
-          `https://od-api.oxforddictionaries.com/api/v1/entries/en/${r.results[0].id}`, { headers }
+          `https://od-api.oxforddictionaries.com/api/v2/entries/en/${r.results[0].id}` +
+            '?strictMatch=false&fields=definitions%2Cexamples',
+          { headers }
         )).json()
-        // Our super filter to remove what we don't need.
-        const categories: Categories = results[0].lexicalEntries
         // Now we create an embed based on the 1st entry.
         const fields: Array<{ name: string, value: string, inline?: boolean }> = []
         // Function to check for maximum number of fields in an embed, then push.
@@ -475,38 +483,42 @@ export const handleDefine: Command = {
           if (fields.length < 24) fields.push(object)
           else if (fields.length === 24) fields.push({ name: '...too many definitions.', value: zeroWidthSpace })
         }
-        categories.forEach(
-          // The function run on each category.
-          category => {
-            // If our field doesn't have the category name, we push the category name to it.
-            if (!fields.includes({
-              name: '**' + category.lexicalCategory + '**', value: zeroWidthSpace
-            })) {
-              // We don't push an empty field for the first element, else we do.
-              if (fields.length !== 0) safePush({ name: zeroWidthSpace, value: zeroWidthSpace })
-              safePush({ name: '**' + category.lexicalCategory + '**', value: zeroWidthSpace })
-            }
-            // Here we add every definition and example to the fields.
-            category.entries.forEach(({ senses }) => {
-              // Iterate over every definition.
-              senses.forEach((sense, i) => {
-                // Check if there is a definition.
-                if (!sense.short_definitions && !sense.definitions) return
-                // Then safely push the definition to the array.
-                const a = i + 1 // Index for the definition.
-                safePush({
-                  name: sense.short_definitions
-                    ? (sense.registers ? `**${a}.** (${sense.registers[0]}) ` : `**${a}.** `) +
-                      sense.short_definitions[0]
-                    : (sense.registers ? `**${a}.** (${sense.registers[0]}) ` : `**${a}.** `) +
-                      sense.definitions[0],
-                  value: sense.examples && sense.examples[0].text
-                    ? `e.g. ${sense.examples[0].text}` : 'No example is available.'
+        for (let i = 0; i < results.length; i++) {
+          // Our super filter to remove what we don't need.
+          const categories: Categories = results[i].lexicalEntries
+          categories.forEach(
+            // The function run on each category.
+            category => {
+              // If our field doesn't have the category name, we push the category name to it.
+              if (!fields.includes({
+                name: '**' + category.lexicalCategory.text + '**', value: zeroWidthSpace
+              })) {
+                // We don't push an empty field for the first element, else we do.
+                if (fields.length !== 0) safePush({ name: zeroWidthSpace, value: zeroWidthSpace })
+                safePush({ name: '**' + category.lexicalCategory.text + '**', value: zeroWidthSpace })
+              }
+              // Here we add every definition and example to the fields.
+              let a = 1 // Index for the definition.
+              category.entries.forEach(({ senses }) => {
+                // Iterate over every definition.
+                senses.forEach((sense) => {
+                  // Check if there is a definition.
+                  if (!sense.shortDefinitions && !sense.definitions) return
+                  // Then safely push the definition to the array.
+                  safePush({
+                    name: `**${a}.** ` + (sense.registers ? `(${sense.registers[0].text}) ` : '') + (
+                      (sense.shortDefinitions || sense.definitions)[0]
+                    ),
+                    value: sense.examples && sense.examples[0].text
+                      ? `e.g. ${sense.examples[0].text}` : 'No example is available.'
+                  })
+                  // Add 1 to the index.
+                  a += 1
                 })
               })
-            })
-          }
-        )
+            }
+          )
+        }
         return {
           content: `📕 **|** Definition of **${args.join(' ')}**:`,
           embed: {
