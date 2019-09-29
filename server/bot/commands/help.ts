@@ -27,7 +27,8 @@ const generalHelp = {
 \`/namemc\` - A Minecraft user's previous usernames and skin.
 \`/astronomy-picture-of-the-day\` or \`/apod\`
 \`/currency\` - Currency conversion (\`/help currency\`)
-\`/xkcd\` - Get the latest or a random xkcd comic.`
+\`/xkcd\` - Get the latest or a random xkcd comic.
+\`/httpcat\` - Cats for HTTP status codes.`
     }, {
       name: '**Utilities.**', value: `
 TP \`/request\` - Request a specific feature.
@@ -49,6 +50,7 @@ TP \`/request\` - Request a specific feature.
       name: '**Administrative commands.**', value: `
 \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
 \`/addEmoji\`, \`/deleteEmoji\` and \`/editEmoji\`
+\`/deleteChannel\` and \`/editChannel\`
 \`/warn\` and \`/warnings\` | \`/clearwarns\` and \`/removewarn\`
 \`/changeserverregion\` and \`/listserverregions\`
 \`/purge\` - Bulk delete a set of messages.

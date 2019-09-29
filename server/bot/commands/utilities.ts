@@ -198,13 +198,19 @@ export const handleSay: Command = {
       args.shift()
       if (args.join(' ') === 'pls adim me') args = ['no']
       tempDB.say[message.channelMentions[0]] = (
-        await client.createMessage(message.channelMentions[0], args.join(' '))
+        await client.createMessage(message.channelMentions[0], {
+          content: args.join(' '),
+          disableEveryone: !(message.member && message.member.permission.has('mentionEveryone'))
+        })
       ).id
       return
     }
     // Send the message.
     if (args.join(' ') === 'pls adim me') args = ['no']
-    return args.join(' ')
+    return {
+      content: args.join(' '),
+      disableEveryone: !(message.member && message.member.permission.has('mentionEveryone'))
+    }
   }
 }
 
@@ -238,7 +244,10 @@ export const handleType: Command = {
         args.join(' ').length * 120 > 8000 ? 8000 : args.join(' ').length * 120
       )
       tempDB.say[message.channelMentions[0]] = (
-        await client.createMessage(message.channelMentions[0], args.join(' '))
+        await client.createMessage(message.channelMentions[0], {
+          content: args.join(' '),
+          disableEveryone: !(message.member && message.member.permission.has('mentionEveryone'))
+        })
       ).id
       return
     }
@@ -248,7 +257,10 @@ export const handleType: Command = {
     await (ms => new Promise(resolve => setTimeout(resolve, ms)))(
       args.join(' ').length * 120 > 8000 ? 8000 : args.join(' ').length * 120
     )
-    return args.join(' ')
+    return {
+      content: args.join(' '),
+      disableEveryone: !(message.member && message.member.permission.has('mentionEveryone'))
+    }
   }
 }
 
