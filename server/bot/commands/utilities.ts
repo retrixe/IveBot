@@ -30,7 +30,7 @@ export const handleServerinfo: Command = {
     // Nitro Boosting support.
     const boost = guild.premiumTier ? [{
       name: '<:boost:602100826214760452> Boost Status',
-      value: `Level ${guild.premiumTier} with ${guild.premiumSuscriptionCount} Boosts`,
+      value: `Level ${guild.premiumTier} with ${guild.premiumSubscriptionCount} Boosts`,
       inline: true
     }] : []
     // Display information.

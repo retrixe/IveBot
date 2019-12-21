@@ -18,6 +18,7 @@ import CommandParser from './bot/client'
 import { MongoClient } from 'mongodb'
 // Import fs.
 import { readdir, statSync } from 'fs'
+import { inspect } from 'util'
 // Import the bot.
 import { guildMemberAdd, guildMemberRemove, guildDelete } from './bot'
 // Get the token needed.
@@ -32,7 +33,8 @@ const port = parseInt(process.env.PORT, 10) || 3000 // If port variable has been
 
 // Create a client to connect to Discord API Gateway.
 const client = new Client(token === 'dotenv' ? process.env.IVEBOT_TOKEN : token, {
-  autoreconnect: true, restMode: true
+  autoreconnect: true,
+  restMode: true
 })
 
 // Connect ASAP, hopefully before the server starts.
@@ -90,8 +92,8 @@ client.on('ready', () => {
 })
 
 // Disconnection from Discord by error will trigger the following.
-client.on('error', (err: string, id: string) => {
-  if (!dev) throw new Error(`Error: ${err}\nShard ID: ${id}`)
+client.on('error', (err: Error, id: string) => {
+  console.error(`Error: ${inspect(err)}\nShard ID: ${id}`)
 })
 
 // Create a database to handle certain stuff.

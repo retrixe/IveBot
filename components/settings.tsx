@@ -90,6 +90,9 @@ mutation variables(
               necessary permissions. This enables features such as colored roles or announcement \
               pings.'}
             </Typography>
+            <Typography gutterBottom>
+              Use | to separate roles. If a role contains |, it will not be added to the list.
+            </Typography>
             <FormControl fullWidth>
               <InputLabel>Role Names</InputLabel>
               <Input

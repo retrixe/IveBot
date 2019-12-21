@@ -17,5 +17,8 @@
     "tslint.enable": false,
     "eslint.packageManager": "yarn",
     "eslint.autoFixOnSave": true,
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    }
   }
