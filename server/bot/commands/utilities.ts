@@ -332,7 +332,7 @@ export const handleLeave: Command = {
     argsRequired: false
   },
   name: 'leave',
-  generator: (message, args, { tempDB, client }) => {
+  generator: async (message, args, { tempDB, client }) => {
     if (!tempDB.leave.includes(message.author.id)) {
       client.createMessage(
         message.channel.id,
@@ -350,7 +350,7 @@ export const handleLeave: Command = {
     } else if (tempDB.leave.includes(message.author.id)) {
       tempDB.leave.splice(tempDB.leave.findIndex(i => i === message.author.id), 1)
       try {
-        client.kickGuildMember(message.member.guild.id, message.author.id, 'Used /leave.')
+        await client.kickGuildMember(message.member.guild.id, message.author.id, 'Used /leave.')
       } catch (e) {
         return 'You will have to manually leave the server or transfer ownership before leaving.'
       }
@@ -425,14 +425,14 @@ export const handleEdit: Command = {
       ) return `**You don't have enough permissions for that, you ${getInsult()}.**`
       const messageID = args.slice(1).shift()
       try {
-        client.editMessage(possibleChannel, messageID, args.slice(1).join(' '))
+        await client.editMessage(possibleChannel, messageID, args.slice(1).join(' '))
       } catch (e) { return 'Nothing to edit.' }
       return
     }
     // Edit the message.
     const messageID = args.shift()
     try {
-      client.editMessage(message.channel.id, messageID, args.join(' '))
+      await client.editMessage(message.channel.id, messageID, args.join(' '))
     } catch (e) { return 'Nothing to edit.' }
   }
 }
@@ -460,13 +460,13 @@ export const handleEditLastSay: Command = {
       ) return `**You don't have enough permissions for that, you ${getInsult()}.**`
       // Edit the message.
       try {
-        client.editMessage(possibleChannel, tempDB.say[possibleChannel], args.slice(1).join(' '))
+        await client.editMessage(possibleChannel, tempDB.say[possibleChannel], args.slice(1).join(' '))
       } catch (e) { return 'Nothing to edit.' }
       return
     }
     // Edit the message.
     try {
-      client.editMessage(message.channel.id, tempDB.say[message.channel.id], args.join(' '))
+      await client.editMessage(message.channel.id, tempDB.say[message.channel.id], args.join(' '))
     } catch (e) { return 'Nothing to edit.' }
   }
 }

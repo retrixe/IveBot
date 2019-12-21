@@ -154,7 +154,7 @@ export default class CommandParser {
     }
     // Delete the message if needed.
     try {
-      if (command.deleteCommand) message.delete('Automatically deleted by IveBot.')
+      if (command.deleteCommand) await message.delete('Automatically deleted by IveBot.')
     } catch (e) {}
     // We get the exact content to send.
     const messageToSend = await command.execute(context, message, args)

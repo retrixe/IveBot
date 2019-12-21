@@ -92,9 +92,9 @@ export const handleAccept: Command = {
       message.channel.id, `Within 20 seconds, you will be asked to say a random word.`
     )
     // Let's wait for random amount under 20s and call a random word.
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
-        message.channel.createMessage('Say ' + tempDB.gunfight[indexOfGunfight].randomWord + '!')
+        await message.channel.createMessage('Say ' + tempDB.gunfight[indexOfGunfight].randomWord + '!')
       } catch (e) {}
       /* tempDB.gunfight[tempDB.gunfight.indexOf(gunfightToAccept)].wordSaid = true
       setTimeout(() => {

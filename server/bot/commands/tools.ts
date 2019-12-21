@@ -18,7 +18,7 @@ export const handleToken: Command = {
     argsRequired: false
   },
   postGenerator: (a, b, sent) => {
-    setTimeout(() => { try { sent.delete() } catch (e) {} }, 30000)
+    setTimeout(async () => { try { await sent.delete() } catch (e) {} }, 30000)
   },
   generator: async (message, args, { tempDB, client }) => {
     let secureToken = randomBytes(3).toString('hex')
@@ -166,7 +166,7 @@ export const handleEval: Command = {
       const res = inspect(await Promise.resolve(eval(toEval)), false, 0)
       // const res = eval(`(async () => { const a = ${toEval}; return a })()`)
       message.addReaction('✅')
-      return res !== 'undefined' ? `${'```'}${res}${'```'}` : undefined
+      return res !== 'undefined' ? `${'```'}${res}${'```'}`.replace(client.token, 'censored') : undefined
     } catch (e) {
       const channel = await client.getDMChannel(host)
       message.addReaction('❌')
@@ -198,7 +198,7 @@ getContent/getCleanContent(messageID), createMessage(content), getReactions(mess
       if (toEval.endsWith('`')) toEval = toEval.substring(0, toEval.length - 1)
       if (toEval.endsWith('``')) toEval = toEval.substring(0, toEval.length - 2)
       // Evaluate!
-      const res = runInNewContext(toEval.split('```').join(''), {
+      const result = runInNewContext(toEval.split('```').join(''), {
         createMessage: async (co: string) => {
           return (await context.client.createMessage(message.channel.id, co)).content
         },
@@ -207,6 +207,7 @@ getContent/getCleanContent(messageID), createMessage(content), getReactions(mess
         getCleanContent: async (id: string) => (await message.channel.getMessage(id)).cleanContent,
         getReactions: async (id: string) => (await message.channel.getMessage(id)).reactions
       })
+      const res = inspect(await Promise.resolve(result), false, 0)
       message.addReaction('✅')
       return res !== 'undefined' ? `${'```'}${res}${'```'}` : undefined
     } catch (e) {

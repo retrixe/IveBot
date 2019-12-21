@@ -1,5 +1,5 @@
 import { Command as IveBotCommand } from '../imports/types'
-import { zeroWidthSpace } from '../imports/tools'
+import { zeroWidthSpace, getInsult } from '../imports/tools'
 import { rootURL } from '../../../config.json5'
 import { Command } from '../client'
 
@@ -104,18 +104,22 @@ export const handleHelp: IveBotCommand = {
       return generateDocs(commands[Object.keys(commands).find(check)])
     } else if (args.join(' ')) return 'Incorrect parameters. Run /help for general help.'
     // Default help.
-    const channel = await message.author.getDMChannel()
-    channel.createMessage({
-      content: `**IveBot's dashboard**: ${rootURL || 'https://ivebot.now.sh'}/
+    try {
+      const channel = await message.author.getDMChannel()
+      await channel.createMessage({
+        content: `**IveBot's dashboard**: ${rootURL || 'https://ivebot.now.sh'}/
 (Manage Server required to manage a server)`,
-      embed: {
-        color: 0x00AE86,
-        type: 'rich',
-        title: 'Help',
-        ...generalHelp,
-        footer: { text: 'For help on a specific command or aliases, run /help <command>.' }
-      }
-    })
-    return 'newbie, help has been direct messaged to you ✅'
+        embed: {
+          color: 0x00AE86,
+          type: 'rich',
+          title: 'Help',
+          ...generalHelp,
+          footer: { text: 'For help on a specific command or aliases, run /help <command>.' }
+        }
+      })
+      return 'newbie, help has been direct messaged to you ✅'
+    } catch {
+      return `I cannot DM you the help for newbies, you ${getInsult()} ❌`
+    }
   }
 }

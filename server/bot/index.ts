@@ -15,7 +15,7 @@ export const guildMemberAdd = (client: Client, db: Db, tempDB: DB) => async (
   // Mute persist.
   try {
     if (tempDB.mute[guild.id].includes(member.id)) {
-      member.addRole(guild.roles.find((role) => role.name === 'Muted').id, 'Persisting mute.')
+      await member.addRole(guild.roles.find((role) => role.name === 'Muted').id, 'Persisting mute.')
     }
   } catch (e) {}
   // Get server settings.
@@ -75,16 +75,15 @@ export const guildBanAdd = (client: Client, db: Db) => async (guild: Guild, user
   const serverSettings = await getServerSettings(db, guild.id)
   // If join/leave messages is not configured/improperly configured..
   if (!serverSettings.joinLeaveMessages) return
-  const { channelName, banMessage } = serverSettings.joinLeaveMessages
-  if (!channelName || !banMessage) return
+  const { channel, banMessage } = serverSettings.joinLeaveMessages
+  if (!channel || !banMessage) return
   // We send a message.
   try {
-    const channelID = guild.channels.find(i => i.name === channelName).id
     const toSend = banMessage
       .split('{un}').join(user.username) // Replace the username.
       .split('{m}').join(user.mention) // Replace the mention.
       .split('{d}').join(user.discriminator) // Replace the discriminator.
-    client.createMessage(channelID, toSend)
+    await client.createMessage(channel, toSend)
   } catch (e) { }
 }
 

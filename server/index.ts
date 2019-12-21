@@ -20,7 +20,7 @@ import { MongoClient } from 'mongodb'
 import { readdir, statSync } from 'fs'
 import { inspect } from 'util'
 // Import the bot.
-import { guildMemberAdd, guildMemberRemove, guildDelete } from './bot'
+import { guildMemberAdd, guildMemberRemove, guildDelete, guildBanAdd } from './bot'
 // Get the token needed.
 import 'json5/lib/require'
 import { token, mongoURL } from '../config.json5'
@@ -50,6 +50,7 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, {
   // When a server loses a member, it will callback.
   client.on('guildMemberAdd', guildMemberAdd(client, db, tempDB))
   client.on('guildMemberRemove', guildMemberRemove(client, db))
+  client.on('guildBanAdd', guildBanAdd(client, db))
   // When the bot leaves a server, it will callback.
   client.on('guildDelete', guildDelete(db))
   // Register the commandParser.
@@ -93,7 +94,7 @@ client.on('ready', () => {
 
 // Disconnection from Discord by error will trigger the following.
 client.on('error', (err: Error, id: string) => {
-  console.error(`Error: ${inspect(err)}\nShard ID: ${id}`)
+  console.error(`Error: ${inspect(err, false, 0)}\nShard ID: ${id}`)
 })
 
 // Create a database to handle certain stuff.
