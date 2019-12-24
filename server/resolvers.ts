@@ -51,10 +51,10 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
     // Get user info.
     getUserInfo: (_: string, { linkToken }: { linkToken: string }) => {
       if (ctx.tempDB.link[linkToken]) {
-        let servers: Array<{ /* eslint-disable indent */
+        let servers: Array<{
           perms: boolean, icon: string, serverId: string, name: string,
           channels: Array<{ id: string, name: string }>
-        }> = [] /* eslint-enable indent */
+        }> = []
         // Send back mutual servers.
         ctx.client.guilds.forEach(guild => {
           if (guild.members.has(ctx.tempDB.link[linkToken])) {
@@ -77,15 +77,15 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
     // Get user info.
     getOAuthUserInfo: async (_: string, { token }: { token: string }) => {
       // Get info about the user.
-      type Base = { id: string } // eslint-disable-line no-use-before-define
+      type Base = { id: string }
       const headers = { Authorization: `Bearer ${token}` }
       const guilds: Array<Base> = await (await fetch(`${api}/users/@me/guilds`, { headers })).json()
       const { id }: Base = await (await fetch(`${api}/users/@me`, { headers })).json()
       // Generate the server info.
-      let servers: Array<{ /* eslint-disable indent */
+      let servers: Array<{
         perms: boolean, icon: string, serverId: string, name: string,
         channels: Array<{ id: string, name: string }>
-      }> = [] /* eslint-enable indent */
+      }> = []
       guilds.forEach(server => {
         if (ctx.client.guilds.has(server.id)) {
           const guild = ctx.client.guilds.get(server.id)
@@ -106,11 +106,9 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
   },
   Mutation: {
     editServerSettings: async (
-      _: string, { input }: { input: { // eslint-disable-next-line indent
+      _: string, { input }: { input: {
         serverId: string, linkToken: string, addRoleForAll: string, joinAutorole: string,
-      // eslint-disable-next-line indent
         joinLeaveMessages: { channel: string, joinMessage: string, leaveMessage: string },
-      // eslint-disable-next-line indent
         ocrOnSend: boolean
       } }
     ) => {

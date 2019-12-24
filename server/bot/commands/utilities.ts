@@ -1,5 +1,5 @@
 // All the types!
-import { Message } from 'eris' // eslint-disable-line no-unused-vars
+import { Message } from 'eris'
 import { Command } from '../imports/types'
 // All the needs!
 import { getIdFromMention, getInsult, getUser } from '../imports/tools'

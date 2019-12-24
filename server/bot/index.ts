@@ -109,7 +109,7 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
   else if (command.startsWith('iphone x')) sendResponse(`You don't deserve it. 😎`)
   else if (command.startsWith('triggered')) sendResponse('Ah, pathetic people again.')
   else if (command.startsWith('ayy')) sendResponse('lmao')
-  // Handle answers to gunfight.
+  // TODO: Handle answers to gunfight.
   /* else if (['fire', 'water', 'gun', 'dot'].includes(command)) {
     const gunfight = tempDB.gunfight.find(i => i.randomWord === command && (
       i.challenged === message.author.id || i.challenger === message.author.id

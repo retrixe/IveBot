@@ -96,7 +96,8 @@ export const handleAccept: Command = {
       try {
         await message.channel.createMessage('Say ' + tempDB.gunfight[indexOfGunfight].randomWord + '!')
       } catch (e) {}
-      /* tempDB.gunfight[tempDB.gunfight.indexOf(gunfightToAccept)].wordSaid = true
+      /* TODO
+      tempDB.gunfight[tempDB.gunfight.indexOf(gunfightToAccept)].wordSaid = true
       setTimeout(() => {
         if (tempDB.gunfight.find(
           i => i.challenged === message.author.id && message.channel.id === i.channelID

@@ -24,7 +24,6 @@ function isEquivalent (a: { [index: string]: boolean }, b: { [index: string]: bo
 }
 
 export class Command {
-  /* eslint-disable no-undef */
   name: string
   aliases: string[]
   generator: IveBotCommandGenerator
@@ -48,7 +47,6 @@ export class Command {
     permissions?: {},
     roleIDs?: string[]
   }
-  /* eslint-enable no-undef */
 
   constructor (command: IveBotCommand) {
     // Key functions.
@@ -95,7 +93,7 @@ export class Command {
     return userIDs || custom || permissions
   }
 
-  async execute (context: Context, message: Message, args: string[]) { // eslint-disable-line indent
+  async execute (context: Context, message: Message, args: string[]) {
     // Define 2 vars.
     let messageToSend: MessageContent | void | Promise<MessageContent> | Promise<void>
     // If it's a function, we call it first.
@@ -108,12 +106,11 @@ export class Command {
 }
 
 export default class CommandParser {
-  commands: { [name: string]: Command } // eslint-disable-line no-undef
-  client: Client // eslint-disable-line no-undef
-  tempDB: DB // eslint-disable-line no-undef
-  db: Db // eslint-disable-line no-undef
-  evaluatedMessages: string[] // eslint-disable-line no-undef
-  // eslint-disable-next-line no-undef
+  commands: { [name: string]: Command }
+  client: Client
+  tempDB: DB
+  db: Db
+  evaluatedMessages: string[]
   analytics: { name: string, totalUse: number, averageExecTime: number[] }[]
 
   constructor (client: Client, tempDB: DB, db: Db) {
@@ -128,7 +125,7 @@ export default class CommandParser {
     setInterval(() => this.sendAnalytics(), 30000)
   }
 
-  registerCommand = (command: IveBotCommand) => { // eslint-disable-line no-undef
+  registerCommand = (command: IveBotCommand) => {
     this.commands[command.name] = new Command(command)
   }
 

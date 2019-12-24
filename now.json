@@ -1,7 +1,8 @@
 {
   "files": [
-    "bot", "pages", "server", "components", ".env", "config.json5",
-    "index.d.ts", "next.config.js", "package.json", "now.json", "tsconfig.json", "yarn.lock"
+    "pages", "server", "components",
+    "config.json5", "index.d.ts", "next.config.js",
+    "now.json", "package.json", "tsconfig.json", "yarn.lock"
   ],
   "env": {
     "IVEBOT_TOKEN": "@ivebot-token",

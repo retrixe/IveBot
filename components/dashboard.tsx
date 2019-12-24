@@ -8,7 +8,6 @@ import { Query } from 'react-apollo'
 import Settings from './settings'
 import { gql } from 'apollo-boost'
 
-/* eslint-disable quotes, no-multi-str, no-undef */
 interface Props {
   data: Array<{
     perms: boolean, icon: string, serverId: string, name: string, channels: {
@@ -116,6 +115,5 @@ query getServerSettings($server: String!, $token: String!) {
     )
   }
 }
-/* eslint-enable quotes, no-multi-str, no-undef */
 
 export default withWidth()(DashboardIndex)

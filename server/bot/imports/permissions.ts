@@ -2,8 +2,8 @@
 import { Member } from 'eris'
 
 // Export function.
-export function checkRolePosition ( // eslint-disable-next-line space-infix-ops
-  member: Member, considerOwnership: boolean=true, considerMutedRole: boolean=true
+export function checkRolePosition (
+  member: Member, considerOwnership: boolean = true, considerMutedRole: boolean = true
 ) {
   // If owner, return.
   if (member.guild.ownerID === member.id && considerOwnership) return 9999

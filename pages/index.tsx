@@ -13,7 +13,6 @@ const GitHubLogo = () => (
 )
 const rootURL = 'https://ivebot.now.sh' // Modify when self-hosting.
 
-/* eslint-disable quotes, no-multi-str, no-undef */
 class Index extends React.Component {
   state = { id: '' }
 
@@ -66,6 +65,5 @@ IveBot is 100% open source and always will be.</Typography>
     )
   }
 }
-/* eslint-enable quotes, no-multi-str, no-undef */
 
 export default withRoot(Index)

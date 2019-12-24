@@ -6,7 +6,6 @@ import {
 import { Mutation } from 'react-apollo'
 import { gql } from 'apollo-boost'
 
-/* eslint-disable quotes, no-multi-str, no-undef */
 interface Props {
   data: {
     addRoleForAll: string, joinAutorole: string, ocrOnSend: boolean, joinLeaveMessages: {
@@ -208,4 +207,3 @@ mutation variables(
     )
   }
 }
-/* eslint-enable quotes, no-multi-str, no-undef */

@@ -356,7 +356,7 @@ letter code + the first letter of the currency name.` }]
 }
 
 // Our weather and define types.
-/* eslint-disable no-undef,no-use-before-define,camelcase */
+/* eslint-disable camelcase */
 type Weather = { cod: string, coord: { lon: number, lat: number }, weather: Array<{
   main: string,
   description: string,
@@ -375,7 +375,7 @@ type Categories = Array<{
       registers: Array<{ id: string, text: string }>
     }>
   }>
-}> /* eslint-enable */
+}> /* eslint-enable camelcase */
 export const handleWeather: Command = {
   name: 'weather',
   aliases: ['wt'],

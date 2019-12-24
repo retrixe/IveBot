@@ -2,7 +2,7 @@ declare module '*.json'
 declare module '*.json5'
 
 declare module 'isomorphic-unfetch' {
-  // eslint-disable-next-line no-undef,import/export
+  // eslint-disable-next-line import/export
   export default fetch
 }
 declare module 'ms' {

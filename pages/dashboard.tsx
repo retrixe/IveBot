@@ -14,7 +14,6 @@ import { ApolloProvider, Query } from 'react-apollo'
 const client = new ApolloClient({ uri: `/graphql`, fetchOptions: { fetch } })
 const rootURL = 'https://ivebot.now.sh' // Modify when self-hosting.
 
-/* eslint-disable quotes, no-multi-str, no-undef */
 class DashboardIndex extends React.Component {
   state = { open: false, token: '' }
   openDialog = () => this.setState({ open: true })
@@ -97,6 +96,5 @@ query getAllCommonServers($token: String!) {
     )
   }
 }
-/* eslint-enable quotes, no-multi-str, no-undef */
 
 export default withRoot(DashboardIndex)

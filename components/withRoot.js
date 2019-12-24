@@ -19,7 +19,7 @@ function withRoot (Component) {
       }
     }
 
-    pageContext = null // eslint-disable-line no-undef
+    pageContext = null
 
     render () {
       // MuiThemeProvider makes the theme available down the React tree thanks to React context.

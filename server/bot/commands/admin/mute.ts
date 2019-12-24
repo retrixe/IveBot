@@ -6,7 +6,7 @@ import ms from 'ms'
 
 export const handleMute: Command = {
   name: 'mute',
-  aliases: ['shutup'],
+  aliases: ['shutup', 'oppress'],
   opts: {
     description: 'Mute someone.',
     fullDescription: 'Mute someone. Compatible with Dyno.',
@@ -77,8 +77,7 @@ export const handleMute: Command = {
     } catch (e) { return 'Could not mute that person.' }
     // Persist the mute.
     const guildID = message.member.guild.id
-    /*
-    Some database stuff.
+    /* TODO: Some database stuff.
     try {
       const mute = await db.collection('mute').findOne({ guild: guildID, user: user.id })
       // Figure out the time for which the user is muted.

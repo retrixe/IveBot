@@ -1,5 +1,4 @@
 // Flow our types.
-/* eslint-disable no-undef */
 import { Client, Message, MessageContent, EmbedOptions } from 'eris'
 import CommandParser from '../client'
 import { Db } from 'mongodb'
@@ -36,7 +35,6 @@ export type IveBotCommandGeneratorFunction = (msg: Message, args: string[], ctx:
 } | Promise<MessageContent> | Promise<void>
 export type IveBotCommandGenerator = IveBotCommandGeneratorFunction|MessageContent
 export type Command = {
-  // eslint-disable-next-line no-use-before-define
   opts: CommandOptions,
   aliases?: string[],
   name: string,
@@ -64,4 +62,3 @@ export type CommandOptions = {
     roleIDs?: string[]
   }
 }
-/* eslint-enable no-undef */

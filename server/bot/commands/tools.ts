@@ -27,11 +27,14 @@ export const handleToken: Command = {
     try {
       const dm = await client.getDMChannel(message.author.id)
       try {
-        const dmMessage = await dm.createMessage(
-          '**DO NOT SHARE THIS WITH ANYONE >_<** | Your token is:'
-        )
-        const tokenMessage = await dm.createMessage(`**${secureToken}**`)
-        setTimeout(async () => { dmMessage.delete(); tokenMessage.delete() }, 30000)
+        const dmMessage = await dm.createMessage({
+          content: '**DO NOT SHARE THIS WITH ANYONE >_<** | Your token is:',
+          embed: {
+            color: 0x17ac86,
+            title: secureToken
+          }
+        })
+        setTimeout(async () => { await dmMessage.delete() }, 30000)
       } catch (e) { return 'There was an error processing your request (unable to DM token)' }
     } catch (e) { return 'There was an error processing your request (unable to DM)' }
     // The non-DM part.

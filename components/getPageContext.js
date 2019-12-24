@@ -1,5 +1,3 @@
-/* eslint-disable no-underscore-dangle */
-
 import { SheetsRegistry } from 'jss'
 import { createMuiTheme, createGenerateClassName, colors } from '@material-ui/core'
 
