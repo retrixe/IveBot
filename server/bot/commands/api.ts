@@ -466,13 +466,16 @@ export const handleDefine: Command = {
         `https://od-api.oxforddictionaries.com/api/v2/lemmas/en/${args.join(' ')}`, { headers }
       )).json()
       // If the word doesn't exist in the Oxford Dictionary..
-      if (r.error === 'No entries were found for a given inflected word') {
+      if (r.error === 'No entries were found for a given inflected word' || (
+        r.error && r.error.startsWith('No lemma was found')
+      )) {
         return 'Did you enter a valid word? 👾'
       }
       try {
         // Here we get the dictionary entries for the specified word.
+        const word = r.results[0].lexicalEntries[0].inflectionOf[0].id
         const { results } = await (await fetch(
-          `https://od-api.oxforddictionaries.com/api/v2/entries/en/${r.results[0].id}` +
+          `https://od-api.oxforddictionaries.com/api/v2/entries/en/${word}` +
             '?strictMatch=false&fields=definitions%2Cexamples',
           { headers }
         )).json()
