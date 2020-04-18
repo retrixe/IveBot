@@ -161,8 +161,17 @@ export default class CommandParser {
       messageToSend && ((message.member &&
       message.member.guild.channels.get(message.channel.id)
         .permissionsOf(this.client.user.id).has('sendMessages')) || message.channel.type === 1)
-    ) sent = await message.channel.createMessage(messageToSend)
+    ) sent = await message.channel.createMessage(this.disableEveryone(messageToSend))
     if (command.postGenerator) command.postGenerator(message, args, sent, context)
+  }
+
+  disableEveryone = (message: MessageContent) => {
+    if (typeof message !== 'string' && !message.allowedMentions) {
+      message.allowedMentions = { everyone: false, roles: true, users: true }
+      return message
+    } else if (typeof message === 'string') {
+      return { content: message, allowedMentions: { everyone: false, roles: true, users: true } }
+    } else return message
   }
 
   async saveAnalytics (timeTaken: [number, number], name: string) {

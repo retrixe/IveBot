@@ -7,6 +7,8 @@ import 'json5/lib/require'
 import { host, testPilots } from '../../../config.json5'
 import { runInNewContext } from 'vm'
 import { inspect } from 'util'
+import { getIdFromMention, getInsult } from '../imports/tools'
+import { Base } from 'eris'
 
 export const handleToken: Command = {
   name: 'token',
@@ -129,7 +131,7 @@ export const handlePing: Command = {
     if (args.length === 1 && testPilots.includes(message.author.id)) {
       try {
         return execSync('ping -c 1 ' + args[0], { encoding: 'utf8' }).split('\n')[1]
-      } catch (e) { return 'Looks like pinging the website failed. Don\'t ping subdomains.' }
+      } catch (e) { return 'Looks like pinging the website failed.' }
     }
     // Get the time before sending the message.
     const startTime = Date.now()
@@ -217,6 +219,40 @@ getContent/getCleanContent(messageID), createMessage(content), getReactions(mess
       message.addReaction('❌')
       return `**Error:**
 ${e}`
+    }
+  }
+}
+
+export const handleCreationtime: Command = {
+  name: 'creationtime',
+  aliases: ['ct', 'creation', 'createdat', 'when'],
+  opts: {
+    description: 'Finds out when a Snowflake (e.g. user ID) was created.',
+    fullDescription: 'Finds out when a Snowflake (e.g. user ID) was created.',
+    usage: '/creationtime <ID or mention>',
+    example: '/creationtime 383591525944262656'
+  },
+  generator: async (message, args) => {
+    if (args.length === 1) {
+      // Just parse it normally.
+      const id = getIdFromMention(args[0])
+      if ((id.length !== 17 && id.length !== 18) || isNaN(+id)) {
+        return `Provide an valid ID or mention, you ${getInsult()}.`
+      }
+      return moment((new Base(id)).createdAt).format('YYYY/MM/DD, hh:mm:ss A')
+    } else {
+      const res = args.map(mention => {
+        // Parse each ID.
+        const id = getIdFromMention(mention)
+        if ((id.length !== 17 && id.length !== 18) || isNaN(+id)) {
+          return mention + ': invalid!'
+        }
+        return mention + ': ' + moment((new Base(id)).createdAt).format('YYYY/MM/DD, hh:mm:ss A')
+      }).join('\n')
+      return {
+        content: res,
+        allowedMentions: { users: false, roles: false, everyone: false }
+      }
     }
   }
 }

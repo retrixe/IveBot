@@ -3,7 +3,7 @@ import { Command } from '../imports/types'
 // All the tools!
 import fetch from 'isomorphic-unfetch'
 import moment from 'moment'
-import { zeroWidthSpace, getInsult } from '../imports/tools'
+import { zeroWidthSpace, getInsult, fetchLimited } from '../imports/tools'
 // Get the NASA API token.
 import 'json5/lib/require'
 import {
@@ -24,7 +24,10 @@ export const handleOcr: Command = {
     // Get the image and convert it to Base64.
     try {
       const url = args.length ? args.join('%20') : message.attachments[0].url
-      const image = Buffer.from(await (await fetch(url)).arrayBuffer()).toString('base64')
+      // const image = Buffer.from(await (await fetch(url)).arrayBuffer()).toString('base64')
+      const fetchedImage = await fetchLimited(url, 16)
+      if (fetchedImage === false) return 'The file provided is larger than 16 MB!'
+      const image = fetchedImage.toString('base64')
       // Now send the request.
       const res = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${cvAPIkey}`, {
         body: JSON.stringify({
@@ -39,9 +42,25 @@ export const handleOcr: Command = {
       // If no text was found.
       if (!result.responses[0].fullTextAnnotation
       ) return 'I was unable to get any results for the image.'
+      // If the result is too long, upload it to hasteb.in.
+      const text = result.responses[0].fullTextAnnotation.text
+      let hastebin = ''
+      try {
+        if (text.length > 2000) {
+          const { key } = await fetch('https://hasteb.in/documents', {
+            method: 'POST', body: text
+          }).then(e => e.json())
+          hastebin = key
+        }
+      } catch (e) {
+        return `Failed to upload long OCR result to hasteb.in! (${text.length} characters long)`
+      }
       // Return our answer.
       return {
-        content: '🤔 **Text recognition result:**\n' + result.responses[0].fullTextAnnotation.text,
+        content: hastebin
+          ? `🤔 **Text recognition result uploaded to hasteb.in due to length:**
+https://hasteb.in/${hastebin} (will be deleted after 30 days)`
+          : '🤔 **Text recognition result:**\n' + text,
         embed: {
           color: 0x666666,
           author: {
@@ -50,8 +69,9 @@ export const handleOcr: Command = {
           },
           footer: {
             text: 'Powered by Google Cloud Vision API',
-            icon_url: 'https://cloud.google.com' +
-            '/_static/7e8fbbc4f5/images/cloud/icons/favicons/onecloud/favicon.ico'
+            icon_url: 'https://www.gstatic.com/devrel-devsite/prod/' +
+            'v2210deb8920cd4a55bd580441aa58e7853afc04b39a9d9ac4198e1cd7fbe04ef/cloud/images/' +
+            'favicons/onecloud/favicon.ico'
           },
           timestamp: new Date(message.timestamp).toISOString()
         }

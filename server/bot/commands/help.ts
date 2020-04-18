@@ -42,6 +42,7 @@ TP \`/request\` - Request a specific feature.
 \`/avatar\` - Avatar of a user.
 \`/userinfo\` - User info.
 \`/serverinfo\` - Server info 🤔
+\`/creationtime\` - Find out creation time of something by Discord ID.
 \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
 \`/emojiImage\` - Image of an emoji.
 \`/giverole\` and \`/takerole\` - Edit roles.

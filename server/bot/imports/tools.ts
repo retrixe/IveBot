@@ -1,8 +1,11 @@
+import https from 'https'
+import { get } from 'http'
+import { parse } from 'url'
 import { Db } from 'mongodb'
 import { Message } from 'eris'
 
 export const getIdFromMention = (mention: string) => {
-  const f = mention.substring(2, mention.length - 1).split('!').join('').split('&').join('').split(':')
+  const f = mention.substring(2, mention.length - 1).replace('!', '').replace('&', '').split(':')
   return f[f.length - 1]
 }
 
@@ -56,4 +59,39 @@ export const getInsult = () => {
     'pathetic lifeform', 'ungrateful bastard', 'idiotic slimeball', 'worthless ass', 'dumb dolt'
   ]
   return insults[Math.floor(Math.random() * insults.length)]
+}
+
+export const fetchLimited = async (url: string, limit: number, opts = {}): Promise<false | Buffer> => {
+  const byteLimit = limit * 1024 * 1024
+  try {
+    const contentLength = (await fetch(url, { method: 'HEAD' })).headers.get('content-length')
+    if (+contentLength > byteLimit) return false
+  } catch (e) {} // Understandable that this may fail.
+  // Create a Promise which resolves on stream finish.
+  return new Promise((resolve, reject) => {
+    let size = 0
+    const data: Buffer[] = []
+    const parsedUrl = parse(url)
+    const req = (parsedUrl.protocol === 'https:' ? https.get : get)({ ...parse(url), ...opts }, (res) => {
+      if (!isNaN(+res.headers['content-length']) && +res.headers['content-length'] > byteLimit) {
+        req.abort()
+        resolve(false)
+      }
+      res.on('data', (chunk) => {
+        if (!Buffer.isBuffer(chunk)) chunk = Buffer.from(chunk)
+        data.push(chunk)
+        size += chunk.length
+        if (size > byteLimit) {
+          req.abort()
+          resolve(false)
+        }
+      })
+      res.on('end', () => {
+        const concat = Buffer.concat(data)
+        resolve(concat)
+      })
+      res.on('error', reject)
+    })
+    req.on('error', reject)
+  })
 }

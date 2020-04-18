@@ -28,9 +28,9 @@ export const handleServerinfo: Command = {
     // Owner.
     const owner = guild.members.get(guild.ownerID)
     // Nitro Boosting support.
-    const boost = guild.premiumTier ? [{
+    const boost = guild.premiumSubscriptionCount ? [{
       name: '<:boost:602100826214760452> Boost Status',
-      value: `Level ${guild.premiumTier} with ${guild.premiumSubscriptionCount} Boosts`,
+      value: `Level ${guild.premiumTier || 0} with ${guild.premiumSubscriptionCount} Boosts`,
       inline: true
     }] : []
     // Display information.
@@ -47,6 +47,11 @@ export const handleServerinfo: Command = {
           { name: 'Owner', value: `${owner.username}#${owner.discriminator}`, inline: true },
           { name: 'Owner ID', value: guild.ownerID, inline: true },
           { name: 'Region', value: guild.region, inline: true },
+          {
+            name: 'Created On',
+            value: moment(guild.createdAt).format('DD/MM/YYYY, hh:mm:ss A'),
+            inline: true
+          },
           {
             name: 'Channel Categories',
             inline: true,
@@ -200,7 +205,14 @@ export const handleSay: Command = {
       tempDB.say[message.channelMentions[0]] = (
         await client.createMessage(message.channelMentions[0], {
           content: args.join(' '),
-          disableEveryone: !(message.member && message.member.permission.has('mentionEveryone'))
+          allowedMentions: {
+            everyone: message.member && message.member.permission.has('mentionEveryone'),
+            users: true,
+            roles: message.member && (
+              message.member.permission.has('mentionEveryone') ||
+              message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)
+            )
+          }
         })
       ).id
       return
@@ -209,7 +221,14 @@ export const handleSay: Command = {
     if (args.join(' ') === 'pls adim me') args = ['no']
     return {
       content: args.join(' '),
-      disableEveryone: !(message.member && message.member.permission.has('mentionEveryone'))
+      allowedMentions: {
+        everyone: message.member && message.member.permission.has('mentionEveryone'),
+        users: true,
+        roles: message.member && (
+          message.member.permission.has('mentionEveryone') ||
+          message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)
+        )
+      }
     }
   }
 }
@@ -246,7 +265,14 @@ export const handleType: Command = {
       tempDB.say[message.channelMentions[0]] = (
         await client.createMessage(message.channelMentions[0], {
           content: args.join(' '),
-          disableEveryone: !(message.member && message.member.permission.has('mentionEveryone'))
+          allowedMentions: {
+            everyone: message.member && message.member.permission.has('mentionEveryone'),
+            users: true,
+            roles: message.member && (
+              message.member.permission.has('mentionEveryone') ||
+              message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)
+            )
+          }
         })
       ).id
       return
@@ -259,7 +285,14 @@ export const handleType: Command = {
     )
     return {
       content: args.join(' '),
-      disableEveryone: !(message.member && message.member.permission.has('mentionEveryone'))
+      allowedMentions: {
+        everyone: message.member && message.member.permission.has('mentionEveryone'),
+        users: true,
+        roles: message.member && (
+          message.member.permission.has('mentionEveryone') ||
+          message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)
+        )
+      }
     }
   }
 }
