@@ -3,7 +3,7 @@ import { zeroWidthSpace, getInsult } from '../imports/tools'
 import { rootURL } from '../../../config.json5'
 import { Command } from '../client'
 
-const generalHelp = {
+export const generalHelp = {
   description: `**Jony Ive can do many commands 📡**
 \`/halp\` and \`/help\` - The most innovative help.`,
   fields: [
@@ -84,7 +84,7 @@ Arguments in () are optional :P
 
 export const handleHelp: IveBotCommand = {
   name: 'help',
-  aliases: ['halp'],
+  aliases: ['halp', 'commands'],
   opts: {
     description: 'The most innovative help.',
     fullDescription: 'The most innovative halp.',

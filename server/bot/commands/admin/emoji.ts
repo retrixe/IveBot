@@ -21,13 +21,13 @@ export const handleAddemoji: Command = {
       return true
     }
     // Fetch the emoji.
-    let image
+    let image: false | Buffer
     try {
       // image = Buffer.from(await (await fetch(url)).arrayBuffer())
       image = await fetchLimited(url, 0.25)
     } catch (e) { return `Invalid image URL, you ${getInsult()}` }
     // If emoji larger than 384 KB (in case)
-    if (image === false || image === true || (image.byteLength / 1024) >= 384) {
+    if (image === false || (image.byteLength / 1024) >= 384) {
       return `Your emoji is larger than 256 KB, resize your image!
 I recommend using <https://picresize.com/> if the emoji is JPG.
 Set step 2 to No Change, set Max Filesize to 255 in step 4 and set to Best quality.

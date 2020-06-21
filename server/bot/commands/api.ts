@@ -17,10 +17,13 @@ export const handleOcr: Command = {
     description: 'Get text from an image.',
     fullDescription: 'Get text from an image. Powered by Google Cloud Vision.',
     example: '/ocr <with uploaded image>',
-    usage: '/ocr <link to image/uploaded image>',
+    usage: '/ocr (--hastebin) <link to image/uploaded image>',
     argsRequired: false
   },
   generator: async (message, args) => {
+    // To hasteb.in or not to hasteb.in.
+    const useHastebin = args[0] === '--hastebin'
+    if (useHastebin) args.shift()
     // Get the image and convert it to Base64.
     try {
       const url = args.length ? args.join('%20') : message.attachments[0].url
@@ -46,7 +49,7 @@ export const handleOcr: Command = {
       const text = result.responses[0].fullTextAnnotation.text
       let hastebin = ''
       try {
-        if (text.length > 2000) {
+        if (text.length > 2000 || useHastebin) {
           const { key } = await fetch('https://hasteb.in/documents', {
             method: 'POST', body: text
           }).then(e => e.json())
@@ -58,7 +61,7 @@ export const handleOcr: Command = {
       // Return our answer.
       return {
         content: hastebin
-          ? `🤔 **Text recognition result uploaded to hasteb.in due to length:**
+          ? `🤔 **Text recognition result uploaded to hasteb.in${!useHastebin ? ' due to length' : ''}:**
 https://hasteb.in/${hastebin} (will be deleted after 30 days)`
           : '🤔 **Text recognition result:**\n' + text,
         embed: {
