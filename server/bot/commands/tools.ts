@@ -235,7 +235,8 @@ export const handleCreationtime: Command = {
   generator: async (message, args) => {
     if (args.length === 1) {
       // Just parse it normally.
-      const id = getIdFromMention(args[0])
+      let id = args[0]
+      id = (id.length === 17 || id.length === 18) && !isNaN(+id) ? id : getIdFromMention(args[0])
       if ((id.length !== 17 && id.length !== 18) || isNaN(+id)) {
         return `Provide an valid ID or mention, you ${getInsult()}.`
       }
@@ -243,7 +244,8 @@ export const handleCreationtime: Command = {
     } else {
       const res = args.map(mention => {
         // Parse each ID.
-        const id = getIdFromMention(mention)
+        let id = args[0]
+        id = (id.length === 17 || id.length === 18) && !isNaN(+id) ? id : getIdFromMention(args[0])
         if ((id.length !== 17 && id.length !== 18) || isNaN(+id)) {
           return mention + ': invalid!'
         }
