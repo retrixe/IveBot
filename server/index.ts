@@ -80,6 +80,22 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, {
       }
     })
   })
+  // Register setInterval to fulfill delayed tasks.
+  setInterval(async () => {
+    const tasks = await db.collection('tasks').find({ time: { $lte: Date.now() + 60000 } }).toArray()
+    if (tasks) {
+      tasks.forEach(task => setTimeout(() => {
+        if (task.type === 'unmute') {
+          client.removeGuildMemberRole(task.guild, task.user, task.target, 'Muted for fixed duration.')
+            .catch(e => e.res.statusCode !== 404 && console.error(e))
+        } else if (task.type === 'reminder') {
+          client.createMessage(task.target, task.message)
+            .catch(e => e.res.statusCode !== 404 && console.error(e))
+        }
+        db.collection('tasks').deleteOne({ _id: task._id })
+      }, task.time - Date.now()))
+    }
+  }, 60000)
 })
 
 // On connecting..

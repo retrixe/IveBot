@@ -84,7 +84,7 @@ Arguments in () are optional :P
 
 export const handleHelp: IveBotCommand = {
   name: 'help',
-  aliases: ['halp', 'commands'],
+  aliases: ['halp', 'hulp', 'gethelp', 'commands'],
   opts: {
     description: 'The most innovative help.',
     fullDescription: 'The most innovative halp.',

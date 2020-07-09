@@ -306,21 +306,36 @@ export const handleRemindme: Command = {
     usage: '/remindme <time in 1d|1h|1m|1s> (--channel|-c) <description>',
     example: '/remindme 1h do your homework'
   },
-  generator: (message, args) => {
+  generator: async (message, args, { db }) => {
     if (args.length < 2 || !ms(args[0])) {
       return 'Correct usage: /remindme <time in 1d|1h|1m|1s> <description>'
     }
     let channel = false
     if (args[1] === '-c' || args[1] === '--channel') channel = true
-    setTimeout(async () => {
-      channel
-        ? message.channel.createMessage(
-          `⏰ ${message.author.mention} ${args.slice(2).join(' ')}\nReminder set ${args[0]} ago.`
-        )
-        : (await message.author.getDMChannel()).createMessage(
-          `⏰ ${args.slice(1).join(' ')}\nReminder set ${args[0]} ago.`
-        )
-    }, ms(args[0]))
+    if (ms(args[0]) > 61 * 1000) { // Greater than 61 seconds and it's relegated to the database.
+      try {
+        const res = await db.collection('tasks').insertOne({
+          type: 'reminder',
+          time: Date.now() + ms(args[0]),
+          user: message.author.id,
+          target: channel ? message.channel.id : 'dm',
+          message: `⏰${
+            channel ? message.author.mention + ' ' : ''
+          } ${args.slice(channel ? 2 : 1).join(' ')}\nReminder set ${args[0]} ago.`
+        })
+        if (res.insertedCount !== 1) return 'Failed to add a reminder to the database!'
+      } catch (e) { return 'Failed to add a reminder to the database!' }
+    } else {
+      setTimeout(async () => {
+        channel
+          ? message.channel.createMessage(
+            `⏰ ${message.author.mention} ${args.slice(2).join(' ')}\nReminder set ${args[0]} ago.`
+          )
+          : (await message.author.getDMChannel()).createMessage(
+            `⏰ ${args.slice(1).join(' ')}\nReminder set ${args[0]} ago.`
+          )
+      }, ms(args[0]))
+    }
     return `You will be reminded in ${args[0]} through a ${channel ? 'mention' : 'DM'}.`
   }
 }

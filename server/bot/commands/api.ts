@@ -560,19 +560,38 @@ export const handleDefine: Command = {
   }
 }
 
+const noimageposts = [1037, 1608, 1663].map(e => 'https://xkcd.com' + e)
 export const handleXkcd: Command = {
   name: 'xkcd',
   opts: {
-    description: 'Get the latest or a random xkcd comic.',
-    fullDescription: 'Get the latest or a random xkcd comic.',
-    usage: '/xkcd (latest (default)|random)',
+    description: 'Get the latest, random or search for an xkcd comic.',
+    fullDescription: 'Get the latest, random or search for an xkcd comic.',
+    usage: '/xkcd (latest (default)|random|search) (search query, if searching)',
     example: '/xkcd random',
     argsRequired: false
   },
   generator: async (message, args) => {
-    if (
+    if (args.length >= 2 && args[0] === 'search') {
+      try {
+        // Fetch all posts and parse the HTML.
+        const req = await fetch('https://xkcd.com/archive')
+        if (!req.ok) return 'Failed to fetch list of xkcd comics!\nhttps://xkcd.com/1348'
+        const posts = (await req.text()).split('<br/>').map(e => ({
+          name: e.substring(0, e.length - 4).split('>').pop(),
+          url: 'https://xkcd.com/' + e.substring(e.lastIndexOf('href="/') + 7).split('/"').shift()
+        })).slice(4)
+        posts.splice(posts.length - 11, 11) // Slice and splice invalid elements.
+        // Construct search result.
+        // TODO: More powerful search required.
+        const res = posts.filter(post => post.name.toLowerCase().startsWith(args.slice(1).join(' ').toLowerCase()))
+          .map(e => e && noimageposts.includes(e.url) ? { ...e, url: e.url + '(no image)' } : e)
+        if (!res.length) return 'No results were found for your search criteria!'
+        return `**Top results:**
+1. ${res[0].url}${res[1] ? `\n2. <${res[1].url}>` : ''}${res[2] ? `\n3. <${res[2].url}>` : ''}`
+      } catch (e) { console.error(e); return 'Failed to fetch list of xkcd comics!\nhttps://xkcd.com/1348' }
+    } else if (
       args.length > 1 || (args.length === 1 && args[0] !== 'latest' && args[0] !== 'random')
-    ) return 'Correct usage: /xkcd (latest|random)'
+    ) return 'Correct usage: /xkcd (latest|random|search) (search query if searching)'
     // Get the latest xkcd comic.
     try {
       const { num } = await (await fetch('http://xkcd.com/info.0.json')).json()

@@ -86,8 +86,8 @@ export const handleUptime: Command = {
     example: '/uptime',
     argsRequired: false
   },
-  generator: (message, args, { client }) => {
-    const d = moment.duration(client.uptime)
+  generator: () => {
+    const d = moment.duration(Math.floor(process.uptime() * 1000))
     const days = Math.floor(d.asDays())
     if (days) {
       return `${days} days ${d.hours()} hours ${d.minutes()} minutes ${d.seconds()} seconds`

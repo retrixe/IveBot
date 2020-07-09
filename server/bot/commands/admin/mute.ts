@@ -15,7 +15,7 @@ export const handleMute: Command = {
     guildOnly: true,
     requirements: { permissions: { 'manageMessages': true } }
   },
-  generator: async (message, args, { client, tempDB }) => {
+  generator: async (message, args, { client, tempDB, db }) => {
     // Find the user ID.
     let user = getUser(message, args.shift())
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
@@ -77,33 +77,29 @@ export const handleMute: Command = {
     } catch (e) { return 'Could not mute that person.' }
     // Persist the mute.
     const guildID = message.member.guild.id
-    /* TODO: Some database stuff.
+    // If time given, set timeout to remove role in database.
     try {
-      const mute = await db.collection('mute').findOne({ guild: guildID, user: user.id })
       // Figure out the time for which the user is muted.
       let time = 0
       try { time = ms(args[0]) || 0 } catch (e) { }
+      if (time && time >= 2073600000) return 'Mute limit is 24 days.'
+      const mute = await db.collection('tasks').findOne({ type: 'unmute', guild: guildID, user: user.id })
       if (!mute && time > 0) {
         // Insert the persisted mute.
-        await db.collection('mute').insertOne({
-          guild: guildID, user: user.id, till: Date.now() + time, time
+        await db.collection('tasks').insertOne({
+          type: 'unmute', guild: guildID, user: user.id, target: role.id, time: time + Date.now()
         })
-      } else if (!mute) await db.collection('mute').insertOne({ guild: guildID, user: user.id })
-      // If this was modifying a previous mute.
-      else if (mute && time > 0) {
-        await db.collection('mute').updateOne({ guild: guildID, user: user.id }, {
-          $set: { till: Date.now() + time, time }
-        })
-      } else if (mute) {
-        await db.collection('mute').updateOne({ guild: guildID, user: user.id }, {
-          $set: { till: 0, time: 0 }
+        // If this was modifying a previous mute.
+      } else if (mute && time > 0) {
+        await db.collection('tasks').updateOne({ type: 'unmute', guild: guildID, user: user.id }, {
+          $set: { time: time + Date.now() }
         })
       }
-    } catch (e) { return 'Failed to persist mute! However, user has been muted.' }
-    */
-    if (!tempDB.mute[guildID]) tempDB.mute[guildID] = []
-    if (!tempDB.mute[guildID].includes(user.id)) tempDB.mute[guildID].push(user.id)
-    // If time given, set timeout.
+    } catch (e) { return 'Failed to add mute timer! However, user has been muted.' }
+    // Persist in cache.
+    if (!tempDB.mute[guildID]) tempDB.mute[guildID] = [user.id]
+    else if (!tempDB.mute[guildID].includes(user.id)) tempDB.mute[guildID].push(user.id)
+    /*
     try {
       if (ms(args[0]) && ms(args[0]) >= 2073600000) return 'Mute limit is 24 days.'
       else if (ms(args[0])) {
@@ -117,6 +113,7 @@ export const handleMute: Command = {
         }, ms(args[0]))
       }
     } catch (e) {}
+    */
     return 'Muted.'
   }
 }
