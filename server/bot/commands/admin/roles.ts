@@ -33,6 +33,11 @@ export const handleGiverole: Command = {
     // Can the user manage this role?
     if (role.position >= checkRolePosition(message.member) && !isPublicRole
     ) return `You cannot give this role. Pfft, overestimating their own powers now.`
+    // Can the bot manage this role?
+    if (
+      role.position >= checkRolePosition(message.member.guild.members.get(client.user.id)) ||
+      !message.member.guild.members.get(client.user.id).permission.has('manageRoles')
+    ) return `I lack permissions to give this role, you ${getInsult()}.`
     // Give the role.
     const rolesOfMember = user.id !== message.author.id // Ternary statement.
       ? message.member.guild.members.find(a => a.id === user.id).roles
@@ -86,6 +91,11 @@ export const handleTakerole: Command = {
     // Can the user manage this role?
     if (role.position >= checkRolePosition(message.member) && !isPublicRole
     ) return `You cannot take this role. Pfft, overestimating their own powers now.`
+    // Can the bot manage this role?
+    if (
+      role.position >= checkRolePosition(message.member.guild.members.get(client.user.id)) ||
+      !message.member.guild.members.get(client.user.id).permission.has('manageRoles')
+    ) return `I lack permissions to take this role, you ${getInsult()}.`
     // Give the role.
     const rolesOfMember = user.id !== message.author.id // Ternary statement.
       ? message.member.guild.members.find(a => a.id === user.id).roles
@@ -119,7 +129,7 @@ export const handleNotify: Command = {
     deleteCommand: true,
     requirements: { permissions: { 'manageRoles': true } }
   },
-  generator: async (message, args) => {
+  generator: async (message, args, { client }) => {
     // Find the role.
     const arg = args.shift()
     const role = message.member.guild.roles.find(
@@ -129,6 +139,12 @@ export const handleNotify: Command = {
     // Can the user manage this role?
     if (role.position >= checkRolePosition(message.member) && !role.mentionable
     ) return `You cannot notify this role, you ${getInsult()}.`
+    // Can the bot manage this role?
+    if (
+      (role.position >= checkRolePosition(message.member.guild.members.get(client.user.id)) ||
+      !message.member.guild.members.get(client.user.id).permission.has('manageRoles')) &&
+      !role.mentionable
+    ) return `I cannot notify this role, you ${getInsult()}.`
     // Edit the role.
     const wasMentionable = role.mentionable
     if (!wasMentionable) await role.edit({ mentionable: true })

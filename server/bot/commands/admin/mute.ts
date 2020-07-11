@@ -71,6 +71,11 @@ export const handleMute: Command = {
         })
       } catch (e) { return 'I cannot set permissions for the Muted role.' }
     }
+    // Can the bot manage this role?
+    if (
+      role.position >= checkRolePosition(message.member.guild.members.get(client.user.id)) ||
+      !message.member.guild.members.get(client.user.id).permission.has('manageRoles')
+    ) return `I lack permissions to mute people with the role, you ${getInsult()}.`
     // Mute person.
     try {
       await client.addGuildMemberRole(message.member.guild.id, user.id, role.id, args.join(' '))

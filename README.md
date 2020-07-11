@@ -4,64 +4,73 @@ The bot that created the iPhone X. It's strictly private. You may run it locally
 
 **Requires Node.js 8.5.0 or higher.**
 
+It includes many different and useful commands, from games to tools, utilities, fun commands and moderation. It also uses Next.js to provide a web dashboard as part of the bot itself.
+
 It's planned to have some nifty commands like /assistant which directly communicates with the Google Assistant gRPC API. You heard that, Google Assistant in a Discord bot.
 
-2.0 is built upon Next.js with administrative commands and a web dashboard. 3.0 in development uses Eris and is a rewritten and refined codebase focused on stability and a framework for further enhancements.
+1.0 and 2.0 used discord.io while 3.0 uses Eris and is much more refined and full-featured. It is highly recommended to use 3.0 as older versions are unsupported and may not connect to Discord's API gateway anymore.
 
 <hr />
 <details><summary>Commands</summary>
 
 <br />
 
-\`/halp\` and \`/help\` - The most innovative help.
+`/halp` and `/help` - The most innovative help.
 
 **Games.**
 
-- \`/gunfight\`
-- \`/random\`
-- \`/randomword\`
-- \`/choose\`
-- \`/reverse\`
-- \`/8ball\`
-- \`/repeat\`
-- \`/calculate\`
-- \`/distort\`
+- `/gunfight`
+- `/random`
+- `/randomword`
+- `/choose`
+- `/reverse`
+- `/8ball`
+- `/repeat`
+- `/calculate`
+- `/distort`
 
 **Random searches.**
 
-- \`/urban\`
-- \`/cat\` and \`/dog\`
-- \`/robohash\`
-- \`/zalgo\` \`/dezalgo\`
-- \`/namemc\`
-- \`/astronomy-picture-of-the-day\` or \`/apod\`
-- \`/currency\`
+- `/urban`
+- `/cat` and `/dog`
+- `/robohash`
+- `/zalgo` `/dezalgo`
+- `/namemc`
+- `/astronomy-picture-of-the-day` or `/apod`
+- `/currency`
+- `/xkcd`
+- `/httpcat`
 
 **Utilities.**
 
-- \`/request\` (for test pilots)
-- \`/token\`
-- \`/weather\`
-- \`/say\` | \`/type\`
-- \`/editLastSay\`
-- \`/remindme\`
-- \`/leave\`
-- \`/ocr\`
-- \`/avatar\`
-- \`/userinfo\`
-- \`/serverinfo\`
-- \`/about\`, \`/ping\`, \`/uptime\` and \`/version\`
-- \`/giverole\` and \`/takerole\`
+- `/request`
+- `/token`
+- `/weather`
+- `/say` | `/type`
+- `/editLastSay`
+- `/remindme`
+- `/leave`
+- `/ocr`
+- `/avatar`
+- `/userinfo`
+- `/serverinfo`
+- `/creationtime`
+- `/about`, `/ping`, `/uptime` and `/version`
+- `/emojiImage`
+- `/giverole` and `/takerole`
+- `/notify`
 
 **Administrative commands.**
 
-- \`/deleteChannel\` and \`/editChannel\`
-- \`/changeserverregion\` and \`/listserverregions\`
-- \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
-- \`/warn\` and \`/warnings\` | \`/clearwarns\` and \`/removewarn\`
-- \`/addEmoji\`, \`/deleteEmoji\`, \`/emojiImage\` and \`/editEmoji\`
-- \`/purge\`
-- \`/slowmode\`
+- `/deleteChannel` and `/editChannel`
+- `/changeserverregion` and `/listserverregions`
+- `/ban`, `/unban`, `/kick`, `/mute` and `/unmute`
+- `/warn` and `/warnings` | `/clearwarns` and `/removewarn`
+- `/addEmoji`, `/deleteEmoji` and `/editEmoji`
+- `/purge`
+- `/slowmode`
+
+[Complete list of commands along with their descriptions available here.](https://github.com/retrixe/IveBot/blob/master/server/bot/commands/help.ts#L6)
 
 </details>
 <hr />

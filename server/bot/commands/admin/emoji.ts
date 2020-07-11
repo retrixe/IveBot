@@ -71,7 +71,11 @@ export const handleDeleteemoji: Command = {
     guildOnly: true,
     requirements: { permissions: { 'manageEmojis': true } }
   },
-  generator: async (message, args) => {
+  generator: async (message, args, { client }) => {
+    // Check bot permissions.
+    if (!message.member.guild.members.get(client.user.id).permission.has('manageEmojis')) {
+      return `I don't even have permissions to do that, you ${getInsult()}.`
+    }
     // Try deleting it, else throw an error.
     try {
       const emoji = message.member.guild.emojis.find(
@@ -98,9 +102,13 @@ export const handleEditemoji: Command = {
     guildOnly: true,
     requirements: { permissions: { 'manageEmojis': true } }
   },
-  generator: async (message, args) => {
+  generator: async (message, args, { client }) => {
     // Check if enough arguments were provided.
     if (args.length !== 2) return 'Correct usage: /editEmoji <emoji by ID/mention/name> <new name>'
+    // Check bot permissions.
+    if (!message.member.guild.members.get(client.user.id).permission.has('manageEmojis')) {
+      return `I don't even have permissions to do that, you ${getInsult()}.`
+    }
     // Try editing it, else throw an error.
     try {
       const emoji = message.member.guild.emojis.find(

@@ -44,6 +44,11 @@ export const handlePurge: Command = {
     if (
       isNaN(+args[0]) || args.length !== 1 || +args[0] <= 0 || +args[0] > 100
     ) { return 'Correct usage: /purge <number greater than 0 and less than 100>' }
+    // Check bot for permissions.
+    const permission = message.member.guild.channels.get(message.channel.id).permissionsOf(client.user.id)
+    if (!permission.has('manageMessages')) {
+      return `I lack permission to purge messages in this channel, you ${getInsult()}.`
+    }
     // Pre-defined variables.
     let messages: Array<Message>
     // Get the list of messages.
@@ -130,16 +135,22 @@ export const handleSlowmode: Command = {
       permissions: { 'manageChannels': true },
       custom: (message) => (
         message.member.guild.channels.get(message.channel.id)
-          .permissionsOf(message.author.id).has('manageChannels')
+          .permissionsOf(message.author.id).has('manageChannels') ||
+        message.member.guild.channels.get(message.channel.id)
+          .permissionsOf(message.author.id).has('manageMessages')
       )
     }
   },
   generator: async (message, args, { client }) => {
-    // Check user for permissions.
     const t = +args[0]
     if (
       (isNaN(t) && args[0] !== 'off') || !args[0] || t < 0 || t > 120 || args.length > 1
     ) { return 'Correct usage: /slowmode <number in seconds, max: 120 or off>' }
+    // Check bot for permissions.
+    const permission = message.member.guild.channels.get(message.channel.id).permissionsOf(client.user.id)
+    if (!permission.has('manageMessages') && !permission.has('manageChannels')) {
+      return `I lack permission to set slowmode in this channel, you ${getInsult()}.`
+    }
     // Set slowmode.
     try {
       await client.editChannel(message.channel.id, { rateLimitPerUser: isNaN(t) ? 0 : t })

@@ -95,6 +95,10 @@ export const handleUnban: Command = {
     requirements: { permissions: { 'banMembers': true } }
   },
   generator: async (message, args, { client }) => {
+    // Check bot for permissions.
+    if (!message.member.guild.members.get(client.user.id).permission.has('banMembers')) {
+      return `I lack permission to unban members, you ${getInsult()}.`
+    }
     // Find the user ID.
     const userSpecified = args.shift()
     let user: User

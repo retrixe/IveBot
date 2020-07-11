@@ -12,12 +12,18 @@ export const handleDeletechannel: Command = {
     guildOnly: true,
     requirements: { permissions: { 'manageChannels': true } }
   },
-  generator: async (message, args) => {
+  generator: async (message, args, { client }) => {
     // Get the channel ID.
     const channel = getChannel(message, args.shift())
     if (!channel) return `Specify a valid channel, you ${getInsult()}!`
+    // If no permission to manage channels, say it.
+    if (!message.member.guild.members.get(client.user.id).permission.has('manageChannels')) {
+      return 'I can\'t even delete that channel, you ' + getInsult() + '.'
+    }
     // Delete it.
-    await channel.delete(args.join(' '))
+    try {
+      await channel.delete(args.join(' '))
+    } catch (e) { return 'I was unable to delete that channel >_<' }
     // Confirm the delete.
     return `Channel \`${channel.name}\` deleted.`
   }
@@ -36,10 +42,14 @@ export const handleEditchannel: Command = {
     guildOnly: true,
     requirements: { permissions: { 'manageChannels': true } }
   },
-  generator: async (message, args) => {
+  generator: async (message, args, { client }) => {
     // Get the channel ID.
     const channel = getChannel(message, args.shift())
     if (!channel) return `Specify a valid channel, you ${getInsult()}!`
+    // If no permission to manage channel, say it.
+    if (!channel.permissionsOf(client.user.id).has('manageChannels')) {
+      return 'I can\'t edit that channel, you ' + getInsult() + '.'
+    }
     // Get the operations.
     const ops: string[] = args.join(' ').split('|')
     // Now iterate over each operation and execute them.
@@ -69,8 +79,8 @@ export const handleEditchannel: Command = {
         })
       } else if (name === 'nsfw' && value !== 'true' && value !== 'false') {
         failedOps.push({ name: `❌ ${operation}`, value: 'NSFW must be either true or false.' })
-      } else if (name === 'bitrate' && (isNaN(+value) || +value < 8 || +value > 96)) {
-        failedOps.push({ name: `❌ ${operation}`, value: 'bitrate must be a number between 8-96.' })
+      } else if (name === 'bitrate' && (isNaN(+value) || +value < 8 || +value > 384)) {
+        failedOps.push({ name: `❌ ${operation}`, value: 'bitrate must be a number between 8-384.' })
       } else if (name === 'userLimit' && (isNaN(+value) || +value > 99 || +value < 0)) {
         failedOps.push({ name: `❌ ${operation}`, value: 'userLimit must be a number between 0-99.' })
         // Now we edit the channel.
