@@ -20,13 +20,19 @@ export const handleOcr: Command = {
     usage: '/ocr (--hastebin) <link to image/uploaded image>',
     argsRequired: false
   },
-  generator: async (message, args) => {
+  generator: async (message, args, { client }) => {
     // To hasteb.in or not to hasteb.in.
     const useHastebin = args[0] === '--hastebin'
     if (useHastebin) args.shift()
     // Get the image and convert it to Base64.
     try {
-      const url = args.length ? args.join('%20') : message.attachments[0].url
+      // Check if a message link was passed.
+      const regex = /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
+      let url = args.length ? args.join('%20') : message.attachments[0].url
+      if (regex.test(url)) {
+        const split = url.split('/')
+        url = (await client.getMessage(split[split.length - 2], split.pop())).attachments[0].url
+      }
       // const image = Buffer.from(await (await fetch(url)).arrayBuffer()).toString('base64')
       const fetchedImage = await fetchLimited(url, 16)
       if (fetchedImage === false) return 'The file provided is larger than 16 MB!'
