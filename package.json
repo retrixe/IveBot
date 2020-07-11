@@ -1,6 +1,6 @@
 {
   "name": "ivebot",
-  "version": "3.0.0-canary.8",
+  "version": "3.0.0",
   "description": "The bot that created the iPhone X.",
   "main": "server/index.ts",
   "scripts": {
