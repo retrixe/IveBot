@@ -4,13 +4,15 @@ import CommandParser from '../client'
 import { Db } from 'mongodb'
 
 export type DB = {
-  gunfight: Array<{
-    challenged: string,
-    challenger: string,
-    accepted: boolean,
-    randomWord: string,
-    channelID: string
-  }>,
+  gunfight: {
+    [key: string]: {
+      randomWord: string,
+      timestamp: number,
+      channelID: string,
+      accepted: boolean,
+      wordSaid: boolean
+    }
+  },
   say: {
     // Channels.
     [index: string]: string

@@ -109,17 +109,17 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
   else if (command.startsWith('iphone x')) sendResponse(`You don't deserve it. 😎`)
   else if (command.startsWith('triggered')) sendResponse('Ah, pathetic people again.')
   else if (command.startsWith('ayy')) sendResponse('lmao')
-  // TODO: Handle answers to gunfight.
-  /* else if (['fire', 'water', 'gun', 'dot'].includes(command)) {
-    const gunfight = tempDB.gunfight.find(i => i.randomWord === command && (
-      i.challenged === message.author.id || i.challenger === message.author.id
-    ) && i.wordSaid)
-    if (!gunfight) return
+  // Handle answers to gunfight.
+  else if (['fire', 'water', 'gun', 'dot'].includes(command)) {
+    const key = Object.keys(tempDB.gunfight).find(i => (
+      i.split('-')[0] === message.author.id || i.split('-')[1] === message.author.id
+    ))
+    if (!key) return
+    const gunfight = tempDB.gunfight[key]
+    if (!gunfight || !gunfight.wordSaid || gunfight.randomWord !== command) return
     sendResponse(`${message.author.mention} won!`)
-    tempDB.gunfight.splice(tempDB.gunfight.findIndex(i => i.randomWord === command && (
-      i.challenged === message.author.id || i.challenger === message.author.id
-    )), 1)
-  } */
+    delete tempDB.gunfight[key]
+  }
 
   // Get settings, server specific from now on.
   if (!message.member) return
