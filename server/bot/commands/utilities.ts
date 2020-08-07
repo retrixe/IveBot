@@ -299,7 +299,7 @@ export const handleType: Command = {
 
 export const handleRemindme: Command = {
   name: 'remindme',
-  aliases: ['rm'],
+  aliases: ['rm', 'reminder', 'remind'],
   opts: {
     fullDescription: 'Remind you of something.',
     description: 'Reminders.',

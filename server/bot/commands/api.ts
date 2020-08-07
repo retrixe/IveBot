@@ -31,7 +31,8 @@ export const handleOcr: Command = {
       let url = args.length ? args.join('%20') : message.attachments[0].url
       if (regex.test(url)) {
         const split = url.split('/')
-        url = (await client.getMessage(split[split.length - 2], split.pop())).attachments[0].url
+        const mess = await client.getMessage(split[split.length - 2], split.pop())
+        url = /^https?:\/\/\S+$/.test(mess.content) ? mess.content : mess.attachments[0].url
       }
       // const image = Buffer.from(await (await fetch(url)).arrayBuffer()).toString('base64')
       const fetchedImage = await fetchLimited(url, 16)
