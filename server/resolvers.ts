@@ -28,7 +28,7 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
       _: string, { serverId, linkToken }: { serverId: string, linkToken: string }
     ) => {
       const member = ctx.client.guilds
-        .find(t => t.id === serverId).members.find(t => t.id === ctx.tempDB.link[linkToken])
+        .find(t => t.id === serverId).members.get(ctx.tempDB.link[linkToken])
       let {
         addRoleForAll, joinLeaveMessages, joinAutorole, ocrOnSend
       } = await getServerSettings(db, serverId)
@@ -116,7 +116,7 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
         serverId, linkToken, addRoleForAll, joinAutorole, joinLeaveMessages, ocrOnSend
       } = input
       const member = ctx.client.guilds
-        .find(t => t.id === serverId).members.find(t => t.id === ctx.tempDB.link[linkToken])
+        .find(t => t.id === serverId).members.get(ctx.tempDB.link[linkToken])
       if (member.permission.has('manageGuild') || host === ctx.tempDB.link[linkToken]) {
         await getServerSettings(db, serverId)
         await db.collection('servers').updateOne({ serverID: serverId }, { $set: {

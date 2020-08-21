@@ -1,7 +1,7 @@
 import { Command } from '../../imports/types'
 import { getInsult, getUser } from '../../imports/tools'
 import { checkRolePosition } from '../../imports/permissions'
-import { Message } from 'eris'
+import { Message, GuildTextableChannel } from 'eris'
 export { handleAddemoji, handleDeleteemoji, handleEditemoji, handleEmojiimage } from './emoji'
 export { handleWarn, handleWarnings, handleClearwarns, handleRemovewarn } from './warn'
 export { handleGiverole, handleTakerole, handleNotify } from './roles'
@@ -34,7 +34,7 @@ export const handlePurge: Command = {
     requirements: {
       permissions: { 'manageMessages': true },
       custom: (message) => (
-        message.member.guild.channels.get(message.channel.id)
+        (message.channel as GuildTextableChannel)
           .permissionsOf(message.author.id).has('manageMessages')
       )
     }
@@ -45,7 +45,7 @@ export const handlePurge: Command = {
       isNaN(+args[0]) || args.length !== 1 || +args[0] <= 0 || +args[0] > 100
     ) { return 'Correct usage: /purge <number greater than 0 and less than 100>' }
     // Check bot for permissions.
-    const permission = message.member.guild.channels.get(message.channel.id).permissionsOf(client.user.id)
+    const permission = (message.channel as GuildTextableChannel).permissionsOf(client.user.id)
     if (!permission.has('manageMessages')) {
       return `I lack permission to purge messages in this channel, you ${getInsult()}.`
     }
@@ -88,7 +88,7 @@ export const handleKick: Command = {
     const f = parseSilentDelete(args)
     // If we can't ban the person..
     if (
-      message.member.guild.members.find(i => i.user === user) &&
+      message.member.guild.members.get(user.id) &&
       (checkRolePosition(message.member.guild.members.get(user.id)) >=
         checkRolePosition(message.member.guild.members.get(client.user.id)) ||
         !message.member.guild.members.get(client.user.id).permission.has('banMembers'))
@@ -134,9 +134,9 @@ export const handleSlowmode: Command = {
     requirements: {
       permissions: { 'manageChannels': true },
       custom: (message) => (
-        message.member.guild.channels.get(message.channel.id)
+        (message.channel as GuildTextableChannel)
           .permissionsOf(message.author.id).has('manageChannels') ||
-        message.member.guild.channels.get(message.channel.id)
+        (message.channel as GuildTextableChannel)
           .permissionsOf(message.author.id).has('manageMessages')
       )
     }
@@ -147,7 +147,7 @@ export const handleSlowmode: Command = {
       (isNaN(t) && args[0] !== 'off') || !args[0] || t < 0 || t > 120 || args.length > 1
     ) { return 'Correct usage: /slowmode <number in seconds, max: 120 or off>' }
     // Check bot for permissions.
-    const permission = message.member.guild.channels.get(message.channel.id).permissionsOf(client.user.id)
+    const permission = (message.channel as GuildTextableChannel).permissionsOf(client.user.id)
     if (!permission.has('manageMessages') && !permission.has('manageChannels')) {
       return `I lack permission to set slowmode in this channel, you ${getInsult()}.`
     }

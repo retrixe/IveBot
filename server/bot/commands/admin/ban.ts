@@ -43,7 +43,7 @@ export const handleBan: Command = {
     if (!user) return `Specify a valid user, ${getInsult()}.`
     // If the user cannot ban the person..
     if (
-      message.member.guild.members.find(i => i.user === user) &&
+      message.member.guild.members.get(user.id) &&
       checkRolePosition(message.member.guild.members.get(user.id)) >=
       checkRolePosition(message.member)
     ) return `You cannot ban this person, you ${getInsult()}.`
@@ -51,7 +51,7 @@ export const handleBan: Command = {
     const f = parseSilentDelete(args)
     // If we can't ban the person..
     if (
-      message.member.guild.members.find(i => i.user === user) &&
+      message.member.guild.members.get(user.id) &&
       (checkRolePosition(message.member.guild.members.get(user.id)) >=
       checkRolePosition(message.member.guild.members.get(client.user.id)) ||
       !message.member.guild.members.get(client.user.id).permission.has('banMembers'))

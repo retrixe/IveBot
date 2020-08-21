@@ -40,7 +40,7 @@ export const handleGiverole: Command = {
     ) return `I lack permissions to give this role, you ${getInsult()}.`
     // Give the role.
     const rolesOfMember = user.id !== message.author.id // Ternary statement.
-      ? message.member.guild.members.find(a => a.id === user.id).roles
+      ? message.member.guild.members.get(user.id).roles
       : message.member.roles
     if (rolesOfMember.includes(role.id)) {
       return user.id === message.author.id // Ternary statement.
@@ -98,7 +98,7 @@ export const handleTakerole: Command = {
     ) return `I lack permissions to take this role, you ${getInsult()}.`
     // Give the role.
     const rolesOfMember = user.id !== message.author.id // Ternary statement.
-      ? message.member.guild.members.find(a => a.id === user.id).roles
+      ? message.member.guild.members.get(user.id).roles
       : message.member.roles
     if (!rolesOfMember.includes(role.id)) {
       return user.id === message.author.id // Ternary statement.

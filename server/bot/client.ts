@@ -1,4 +1,4 @@
-import { Message, MessageContent, Client } from 'eris'
+import { Message, MessageContent, Client, GuildTextableChannel } from 'eris'
 import { DB, Command as IveBotCommand, IveBotCommandGenerator, Context } from './imports/types'
 import { Db } from 'mongodb'
 import { getInsult } from './imports/tools'
@@ -159,7 +159,7 @@ export default class CommandParser {
     let sent
     if ( // No permission protection is here as well.
       messageToSend && ((message.member &&
-      message.member.guild.channels.get(message.channel.id)
+      (message.channel as GuildTextableChannel)
         .permissionsOf(this.client.user.id).has('sendMessages')) || message.channel.type === 1)
     ) sent = await message.channel.createMessage(this.disableEveryone(messageToSend))
     if (command.postGenerator) command.postGenerator(message, args, sent, context)

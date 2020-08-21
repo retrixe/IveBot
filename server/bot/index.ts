@@ -1,6 +1,6 @@
 // We need types.
 import { DB } from './imports/types'
-import { Member, Message, Client, User, Guild } from 'eris'
+import { Member, Message, Client, User, Guild, GuildTextableChannel } from 'eris'
 import { Db } from 'mongodb'
 
 // Database reading function.
@@ -97,7 +97,7 @@ export const guildDelete = (db: Db) => async (guild: Guild) => {
 export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
   try {
     if ( // If there are no permissions do not do anything.
-      !message.member.guild.channels.get(message.channel.id)
+      !(message.channel as GuildTextableChannel)
         .permissionsOf(client.user.id).has('sendMessages')
     ) return
   } catch (e) {}

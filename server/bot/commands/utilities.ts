@@ -104,7 +104,7 @@ export const handleUserinfo: Command = {
     }
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
     // Display information.
-    const member = message.member.guild.members.find(i => i.user.id === user.id)
+    const member = message.member.guild.members.get(user.id)
     const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
       (a, b) => a.position > b.position ? -1 : 1
     ).find(i => i.color !== 0) || { color: 0 }).color : 0
@@ -117,7 +117,7 @@ export const handleUserinfo: Command = {
         thumbnail: { url: user.dynamicAvatarURL('png', 2048) },
         color,
         fields: [
-          { name: 'Status', value: member ? member.status : 'N/A', inline: true },
+          { name: 'Status', value: member && member.status ? member.status : 'N/A', inline: true },
           // { name: 'Join Position }
           // { name: 'Name', value: user.username, inline: true },
           // { name: 'Discriminator', value: user.discriminator, inline: true },
@@ -438,7 +438,7 @@ export const handleChangeserverregion: Command = {
     invalidUsageMessage: 'Correct usage: /changeserverregion <valid server region, /listserverregion>'
   },
   generator: async (message, args, { client }) => {
-    if (!message.member.guild.members.find(a => a.id === client.user.id).permission.has('manageGuild')) {
+    if (!message.member.guild.members.get(client.user.id).permission.has('manageGuild')) {
       return 'I require the Manage Server permission to do that..'
     }
     try {

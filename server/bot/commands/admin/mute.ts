@@ -21,7 +21,7 @@ export const handleMute: Command = {
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
     // Respect role order.
     if (
-      checkRolePosition(message.member.guild.members.find(i => i.user === user), true, false) >=
+      checkRolePosition(message.member.guild.members.get(user.id), true, false) >=
       checkRolePosition(message.member, true, false)
     ) return `You cannot mute this person, you ${getInsult()}.`
 
@@ -139,7 +139,7 @@ export const handleUnmute: Command = {
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
     // Respect role order.
     if (
-      checkRolePosition(message.member.guild.members.find(i => i.user === user), true, false) >=
+      checkRolePosition(message.member.guild.members.get(user.id), true, false) >=
       checkRolePosition(message.member, true, false)
     ) {
       return `You cannot mute this person, you ${getInsult()}.`

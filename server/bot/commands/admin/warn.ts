@@ -22,7 +22,7 @@ export const handleWarn: Command = {
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
     // Respect role order.
     if (
-      checkRolePosition(message.member.guild.members.find(i => i.user === user)) >=
+      checkRolePosition(message.member.guild.members.get(user.id)) >=
       checkRolePosition(message.member)
     ) {
       return `You cannot warn this person, you ${getInsult()}.`
@@ -131,7 +131,7 @@ export const handleClearwarns: Command = {
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
     // Respect role order.
     if (
-      checkRolePosition(message.member.guild.members.find(i => i.user === user)) >=
+      checkRolePosition(message.member.guild.members.get(user.id)) >=
       checkRolePosition(message.member)
     ) {
       return `You cannot clear the warnings of this person, you ${getInsult()}.`
@@ -166,7 +166,7 @@ export const handleRemovewarn: Command = {
     if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
     // Respect role order.
     if (
-      checkRolePosition(message.member.guild.members.find(i => i.user === user)) >=
+      checkRolePosition(message.member.guild.members.get(user.id)) >=
       checkRolePosition(message.member)
     ) {
       return `You cannot remove a warning from this person, you ${getInsult()}.`
