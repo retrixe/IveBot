@@ -30,7 +30,6 @@ module.exports = {
     '@typescript-eslint/no-angle-bracket-type-assertion': ['error'],
     // Fix no-unused-vars.
     '@typescript-eslint/no-unused-vars': ['error'],
-
     // Make TypeScript ESLint less strict.
     '@typescript-eslint/member-delimiter-style': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
