@@ -26,7 +26,7 @@ export const handleTrivia: Command = {
     guildOnly: true,
     argsRequired: true
   },
-  generator: async (message: Message, args: string[], { tempDB }) => {
+  generator: async (message: Message, args: string[], { tempDB, client }) => {
     let botPlays = false
     let timeLimit = 15000
     let maxScore = 30
@@ -91,7 +91,7 @@ export const handleTrivia: Command = {
         } catch (err) {
           return 'That trivia list doesn\'t exist.'
         }
-        const t = new TriviaSession(triviaList, message, botPlays, timeLimit, maxScore, revealAnswer, tempDB)
+        const t = new TriviaSession(triviaList, message, botPlays, timeLimit, maxScore, revealAnswer, tempDB, client)
         tempDB.trivia[message.channel.id] = t
         t.newQuestion()
       } else {

@@ -84,8 +84,9 @@ export class TriviaSession {
   timeout: number
   count: number
   tempDB: DB
+  client: Client
 
-  constructor (triviaList: {question: string, answers: string[]}[], message: Message, botPlays: boolean, timeLimit: number, maxScore: number, revealAnswers: boolean, tempDB: DB) {
+  constructor (triviaList: {question: string, answers: string[]}[], message: Message, botPlays: boolean, timeLimit: number, maxScore: number, revealAnswers: boolean, tempDB: DB, client: Client) {
     this.channel = message.channel
     this.author = message.author
     this.message = message
@@ -96,11 +97,12 @@ export class TriviaSession {
     this.count = 0
     this.timeout = Date.now()
     this.tempDB = tempDB
+    this.client = client
   }
 
   async sendScores () {
     const currentScores = Object.values(this.scores).sort((a: number, b: number) => b - a)
-    const member = this.message.member.guild.members.find(i => i.user.id === '383591525944262656')
+    const member = this.message.member.guild.members.find(i => i.user.id === this.client.user.id)
     const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
       (a, b) => a.position > b.position ? -1 : 1
     ).find(i => i.color !== 0) || { color: 0 }).color : 0
@@ -175,7 +177,7 @@ export class TriviaSession {
         await this.stopTrivia()
         return true
       }
-      await sleep(1000)
+      await sleep(1000) // Wait for answer or timeout
     }
 
     if (this.status === 'correct answer') {
@@ -217,7 +219,7 @@ export class TriviaSession {
     for (let i = 0; i < this.currentLine.answers.length; i++) {
       let answer = this.currentLine.answers[i].toLowerCase()
       let guess = message.content.toLowerCase()
-      if (!(answer.includes(' '))) {
+      if (!(answer.includes(' '))) { // Strict answer checking for one word answers
         const guessWords = guess.split(' ')
         for (let j = 0; j < guessWords.length; j++) {
           if (guessWords[j] === answer) {
@@ -225,7 +227,7 @@ export class TriviaSession {
           }
         }
       } else {
-        if (guess.includes(answer)) {
+        if (guess.includes(answer)) { // The answer has spaces, checkign isn't as strict
           hasGuessed = true
         }
       }
