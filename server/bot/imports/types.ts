@@ -102,7 +102,7 @@ export class TriviaSession {
 
   async sendScores () {
     const currentScores = Object.values(this.scores).sort((a: number, b: number) => b - a)
-    const member = this.message.member.guild.members.find(i => i.user.id === this.client.user.id)
+    const member = this.message.member.guild.members.get(this.client.user.id)
     const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
       (a, b) => a.position > b.position ? -1 : 1
     ).find(i => i.color !== 0) || { color: 0 }).color : 0
