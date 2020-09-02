@@ -67,6 +67,7 @@ It's planned to have some nifty commands like /assistant which directly communic
 - `/ban`, `/unban`, `/kick`, `/mute` and `/unmute`
 - `/warn` and `/warnings` | `/clearwarns` and `/removewarn`
 - `/addEmoji`, `/deleteEmoji` and `/editEmoji`
+- `/perms`
 - `/purge`
 - `/slowmode`
 

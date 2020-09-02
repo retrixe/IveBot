@@ -328,7 +328,7 @@ export const handleType: Command = {
       ) return `**You don't have enough permissions for that, you ${getInsult()}.**`
       args.shift()
       if (args.join(' ') === 'pls adim me') args = ['no']
-      message.channel.sendTyping()
+      await client.sendChannelTyping(message.channelMentions[0])
       await (ms => new Promise(resolve => setTimeout(resolve, ms)))(
         args.join(' ').length * 120 > 8000 ? 8000 : args.join(' ').length * 120
       )
@@ -349,7 +349,7 @@ export const handleType: Command = {
     }
     // Send the message.
     if (args.join(' ') === 'pls adim me') args = ['no']
-    message.channel.sendTyping()
+    await message.channel.sendTyping()
     await (ms => new Promise(resolve => setTimeout(resolve, ms)))(
       args.join(' ').length * 120 > 8000 ? 8000 : args.join(' ').length * 120
     )
