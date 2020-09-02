@@ -153,7 +153,7 @@ export const handleRandom: Command = {
     // If argument length is 1 and the argument is a number..
     if (args.length === 1 && !isNaN(+args[0])) {
       const number = +args[0]
-      return `The number.. is.. ${Math.floor(Math.random() * 10) + number}`
+      return `The number.. is.. ${Math.floor(Math.random() * number)}`
       // If argument length is 2 and both arguments are numbers..
     } else if (args.length === 2 && !isNaN(+args[0]) && !isNaN(+args[1])) {
       const number1 = +args[0]

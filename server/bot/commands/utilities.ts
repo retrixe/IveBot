@@ -1,5 +1,5 @@
 // All the types!
-import { Message } from 'eris'
+import { Message, GuildTextableChannel } from 'eris'
 import { Command } from '../imports/types'
 // All the needs!
 import { getIdFromMention, getInsult, getUser } from '../imports/tools'
@@ -126,7 +126,6 @@ export const handleUserinfo: Command = {
             value: member ? moment(member.joinedAt).format('DD/MM/YYYY, hh:mm:ss A') : 'N/A',
             inline: true
           },
-          { name: 'User ID', value: user.id, inline: true },
           {
             name: 'Registered at',
             value: moment(user.createdAt).format('DD/MM/YYYY, hh:mm:ss A'),
@@ -137,9 +136,80 @@ export const handleUserinfo: Command = {
             value: member ? member.roles.map(i => member.guild.roles.get(i)).sort(
               (a, b) => a.position > b.position ? -1 : 1
             ).map(i => `<@&${i.id}>`).join(' ') : 'N/A'
-          }
-          // { name: 'Permissions' }
-        ]
+          },
+          { name: 'Permissions', value: member ? 'Run `/perms <user>` to get their permissions!' : 'N/A' }
+        ],
+        footer: { text: 'User ID: ' + user.id }
+      }
+    }
+  }
+}
+
+export const handlePermissions: Command = {
+  name: 'permissions',
+  aliases: ['perms'],
+  opts: {
+    description: 'Displays a particular member\'s permissions.',
+    fullDescription: 'Displays a particular member\'s permissions.',
+    example: '/permissions voldemort#6931',
+    usage: '/permissions (--ignore-admin) (user by ID/mention/username)',
+    argsRequired: false,
+    guildOnly: true,
+    requirements: { permissions: { manageRoles: true } }
+  },
+  generator: async (message, args, { client }) => {
+    const ignoreAdmin = args.includes('--ignore-admin')
+    if (ignoreAdmin) args.splice(args.indexOf('--ignore-admin'), 1)
+    // Find the user ID.
+    const toGet = args.length === 0 ? message.author.id : args.shift()
+    let user = getUser(message, toGet)
+    if (!user && message.author.id === host && [18, 17].includes(toGet.length) && !isNaN(+toGet)) {
+      try { user = await client.getRESTUser(toGet) } catch (e) { }
+    }
+    if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
+    // Display permission info.
+    const member = message.member.guild.members.get(user.id)
+    const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
+      (a, b) => a.position > b.position ? -1 : 1
+    ).find(i => i.color !== 0) || { color: 0 }).color : 0
+    const permissions = member.permission
+    const channelPerm = (message.channel as GuildTextableChannel).permissionsOf(user.id)
+    return {
+      content: `✅ **Permissions of ${user.username}:**`,
+      embed: {
+        author: {
+          name: `${user.username}#${user.discriminator}'s permissions`,
+          icon_url: user.avatarURL
+        },
+        description: user.mention,
+        color,
+        fields: [
+          {
+            name: 'Guild Permissions',
+            value: message.member.guild.ownerID === user.id && !ignoreAdmin
+              ? 'Owner! (use `/perms --ignore-admin` to show perms regardless)'
+              : permissions.has('administrator') && !ignoreAdmin
+                ? 'Administrator! (use `/perms --ignore-admin` to show perms regardless)'
+                : Object.keys(permissions.json).filter(perm => permissions.has(perm))
+                  .map(perm => (perm.substr(0, 1).toUpperCase() + perm.substr(1))
+                    .replace(/[A-Z]+/g, s => ' ' + s))
+                  .join(', ').replace('TTSMessages', 'TTS Messages')
+          },
+          !(message.member.guild.ownerID === user.id || permissions.has('administrator')) || ignoreAdmin
+            ? {
+              name: 'Channel Permissions',
+              value: (Object.keys(permissions.json)
+                .filter(perm => !permissions.has(perm) && channelPerm.has(perm))
+                .map(perm => (perm.substr(0, 1).toUpperCase() + perm.substr(1))
+                  .replace(/[A-Z]+/g, s => ' ' + s))
+                .join(', ') + Object.keys(permissions.json)
+                .filter(perm => permissions.has(perm) && !channelPerm.has(perm))
+                .map(perm => '**!(' + (perm.substr(0, 1).toUpperCase() + perm.substr(1))
+                  .replace(/[^(][A-Z]+/g, s => s.substr(0, 1) + ' ' + s.substr(1)) + ')**')
+                .join(', ')).replace('TTSMessages', 'TTS Messages')
+            } : { name: '', value: '' }
+        ].filter(e => !!e.value),
+        footer: { text: 'User ID: ' + user.id }
       }
     }
   }
@@ -318,13 +388,13 @@ export const handleRemindme: Command = {
           type: 'reminder',
           time: Date.now() + ms(args[0]),
           user: message.author.id,
-          target: channel ? message.channel.id : 'dm',
+          target: channel ? message.channel.id : (await message.author.getDMChannel()).id,
           message: `⏰${
             channel ? message.author.mention + ' ' : ''
           } ${args.slice(channel ? 2 : 1).join(' ')}\nReminder set ${args[0]} ago.`
         })
         if (res.insertedCount !== 1) return 'Failed to add a reminder to the database!'
-      } catch (e) { return 'Failed to add a reminder to the database!' }
+      } catch (e) { return 'Failed to add a reminder to the database!' + channel ? '' : ' Can I DM you?' }
     } else {
       setTimeout(async () => {
         channel
@@ -503,7 +573,7 @@ export const handleEditLastSay: Command = {
       message.channelMentions[0] === possibleChannel ||
       (message.member && message.member.guild.channels.has(possibleChannel))
     ) {
-      if (message.member && message.member.guild.channels.get(possibleChannel)
+      if (message.member && !message.member.guild.channels.get(possibleChannel)
         .permissionsOf(message.member.id).has('sendMessages')
       ) return `**You don't have enough permissions for that, you ${getInsult()}.**`
       // Edit the message.
