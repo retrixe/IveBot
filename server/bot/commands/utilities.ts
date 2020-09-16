@@ -1,5 +1,5 @@
 // All the types!
-import { Message, GuildTextableChannel } from 'eris'
+import Eris, { Message, TextChannel, GuildTextableChannel } from 'eris'
 import { Command } from '../imports/types'
 // All the needs!
 import { getIdFromMention, getInsult, getUser } from '../imports/tools'
@@ -586,5 +586,68 @@ export const handleEditLastSay: Command = {
     try {
       await client.editMessage(message.channel.id, tempDB.say[message.channel.id], args.join(' '))
     } catch (e) { return 'Nothing to edit.' }
+  }
+}
+
+export const handleSuppress: Command = {
+  name: 'suppress',
+  opts: {
+    requirements: {
+      permissions: { manageMessages: true }
+    },
+    description: 'Suppress or unsuppress embeds in a message.',
+    fullDescription: 'Suppress embeds in a message. If the message already has a suppressed embed, it will get unsuppressed. Requires \'Manage Messages\' permission',
+    usage: '/suppress (channel) <message ID or link>',
+    example: '/suppress #general 123456789012345678'
+  },
+  generator: async (message, args, { client }) => {
+    if (args.length === 1) {
+      let msg
+      let channelToEdit
+      const regex = /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
+      if (regex.test(args[0])) {
+        if (!((message.member.guild.channels.get(args[0].split('/')[5]) as TextChannel).messages.get(args[0].split('/')[6]))) {
+          msg = await client.getMessage(args[0].split('/')[5], args[0].split('/')[6])
+          channelToEdit = args[0].split('/')[5]
+        } else {
+          msg = (message.member.guild.channels.get(args[0].split('/')[5]) as TextChannel).messages.get(args[0].split('/')[6])
+          channelToEdit = args[0].split('/')[5]
+        }
+      } else {
+        if (!(message.channel.messages.get(args[0]))) {
+          msg = await message.channel.getMessage(args[0])
+          channelToEdit = message.channel.id
+        } else {
+          msg = message.channel.messages.get(args[0])
+          channelToEdit = message.channel.id
+        }
+      }
+      if (msg) {
+        await (client as unknown as { requestHandler: { request: (method: string, url: string, auth: boolean, body: object) => Promise<Object> } }).requestHandler.request('PATCH', `/channels/${channelToEdit}/messages/${msg.id}`, true, { flags: (msg as unknown as { flags: number }).flags ^ Eris.Constants.MessageFlags.SUPPRESS_EMBEDS })
+        message.addReaction('✅')
+      } else {
+        return `That's not a real message, you ${getInsult}`
+      }
+    } else if (args.length === 2) {
+      const channelToEdit = getIdFromMention(args[0])
+      if (message.member.guild.channels.get(channelToEdit).type === 0) {
+        let msg
+        if (!((message.member.guild.channels.get(channelToEdit) as TextChannel).messages.get(args[1]))) {
+          msg = await client.getMessage(channelToEdit, args[1])
+        } else {
+          msg = (message.member.guild.channels.get(channelToEdit) as TextChannel).messages.get(args[1])
+        }
+        if (msg) {
+          await (client as unknown as { requestHandler: { request: (method: string, url: string, auth: boolean, body: object) => Promise<Object> } }).requestHandler.request('PATCH', `/channels/${channelToEdit}/messages/${msg.id}`, true, { flags: (msg as unknown as { flags: number }).flags ^ Eris.Constants.MessageFlags.SUPPRESS_EMBEDS })
+          message.addReaction('✅')
+        } else {
+          return `That's not a real message, you ${getInsult}`
+        }
+      } else {
+        return `That's not a real channel, you ${getInsult}`
+      }
+    } else {
+      return 'Invalid usage.'
+    }
   }
 }
