@@ -122,7 +122,7 @@ export const handleRobohash: Command = {
   },
   generator: (message, args) => {
     // Get text to hash.
-    const target = args.shift()
+    const target = args.shift().toLowerCase()
     const text = args.join('%20')
     // Send a robohash.
     const color = 0xcf1c1c
