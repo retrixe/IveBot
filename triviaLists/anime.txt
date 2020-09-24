@@ -1,8 +1,6 @@
 ﻿Which genre is aimed at girls between 10-18?`shoujo
 When was the first known Japanese animation produced?`1917
 The practice of dressing up like anime characters in Japan is called?`cosplay
-In yaoi pairing, what is the "receiving", "bottom", or passive partner known as?`uke
-In yaoi pairing, what is the "top" or dominant partner known as?`seme
 What is a popular anime/manga character archetype that derives from the Japanese pronunciation of the English word 'cool'?`kuudere`coodere
 What is a Japanese term for a character development process that describes a person who is initially cold and even hostile towards another person before gradually showing their warm side over time?`tsundere
 Type of anime aimed at young boys under the age of fifteen?`shonen
@@ -10,14 +8,11 @@ Type of anime aimed at young men between the ages of 15-24?`seinen
 Type of anime aimed at adult women?`josei
 Type of anime largely focused on one distinct aspect: pilotable robots?`mecha`robot
 Type of anime about innocent young girls using a magical object to transform into a superhero version of themselves?`magical girl`mahou shoujo`majokko
-Type of anime which do not show sexual intercourse or genitalia, but sexual themes are referenced?`ecchi
 Type of anime where one male character, the protagonist, at the center of a group of female characters who are all vying for his romantic affections?`harem
 What character type is a heroine that started as a villain trying to kill the protagonist but then switched to his side after falling in love with him?`mayadere
 It's common in anime for a character to pull their lower eyelid down to taunt someone. What is this called?`akanabe
 What anime character type is known as a quiet and often antisocial character?`dandere
 What character type is very loving and gentle to someone before their devotion becomes destructive in nature, often through violence and/or brutality?`yandere
-What genre of anime covers female to female sexual relationships?`Yuri
-What genre of anime covers male to male sexual relationships?`Yaoi
 Which Hayao Miyazaki movie was based off of a book by a British author named Dianna Wynne Jones?`Castle in the sky
 As of 2015, among all the 17 long anime movies Hayao Miyazaki participated in, how many did he direct?`11`eleven
 (Angel Sanctuary) Who was the first demon to contact Setsuna?`Kurai
