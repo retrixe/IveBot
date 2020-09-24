@@ -224,10 +224,22 @@ export const handleDog: Command = {
       // Fetch a random picture for a sub-breed.
     } else if (args[0] && args[1]) {
       try {
-        const { message } = await (await fetch(
+        let { message } = await (await fetch(
           `http://dog.ceo/api/breed/${args[0].toLowerCase()}/${args[1].toLowerCase()}/images/random`
         )).json()
-        if (!message || message === 'Breed not found') return 'This breed/sub-breed does not exist!'
+        if (!message || message.includes('Breed not found')) {
+          ({ message } = await (await fetch(
+            `http://dog.ceo/api/breed/${args.join('').toLowerCase()}/images/random`
+          )).json())
+          if (!(message.includes('Beed not found'))) {
+            return {
+              embed: { image: { url: message }, color: 0x654321 },
+              content: `🐕 ${args.join('')}`
+            }
+          } else {
+            return 'This breed/sub-breed does not exist!'
+          }
+        }
         return {
           embed: { image: { url: message }, color: 0x654321 },
           content: `🐕 ${args[0]} ${args[1]}`
@@ -239,7 +251,7 @@ export const handleDog: Command = {
         const { message } = await (await fetch(
           `http://dog.ceo/api/breed/${args[0].toLowerCase()}/images/random`
         )).json()
-        if (!message || message === 'Breed not found') return 'This breed does not exist!'
+        if (!message || message.includes('Breed not found')) return 'This breed does not exist!'
         return { embed: { image: { url: message }, color: 0x654321 }, content: '🐕 ' + args[0] }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
     }
