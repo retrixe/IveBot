@@ -605,9 +605,9 @@ export const handleSuppress: Command = {
     example: '/suppress #general 123456789012345678'
   },
   generator: async (message, args, { client }) => {
+    let msg
+    let channelToEdit
     if (args.length === 1) {
-      let msg
-      let channelToEdit
       const regex = /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
       if (regex.test(args[0])) {
         const split = args[0].split('/')
@@ -618,30 +618,22 @@ export const handleSuppress: Command = {
         msg = message.channel.messages.get(args[0]) || await message.channel.getMessage(args[0])
         channelToEdit = message.channel.id
       }
+    } else if (args.length === 2) {
+      channelToEdit = getIdFromMention(args[0])
+      if (message.member.guild.channels.get(channelToEdit).type === 0) {
+        const channel = message.member.guild.channels.get(channelToEdit) as GuildTextableChannel
+        msg = channel.messages.get(args[1]) || await client.getMessage(channelToEdit, args[1])
+      } else return `That's not a real channel, you ${getInsult()}`
       if (msg) {
-        await (client as unknown as { requestHandler: { request: (method: string, url: string, auth: boolean, body: object) => Promise<Object> } }).requestHandler.request('PATCH', `/channels/${channelToEdit}/messages/${msg.id}`, true, { flags: (msg as unknown as { flags: number }).flags ^ Eris.Constants.MessageFlags.SUPPRESS_EMBEDS })
+        const { requestHandler } = client as unknown as { requestHandler: {
+            request: (method: string, url: string, auth: boolean, body: object) => Promise<Object>
+          }
+        }
+        await requestHandler.request('PATCH', `/channels/${channelToEdit}/messages/${msg.id}`, true, {
+          flags: (msg as unknown as { flags: number }).flags ^ Eris.Constants.MessageFlags.SUPPRESS_EMBEDS
+        })
         message.addReaction('✅')
       } else return `That's not a real message, you ${getInsult()}`
-    } else if (args.length === 2) {
-      const channelToEdit = getIdFromMention(args[0])
-      if (message.member.guild.channels.get(channelToEdit).type === 0) {
-        let msg
-        if (!((message.member.guild.channels.get(channelToEdit) as GuildTextableChannel).messages.get(args[1]))) {
-          msg = await client.getMessage(channelToEdit, args[1])
-        } else {
-          msg = (message.member.guild.channels.get(channelToEdit) as GuildTextableChannel).messages.get(args[1])
-        }
-        if (msg) {
-          const { requestHandler } = client as unknown as { requestHandler: {
-              request: (method: string, url: string, auth: boolean, body: object) => Promise<Object>
-            }
-          }
-          await requestHandler.request('PATCH', `/channels/${channelToEdit}/messages/${msg.id}`, true, {
-            flags: (msg as unknown as { flags: number }).flags ^ Eris.Constants.MessageFlags.SUPPRESS_EMBEDS
-          })
-          message.addReaction('✅')
-        } else return `That's not a real message, you ${getInsult()}`
-      } else return `That's not a real channel, you ${getInsult()}`
     } else return 'Invalid usage.'
   }
 }
