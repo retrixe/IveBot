@@ -224,8 +224,8 @@ export const handleDog: Command = {
       // Fetch a random picture for a sub-breed.
     } else if (args[0] && args[1]) {
       try {
-        let { message } = await (await fetch(
-          `http://dog.ceo/api/breed/${args[0].toLowerCase()}/${args[1].toLowerCase()}/images/random`
+        const { message } = await (await fetch(
+          `http://dog.ceo/api/breed/${args.join('').toLowerCase()}/${args[1].toLowerCase()}/images/random`
         )).json()
         if (!message || message.includes('Breed not found')) return 'This breed/sub-breed does not exist!'
         return {
