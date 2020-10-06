@@ -613,7 +613,7 @@ export const handleSuppress: Command = {
         const split = args[0].split('/')
         channel = message.member.guild.channels.get(split[5]) as GuildTextableChannel
         if (!channel) return `That's not a real channel, you ${getInsult()}.`
-        msg = channel.messages.get(split[6]) || await channel.getMessage(split[6]
+        msg = channel.messages.get(split[6]) || await channel.getMessage(split[6])
       } else {
         msg = message.channel.messages.get(args[0]) || await message.channel.getMessage(args[0])
         channel = message.channel
