@@ -606,34 +606,34 @@ export const handleSuppress: Command = {
   },
   generator: async (message, args, { client }) => {
     let msg
-    let channelToEdit
+    let channel
     if (args.length === 1) {
       const regex = /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
       if (regex.test(args[0])) {
         const split = args[0].split('/')
-        const channel = message.member.guild.channels.get(split[5]) as GuildTextableChannel
-        msg = channel.messages.get(split[6]) || await client.getMessage(split[5], split[6])
-        channelToEdit = split[5]
+        channel = message.member.guild.channels.get(split[5]) as GuildTextableChannel
+        if (!channel) return `That's not a real channel, you ${getInsult()}.`
+        msg = channel.messages.get(split[6]) || await channel.getMessage(split[6]
       } else {
         msg = message.channel.messages.get(args[0]) || await message.channel.getMessage(args[0])
-        channelToEdit = message.channel.id
+        channel = message.channel
       }
     } else if (args.length === 2) {
-      channelToEdit = getIdFromMention(args[0])
-      if (message.member.guild.channels.get(channelToEdit).type === 0) {
-        const channel = message.member.guild.channels.get(channelToEdit) as GuildTextableChannel
-        msg = channel.messages.get(args[1]) || await client.getMessage(channelToEdit, args[1])
-      } else return `That's not a real channel, you ${getInsult()}`
-      if (msg) {
-        const { requestHandler } = client as unknown as { requestHandler: {
-            request: (method: string, url: string, auth: boolean, body: object) => Promise<Object>
-          }
-        }
-        await requestHandler.request('PATCH', `/channels/${channelToEdit}/messages/${msg.id}`, true, {
-          flags: (msg as unknown as { flags: number }).flags ^ Eris.Constants.MessageFlags.SUPPRESS_EMBEDS
-        })
-        message.addReaction('✅')
-      } else return `That's not a real message, you ${getInsult()}`
+      channel = message.member.guild.channels.get(getIdFromMention(args[0])) as GuildTextableChannel
+      if (channel && channel.type === 0) {
+        msg = channel.messages.get(args[1]) || await channel.getMessage(args[1])
+      } else return `That's not a real channel, you ${getInsult()}.`
     } else return 'Invalid usage.'
+    if (msg) {
+      const { requestHandler } = client as unknown as {
+        requestHandler: {
+          request: (method: string, url: string, auth: boolean, body: object) => Promise<Object>
+        }
+      }
+      await requestHandler.request('PATCH', `/channels/${channel.id}/messages/${msg.id}`, true, {
+        flags: (msg as unknown as { flags: number }).flags ^ Eris.Constants.MessageFlags.SUPPRESS_EMBEDS
+      })
+      message.addReaction('✅')
+    } else return `That's not a real message, you ${getInsult()}.`
   }
 }
