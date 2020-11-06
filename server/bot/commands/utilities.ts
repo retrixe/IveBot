@@ -1,9 +1,5 @@
 // All the types!
-<<<<<<< HEAD
-import Eris, { Message, TextChannel, GuildTextableChannel } from 'eris'
-=======
 import Eris, { Message, GuildTextableChannel } from 'eris'
->>>>>>> 05cda48 (Apply suggestions from code review)
 import { Command } from '../imports/types'
 // All the needs!
 import { getIdFromMention, getInsult, getUser } from '../imports/tools'
@@ -600,7 +596,7 @@ export const handleSuppress: Command = {
       permissions: { manageMessages: true }
     },
     description: 'Suppress or unsuppress embeds in a message.',
-    fullDescription: 'Suppress embeds in a message. If the message already has a suppressed embed, it will get unsuppressed. Requires \'Manage Messages\' permission',
+    fullDescription: 'Suppress or unsuppress embeds in a message.',
     usage: '/suppress (channel) <message ID or link>',
     example: '/suppress #general 123456789012345678'
   },
@@ -612,7 +608,7 @@ export const handleSuppress: Command = {
       if (regex.test(args[0])) {
         const split = args[0].split('/')
         channel = message.member.guild.channels.get(split[5]) as GuildTextableChannel
-        if (!channel) return `That's not a real channel, you ${getInsult()}.`
+        if (!channel || channel.type !== 0) return `That's not a real channel, you ${getInsult()}.`
         msg = channel.messages.get(split[6]) || await channel.getMessage(split[6])
       } else {
         msg = message.channel.messages.get(args[0]) || await message.channel.getMessage(args[0])
@@ -624,14 +620,10 @@ export const handleSuppress: Command = {
         msg = channel.messages.get(args[1]) || await channel.getMessage(args[1])
       } else return `That's not a real channel, you ${getInsult()}.`
     } else return 'Invalid usage.'
+
     if (msg) {
-      const { requestHandler } = client as unknown as {
-        requestHandler: {
-          request: (method: string, url: string, auth: boolean, body: object) => Promise<Object>
-        }
-      }
-      await requestHandler.request('PATCH', `/channels/${channel.id}/messages/${msg.id}`, true, {
-        flags: (msg as unknown as { flags: number }).flags ^ Eris.Constants.MessageFlags.SUPPRESS_EMBEDS
+      await client.requestHandler.request('PATCH', `/channels/${channel.id}/messages/${msg.id}`, true, {
+        flags: msg.flags ^ Eris.Constants.MessageFlags.SUPPRESS_EMBEDS
       })
       message.addReaction('✅')
     } else return `That's not a real message, you ${getInsult()}.`
