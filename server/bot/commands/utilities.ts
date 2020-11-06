@@ -1,5 +1,5 @@
 // All the types!
-import { Message, GuildTextableChannel } from 'eris'
+import Eris, { Message, GuildTextableChannel } from 'eris'
 import { Command } from '../imports/types'
 // All the needs!
 import { getIdFromMention, getInsult, getUser } from '../imports/tools'
@@ -586,5 +586,46 @@ export const handleEditLastSay: Command = {
     try {
       await client.editMessage(message.channel.id, tempDB.say[message.channel.id], args.join(' '))
     } catch (e) { return 'Nothing to edit.' }
+  }
+}
+
+export const handleSuppress: Command = {
+  name: 'suppress',
+  opts: {
+    requirements: {
+      permissions: { manageMessages: true }
+    },
+    description: 'Suppress or unsuppress embeds in a message.',
+    fullDescription: 'Suppress or unsuppress embeds in a message.',
+    usage: '/suppress (channel) <message ID or link>',
+    example: '/suppress #general 123456789012345678'
+  },
+  generator: async (message, args, { client }) => {
+    let msg
+    let channel
+    if (args.length === 1) {
+      const regex = /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
+      if (regex.test(args[0])) {
+        const split = args[0].split('/')
+        channel = message.member.guild.channels.get(split[5]) as GuildTextableChannel
+        if (!channel || channel.type !== 0) return `That's not a real channel, you ${getInsult()}.`
+        msg = channel.messages.get(split[6]) || await channel.getMessage(split[6])
+      } else {
+        msg = message.channel.messages.get(args[0]) || await message.channel.getMessage(args[0])
+        channel = message.channel
+      }
+    } else if (args.length === 2) {
+      channel = message.member.guild.channels.get(getIdFromMention(args[0])) as GuildTextableChannel
+      if (channel && channel.type === 0) {
+        msg = channel.messages.get(args[1]) || await channel.getMessage(args[1])
+      } else return `That's not a real channel, you ${getInsult()}.`
+    } else return 'Invalid usage.'
+
+    if (msg) {
+      await client.requestHandler.request('PATCH', `/channels/${channel.id}/messages/${msg.id}`, true, {
+        flags: msg.flags ^ Eris.Constants.MessageFlags.SUPPRESS_EMBEDS
+      })
+      message.addReaction('✅')
+    } else return `That's not a real message, you ${getInsult()}.`
   }
 }
