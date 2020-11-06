@@ -113,7 +113,7 @@ export const handleHelp: IveBotCommand = {
 (Manage Server required to manage a server)`,
         embed: {
           color: 0x00AE86,
-          type: 'rich',
+          // type: 'rich',
           title: 'Help',
           ...generalHelp,
           footer: { text: 'For help on a specific command or aliases, run /help <command>.' }

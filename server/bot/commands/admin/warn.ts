@@ -45,7 +45,7 @@ export const handleWarn: Command = {
         content: `**${user.username}#${user.discriminator}** has been warned:`,
         embed: {
           color: 0x00AE86,
-          type: 'rich',
+          // type: 'rich',
           title: 'Information',
           description: `
   *| Moderator:** ${message.author.username}#${message.author.discriminator} **| Reason:** ${args.join(' ')}
