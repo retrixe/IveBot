@@ -39,7 +39,7 @@ After checking image format as JPG, resize, View Image and use the URL to the im
       (isGif && message.member.guild.emojis.filter(i => i.animated).length === 50) ||
       message.member.guild.emojis.filter(i => !i.animated).length === 50
     ) return 'Looks like all your emoji slots are used up. Use /deleteemoji on one and try again.'
-    else if (!message.member.guild.members.get(client.user.id).permission.has('manageEmojis')) {
+    else if (!message.member.guild.members.get(client.user.id).permissions.has('manageEmojis')) {
       return `I don't even have permissions to do that, you ${getInsult()}.`
     }
     // Try adding it, else throw an error.
@@ -73,7 +73,7 @@ export const handleDeleteemoji: Command = {
   },
   generator: async (message, args, { client }) => {
     // Check bot permissions.
-    if (!message.member.guild.members.get(client.user.id).permission.has('manageEmojis')) {
+    if (!message.member.guild.members.get(client.user.id).permissions.has('manageEmojis')) {
       return `I don't even have permissions to do that, you ${getInsult()}.`
     }
     // Try deleting it, else throw an error.
@@ -106,7 +106,7 @@ export const handleEditemoji: Command = {
     // Check if enough arguments were provided.
     if (args.length !== 2) return 'Correct usage: /editEmoji <emoji by ID/mention/name> <new name>'
     // Check bot permissions.
-    if (!message.member.guild.members.get(client.user.id).permission.has('manageEmojis')) {
+    if (!message.member.guild.members.get(client.user.id).permissions.has('manageEmojis')) {
       return `I don't even have permissions to do that, you ${getInsult()}.`
     }
     // Try editing it, else throw an error.

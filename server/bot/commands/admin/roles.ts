@@ -13,7 +13,7 @@ export const handleGiverole: Command = {
     guildOnly: true
   },
   generator: async (message, args, { db, client }) => {
-    const manageRoles = message.member.permission.has('manageRoles')
+    const manageRoles = message.member.permissions.has('manageRoles')
     // Check user for permissions.
     const insult = `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
     const publicRoles = (await getServerSettings(db, message.member.guild.id)).addRoleForAll || ''
@@ -36,7 +36,7 @@ export const handleGiverole: Command = {
     // Can the bot manage this role?
     if (
       role.position >= checkRolePosition(message.member.guild.members.get(client.user.id)) ||
-      !message.member.guild.members.get(client.user.id).permission.has('manageRoles')
+      !message.member.guild.members.get(client.user.id).permissions.has('manageRoles')
     ) return `I lack permissions to give this role, you ${getInsult()}.`
     // Give the role.
     const rolesOfMember = user.id !== message.author.id // Ternary statement.
@@ -71,7 +71,7 @@ export const handleTakerole: Command = {
     guildOnly: true
   },
   generator: async (message, args, { db, client }) => {
-    const manageRoles = message.member.permission.has('manageRoles')
+    const manageRoles = message.member.permissions.has('manageRoles')
     // Check user for permissions.
     const insult = `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
     const publicRoles = (await getServerSettings(db, message.member.guild.id)).addRoleForAll || ''
@@ -94,7 +94,7 @@ export const handleTakerole: Command = {
     // Can the bot manage this role?
     if (
       role.position >= checkRolePosition(message.member.guild.members.get(client.user.id)) ||
-      !message.member.guild.members.get(client.user.id).permission.has('manageRoles')
+      !message.member.guild.members.get(client.user.id).permissions.has('manageRoles')
     ) return `I lack permissions to take this role, you ${getInsult()}.`
     // Give the role.
     const rolesOfMember = user.id !== message.author.id // Ternary statement.
@@ -142,7 +142,7 @@ export const handleNotify: Command = {
     // Can the bot manage this role?
     if (
       (role.position >= checkRolePosition(message.member.guild.members.get(client.user.id)) ||
-      !message.member.guild.members.get(client.user.id).permission.has('manageRoles')) &&
+      !message.member.guild.members.get(client.user.id).permissions.has('manageRoles')) &&
       !role.mentionable
     ) return `I cannot notify this role, you ${getInsult()}.`
     // Edit the role.

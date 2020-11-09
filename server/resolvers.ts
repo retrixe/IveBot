@@ -44,7 +44,7 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
       joinAutorole = joinAutorole || ''
       // Check for permissions, and then send server settings.
       if (
-        member && (member.permission.has('manageGuild') || host === ctx.tempDB.link[linkToken])
+        member && (member.permissions.has('manageGuild') || host === ctx.tempDB.link[linkToken])
       ) return { serverId, addRoleForAll, joinLeaveMessages, joinAutorole, ocrOnSend }
       else return { serverId: 'Forbidden.' }
     },
@@ -66,7 +66,7 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
                 id: i.id, name: i.name
               })),
               perms: host === ctx.tempDB.link[linkToken]
-                ? true : guild.members.get(ctx.tempDB.link[linkToken]).permission.has('manageGuild')
+                ? true : guild.members.get(ctx.tempDB.link[linkToken]).permissions.has('manageGuild')
             })
           }
         })
@@ -96,7 +96,7 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
             channels: guild.channels.filter(i => i.type === 0).map(i => ({
               id: i.id, name: i.name
             })),
-            perms: host === id || guild.members.get(id).permission.has('manageGuild')
+            perms: host === id || guild.members.get(id).permissions.has('manageGuild')
           })
         }
       })
@@ -117,7 +117,7 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
       } = input
       const member = ctx.client.guilds
         .find(t => t.id === serverId).members.get(ctx.tempDB.link[linkToken])
-      if (member.permission.has('manageGuild') || host === ctx.tempDB.link[linkToken]) {
+      if (member.permissions.has('manageGuild') || host === ctx.tempDB.link[linkToken]) {
         await getServerSettings(db, serverId)
         await db.collection('servers').updateOne({ serverID: serverId }, { $set: {
           addRoleForAll: addRoleForAll || undefined,

@@ -17,7 +17,7 @@ export const handleDeletechannel: Command = {
     const channel = getChannel(message, args.shift())
     if (!channel) return `Specify a valid channel, you ${getInsult()}!`
     // If no permission to manage channels, say it.
-    if (!message.member.guild.members.get(client.user.id).permission.has('manageChannels')) {
+    if (!message.member.guild.members.get(client.user.id).permissions.has('manageChannels')) {
       return 'I can\'t even delete that channel, you ' + getInsult() + '.'
     }
     // Delete it.

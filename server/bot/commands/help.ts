@@ -38,7 +38,6 @@ TP \`/request\` - Request a specific feature.
 \`/editLastSay\` - Even if it was another channel.
 \`/remindme\` - Reminders.
 \`/leave\` - Makes you leave the server.
-\`/suppress\` - Suppress or unsuppress embeds in a message.
 \`/ocr\` - Get text from an image.
 \`/avatar\` - Avatar of a user.
 \`/userinfo\` - User info.
@@ -47,7 +46,8 @@ TP \`/request\` - Request a specific feature.
 \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
 \`/emojiImage\` - Image of an emoji.
 \`/giverole\` and \`/takerole\` - Edit roles.
-\`/notify\` - Ping a role that cannot be pinged.`
+\`/notify\` - Ping a role that cannot be pinged.
+\`/suppress\` - Suppress or unsuppress embeds in a message.`
     }, {
       name: '**Administrative commands.**', value: `
 \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`

@@ -54,7 +54,7 @@ export const handleBan: Command = {
       message.member.guild.members.get(user.id) &&
       (checkRolePosition(message.member.guild.members.get(user.id)) >=
       checkRolePosition(message.member.guild.members.get(client.user.id)) ||
-      !message.member.guild.members.get(client.user.id).permission.has('banMembers'))
+      !message.member.guild.members.get(client.user.id).permissions.has('banMembers'))
     ) return `I cannot ban this person, you ${getInsult()}.`
     let dm
     try {
@@ -96,7 +96,7 @@ export const handleUnban: Command = {
   },
   generator: async (message, args, { client }) => {
     // Check bot for permissions.
-    if (!message.member.guild.members.get(client.user.id).permission.has('banMembers')) {
+    if (!message.member.guild.members.get(client.user.id).permissions.has('banMembers')) {
       return `I lack permission to unban members, you ${getInsult()}.`
     }
     // Find the user ID.

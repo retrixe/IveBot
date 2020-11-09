@@ -56,7 +56,8 @@ export class Command {
     this.postGenerator = command.postGenerator
     // Options.
     this.argsRequired = command.opts.argsRequired === undefined || command.opts.argsRequired
-    this.invalidUsageMessage = command.opts.invalidUsageMessage || 'Invalid usage.'
+    const defaultUsageMessage = 'Invalid usage, correct usage: ' + command.opts.usage
+    this.invalidUsageMessage = command.opts.invalidUsageMessage || defaultUsageMessage
     this.errorMessage = command.opts.errorMessage || 'IveBot has experienced an internal error.'
     // No impl for next.
     this.caseInsensitive = command.opts.caseInsensitive === undefined || command.opts.caseInsensitive
@@ -86,8 +87,8 @@ export class Command {
     if (message.channel.type !== 0) return userIDs || custom
     const permissions = this.requirements.permissions
       ? isEquivalent(Object.assign( // Assign the required permissions onto the member's permission.
-        message.member.permission.json, this.requirements.permissions
-      ), message.member.permission.json) // This should eval true if user has permissions.
+        message.member.permissions.json, this.requirements.permissions
+      ), message.member.permissions.json) // This should eval true if user has permissions.
       : false
     // If any of these are true, it's a go.
     return userIDs || custom || permissions

@@ -276,10 +276,10 @@ export const handleSay: Command = {
         await client.createMessage(message.channelMentions[0], {
           content: args.join(' '),
           allowedMentions: {
-            everyone: message.member && message.member.permission.has('mentionEveryone'),
+            everyone: message.member && message.member.permissions.has('mentionEveryone'),
             users: true,
             roles: message.member && (
-              message.member.permission.has('mentionEveryone') ||
+              message.member.permissions.has('mentionEveryone') ||
               message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)
             )
           }
@@ -292,10 +292,10 @@ export const handleSay: Command = {
     return {
       content: args.join(' '),
       allowedMentions: {
-        everyone: message.member && message.member.permission.has('mentionEveryone'),
+        everyone: message.member && message.member.permissions.has('mentionEveryone'),
         users: true,
         roles: message.member && (
-          message.member.permission.has('mentionEveryone') ||
+          message.member.permissions.has('mentionEveryone') ||
           message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)
         )
       }
@@ -336,10 +336,10 @@ export const handleType: Command = {
         await client.createMessage(message.channelMentions[0], {
           content: args.join(' '),
           allowedMentions: {
-            everyone: message.member && message.member.permission.has('mentionEveryone'),
+            everyone: message.member && message.member.permissions.has('mentionEveryone'),
             users: true,
             roles: message.member && (
-              message.member.permission.has('mentionEveryone') ||
+              message.member.permissions.has('mentionEveryone') ||
               message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)
             )
           }
@@ -356,10 +356,10 @@ export const handleType: Command = {
     return {
       content: args.join(' '),
       allowedMentions: {
-        everyone: message.member && message.member.permission.has('mentionEveryone'),
+        everyone: message.member && message.member.permissions.has('mentionEveryone'),
         users: true,
         roles: message.member && (
-          message.member.permission.has('mentionEveryone') ||
+          message.member.permissions.has('mentionEveryone') ||
           message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)
         )
       }
@@ -508,7 +508,7 @@ export const handleChangeserverregion: Command = {
     invalidUsageMessage: 'Correct usage: /changeserverregion <valid server region, /listserverregion>'
   },
   generator: async (message, args, { client }) => {
-    if (!message.member.guild.members.get(client.user.id).permission.has('manageGuild')) {
+    if (!message.member.guild.members.get(client.user.id).permissions.has('manageGuild')) {
       return 'I require the Manage Server permission to do that..'
     }
     try {
@@ -593,7 +593,11 @@ export const handleSuppress: Command = {
   name: 'suppress',
   opts: {
     requirements: {
-      permissions: { manageMessages: true }
+      permissions: { manageMessages: true },
+      custom: (message) => (
+        (message.channel as GuildTextableChannel)
+          .permissionsOf(message.author.id).has('manageMessages')
+      )
     },
     description: 'Suppress or unsuppress embeds in a message.',
     fullDescription: 'Suppress or unsuppress embeds in a message.',
@@ -619,7 +623,7 @@ export const handleSuppress: Command = {
       if (channel && channel.type === 0) {
         msg = channel.messages.get(args[1]) || await channel.getMessage(args[1])
       } else return `That's not a real channel, you ${getInsult()}.`
-    } else return 'Invalid usage.'
+    } else return 'Correct usage: /suppress (channel) <message ID or link>'
 
     if (msg) {
       await client.requestHandler.request('PATCH', `/channels/${channel.id}/messages/${msg.id}`, true, {

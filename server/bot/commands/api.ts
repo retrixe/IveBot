@@ -147,7 +147,7 @@ export const handleRobohash: Command = {
         embed: { image: { url: `https://robohash.org/${text}.png?set=set5` }, color }, content: '🤔'
       }
     } else {
-      return 'Proper usage: /robohash <robot, monster, head, cat, human> <text to robohash>'
+      return 'Correct usage: /robohash <robot, monster, head, cat, human> <text to robohash>'
     }
   }
 }

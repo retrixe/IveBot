@@ -74,7 +74,7 @@ export const handleMute: Command = {
     // Can the bot manage this role?
     if (
       role.position >= checkRolePosition(message.member.guild.members.get(client.user.id)) ||
-      !message.member.guild.members.get(client.user.id).permission.has('manageRoles')
+      !message.member.guild.members.get(client.user.id).permissions.has('manageRoles')
     ) return `I lack permissions to mute people with the role, you ${getInsult()}.`
     // Mute person.
     try {
