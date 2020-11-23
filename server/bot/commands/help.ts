@@ -47,6 +47,7 @@ TP \`/request\` - Request a specific feature.
 \`/emojiImage\` - Image of an emoji.
 \`/giverole\` and \`/takerole\` - Edit roles.
 \`/notify\` - Ping a role that cannot be pinged.
+\`/hastebin\` - Upload a file to hasteb.in to view on phone.
 \`/suppress\` - Suppress or unsuppress embeds in a message.`
     }, {
       name: '**Administrative commands.**', value: `

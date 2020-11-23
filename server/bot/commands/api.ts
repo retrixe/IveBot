@@ -3,7 +3,7 @@ import { Command } from '../imports/types'
 // All the tools!
 import fetch from 'isomorphic-unfetch'
 import moment from 'moment'
-import { zeroWidthSpace, getInsult, fetchLimited } from '../imports/tools'
+import { zeroWidthSpace, getInsult, fetchLimited, getIdFromMention } from '../imports/tools'
 // Get the NASA API token.
 import 'json5/lib/require'
 import {
@@ -87,6 +87,41 @@ https://hasteb.in/${hastebin} (will be deleted after 30 days)`
         }
       }
     } catch (e) { return `Invalid image URL, you ${getInsult()}.` }
+  }
+}
+
+export const handleHastebin: Command = {
+  name: 'hastebin',
+  aliases: ['hasteb.in', 'texturl', 'hbin', 'haste'],
+  opts: {
+    description: 'Upload a file to hasteb.in to view on phone',
+    fullDescription: 'Upload a file to hasteb.in to view on phone',
+    example: '/hastebin <with uploaded text file>',
+    usage: '/hastebin <link to text fo;e/uploaded text file>',
+    argsRequired: false
+  },
+  generator: async (message, args, { client }) => {
+    try {
+      // Check if a message link was passed.
+      const regex = /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
+      let url = args.length ? args.join('%20') : message.attachments[0].url
+      if (regex.test(url)) {
+        const split = url.split('/')
+        const mess = await client.getMessage(split[split.length - 2], split.pop())
+        url = /^https?:\/\/\S+$/.test(mess.content) ? mess.content : mess.attachments[0].url
+      }
+      // Fetch text file.
+      const text = await fetchLimited(url, 0.4)
+      if (text === false) return 'The file provided is larger than 400 KB (hasteb.in limit)!'
+      // Now send the request.
+      const req = await fetch('https://hasteb.in/documents', {
+        method: 'POST', body: text.toString('utf8')
+      })
+      if (!req.ok) return 'Failed to upload text to hasteb.in!'
+      // Parse the response.
+      const res = await req.json()
+      return res.key ? `**hastebin URL:**\nhttps://hasteb.in/${res.key}` : 'Failed to upload text to hasteb.in!'
+    } catch (e) { return `Invalid text file, you ${getInsult()}.` }
   }
 }
 
@@ -312,8 +347,10 @@ export const handleNamemc: Command = {
     if (args.length > 1) return 'Minecraft users cannot have spaces in their name.'
     try {
       // Fetch the UUID and name of the user and parse it to JSON.
+      const member = message.member && message.member.guild.members.get(getIdFromMention(args[0]))
+      const username = member ? (member.nick || member.username) : args[0]
       const { id, name } = await (await fetch(
-        `https://api.mojang.com/users/profiles/minecraft/${args[0]}`
+        `https://api.mojang.com/users/profiles/minecraft/${username}`
       )).json()
       // Fetch the previous names as well.
       try {
