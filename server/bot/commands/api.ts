@@ -1,3 +1,4 @@
+
 // All the types!
 import { Command } from '../imports/types'
 // All the tools!
@@ -52,24 +53,29 @@ export const handleOcr: Command = {
       // If no text was found.
       if (!result.responses[0].fullTextAnnotation
       ) return 'I was unable to get any results for the image.'
-      // If the result is too long, upload it to hasteb.in.
+      // If the result is too long, upload it to paste.gg.
       const text = result.responses[0].fullTextAnnotation.text
       let hastebin = ''
+      let deletionKey = ''
       try {
         if (text.length > 2000 || useHastebin) {
-          const { key } = await fetch('https://hasteb.in/documents', {
-            method: 'POST', body: text
+          const { result } = await fetch('https://api.paste.gg/v1/pastes', {
+            method: 'POST',
+            body: JSON.stringify({
+              name: 'IveBot /ocr result', files: [{ content: { format: 'text', value: text } }]
+            })
           }).then(e => e.json())
-          hastebin = key
+          hastebin = result.id
+          deletionKey = result.deletion_key
         }
       } catch (e) {
-        return `Failed to upload long OCR result to hasteb.in! (${text.length} characters long)`
+        return `Failed to upload long OCR result to paste.gg! (${text.length} characters long)`
       }
       // Return our answer.
       return {
         content: hastebin
-          ? `🤔 **Text recognition result uploaded to hasteb.in${!useHastebin ? ' due to length' : ''}:**
-https://hasteb.in/${hastebin} (will be deleted after 30 days)`
+          ? `🤔 **Text recognition result uploaded to paste.gg${!useHastebin ? ' due to length' : ''}:**
+https://paste.gg/p/anonymous/${id} (use this key to delete: \`${deletionKey}\`)`
           : '🤔 **Text recognition result:**\n' + text,
         embed: {
           color: 0x666666,
@@ -92,12 +98,12 @@ https://hasteb.in/${hastebin} (will be deleted after 30 days)`
 
 export const handleHastebin: Command = {
   name: 'hastebin',
-  aliases: ['hasteb.in', 'texturl', 'hbin', 'haste'],
+  aliases: ['hasteb.in', 'texturl', 'hbin', 'haste', 'paste.gg', 'pastegg', 'paste'],
   opts: {
-    description: 'Upload a file to hasteb.in to view on phone',
-    fullDescription: 'Upload a file to hasteb.in to view on phone',
+    description: 'Upload a file to paste.gg to view on phone',
+    fullDescription: 'Upload a file to paste.gg to view on phone',
     example: '/hastebin <with uploaded text file>',
-    usage: '/hastebin <link to text fo;e/uploaded text file>',
+    usage: '/hastebin <link to text file/uploaded text file>',
     argsRequired: false
   },
   generator: async (message, args, { client }) => {
@@ -111,16 +117,27 @@ export const handleHastebin: Command = {
         url = /^https?:\/\/\S+$/.test(mess.content) ? mess.content : mess.attachments[0].url
       }
       // Fetch text file.
+      // TODO: Outdated..
       const text = await fetchLimited(url, 0.4)
-      if (text === false) return 'The file provided is larger than 400 KB (hasteb.in limit)!'
+      if (text === false) return 'The file provided is larger than 400 KB (paste.gg limit)!'
       // Now send the request.
-      const req = await fetch('https://hasteb.in/documents', {
-        method: 'POST', body: text.toString('utf8')
+      const req = await fetch('https://api.paste.gg/v1/pastes', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: 'IveBot /ocr result',
+          files: [{
+            name: message.attachments.length ? message.attachments[0].name : 'pastefile1',
+            content: { format: 'text', value: text.toString('utf8') }
+          }]
+        })
       })
-      if (!req.ok) return 'Failed to upload text to hasteb.in!'
+      if (!req.ok) return 'Failed to upload text to paste.gg!'
       // Parse the response.
       const res = await req.json()
-      return res.key ? `**hastebin URL:**\nhttps://hasteb.in/${res.key}` : 'Failed to upload text to hasteb.in!'
+      const { id, deletion_key: deletionKey } = res.result
+      return res.key
+        ? `**paste.gg URL:**\nhttps://paste.gg/p/anonymous/${id}\nDeletion key: ${deletionKey}`
+        : 'Failed to upload text to paste.gg!'
     } catch (e) { return `Invalid text file, you ${getInsult()}.` }
   }
 }
@@ -458,15 +475,15 @@ export const handleWeather: Command = {
     example: '/weather Shanghai CN'
   },
   generator: async (message, args) => {
-    const farhenheit = args.includes('--fahrenheit') || args.includes('-f')
-    if (farhenheit) args.splice(args.includes('-f') ? args.indexOf('-f') : args.indexOf('--fahrenheit'), 1)
+    const fahrenheit = args.includes('--fahrenheit') || args.includes('-f')
+    if (fahrenheit) args.splice(args.includes('-f') ? args.indexOf('-f') : args.indexOf('--fahrenheit'), 1)
     // Get the response from our API.
     const weather: Weather = await (await fetch(
       `http://api.openweathermap.org/data/2.5/weather?q=${args.join(',')}&appid=${weatherAPIkey}${
-        farhenheit ? '&units=imperial' : '&units=metric'
+        fahrenheit ? '&units=imperial' : '&units=metric'
       }`
     )).json()
-    const temp = farhenheit ? '°F' : '°C'
+    const temp = fahrenheit ? '°F' : '°C'
     // If the place doesn't exist..
     if (weather.cod === '404') return 'Enter a valid city >_<'
     // We generate the entire embed.
