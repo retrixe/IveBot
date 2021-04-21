@@ -3,6 +3,7 @@ import { Command } from '../imports/types'
 // All the tools!
 import fetch from 'isomorphic-unfetch'
 import moment from 'moment'
+import Fuse from 'fuse.js'
 import { zeroWidthSpace, getInsult, fetchLimited, getIdFromMention } from '../imports/tools'
 // Get the NASA API token.
 import 'json5/lib/require'
@@ -627,7 +628,7 @@ export const handleDefine: Command = {
   }
 }
 
-const noimageposts = [1037, 1608, 1663].map(e => 'https://xkcd.com' + e)
+const noimageposts = ['1037', '1608', '1663']
 export const handleXkcd: Command = {
   name: 'xkcd',
   opts: {
@@ -645,16 +646,19 @@ export const handleXkcd: Command = {
         if (!req.ok) return 'Failed to fetch list of xkcd comics!\nhttps://xkcd.com/1348'
         const posts = (await req.text()).split('<br/>').map(e => ({
           name: e.substring(0, e.length - 4).split('>').pop(),
-          url: 'https://xkcd.com/' + e.substring(e.lastIndexOf('href="/') + 7).split('/"').shift()
+          id: e.substring(e.lastIndexOf('href="/') + 7).split('/"').shift()
         })).slice(4)
         posts.splice(posts.length - 11, 11) // Slice and splice invalid elements.
-        // Construct search result.
-        // TODO: More powerful search required.
-        const res = posts.filter(post => post.name.toLowerCase().startsWith(args.slice(1).join(' ').toLowerCase()))
-          .map(e => e && noimageposts.includes(e.url) ? { ...e, url: e.url + '(no image)' } : e)
+        // Construct search result. Default threshold was 0.6, 0.4 is more precise.
+        const fuse = new Fuse(posts, { keys: ['name', 'id'], threshold: 0.4 })
+        const res = fuse.search(args.slice(1).join(' '), { limit: 3 }).map(e => (
+          noimageposts.includes(e.item.id) ? { ...e.item, id: e.item.id + '(no image)' } : e.item
+        ))
         if (!res.length) return 'No results were found for your search criteria!'
-        return `**Top results:**
-1. ${res[0].url}${res[1] ? `\n2. <${res[1].url}>` : ''}${res[2] ? `\n3. <${res[2].url}>` : ''}`
+        const res1 = 'https://xkcd.com/' + res[0].id
+        const res2 = res[1] ? `\n2. <https://xkcd.com/${res[1].id}>` : ''
+        const res3 = res[2] ? `\n3. <https://xkcd.com/${res[2].id}>` : ''
+        return `**Top results:**\n1. ${res1}${res2}${res3}`
       } catch (e) { console.error(e); return 'Failed to fetch list of xkcd comics!\nhttps://xkcd.com/1348' }
     } else if (
       args.length > 1 || (args.length === 1 && args[0] !== 'latest' && args[0] !== 'random')

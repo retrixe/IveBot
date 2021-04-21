@@ -20,6 +20,7 @@
     "@material-ui/icons": "^3.0.1",
     "apollo-boost": "^0.1.4",
     "eris": "^0.15.0",
+    "fuse.js": "^6.4.6",
     "graphql": "^14.0.2",
     "graphql-yoga": "^1.16.7",
     "isomorphic-unfetch": "^2.0.0",
