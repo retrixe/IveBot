@@ -107,6 +107,10 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
   // Auto responses and easter eggs.
   if (command.startsWith('is dot a good boy')) sendResponse('Shame on you. He\'s undefined.')
   else if (command.startsWith('iphone x')) sendResponse(`You don't deserve it. 😎`)
+  else if (command.startsWith('iphone 11')) sendResponse(`You don't deserve it. 😎`)
+  else if (command.startsWith('iphone 12')) sendResponse(`You don't deserve it. 😎`)
+  else if (command.startsWith('iphone 13')) sendResponse(`You don't deserve it. 😎`)
+  else if (command.startsWith('iphone se')) sendResponse(`lol peasant`)
   else if (command.startsWith('triggered')) sendResponse('Ah, pathetic people again.')
   else if (command.startsWith('ayy')) sendResponse('lmao')
   // Handle answers to gunfight.

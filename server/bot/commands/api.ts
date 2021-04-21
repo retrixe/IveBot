@@ -1,4 +1,3 @@
-
 // All the types!
 import { Command } from '../imports/types'
 // All the tools!
@@ -61,6 +60,7 @@ export const handleOcr: Command = {
         if (text.length > 2000 || useHastebin) {
           const { result } = await fetch('https://api.paste.gg/v1/pastes', {
             method: 'POST',
+            headers: { 'content-type': 'application/json' },
             body: JSON.stringify({
               name: 'IveBot /ocr result', files: [{ content: { format: 'text', value: text } }]
             })
@@ -75,7 +75,7 @@ export const handleOcr: Command = {
       return {
         content: hastebin
           ? `🤔 **Text recognition result uploaded to paste.gg${!useHastebin ? ' due to length' : ''}:**
-https://paste.gg/p/anonymous/${id} (use this key to delete: \`${deletionKey}\`)`
+https://paste.gg/p/anonymous/${hastebin} (use this key to delete: \`${deletionKey}\`)`
           : '🤔 **Text recognition result:**\n' + text,
         embed: {
           color: 0x666666,
@@ -123,10 +123,11 @@ export const handleHastebin: Command = {
       // Now send the request.
       const req = await fetch('https://api.paste.gg/v1/pastes', {
         method: 'POST',
+        headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
-          name: 'IveBot /ocr result',
+          name: 'IveBot paste.gg upload',
           files: [{
-            name: message.attachments.length ? message.attachments[0].name : 'pastefile1',
+            name: message.attachments.length ? message.attachments[0].filename : 'pastefile1',
             content: { format: 'text', value: text.toString('utf8') }
           }]
         })
@@ -135,7 +136,7 @@ export const handleHastebin: Command = {
       // Parse the response.
       const res = await req.json()
       const { id, deletion_key: deletionKey } = res.result
-      return res.key
+      return id
         ? `**paste.gg URL:**\nhttps://paste.gg/p/anonymous/${id}\nDeletion key: ${deletionKey}`
         : 'Failed to upload text to paste.gg!'
     } catch (e) { return `Invalid text file, you ${getInsult()}.` }

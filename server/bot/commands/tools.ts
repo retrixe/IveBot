@@ -171,7 +171,8 @@ export const handleEval: Command = {
       const res = inspect(await Promise.resolve(eval(toEval)), false, 0)
       // const res = eval(`(async () => { const a = ${toEval}; return a })()`)
       message.addReaction('✅')
-      return res !== 'undefined' ? `${'```'}${res}${'```'}`.replace(client.token, 'censored') : undefined
+      const token = (client as unknown as { _token: string })._token
+      return res !== 'undefined' ? `${'```'}${res}${'```'}`.replace(token, 'censored') : undefined
     } catch (e) {
       const channel = await client.getDMChannel(host)
       message.addReaction('❌')
@@ -214,7 +215,8 @@ getContent/getCleanContent(messageID), createMessage(content), getReactions(mess
       })
       const res = inspect(await Promise.resolve(result), false, 0)
       message.addReaction('✅')
-      return res !== 'undefined' ? `${'```'}${res}${'```'}` : undefined
+      const token = (context.client as unknown as { _token: string })._token
+      return res !== 'undefined' ? `${'```'}${res.replace(token, '')}${'```'}` : undefined
     } catch (e) {
       message.addReaction('❌')
       return `**Error:**

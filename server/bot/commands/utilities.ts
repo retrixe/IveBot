@@ -1,5 +1,5 @@
 // All the types!
-import Eris, { Message, GuildTextableChannel } from 'eris'
+import Eris, { Message, GuildTextableChannel, Constants } from 'eris'
 import { Command } from '../imports/types'
 // All the needs!
 import { getIdFromMention, getInsult, getUser } from '../imports/tools'
@@ -172,7 +172,8 @@ export const handlePermissions: Command = {
     const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
       (a, b) => a.position > b.position ? -1 : 1
     ).find(i => i.color !== 0) || { color: 0 }).color : 0
-    const permissions = member.permission
+    const permissions = member.permissions
+    const permissionKeys = Object.keys(permissions.json) as (keyof Constants['Permissions'])[]
     const channelPerm = (message.channel as GuildTextableChannel).permissionsOf(user.id)
     return {
       content: `✅ **Permissions of ${user.username}:**`,
@@ -190,7 +191,8 @@ export const handlePermissions: Command = {
               ? 'Owner! (use `/perms --ignore-admin` to show perms regardless)'
               : permissions.has('administrator') && !ignoreAdmin
                 ? 'Administrator! (use `/perms --ignore-admin` to show perms regardless)'
-                : Object.keys(permissions.json).filter(perm => permissions.has(perm))
+                : permissionKeys
+                  .filter(perm => permissions.has(perm))
                   .map(perm => (perm.substr(0, 1).toUpperCase() + perm.substr(1))
                     .replace(/[A-Z]+/g, s => ' ' + s))
                   .join(', ').replace('TTSMessages', 'TTS Messages')
@@ -198,15 +200,18 @@ export const handlePermissions: Command = {
           !(message.member.guild.ownerID === user.id || permissions.has('administrator')) || ignoreAdmin
             ? {
               name: 'Channel Permissions',
-              value: (Object.keys(permissions.json)
-                .filter(perm => !permissions.has(perm) && channelPerm.has(perm))
-                .map(perm => (perm.substr(0, 1).toUpperCase() + perm.substr(1))
-                  .replace(/[A-Z]+/g, s => ' ' + s))
-                .join(', ') + Object.keys(permissions.json)
-                .filter(perm => permissions.has(perm) && !channelPerm.has(perm))
-                .map(perm => '**!(' + (perm.substr(0, 1).toUpperCase() + perm.substr(1))
-                  .replace(/[^(][A-Z]+/g, s => s.substr(0, 1) + ' ' + s.substr(1)) + ')**')
-                .join(', ')).replace('TTSMessages', 'TTS Messages')
+              value: (
+                permissionKeys
+                  .filter(perm => !permissions.has(perm) && channelPerm.has(perm))
+                  .map(perm => (perm.substr(0, 1).toUpperCase() + perm.substr(1))
+                    .replace(/[A-Z]+/g, s => ' ' + s))
+                  .join(', ') +
+                permissionKeys
+                  .filter(perm => permissions.has(perm) && !channelPerm.has(perm))
+                  .map(perm => '**!(' + (perm.substr(0, 1).toUpperCase() + perm.substr(1))
+                    .replace(/[^(][A-Z]+/g, s => s.substr(0, 1) + ' ' + s.substr(1)) + ')**')
+                  .join(', ')
+              ).replace('TTSMessages', 'TTS Messages')
             } : { name: '', value: '' }
         ].filter(e => !!e.value),
         footer: { text: 'User ID: ' + user.id }
