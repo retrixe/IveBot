@@ -36,7 +36,7 @@ TP \`/request\` - Request a specific feature.
 \`/weather\` - It's really cloudy here..
 \`/say\` | \`/type\` - Say something, even in another channel.
 \`/editLastSay\` - Even if it was another channel.
-\`/remindme\` - Reminders.
+\`/remindme\` | \`/reminderlist\` - Reminders.
 \`/leave\` - Makes you leave the server.
 \`/ocr\` - Get text from an image.
 \`/avatar\` - Avatar of a user.
@@ -68,19 +68,32 @@ TP \`/request\` - Request a specific feature.
 }
 
 const generateDocs = (command: Command) => {
+  const permissions = command.requirements.permissions
+    ? `Needs the permissions: ${Object.keys(command.requirements.permissions).map(perm => (
+      perm.substr(0, 1).toUpperCase() + perm.substr(1)
+    ).replace(/[A-Z]+/g, s => ' ' + s).trim()).join(', ').replace('TTSMessages', 'TTS Messages')} | ` : ''
+  const roleNames = command.requirements.roleNames
+    ? `Needs the roles: ${command.requirements.roleNames.join(', ')} | ` : ''
+  const roleIDs = command.requirements.roleIDs ? 'Usable by users with a certain role | ' : ''
+  const userIDs = command.requirements.userIDs ? 'Usable by certain users | ' : ''
+  const custom = command.requirements.custom
+    ? '\n**Requirements:** Has some unknown permission checks | ' : ''
+  const requirements = custom || (permissions || roleIDs || roleNames || userIDs
+    ? `\n**Requirements:** ${custom}${permissions}${roleIDs}${roleNames}${userIDs}` : '')
+
   if (command.aliases && command.aliases.length) {
     return `
 **Usage:** ${command.usage}
 **Aliases:** ${command.aliases.map(i => '/' + i).join(', ')}
 **Description:** ${command.fullDescription}
-**Example:** ${command.example}
+**Example:** ${command.example}${requirements.substr(0, requirements.length - 3)}
 Arguments in () are optional :P
     `
   }
   return `
 **Usage:** ${command.usage}
 **Description:** ${command.fullDescription}
-**Example:** ${command.example}
+**Example:** ${command.example}${requirements.substr(0, requirements.length - 3)}
 Arguments in () are optional :P
   `
 }
