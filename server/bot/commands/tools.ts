@@ -70,7 +70,7 @@ export const handleAbout: Command = {
 IveBot is a Discord bot written with Eris and care.
 Unlike most other dumb bots, IveBot was not written with discord.js and has 0% copied code.
 Built with community feedback mainly, IveBot does a lot of random stuff and fun.
-IveBot 3.0 is planned to be a port to Eris with multiple new features and a complete rewrite.
+IveBot 4.0 is planned to revamp the dashboard, make the code a lot more maintainable and use intents.
 For information on what IveBot can do, type **/help** or **/halp**.
 The source code can be found here: <https://github.com/retrixe/IveBot>
 For noobs, this bot is licensed and protected by law. Copy code and I will sue you for a KitKat.`

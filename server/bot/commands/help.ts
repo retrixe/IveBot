@@ -54,7 +54,7 @@ TP \`/request\` - Request a specific feature.
 \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
 \`/addEmoji\`, \`/deleteEmoji\` and \`/editEmoji\`
 \`/deleteChannel\` and \`/editChannel\`
-\`/warn\` and \`/warnings\` | \`/clearwarns\` and \`/removewarn\`
+\`/warn\`, \`/warnings\`, \`/clearwarns\` and \`/removewarn\`
 \`/changeserverregion\` and \`/listserverregions\`
 \`/perms\` - Displays a particular member's permissions.
 \`/purge\` - Bulk delete a set of messages.
