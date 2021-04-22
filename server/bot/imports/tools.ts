@@ -61,7 +61,8 @@ export const getChannel = (message: Message, arg: string) => {
 // Fresh insults. They come and go, I suppose.
 export const getInsult = () => {
   const insults = [
-    'pathetic lifeform', 'ungrateful bastard', 'idiotic slimeball', 'worthless ass', 'dumb dolt', 'one pronged fork', 'withered oak', 'two pump chump', 'oompa loompa'
+    'pathetic lifeform', 'ungrateful bastard', 'idiotic slimeball', 'worthless ass', 'dumb dolt',
+    'one pronged fork', 'withered oak', 'two pump chump', 'oompa loompa'
   ]
   return insults[Math.floor(Math.random() * insults.length)]
 }
