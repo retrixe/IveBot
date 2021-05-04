@@ -201,7 +201,7 @@ export const handleRobohash: Command = {
         embed: { image: { url: `https://robohash.org/${text}.png?set=set5` }, color }, content: '🤔'
       }
     } else {
-      return 'Correct usage: /robohash <robot, monster, head, cat, human> <text to robohash>'
+      return { content: 'Correct usage: /robohash <robot, monster, head, cat, human> <text to robohash>', error: true }
     }
   }
 }
@@ -237,7 +237,7 @@ export const handleApod: Command = {
           }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
     } else if (args.length) {
-      return 'Invalid date.'
+      return { content: 'Invalid date.', error: true }
     }
     // Fetch a picture or video.
     try { // eslint-disable-next-line camelcase
@@ -271,8 +271,8 @@ export const handleDog: Command = {
         // If only list of breeds was asked.
         if (!args[1]) return `**List of breeds:** ${Object.keys(message).join(', ')}`
         // If list of sub-breeds was asked.
-        if (!message[args[1]]) return 'This breed does not exist!'
-        else if (message[args[1]].length === 0) return 'This breed has no sub-breeds!'
+        if (!message[args[1]]) return { content: 'This breed does not exist!', error: true }
+        else if (message[args[1]].length === 0) return { content: 'This breed has no sub-breeds!', error: true }
         return `**List of sub-breeds:** ${message[args[1]].join(', ')}`
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
       // Fetch a random picture for a sub-breed.
@@ -286,7 +286,7 @@ export const handleDog: Command = {
             `http://dog.ceo/api/breed/${args.join('').toLowerCase()}/images/random`
           )).json())
         }
-        if (!message || message.includes('Breed not found')) return 'This breed/sub-breed does not exist!'
+        if (!message || message.includes('Breed not found')) return { content: 'This breed/sub-breed does not exist!', error: true }
         return {
           embed: { image: { url: message }, color: 0x654321 },
           content: `🐕 ${args[0]} ${args[1]}`
@@ -345,7 +345,7 @@ export const handleUrban: Command = {
         }
         // Else, there will be an exception thrown.
       } catch (err) {
-        return 'No definition was found.'
+        return { content: 'No definition was found.', error: true }
       }
     } catch (e) {
       return `Something went wrong 👾 Error: ${e}`
@@ -393,7 +393,7 @@ export const handleNamemc: Command = {
           }
         }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
-    } catch (e) { return `Enter a valid Minecraft username (account must be premium)` }
+    } catch (e) { return { content: `Enter a valid Minecraft username (account must be premium)`, error: true } }
   }
 }
 
@@ -430,15 +430,15 @@ letter code + the first letter of the currency name.` }]
       }
     }
     // Calculate the currencies to conver from and to, as well as the amount.
-    if (args.length < 2) return 'Invalid usage, use /help currency for proper usage.'
+    if (args.length < 2) return { content: 'Invalid usage, use /help currency for proper usage.', error: true }
     const from = args[0].toUpperCase()
     const to = args[1].toUpperCase()
     // Check if everything is in order.
-    if (from.length !== 3 || !currency.rates[from]) return 'Invalid currency to convert from.'
-    else if (to.length !== 3 || !currency.rates[to]) return 'Invalid currency to convert to.'
+    if (from.length !== 3 || !currency.rates[from]) return { content: 'Invalid currency to convert from.', error: true }
+    else if (to.length !== 3 || !currency.rates[to]) return { content: 'Invalid currency to convert to.', error: true }
     else if (!args[2]) args[2] = '1' // If no amount was provided, the amount should be one.
-    else if (args.length > 3) return 'Enter a single number for currency conversion.'
-    else if (isNaN(+args[2])) return 'Enter a proper number to convert.'
+    else if (args.length > 3) return { content: 'Enter a single number for currency conversion.', error: true }
+    else if (isNaN(+args[2])) return { content: 'Enter a proper number to convert.', error: true }
     // Now we convert the amount.
     const convertedAmount = ((currency.rates[to] / currency.rates[from]) * +args[2])
     const roundedOffAmount = Math.ceil(convertedAmount * Math.pow(10, 4)) / Math.pow(10, 4)
@@ -487,7 +487,7 @@ export const handleWeather: Command = {
     )).json()
     const temp = fahrenheit ? '°F' : '°C'
     // If the place doesn't exist..
-    if (weather.cod === '404') return 'Enter a valid city >_<'
+    if (weather.cod === '404') return { content: 'Enter a valid city >_<', error: true }
     // We generate the entire embed.
     return {
       content: `**🌇🌃🌁🌆 The weather for ${args.join(', ')}:**`,
@@ -560,7 +560,7 @@ export const handleDefine: Command = {
       if (r.error === 'No entries were found for a given inflected word' || (
         r.error && r.error.startsWith('No lemma was found')
       )) {
-        return 'Did you enter a valid word? 👾'
+        return { content: 'Did you enter a valid word? 👾', error: true }
       }
       try {
         // Here we get the dictionary entries for the specified word.
@@ -624,7 +624,7 @@ export const handleDefine: Command = {
           }
         }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
-    } catch (e) { return 'Did you enter a valid word? 👾' }
+    } catch (e) { return { content: 'Did you enter a valid word? 👾', error: true } }
   }
 }
 
@@ -654,7 +654,7 @@ export const handleXkcd: Command = {
         const res = fuse.search(args.slice(1).join(' '), { limit: 3 }).map(e => (
           noimageposts.includes(e.item.id) ? { ...e.item, id: e.item.id + '(no image)' } : e.item
         ))
-        if (!res.length) return 'No results were found for your search criteria!'
+        if (!res.length) return { content: 'No results were found for your search criteria!', error: true }
         const res1 = 'https://xkcd.com/' + res[0].id
         const res2 = res[1] ? `\n2. <https://xkcd.com/${res[1].id}>` : ''
         const res3 = res[2] ? `\n3. <https://xkcd.com/${res[2].id}>` : ''
@@ -662,7 +662,7 @@ export const handleXkcd: Command = {
       } catch (e) { console.error(e); return 'Failed to fetch list of xkcd comics!\nhttps://xkcd.com/1348' }
     } else if (
       args.length > 1 || (args.length === 1 && args[0] !== 'latest' && args[0] !== 'random')
-    ) return 'Correct usage: /xkcd (latest|random|search) (search query if searching)'
+    ) return { content: 'Correct usage: /xkcd (latest|random|search) (search query if searching)', error: true }
     // Get the latest xkcd comic.
     try {
       const { num } = await (await fetch('http://xkcd.com/info.0.json')).json()
@@ -686,7 +686,7 @@ export const handleHttpCat: Command = {
     if (isNaN(+args[0]) || args.length > 1) return 'Enter a valid HTTP status code!'
 
     const req = await fetch('https://http.cat/' + args[0], { method: 'HEAD' })
-    if (req.status === 404) return 'Enter a valid HTTP status code!\nhttps://http.cat/404'
+    if (req.status === 404) return { content: 'Enter a valid HTTP status code!\nhttps://http.cat/404', error: true }
 
     return 'https://http.cat/' + args[0]
   }

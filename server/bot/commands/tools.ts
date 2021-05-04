@@ -131,7 +131,7 @@ export const handlePing: Command = {
     if (args.length === 1 && testPilots.includes(message.author.id)) {
       try {
         return execSync('ping -c 1 ' + args[0], { encoding: 'utf8' }).split('\n')[1]
-      } catch (e) { return 'Looks like pinging the website failed.' }
+      } catch (e) { return { content: 'Looks like pinging the website failed.', error: true } }
     }
     // Get the time before sending the message.
     const startTime = Date.now()
@@ -219,8 +219,7 @@ getContent/getCleanContent(messageID), createMessage(content), getReactions(mess
       return res !== 'undefined' ? `${'```'}${res.replace(token, '')}${'```'}` : undefined
     } catch (e) {
       message.addReaction('❌')
-      return `**Error:**
-${e}`
+      return { content: `**Error:**\n${e}`, error: true }
     }
   }
 }
@@ -240,7 +239,7 @@ export const handleCreationtime: Command = {
       let id = args[0]
       id = (id.length === 17 || id.length === 18) && !isNaN(+id) ? id : getIdFromMention(args[0])
       if ((id.length !== 17 && id.length !== 18) || isNaN(+id)) {
-        return `Provide an valid ID or mention, you ${getInsult()}.`
+        return { content: `Provide an valid ID or mention, you ${getInsult()}.`, error: true }
       }
       return moment((new Base(id)).createdAt).format('YYYY/MM/DD, hh:mm:ss A')
     } else {

@@ -276,17 +276,19 @@ export default class CommandParser {
       if (commandExec === keys[i].toLowerCase() || (
         this.commands[keys[i]].aliases && this.commands[keys[i]].aliases.includes(commandExec)
       )) {
-        // We mark the command as evaluated and schedule a removal of the ID in 30 seconds.
-        this.evaluatedMessages.push(message.id)
-        setTimeout(() => {
-          this.evaluatedMessages.splice(this.evaluatedMessages.findIndex(i => i === message.id), 1)
-        }, 30000)
         // Execute command.
         try {
           const executeFirst = process.hrtime() // Initial high precision time.
-          await this.executeCommand(this.commands[keys[i]], message)
+          const error = await this.executeCommand(this.commands[keys[i]], message)
           const executeSecond = process.hrtime(executeFirst) // Time difference.
           this.saveAnalytics(executeSecond, keys[i]) // Send analytics.
+          if (!error) {
+            // We mark the command as evaluated and schedule a removal of the ID in 30 seconds.
+            this.evaluatedMessages.push(message.id)
+            setTimeout(() => {
+              this.evaluatedMessages.splice(this.evaluatedMessages.findIndex(i => i === message.id), 1)
+            }, 30000)
+          }
         } catch (e) {
           // On error, we tell the user of an unknown error and log it for our reference.
           message.channel.createMessage(this.commands[keys[i]].errorMessage)

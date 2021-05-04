@@ -33,7 +33,7 @@ export const handleChoose: Command = {
   },
   generator: (message, args) => {
     // Is it used correctly?
-    if (message.content.split('|').length === 1) return 'Correct usage: /choose item1|item2|...'
+    if (message.content.split('|').length === 1) return { content: 'Correct usage: /choose item1|item2|...', error: true }
     const choices = args.join(' ').split('|')
     return `I choose: ${choices[Math.floor(Math.random() * choices.length)]}`
   }
@@ -128,10 +128,10 @@ export const handleRepeat: Command = {
     const number = +args.shift()
     if (isNaN(number)) return 'Correct usage: /repeat <number of times> <string to repeat>'
     else if (number * args.join(' ').length >= 2001) {
-      return 'To prevent spam, your excessive message has not been repeated.'
+      return { content: 'To prevent spam, your excessive message has not been repeated.', error: true }
     } else if (
       args.join(' ') === '_' || args.join(' ') === '*' || args.join(' ') === '~'
-    ) return 'This is known to lag users and is disabled.'
+    ) return { content: 'This is known to lag users and is disabled.', error: true }
     // Generate the repeated string.
     let generatedMessage = ''
     for (let x = 0; x < number; x++) { generatedMessage += args.join(' ') }
@@ -160,7 +160,7 @@ export const handleRandom: Command = {
       const number2 = +args[1]
       return `The number.. is.. ${Math.floor(Math.random() * (number2 - number1)) + number1}`
     } else if (args.length >= 1) {
-      return 'Correct usage: /random (optional start number) (optional end number)'
+      return { content: 'Correct usage: /random (optional start number) (optional end number)', error: true }
     }
     return `The number.. is.. ${Math.floor(Math.random() * 10)}`
   }
@@ -181,7 +181,7 @@ More info here: https://mathjs.org/docs/expressions/syntax.html`,
     try {
       return `${eva(args.join(' ').split(',').join('.').split('÷').join('/').toLowerCase())}`
     } catch (e) {
-      return 'Invalid expression >_<'
+      return { content: 'Invalid expression >_<', error: true }
     }
   }
 }

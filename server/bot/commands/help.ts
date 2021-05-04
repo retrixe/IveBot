@@ -122,7 +122,7 @@ export const handleHelp: IveBotCommand = {
     // Check if requested for a specific command.
     if (Object.keys(commands).find(check)) {
       return generateDocs(commands[Object.keys(commands).find(check)])
-    } else if (args.join(' ')) return 'Incorrect parameters. Run /help for general help.'
+    } else if (args.join(' ')) return { content: 'Incorrect parameters. Run /help for general help.', error: true }
     // Default help.
     try {
       const channel = await message.author.getDMChannel()
@@ -139,7 +139,7 @@ export const handleHelp: IveBotCommand = {
       })
       return 'newbie, help has been direct messaged to you ✅'
     } catch {
-      return `I cannot DM you the help for newbies, you ${getInsult()} ❌`
+      return { content: `I cannot DM you the help for newbies, you ${getInsult()} ❌`, error: true }
     }
   }
 }

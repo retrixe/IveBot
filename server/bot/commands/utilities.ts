@@ -24,7 +24,7 @@ export const handleServerinfo: Command = {
     let guild = args.length ? client.guilds.find(
       i => i.members.has(message.author.id) && i.id === args[0]
     ) : message.member.guild
-    if (!guild) return `Specify a valid mutual guild, ${getInsult()}.`
+    if (!guild) return { content: `Specify a valid mutual guild, ${getInsult()}.`, error: true }
     // Owner.
     const owner = guild.members.get(guild.ownerID)
     // Nitro Boosting support.
@@ -102,7 +102,7 @@ export const handleUserinfo: Command = {
     if (!user && message.author.id === host && [18, 17].includes(toGet.length) && !isNaN(+toGet)) {
       try { user = await client.getRESTUser(toGet) } catch (e) { }
     }
-    if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
+    if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // Display information.
     const member = message.member.guild.members.get(user.id)
     const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
@@ -166,7 +166,7 @@ export const handlePermissions: Command = {
     if (!user && message.author.id === host && [18, 17].includes(toGet.length) && !isNaN(+toGet)) {
       try { user = await client.getRESTUser(toGet) } catch (e) { }
     }
-    if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
+    if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // Display permission info.
     const member = message.member.guild.members.get(user.id)
     const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
@@ -274,7 +274,7 @@ export const handleSay: Command = {
     ) {
       if (message.member && !message.member.guild.channels.get(possibleChannel)
         .permissionsOf(message.member.id).has('sendMessages')
-      ) return `**You don't have enough permissions for that, you ${getInsult()}.**`
+      ) return { content: `**You don't have enough permissions for that, you ${getInsult()}.**`, error: true }
       args.shift()
       if (args.join(' ') === 'pls adim me') args = ['no']
       tempDB.say[message.channelMentions[0]] = (
@@ -330,7 +330,7 @@ export const handleType: Command = {
     ) {
       if (message.member && !message.member.guild.channels.get(possibleChannel)
         .permissionsOf(message.member.id).has('sendMessages')
-      ) return `**You don't have enough permissions for that, you ${getInsult()}.**`
+      ) return { content: `**You don't have enough permissions for that, you ${getInsult()}.**`, error: true }
       args.shift()
       if (args.join(' ') === 'pls adim me') args = ['no']
       await client.sendChannelTyping(message.channelMentions[0])
@@ -383,7 +383,7 @@ export const handleRemindme: Command = {
   },
   generator: async (message, args, { db }) => {
     if (args.length < 2 || !ms(args[0])) {
-      return 'Correct usage: /remindme <time in 1d|1h|1m|1s> <description>'
+      return { content: 'Correct usage: /remindme <time in 1d|1h|1m|1s> <description>', error: true }
     }
     let channel = false
     if (args[1] === '-c' || args[1] === '--channel') channel = true
@@ -427,10 +427,10 @@ export const handleReminderlist: Command = {
   },
   generator: async (message, args, { db }) => {
     // If improper arguments were provided, then we must inform the user.
-    if (args.length > 0 && message.author.id !== host) return 'Correct usage: /reminderlist'
+    if (args.length > 0 && message.author.id !== host) return { content: 'Correct usage: /reminderlist', error: true }
     // Now find the user ID.
     let user = args[0] && getUser(message, args[0])
-    if (!user && args.length) return `Specify a valid member of this guild, ${getInsult()}.`
+    if (!user && args.length) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     else if (!user) user = message.author
     // Get a list of reminders.
     const id = user.id
@@ -585,20 +585,20 @@ export const handleEdit: Command = {
       message.channelMentions[0] === possibleChannel ||
       (message.member && message.member.guild.channels.has(possibleChannel))
     ) {
-      if (message.member && !message.member.guild.channels.get(possibleChannel)
-        .permissionsOf(message.member.id).has('sendMessages')
-      ) return `**You don't have enough permissions for that, you ${getInsult()}.**`
+      // if (message.member && !message.member.guild.channels.get(possibleChannel)
+      //   .permissionsOf(message.member.id).has('sendMessages')
+      // ) return `**You don't have enough permissions for that, you ${getInsult()}.**`
       const messageID = args.slice(1).shift()
       try {
         await client.editMessage(possibleChannel, messageID, args.slice(1).join(' '))
-      } catch (e) { return 'Nothing to edit.' }
+      } catch (e) { return { content: 'Nothing to edit.', error: true } }
       return
     }
     // Edit the message.
     const messageID = args.shift()
     try {
       await client.editMessage(message.channel.id, messageID, args.join(' '))
-    } catch (e) { return 'Nothing to edit.' }
+    } catch (e) { return { content: 'Nothing to edit.', error: true } }
   }
 }
 
@@ -622,17 +622,17 @@ export const handleEditLastSay: Command = {
     ) {
       if (message.member && !message.member.guild.channels.get(possibleChannel)
         .permissionsOf(message.member.id).has('sendMessages')
-      ) return `**You don't have enough permissions for that, you ${getInsult()}.**`
+      ) return { content: `**You don't have enough permissions for that, you ${getInsult()}.**`, error: true }
       // Edit the message.
       try {
         await client.editMessage(possibleChannel, tempDB.say[possibleChannel], args.slice(1).join(' '))
-      } catch (e) { return 'Nothing to edit.' }
+      } catch (e) { return { content: 'Nothing to edit.', error: true } }
       return
     }
     // Edit the message.
     try {
       await client.editMessage(message.channel.id, tempDB.say[message.channel.id], args.join(' '))
-    } catch (e) { return 'Nothing to edit.' }
+    } catch (e) { return { content: 'Nothing to edit.', error: true } }
   }
 }
 
@@ -659,7 +659,7 @@ export const handleSuppress: Command = {
       if (regex.test(args[0])) {
         const split = args[0].split('/')
         channel = message.member.guild.channels.get(split[5]) as GuildTextableChannel
-        if (!channel || channel.type !== 0) return `That's not a real channel, you ${getInsult()}.`
+        if (!channel || channel.type !== 0) return { content: `That's not a real channel, you ${getInsult()}.`, error: true }
         msg = channel.messages.get(split[6]) || await channel.getMessage(split[6])
       } else {
         msg = message.channel.messages.get(args[0]) || await message.channel.getMessage(args[0])
@@ -669,14 +669,14 @@ export const handleSuppress: Command = {
       channel = message.member.guild.channels.get(getIdFromMention(args[0])) as GuildTextableChannel
       if (channel && channel.type === 0) {
         msg = channel.messages.get(args[1]) || await channel.getMessage(args[1])
-      } else return `That's not a real channel, you ${getInsult()}.`
-    } else return 'Correct usage: /suppress (channel) <message ID or link>'
+      } else return { content: `That's not a real channel, you ${getInsult()}.`, error: true }
+    } else return { content: 'Correct usage: /suppress (channel) <message ID or link>', error: true }
 
     if (msg) {
       await client.requestHandler.request('PATCH', `/channels/${channel.id}/messages/${msg.id}`, true, {
         flags: msg.flags ^ Eris.Constants.MessageFlags.SUPPRESS_EMBEDS
       })
       message.addReaction('✅')
-    } else return `That's not a real message, you ${getInsult()}.`
+    } else return { content: `That's not a real message, you ${getInsult()}.`, error: true }
   }
 }
