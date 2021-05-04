@@ -651,7 +651,7 @@ export const handleSuppress: Command = {
     usage: '/suppress (channel) <message ID or link>',
     example: '/suppress #general 123456789012345678'
   },
-  generator: async (message, args, { client }) => {
+  generator: async (message, args) => {
     let msg
     let channel
     if (args.length === 1) {
@@ -673,9 +673,7 @@ export const handleSuppress: Command = {
     } else return { content: 'Correct usage: /suppress (channel) <message ID or link>', error: true }
 
     if (msg) {
-      await client.requestHandler.request('PATCH', `/channels/${channel.id}/messages/${msg.id}`, true, {
-        flags: msg.flags ^ Eris.Constants.MessageFlags.SUPPRESS_EMBEDS
-      })
+      await msg.edit({ flags: msg.flags ^ Eris.Constants.MessageFlags.SUPPRESS_EMBEDS })
       message.addReaction('✅')
     } else return { content: `That's not a real message, you ${getInsult()}.`, error: true }
   }
