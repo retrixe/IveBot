@@ -16,16 +16,16 @@ export const handleWarn: Command = {
   },
   generator: async (message, args, { client, db }) => {
     // If improper arguments were provided, then we must inform the user.
-    if (args.length < 2) return 'Correct usage: /warn <user> <reason>'
+    if (args.length < 2) return { content: 'Correct usage: /warn <user> <reason>', error: true }
     // Now find the user ID.
     let user = getUser(message, args[0])
-    if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
+    if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // Respect role order.
     if (
       checkRolePosition(message.member.guild.members.get(user.id)) >=
       checkRolePosition(message.member)
     ) {
-      return `You cannot warn this person, you ${getInsult()}.`
+      return { content: `You cannot warn this person, you ${getInsult()}.`, error: true }
     }
     // Warn the person internally.
     args.shift()
@@ -77,10 +77,10 @@ export const handleWarnings: Command = {
   },
   generator: async (message, args, { client, db }) => {
     // If improper arguments were provided, then we must inform the user.
-    if (args.length > 1) return 'Correct usage: /warnings (user by ID/username/mention)'
+    if (args.length > 1) return { content: 'Correct usage: /warnings (user by ID/username/mention)', error: true }
     // Now find the user ID.
     let user = args[0] && getUser(message, args[0])
-    if (!user && args.length) return `Specify a valid member of this guild, ${getInsult()}.`
+    if (!user && args.length) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     else if (!user) user = message.author
     // Get a list of warnings.
     const warns = await db.collection('warnings').find({
@@ -125,16 +125,16 @@ export const handleClearwarns: Command = {
   },
   generator: async (message, args, { db }) => {
     // If improper arguments were provided, then we must inform the user.
-    if (args.length !== 1) return 'Correct usage: /clearwarns <user>'
+    if (args.length !== 1) return { content: 'Correct usage: /clearwarns <user>', error: true }
     // Now find the user ID.
     let user = getUser(message, args.shift())
-    if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
+    if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // Respect role order.
     if (
       checkRolePosition(message.member.guild.members.get(user.id)) >=
       checkRolePosition(message.member)
     ) {
-      return `You cannot clear the warnings of this person, you ${getInsult()}.`
+      return { content: `You cannot clear the warnings of this person, you ${getInsult()}.`, error: true }
     }
     // Clear the warns of the person internally.
     try {
@@ -160,25 +160,25 @@ export const handleRemovewarn: Command = {
   },
   generator: async (message, args, { db }) => {
     // If improper arguments were provided, then we must inform the user.
-    if (args.length !== 2) return 'Correct usage: /removewarn <user> <warning ID>'
+    if (args.length !== 2) return { content: 'Correct usage: /removewarn <user> <warning ID>', error: true }
     // Now find the user ID.
     let user = getUser(message, args.shift())
-    if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
+    if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // Respect role order.
     if (
       checkRolePosition(message.member.guild.members.get(user.id)) >=
       checkRolePosition(message.member)
     ) {
-      return `You cannot remove a warning from this person, you ${getInsult()}.`
+      return { content: `You cannot remove a warning from this person, you ${getInsult()}.`, error: true }
     }
     // Remove the warning of the person internally.
     try {
       const warn = await db.collection('warnings').findOne({
         _id: new ObjectID(args[0]), serverID: message.member.guild.id
       })
-      if (!warn) return 'This warning does not exist..'
+      if (!warn) return { content: 'This warning does not exist..', error: true }
       else if (warn.warnedID !== user.id) {
-        return 'This warning does not belong to the specified user..'
+        return { content: 'This warning does not belong to the specified user..', error: true }
       }
       try {
         await db.collection('warnings').deleteOne({

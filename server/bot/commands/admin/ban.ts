@@ -37,16 +37,16 @@ export const handleBan: Command = {
       user = client.users.get(userSpecified)
     } else if (!user && [18, 17].includes(userSpecified.length) && !isNaN(+userSpecified)) {
       try { user = await client.getRESTUser(userSpecified) } catch (e) {
-        return 'I cannot find that user.'
+        return { content: 'I cannot find that user.', error: true }
       }
     }
-    if (!user) return `Specify a valid user, ${getInsult()}.`
+    if (!user) return { content: `Specify a valid user, ${getInsult()}.`, error: true }
     // If the user cannot ban the person..
     if (
       message.member.guild.members.get(user.id) &&
       checkRolePosition(message.member.guild.members.get(user.id)) >=
       checkRolePosition(message.member)
-    ) return `You cannot ban this person, you ${getInsult()}.`
+    ) return { content: `You cannot ban this person, you ${getInsult()}.`, error: true }
     // Now we ban the person.
     const f = parseSilentDelete(args)
     // If we can't ban the person..
@@ -55,7 +55,7 @@ export const handleBan: Command = {
       (checkRolePosition(message.member.guild.members.get(user.id)) >=
       checkRolePosition(message.member.guild.members.get(client.user.id)) ||
       !message.member.guild.members.get(client.user.id).permissions.has('banMembers'))
-    ) return `I cannot ban this person, you ${getInsult()}.`
+    ) return { content: `I cannot ban this person, you ${getInsult()}.`, error: true }
     let dm
     try {
       if (!f.silent) {
@@ -109,7 +109,7 @@ export const handleUnban: Command = {
     } else {
       try { user = await client.getRESTUser(userSpecified) } catch (e) {}
     }
-    if (!user) return 'I cannot find that user.'
+    if (!user) return { content: 'I cannot find that user.', error: true }
     // Now we unban the person.
     try {
       await client.unbanGuildMember(message.member.guild.id, user.id, args.join(' '))

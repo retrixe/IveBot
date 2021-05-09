@@ -28,24 +28,24 @@ export const handleGiverole: Command = {
       a => a.name.toLowerCase() === args.join(' ').toLowerCase() || args.join(' ') === a.id
     )
     const isPublicRole = role && publicRoles.split('|').includes(role.name)
-    if (!role) return 'You have provided an invalid role name/ID, you ' + getInsult() + '.'
-    else if (!isPublicRole && !manageRoles) return insult // Permission check.
+    if (!role) return { content: 'You have provided an invalid role name/ID, you ' + getInsult() + '.', error: true }
     // Can the user manage this role?
     if (role.position >= checkRolePosition(message.member) && !isPublicRole
-    ) return `You cannot give this role. Pfft, overestimating their own powers now.`
+    ) return { content: `You cannot give this role. Pfft, overestimating their own powers now.`, error: true }
     // Can the bot manage this role?
     if (
       role.position >= checkRolePosition(message.member.guild.members.get(client.user.id)) ||
       !message.member.guild.members.get(client.user.id).permissions.has('manageRoles')
-    ) return `I lack permissions to give this role, you ${getInsult()}.`
+    ) return { content: `I lack permissions to give this role, you ${getInsult()}.`, error: true }
     // Give the role.
     const rolesOfMember = user.id !== message.author.id // Ternary statement.
       ? message.member.guild.members.get(user.id).roles
       : message.member.roles
     if (rolesOfMember.includes(role.id)) {
-      return user.id === message.author.id // Ternary statement.
+      return { content: user.id === message.author.id // Ternary statement.
         ? `You ${getInsult()}, you already have the specified role.`
-        : `You ${getInsult()}, that person already has the specified role.`
+        : `You ${getInsult()}, that person already has the specified role.`,
+      error: true }
     }
     try {
       await client.addGuildMemberRole(
@@ -86,24 +86,24 @@ export const handleTakerole: Command = {
       a => a.name.toLowerCase() === args.join(' ').toLowerCase() || args.join(' ') === a.id
     )
     const isPublicRole = role && publicRoles.split('|').includes(role.name)
-    if (!role) return 'You have provided an invalid role name/ID, you ' + getInsult() + '.'
-    else if (!isPublicRole && !manageRoles) return insult // Permission check.
+    if (!role) return { content: 'You have provided an invalid role name/ID, you ' + getInsult() + '.', error: true }
     // Can the user manage this role?
     if (role.position >= checkRolePosition(message.member) && !isPublicRole
-    ) return `You cannot take this role. Pfft, overestimating their own powers now.`
+    ) return { content: `You cannot take this role. Pfft, overestimating their own powers now.`, error: true }
     // Can the bot manage this role?
     if (
       role.position >= checkRolePosition(message.member.guild.members.get(client.user.id)) ||
       !message.member.guild.members.get(client.user.id).permissions.has('manageRoles')
-    ) return `I lack permissions to take this role, you ${getInsult()}.`
+    ) return { content: `I lack permissions to take this role, you ${getInsult()}.`, error: true }
     // Give the role.
     const rolesOfMember = user.id !== message.author.id // Ternary statement.
       ? message.member.guild.members.get(user.id).roles
       : message.member.roles
     if (!rolesOfMember.includes(role.id)) {
-      return user.id === message.author.id // Ternary statement.
+      return { content: user.id === message.author.id // Ternary statement.
         ? `You ${getInsult()}, you don't have the specified role.`
-        : `You ${getInsult()}, that person doesn't have the specified role.`
+        : `You ${getInsult()}, that person doesn't have the specified role.`,
+      error: true }
     }
     try {
       await client.removeGuildMemberRole(
@@ -135,16 +135,16 @@ export const handleNotify: Command = {
     const role = message.member.guild.roles.find(
       a => arg === a.id || a.name.toLowerCase() === arg.toLowerCase() || arg === a.mention
     )
-    if (!role) return `You have provided an invalid role name/ID, you ${getInsult()}.`
+    if (!role) return { content: `You have provided an invalid role name/ID, you ${getInsult()}.`, error: true }
     // Can the user manage this role?
     if (role.position >= checkRolePosition(message.member) && !role.mentionable
-    ) return `You cannot notify this role, you ${getInsult()}.`
+    ) return { content: `You cannot notify this role, you ${getInsult()}.`, error: true }
     // Can the bot manage this role?
     if (
       (role.position >= checkRolePosition(message.member.guild.members.get(client.user.id)) ||
       !message.member.guild.members.get(client.user.id).permissions.has('manageRoles')) &&
       !role.mentionable
-    ) return `I cannot notify this role, you ${getInsult()}.`
+    ) return { content: `I cannot notify this role, you ${getInsult()}.`, error: true }
     // Edit the role.
     const wasMentionable = role.mentionable
     if (!wasMentionable) await role.edit({ mentionable: true })

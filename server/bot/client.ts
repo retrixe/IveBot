@@ -148,7 +148,7 @@ export default class CommandParser {
       // We check for arguments.
     } else if (args.length === 0 && command.argsRequired) {
       message.channel.createMessage(command.invalidUsageMessage)
-      return
+      return true
     }
     // Delete the message if needed.
     try {

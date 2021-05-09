@@ -25,13 +25,14 @@ export const handleAddemoji: Command = {
     try {
       // image = Buffer.from(await (await fetch(url)).arrayBuffer())
       image = await fetchLimited(url, 0.25)
-    } catch (e) { return `Invalid image URL, you ${getInsult()}` }
+    } catch (e) { return { content: `Invalid image URL, you ${getInsult()}`, error: true } }
     // If emoji larger than 384 KB (in case)
     if (image === false || (image.byteLength / 1024) >= 384) {
-      return `Your emoji is larger than 256 KB, resize your image!
+      return { content: `Your emoji is larger than 256 KB, resize your image!
 I recommend using <https://picresize.com/> if the emoji is JPG.
 Set step 2 to No Change, set Max Filesize to 255 in step 4 and set to Best quality.
-After checking image format as JPG, resize, View Image and use the URL to the image here.`
+After checking image format as JPG, resize, View Image and use the URL to the image here.`,
+      error: true }
     }
     // Check the slots.
     const isGif = check([0x47, 0x49, 0x46], image)
@@ -52,10 +53,11 @@ After checking image format as JPG, resize, View Image and use the URL to the im
       else mention = `<:${emoji.name}:${emoji.id}>`
       return `Emoji successfully added \\o/ (${mention})`
     } catch (e) {
-      return `Emoji could not be added. Is the emoji larger than 256 kB?
+      return { content: `Emoji could not be added. Is the emoji larger than 256 kB?
 I recommend using <https://picresize.com/> if the emoji is JPG and too large.
 Set step 2 to No Change, set Max Filesize to 255 in step 4 and set to Best quality.
-After checking image format as JPG, resize, View Image and use the URL to the image here.`
+After checking image format as JPG, resize, View Image and use the URL to the image here.`,
+      error: true }
     }
   }
 }
@@ -74,7 +76,7 @@ export const handleDeleteemoji: Command = {
   generator: async (message, args, { client }) => {
     // Check bot permissions.
     if (!message.member.guild.members.get(client.user.id).permissions.has('manageEmojis')) {
-      return `I don't even have permissions to do that, you ${getInsult()}.`
+      return { content: `I don't even have permissions to do that, you ${getInsult()}.`, error: true }
     }
     // Try deleting it, else throw an error.
     try {
@@ -82,7 +84,7 @@ export const handleDeleteemoji: Command = {
         i => (i.name === args[0] || i.id === args[0] || i.id === getIdFromMention(args[0]))
       )
       // If emoji doesn't exist.
-      if (!emoji) return `Invalid emoji, you ${getInsult()}.`
+      if (!emoji) return { content: `Invalid emoji, you ${getInsult()}.`, error: true }
       await message.member.guild.deleteEmoji(emoji.id)
       return 'Emoji successfully deleted \\o/'
     } catch (e) {
@@ -107,7 +109,7 @@ export const handleEditemoji: Command = {
     if (args.length !== 2) return 'Correct usage: /editEmoji <emoji by ID/mention/name> <new name>'
     // Check bot permissions.
     if (!message.member.guild.members.get(client.user.id).permissions.has('manageEmojis')) {
-      return `I don't even have permissions to do that, you ${getInsult()}.`
+      return { content: `I don't even have permissions to do that, you ${getInsult()}.`, error: true }
     }
     // Try editing it, else throw an error.
     try {
@@ -115,7 +117,7 @@ export const handleEditemoji: Command = {
         i => (i.name === args[0] || i.id === args[0] || i.id === getIdFromMention(args[0]))
       )
       // If emoji doesn't exist.
-      if (!emoji) return `Invalid emoji, you ${getInsult()}.`
+      if (!emoji) return { content: `Invalid emoji, you ${getInsult()}.`, error: true }
       const newEmoji = await message.member.guild.editEmoji(emoji.id, { name: args[1] })
       let mention = ''
       if (newEmoji.animated) mention = `<a:${newEmoji.name}:${newEmoji.id}>`
@@ -142,7 +144,7 @@ export const handleEmojiimage: Command = {
     const found = message.member.guild.emojis.find(i => (i.name === args[0] || i.id === args[0]))
     const emoji = args[0].startsWith('<') ? getIdFromMention(args[0]) : (found ? found.id : undefined)
     // If emoji doesn't exist.
-    if (!emoji || ![17, 18].includes(emoji.length)) return `Invalid custom emoji, you ${getInsult()}.`
+    if (!emoji || ![17, 18].includes(emoji.length)) return { content: `Invalid custom emoji, you ${getInsult()}.`, error: true }
     // Get image extension.
     const ext = args[0].split(':')[0] === '<a' || (found && found.animated) ? 'gif' : 'png'
     // Return emoji.

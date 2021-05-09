@@ -18,12 +18,12 @@ export const handleMute: Command = {
   generator: async (message, args, { client, tempDB, db }) => {
     // Find the user ID.
     let user = getUser(message, args.shift())
-    if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
+    if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // Respect role order.
     if (
       checkRolePosition(message.member.guild.members.get(user.id), true, false) >=
       checkRolePosition(message.member, true, false)
-    ) return `You cannot mute this person, you ${getInsult()}.`
+    ) return { content: `You cannot mute this person, you ${getInsult()}.`, error: true }
 
     // Find a Muted role.
     let role = message.member.guild.roles.find((role) => role.name === 'Muted')
@@ -87,7 +87,7 @@ export const handleMute: Command = {
       // Figure out the time for which the user is muted.
       let time = 0
       try { time = ms(args[0]) || 0 } catch (e) { }
-      if (time && time >= 2073600000) return 'Mute limit is 24 days.'
+      if (time && time >= 2073600000) return { content: 'Mute limit is 24 days.', error: true }
       const mute = await db.collection('tasks').findOne({ type: 'unmute', guild: guildID, user: user.id })
       if (!mute && time > 0) {
         // Insert the persisted mute.
@@ -136,13 +136,13 @@ export const handleUnmute: Command = {
   generator: (message, args, { client, tempDB }) => {
     // Find the user ID.
     let user = getUser(message, args.shift())
-    if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
+    if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // Respect role order.
     if (
       checkRolePosition(message.member.guild.members.get(user.id), true, false) >=
       checkRolePosition(message.member, true, false)
     ) {
-      return `You cannot mute this person, you ${getInsult()}.`
+      return { content: `You cannot mute this person, you ${getInsult()}.`, error: true }
     }
     // All roles of user.
     const roles = message.member.guild.members.get(user.id).roles
@@ -162,6 +162,6 @@ export const handleUnmute: Command = {
         return 'Unmuted.'
       }
     }
-    return `That person is not muted, you ${getInsult()}.`
+    return { content: `That person is not muted, you ${getInsult()}.`, error: true }
   }
 }
