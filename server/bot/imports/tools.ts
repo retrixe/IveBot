@@ -95,7 +95,3 @@ export const fetchLimited = async (url: string, limit: number, opts = {}): Promi
     req.on('error', reject)
   })
 }
-
-export function sleep (ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
