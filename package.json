@@ -25,7 +25,7 @@
     "graphql-yoga": "^1.16.7",
     "isomorphic-unfetch": "^2.0.0",
     "json5": "^0.5.1",
-    "mathjs": "^4.1.1",
+    "mathjs": "^9.4.3",
     "moment": "^2.24.0",
     "mongodb": "^3.0.6",
     "next": "^8.1.0",

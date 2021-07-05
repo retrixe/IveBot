@@ -105,7 +105,7 @@ export const handleUserinfo: Command = {
     if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // Display information.
     const member = message.member.guild.members.get(user.id)
-    // TODO: Add publicFlags, game and premiumSince.
+    // TODO: Add publicFlags, game, premiumSince, custom-status. Support per-server pfp, about me, banner.
     const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
       (a, b) => a.position > b.position ? -1 : 1
     ).find(i => i.color !== 0) || { color: 0 }).color : 0
