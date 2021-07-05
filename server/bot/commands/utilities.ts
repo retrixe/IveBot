@@ -105,6 +105,7 @@ export const handleUserinfo: Command = {
     if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // Display information.
     const member = message.member.guild.members.get(user.id)
+    // TODO: Add publicFlags, game and premiumSince.
     const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
       (a, b) => a.position > b.position ? -1 : 1
     ).find(i => i.color !== 0) || { color: 0 }).color : 0
@@ -113,14 +114,12 @@ export const handleUserinfo: Command = {
       embed: {
         author: { name: `User info`, icon_url: user.avatarURL },
         title: `${user.username}#${user.discriminator}` + (user.bot ? ' (Bot account)' : ''),
-        description: user.mention,
+        description: user.mention + (member && member.pending ? ' (pending guild screening)' : ''),
         thumbnail: { url: user.dynamicAvatarURL('png', 2048) },
         color,
         fields: [
           { name: 'Status', value: member && member.status ? member.status : 'N/A', inline: true },
           // { name: 'Join Position }
-          // { name: 'Name', value: user.username, inline: true },
-          // { name: 'Discriminator', value: user.discriminator, inline: true },
           {
             name: 'Joined server at',
             value: member ? moment(member.joinedAt).format('DD/MM/YYYY, hh:mm:ss A') : 'N/A',
@@ -131,6 +130,9 @@ export const handleUserinfo: Command = {
             value: moment(user.createdAt).format('DD/MM/YYYY, hh:mm:ss A'),
             inline: true
           },
+          // Game...
+          // Badges...
+          // Boosting since..
           {
             name: `Roles (${member ? member.roles.length : 'N/A'})`,
             value: member ? member.roles.map(i => member.guild.roles.get(i)).sort(
