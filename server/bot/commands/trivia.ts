@@ -117,7 +117,7 @@ export class TriviaSession {
 
     while (this.status !== 'correct answer' && (Date.now() - this.timer) <= this.settings.delay) {
       if (Date.now() - this.timeout >= this.settings.timeout) {
-        const msg = `If you ${getInsult}s aren't going to play then I might as well stop.`
+        const msg = `If you ${getInsult()}s aren't going to play then I might as well stop.`
         if (msg.includes('asss')) {
           msg.replace('asss', 'asses')
         }
