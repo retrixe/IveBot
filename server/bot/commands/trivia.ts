@@ -70,31 +70,10 @@ export class TriviaSession {
     return { embed }
   }
 
-  async stopTrivia () {
-    this.status = 'stop'
-    delete this.tempDB.trivia[this.channel.id]
-    this.settings = {
-      maxScore: 30,
-      timeout: 120000,
-      delay: 15000,
-      botPlays: false,
-      revealAnswer: true
-    }
-    this.scores = {}
-  }
-
   async endGame () {
     this.status = 'stop'
     delete this.tempDB.trivia[this.channel.id]
     if (this.scores) { this.channel.createMessage(await this.sendScores()) }
-    this.settings = {
-      maxScore: 30,
-      timeout: 120000,
-      delay: 15000,
-      botPlays: false,
-      revealAnswer: true
-    }
-    this.scores = {}
   }
 
   async newQuestion () {
@@ -122,7 +101,7 @@ export class TriviaSession {
           msg.replace('asss', 'asses')
         }
         this.channel.createMessage(msg)
-        await this.stopTrivia()
+        await this.endGame()
         return true
       }
       await new Promise(resolve => setTimeout(resolve, 1000)) // Wait for answer or timeout
@@ -200,7 +179,7 @@ export const handleTrivia: Command = {
     description: 'Start a trivia session',
     fullDescription: 'Start a trivia session\nDefault settings are:\nIve gains points: false\nSeconds to answer: 15\nPoints needed to win: 30\nReveal answer on timeout: true',
     usage: '/trivia <topic> (--bot-plays=true|false) (--time-limit=<time longer than 4s>) (--max-score=<points greater than 0>) (--reveal-answer=true|false)\n During a trivia session, the following commands may also be run:\n/trivia score\n/trivia stop',
-    example: '/trivia greekmyths --bot-plays=true',
+    example: '/trivia greekmyth --bot-plays=true',
     guildOnly: true,
     argsRequired: true
   },
@@ -279,7 +258,7 @@ export const handleTrivia: Command = {
       } else {
         return 'There is no trivia session ongoing in this channel.'
       }
-    } else if (args.length === 1) {
+    } else {
       const session = tempDB.trivia[message.channel.id]
       if (!session) {
         let triviaList
@@ -294,8 +273,6 @@ export const handleTrivia: Command = {
       } else {
         return 'A trivia session is already ongoing in this channel.'
       }
-    } else {
-      return 'Invalid usage. Use `/help trivia` to see proper usage.'
     }
   }
 }
