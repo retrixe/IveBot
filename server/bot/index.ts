@@ -28,8 +28,8 @@ export const guildMemberAdd = (client: Client, db: Db, tempDB: DB) => async (
         const roleName = role.startsWith('bot-') ? role.substr(4) : role
         const roleObj = member.guild.roles.find(element => element.name === roleName)
         if (!role || !roleObj) return
-        if (role.startsWith('bot-') && member.user.bot) member.addRole(roleObj.id)
-        else if (!role.startsWith('bot-') && !member.user.bot) member.addRole(roleObj.id)
+        if (role.startsWith('bot-') && member.user.bot) await member.addRole(roleObj.id)
+        else if (!role.startsWith('bot-') && !member.user.bot) await member.addRole(roleObj.id)
       } catch (e) {}
     })
   }
