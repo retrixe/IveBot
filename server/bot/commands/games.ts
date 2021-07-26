@@ -1,5 +1,5 @@
 import { Command } from '../imports/types'
-import { eval as eva } from 'mathjs'
+import { evaluate } from 'mathjs'
 
 // Zalgo characters.
 const characters = [
@@ -179,7 +179,7 @@ More info here: https://mathjs.org/docs/expressions/syntax.html`,
   },
   generator: (message, args) => {
     try {
-      return `${eva(args.join(' ').split(',').join('.').split('÷').join('/').toLowerCase())}`
+      return `${evaluate(args.join(' ').split(',').join('.').split('÷').join('/').toLowerCase())}`
     } catch (e) {
       return { content: 'Invalid expression >_<', error: true }
     }
