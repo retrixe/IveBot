@@ -37,7 +37,7 @@ TP \`/request\` - Request a specific feature.
 \`/weather\` - It's really cloudy here..
 \`/say\` | \`/type\` - Say something, even in another channel.
 \`/editLastSay\` - Even if it was another channel.
-\`/remindme\` - Reminders.
+\`/remindme\` | \`/reminderlist\` - Reminders.
 \`/leave\` - Makes you leave the server.
 \`/ocr\` - Get text from an image.
 \`/avatar\` - Avatar of a user.
@@ -47,14 +47,17 @@ TP \`/request\` - Request a specific feature.
 \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
 \`/emojiImage\` - Image of an emoji.
 \`/giverole\` and \`/takerole\` - Edit roles.
-\`/notify\` - Ping a role that cannot be pinged.`
+\`/notify\` - Ping a role that cannot be pinged.
+\`/hastebin\` - Upload a file to hasteb.in to view on phone.
+\`/suppress\` - Suppress or unsuppress embeds in a message.`
     }, {
       name: '**Administrative commands.**', value: `
 \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
 \`/addEmoji\`, \`/deleteEmoji\` and \`/editEmoji\`
 \`/deleteChannel\` and \`/editChannel\`
-\`/warn\` and \`/warnings\` | \`/clearwarns\` and \`/removewarn\`
+\`/warn\`, \`/warnings\`, \`/clearwarns\` and \`/removewarn\`
 \`/changeserverregion\` and \`/listserverregions\`
+\`/perms\` - Displays a particular member's permissions.
 \`/purge\` - Bulk delete a set of messages.
 \`/slowmode\` - When you must slow down chat.`
     }, {
@@ -66,19 +69,35 @@ TP \`/request\` - Request a specific feature.
 }
 
 const generateDocs = (command: Command) => {
+  let requirements = ''
+  if (command.requirements) {
+    const permissions = command.requirements.permissions
+      ? `Needs the permissions: ${Object.keys(command.requirements.permissions).map(perm => (
+        perm.substr(0, 1).toUpperCase() + perm.substr(1)
+      ).replace(/[A-Z]+/g, s => ' ' + s).trim()).join(', ').replace('TTSMessages', 'TTS Messages')} | ` : ''
+    const roleNames = command.requirements.roleNames
+      ? `Needs the roles: ${command.requirements.roleNames.join(', ')} | ` : ''
+    const roleIDs = command.requirements.roleIDs ? 'Usable by users with a certain role | ' : ''
+    const userIDs = command.requirements.userIDs ? 'Usable by certain users | ' : ''
+    const custom = command.requirements.custom
+      ? '\n**Requirements:** Has some unknown permission checks | ' : ''
+    requirements = custom || (permissions || roleIDs || roleNames || userIDs
+      ? `\n**Requirements:** ${custom}${permissions}${roleIDs}${roleNames}${userIDs}` : '')
+  }
+
   if (command.aliases && command.aliases.length) {
     return `
 **Usage:** ${command.usage}
 **Aliases:** ${command.aliases.map(i => '/' + i).join(', ')}
 **Description:** ${command.fullDescription}
-**Example:** ${command.example}
+**Example:** ${command.example}${requirements.substr(0, requirements.length - 3)}
 Arguments in () are optional :P
     `
   }
   return `
 **Usage:** ${command.usage}
 **Description:** ${command.fullDescription}
-**Example:** ${command.example}
+**Example:** ${command.example}${requirements.substr(0, requirements.length - 3)}
 Arguments in () are optional :P
   `
 }
@@ -104,7 +123,7 @@ export const handleHelp: IveBotCommand = {
     // Check if requested for a specific command.
     if (Object.keys(commands).find(check)) {
       return generateDocs(commands[Object.keys(commands).find(check)])
-    } else if (args.join(' ')) return 'Incorrect parameters. Run /help for general help.'
+    } else if (args.join(' ')) return { content: 'Incorrect parameters. Run /help for general help.', error: true }
     // Default help.
     try {
       const channel = await message.author.getDMChannel()
@@ -113,7 +132,7 @@ export const handleHelp: IveBotCommand = {
 (Manage Server required to manage a server)`,
         embed: {
           color: 0x00AE86,
-          type: 'rich',
+          // type: 'rich',
           title: 'Help',
           ...generalHelp,
           footer: { text: 'For help on a specific command or aliases, run /help <command>.' }
@@ -121,7 +140,7 @@ export const handleHelp: IveBotCommand = {
       })
       return 'newbie, help has been direct messaged to you ✅'
     } catch {
-      return `I cannot DM you the help for newbies, you ${getInsult()} ❌`
+      return { content: `I cannot DM you the help for newbies, you ${getInsult()} ❌`, error: true }
     }
   }
 }

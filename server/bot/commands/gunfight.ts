@@ -18,20 +18,20 @@ export const handleGunfight: Command = {
     const user = getUser(message, args[0])
     // Confirm an argument was passed including one mention.
     if (!user) {
-      return 'Specify a valid user to challenge >_>'
+      return { content: 'Specify a valid user to challenge >_>', error: true }
       // It should not be a challenge to self.
-    } else if (user.id === message.author.id) return 'You cannot challenge yourself :P'
+    } else if (user.id === message.author.id) return { content: 'You cannot challenge yourself :P', error: true }
     // It should not be a challenge to bot itself.
     else if (user.id === client.user.id) {
-      return 'Aw, how sweet. But I don\'t play with pathetic fools who try to fool me :>'
+      return { content: 'Aw, how sweet. But I don\'t play with pathetic fools who try to fool me :>', error: true }
       // It should not be a challenge to a bot.
-    } else if (user.bot) return 'Noob, that person is a bot.'
+    } else if (user.bot) return { content: 'Noob, that person is a bot.', error: true }
 
     // Do not challenge someone already in a gunfight.
     // Possible gunfights.
     const possibleGunfight = Object.keys(tempDB.gunfight)
       .find((gunfight) => gunfight.split('-').includes(user.id))
-    if (possibleGunfight) return 'This user is already in a fight!'
+    if (possibleGunfight) return { content: 'This user is already in a fight!', error: true }
     // Push to database.
     const timestamp = Date.now()
     tempDB.gunfight[message.author.id + '-' + user.id] = {
@@ -83,7 +83,7 @@ export const handleAccept: Command = {
     if (Object.keys(tempDB.gunfight).filter((gunfight) => (
       gunfight.split('-').includes(message.author.id)
     )).length > 1) {
-      return 'You are already in a gunfight!'
+      return { content: 'You are already in a gunfight!', error: true }
     }
     // Accept the challenge.
     const words = ['fire', 'water', 'gun', 'dot']

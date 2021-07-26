@@ -3,7 +3,8 @@ import { Command } from '../imports/types'
 // All the tools!
 import fetch from 'isomorphic-unfetch'
 import moment from 'moment'
-import { zeroWidthSpace, getInsult, fetchLimited } from '../imports/tools'
+import Fuse from 'fuse.js'
+import { zeroWidthSpace, getInsult, fetchLimited, getIdFromMention } from '../imports/tools'
 // Get the NASA API token.
 import 'json5/lib/require'
 import {
@@ -52,24 +53,30 @@ export const handleOcr: Command = {
       // If no text was found.
       if (!result.responses[0].fullTextAnnotation
       ) return 'I was unable to get any results for the image.'
-      // If the result is too long, upload it to hasteb.in.
+      // If the result is too long, upload it to paste.gg.
       const text = result.responses[0].fullTextAnnotation.text
       let hastebin = ''
+      let deletionKey = ''
       try {
         if (text.length > 2000 || useHastebin) {
-          const { key } = await fetch('https://hasteb.in/documents', {
-            method: 'POST', body: text
+          const { result } = await fetch('https://api.paste.gg/v1/pastes', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+              name: 'IveBot /ocr result', files: [{ content: { format: 'text', value: text } }]
+            })
           }).then(e => e.json())
-          hastebin = key
+          hastebin = result.id
+          deletionKey = result.deletion_key
         }
       } catch (e) {
-        return `Failed to upload long OCR result to hasteb.in! (${text.length} characters long)`
+        return `Failed to upload long OCR result to paste.gg! (${text.length} characters long)`
       }
       // Return our answer.
       return {
         content: hastebin
-          ? `🤔 **Text recognition result uploaded to hasteb.in${!useHastebin ? ' due to length' : ''}:**
-https://hasteb.in/${hastebin} (will be deleted after 30 days)`
+          ? `🤔 **Text recognition result uploaded to paste.gg${!useHastebin ? ' due to length' : ''}:**
+https://paste.gg/p/anonymous/${hastebin} (use this key to delete: \`${deletionKey}\`)`
           : '🤔 **Text recognition result:**\n' + text,
         embed: {
           color: 0x666666,
@@ -87,6 +94,53 @@ https://hasteb.in/${hastebin} (will be deleted after 30 days)`
         }
       }
     } catch (e) { return `Invalid image URL, you ${getInsult()}.` }
+  }
+}
+
+export const handleHastebin: Command = {
+  name: 'hastebin',
+  aliases: ['hasteb.in', 'texturl', 'hbin', 'haste', 'paste.gg', 'pastegg', 'paste'],
+  opts: {
+    description: 'Upload a file to paste.gg to view on phone',
+    fullDescription: 'Upload a file to paste.gg to view on phone',
+    example: '/hastebin <with uploaded text file>',
+    usage: '/hastebin <link to text file/uploaded text file>',
+    argsRequired: false
+  },
+  generator: async (message, args, { client }) => {
+    try {
+      // Check if a message link was passed.
+      const regex = /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
+      let url = args.length ? args.join('%20') : message.attachments[0].url
+      if (regex.test(url)) {
+        const split = url.split('/')
+        const mess = await client.getMessage(split[split.length - 2], split.pop())
+        url = /^https?:\/\/\S+$/.test(mess.content) ? mess.content : mess.attachments[0].url
+      }
+      // Fetch text file.
+      // TODO: Outdated..
+      const text = await fetchLimited(url, 0.4)
+      if (text === false) return 'The file provided is larger than 400 KB (paste.gg limit)!'
+      // Now send the request.
+      const req = await fetch('https://api.paste.gg/v1/pastes', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          name: 'IveBot paste.gg upload',
+          files: [{
+            name: message.attachments.length ? message.attachments[0].filename : 'pastefile1',
+            content: { format: 'text', value: text.toString('utf8') }
+          }]
+        })
+      })
+      if (!req.ok) return 'Failed to upload text to paste.gg!'
+      // Parse the response.
+      const res = await req.json()
+      const { id, deletion_key: deletionKey } = res.result
+      return id
+        ? `**paste.gg URL:**\nhttps://paste.gg/p/anonymous/${id}\nDeletion key: ${deletionKey}`
+        : 'Failed to upload text to paste.gg!'
+    } catch (e) { return `Invalid text file, you ${getInsult()}.` }
   }
 }
 
@@ -122,7 +176,7 @@ export const handleRobohash: Command = {
   },
   generator: (message, args) => {
     // Get text to hash.
-    const target = args.shift()
+    const target = args.shift().toLowerCase()
     const text = args.join('%20')
     // Send a robohash.
     const color = 0xcf1c1c
@@ -147,7 +201,7 @@ export const handleRobohash: Command = {
         embed: { image: { url: `https://robohash.org/${text}.png?set=set5` }, color }, content: '🤔'
       }
     } else {
-      return 'Proper usage: /robohash <robot, monster, head, cat, human> <text to robohash>'
+      return { content: 'Correct usage: /robohash <robot, monster, head, cat, human> <text to robohash>', error: true }
     }
   }
 }
@@ -183,7 +237,7 @@ export const handleApod: Command = {
           }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
     } else if (args.length) {
-      return 'Invalid date.'
+      return { content: 'Invalid date.', error: true }
     }
     // Fetch a picture or video.
     try { // eslint-disable-next-line camelcase
@@ -217,17 +271,22 @@ export const handleDog: Command = {
         // If only list of breeds was asked.
         if (!args[1]) return `**List of breeds:** ${Object.keys(message).join(', ')}`
         // If list of sub-breeds was asked.
-        if (!message[args[1]]) return 'This breed does not exist!'
-        else if (message[args[1]].length === 0) return 'This breed has no sub-breeds!'
+        if (!message[args[1]]) return { content: 'This breed does not exist!', error: true }
+        else if (message[args[1]].length === 0) return { content: 'This breed has no sub-breeds!', error: true }
         return `**List of sub-breeds:** ${message[args[1]].join(', ')}`
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
       // Fetch a random picture for a sub-breed.
     } else if (args[0] && args[1]) {
       try {
-        const { message } = await (await fetch(
+        let { message } = await (await fetch(
           `http://dog.ceo/api/breed/${args[0].toLowerCase()}/${args[1].toLowerCase()}/images/random`
         )).json()
-        if (!message || message === 'Breed not found') return 'This breed/sub-breed does not exist!'
+        if (message.includes('Breed not found')) {
+          ({ message } = await (await fetch(
+            `http://dog.ceo/api/breed/${args.join('').toLowerCase()}/images/random`
+          )).json())
+        }
+        if (!message || message.includes('Breed not found')) return { content: 'This breed/sub-breed does not exist!', error: true }
         return {
           embed: { image: { url: message }, color: 0x654321 },
           content: `🐕 ${args[0]} ${args[1]}`
@@ -239,7 +298,7 @@ export const handleDog: Command = {
         const { message } = await (await fetch(
           `http://dog.ceo/api/breed/${args[0].toLowerCase()}/images/random`
         )).json()
-        if (!message || message === 'Breed not found') return 'This breed does not exist!'
+        if (!message || message.includes('Breed not found')) return 'This breed does not exist!'
         return { embed: { image: { url: message }, color: 0x654321 }, content: '🐕 ' + args[0] }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
     }
@@ -286,7 +345,7 @@ export const handleUrban: Command = {
         }
         // Else, there will be an exception thrown.
       } catch (err) {
-        return 'No definition was found.'
+        return { content: 'No definition was found.', error: true }
       }
     } catch (e) {
       return `Something went wrong 👾 Error: ${e}`
@@ -307,8 +366,10 @@ export const handleNamemc: Command = {
     if (args.length > 1) return 'Minecraft users cannot have spaces in their name.'
     try {
       // Fetch the UUID and name of the user and parse it to JSON.
+      const member = message.member && message.member.guild.members.get(getIdFromMention(args[0]))
+      const username = member ? (member.nick || member.username) : args[0]
       const { id, name } = await (await fetch(
-        `https://api.mojang.com/users/profiles/minecraft/${args[0]}`
+        `https://api.mojang.com/users/profiles/minecraft/${username}`
       )).json()
       // Fetch the previous names as well.
       try {
@@ -332,7 +393,7 @@ export const handleNamemc: Command = {
           }
         }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
-    } catch (e) { return `Enter a valid Minecraft username (account must be premium)` }
+    } catch (e) { return { content: `Enter a valid Minecraft username (account must be premium)`, error: true } }
   }
 }
 
@@ -369,15 +430,15 @@ letter code + the first letter of the currency name.` }]
       }
     }
     // Calculate the currencies to conver from and to, as well as the amount.
-    if (args.length < 2) return 'Invalid usage, use /help currency for proper usage.'
+    if (args.length < 2) return { content: 'Invalid usage, use /help currency for proper usage.', error: true }
     const from = args[0].toUpperCase()
     const to = args[1].toUpperCase()
     // Check if everything is in order.
-    if (from.length !== 3 || !currency.rates[from]) return 'Invalid currency to convert from.'
-    else if (to.length !== 3 || !currency.rates[to]) return 'Invalid currency to convert to.'
+    if (from.length !== 3 || !currency.rates[from]) return { content: 'Invalid currency to convert from.', error: true }
+    else if (to.length !== 3 || !currency.rates[to]) return { content: 'Invalid currency to convert to.', error: true }
     else if (!args[2]) args[2] = '1' // If no amount was provided, the amount should be one.
-    else if (args.length > 3) return 'Enter a single number for currency conversion.'
-    else if (isNaN(+args[2])) return 'Enter a proper number to convert.'
+    else if (args.length > 3) return { content: 'Enter a single number for currency conversion.', error: true }
+    else if (isNaN(+args[2])) return { content: 'Enter a proper number to convert.', error: true }
     // Now we convert the amount.
     const convertedAmount = ((currency.rates[to] / currency.rates[from]) * +args[2])
     const roundedOffAmount = Math.ceil(convertedAmount * Math.pow(10, 4)) / Math.pow(10, 4)
@@ -416,17 +477,17 @@ export const handleWeather: Command = {
     example: '/weather Shanghai CN'
   },
   generator: async (message, args) => {
-    const farhenheit = args.includes('--fahrenheit') || args.includes('-f')
-    if (farhenheit) args.splice(args.includes('-f') ? args.indexOf('-f') : args.indexOf('--fahrenheit'), 1)
+    const fahrenheit = args.includes('--fahrenheit') || args.includes('-f')
+    if (fahrenheit) args.splice(args.includes('-f') ? args.indexOf('-f') : args.indexOf('--fahrenheit'), 1)
     // Get the response from our API.
     const weather: Weather = await (await fetch(
       `http://api.openweathermap.org/data/2.5/weather?q=${args.join(',')}&appid=${weatherAPIkey}${
-        farhenheit ? '&units=imperial' : '&units=metric'
+        fahrenheit ? '&units=imperial' : '&units=metric'
       }`
     )).json()
-    const temp = farhenheit ? '°F' : '°C'
+    const temp = fahrenheit ? '°F' : '°C'
     // If the place doesn't exist..
-    if (weather.cod === '404') return 'Enter a valid city >_<'
+    if (weather.cod === '404') return { content: 'Enter a valid city >_<', error: true }
     // We generate the entire embed.
     return {
       content: `**🌇🌃🌁🌆 The weather for ${args.join(', ')}:**`,
@@ -499,7 +560,7 @@ export const handleDefine: Command = {
       if (r.error === 'No entries were found for a given inflected word' || (
         r.error && r.error.startsWith('No lemma was found')
       )) {
-        return 'Did you enter a valid word? 👾'
+        return { content: 'Did you enter a valid word? 👾', error: true }
       }
       try {
         // Here we get the dictionary entries for the specified word.
@@ -563,11 +624,11 @@ export const handleDefine: Command = {
           }
         }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
-    } catch (e) { return 'Did you enter a valid word? 👾' }
+    } catch (e) { return { content: 'Did you enter a valid word? 👾', error: true } }
   }
 }
 
-const noimageposts = [1037, 1608, 1663].map(e => 'https://xkcd.com' + e)
+const noimageposts = ['1037', '1608', '1663']
 export const handleXkcd: Command = {
   name: 'xkcd',
   opts: {
@@ -585,20 +646,23 @@ export const handleXkcd: Command = {
         if (!req.ok) return 'Failed to fetch list of xkcd comics!\nhttps://xkcd.com/1348'
         const posts = (await req.text()).split('<br/>').map(e => ({
           name: e.substring(0, e.length - 4).split('>').pop(),
-          url: 'https://xkcd.com/' + e.substring(e.lastIndexOf('href="/') + 7).split('/"').shift()
+          id: e.substring(e.lastIndexOf('href="/') + 7).split('/"').shift()
         })).slice(4)
         posts.splice(posts.length - 11, 11) // Slice and splice invalid elements.
-        // Construct search result.
-        // TODO: More powerful search required.
-        const res = posts.filter(post => post.name.toLowerCase().startsWith(args.slice(1).join(' ').toLowerCase()))
-          .map(e => e && noimageposts.includes(e.url) ? { ...e, url: e.url + '(no image)' } : e)
-        if (!res.length) return 'No results were found for your search criteria!'
-        return `**Top results:**
-1. ${res[0].url}${res[1] ? `\n2. <${res[1].url}>` : ''}${res[2] ? `\n3. <${res[2].url}>` : ''}`
+        // Construct search result. Default threshold was 0.6, 0.4 is more precise.
+        const fuse = new Fuse(posts, { keys: ['name', 'id'], threshold: 0.4 })
+        const res = fuse.search(args.slice(1).join(' '), { limit: 3 }).map(e => (
+          noimageposts.includes(e.item.id) ? { ...e.item, id: e.item.id + '(no image)' } : e.item
+        ))
+        if (!res.length) return { content: 'No results were found for your search criteria!', error: true }
+        const res1 = 'https://xkcd.com/' + res[0].id
+        const res2 = res[1] ? `\n2. <https://xkcd.com/${res[1].id}>` : ''
+        const res3 = res[2] ? `\n3. <https://xkcd.com/${res[2].id}>` : ''
+        return `**Top results:**\n1. ${res1}${res2}${res3}`
       } catch (e) { console.error(e); return 'Failed to fetch list of xkcd comics!\nhttps://xkcd.com/1348' }
     } else if (
       args.length > 1 || (args.length === 1 && args[0] !== 'latest' && args[0] !== 'random')
-    ) return 'Correct usage: /xkcd (latest|random|search) (search query if searching)'
+    ) return { content: 'Correct usage: /xkcd (latest|random|search) (search query if searching)', error: true }
     // Get the latest xkcd comic.
     try {
       const { num } = await (await fetch('http://xkcd.com/info.0.json')).json()
@@ -622,7 +686,7 @@ export const handleHttpCat: Command = {
     if (isNaN(+args[0]) || args.length > 1) return 'Enter a valid HTTP status code!'
 
     const req = await fetch('https://http.cat/' + args[0], { method: 'HEAD' })
-    if (req.status === 404) return 'Enter a valid HTTP status code!\nhttps://http.cat/404'
+    if (req.status === 404) return { content: 'Enter a valid HTTP status code!\nhttps://http.cat/404', error: true }
 
     return 'https://http.cat/' + args[0]
   }

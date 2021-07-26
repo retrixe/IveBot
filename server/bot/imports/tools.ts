@@ -28,15 +28,20 @@ export const getUser = (message: Message, arg: string) => {
   const guild = message.member.guild
   if (guild.members.has(arg)) return guild.members.get(arg).user
   else if (mentions.length && mentions[0].id === getIdFromMention(arg)) return mentions[0]
-  else if (guild.members.find(i => i && i.username.toLowerCase() === arg.toLowerCase())) {
-    return guild.members.find(i => i && i.username.toLowerCase() === arg.toLowerCase()).user
-  } else if (guild.members.find(
-    i => i && i.username.toLowerCase() + '#' + i.discriminator === arg.toLowerCase()
-  )) {
-    return guild.members.find(
-      i => i && i.username.toLowerCase() + '#' + i.discriminator === arg.toLowerCase()
-    ).user
-  }
+  // Filter members then use .find for order of precedence.
+  const lower = arg.toLowerCase()
+  const users = guild.members.filter(i => (
+    (i.nick && i.nick.toLowerCase() === lower) || i.username.toLowerCase() === lower ||
+    i.username.toLowerCase() + '#' + i.discriminator === lower
+  ))
+  if (users.length === 0) return
+  else if (users.length === 1) return users[0].user
+  const userDiscrim = users.find(i => i.username.toLowerCase() + '#' + i.discriminator === lower)
+  if (userDiscrim) return userDiscrim.user
+  const username = users.find(i => i.username.toLowerCase() === lower)
+  if (username) return username.user
+  const nickname = users.find(i => i.nick && i.nick.toLowerCase() === lower)
+  if (nickname) return nickname.user
 }
 
 export const getChannel = (message: Message, arg: string) => {
@@ -56,7 +61,8 @@ export const getChannel = (message: Message, arg: string) => {
 // Fresh insults. They come and go, I suppose.
 export const getInsult = () => {
   const insults = [
-    'pathetic lifeform', 'ungrateful bastard', 'idiotic slimeball', 'worthless ass', 'dumb dolt'
+    'pathetic lifeform', 'ungrateful bastard', 'idiotic slimeball', 'worthless ass', 'dumb dolt',
+    'one pronged fork', 'withered oak', 'two pump chump', 'oompa loompa'
   ]
   return insults[Math.floor(Math.random() * insults.length)]
 }

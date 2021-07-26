@@ -1,15 +1,15 @@
 import { Command } from '../imports/types'
-import { eval as eva } from 'mathjs'
+import { evaluate } from 'mathjs'
 
 // Zalgo characters.
-const characters = [ // TODO de adaugat u0e49
+const characters = [
   // upper characters
   '\u030d', '\u030e', '\u0304', '\u0305', '\u033f', '\u0311', '\u0306', '\u0310', '\u0352',
   '\u0357', '\u0351', '\u0307', '\u0308', '\u030a', '\u0342', '\u0343', '\u0344', '\u034a',
   '\u034b', '\u034c', '\u0303', '\u0302', '\u030c', '\u0350', '\u0300', '\u0301', '\u030b',
   '\u030f', '\u0312', '\u0313', '\u0314', '\u033d', '\u0309', '\u0363', '\u0364', '\u0365',
   '\u0366', '\u0367', '\u0368', '\u0369', '\u036a', '\u036b', '\u036c', '\u036d', '\u036e',
-  '\u036f', '\u033e', '\u035b', '\u0346', '\u031a',
+  '\u036f', '\u033e', '\u035b', '\u0346', '\u031a', '\u0e49',
   // middle characters
   '\u0315', '\u031b', '\u0340', '\u0341', '\u0358', '\u0321', '\u0322', '\u0327', '\u0328',
   '\u0334', '\u0335', '\u0336', '\u034f', '\u035c', '\u035d', '\u035e', '\u035f', '\u0360',
@@ -33,7 +33,7 @@ export const handleChoose: Command = {
   },
   generator: (message, args) => {
     // Is it used correctly?
-    if (message.content.split('|').length === 1) return 'Correct usage: /choose item1|item2|...'
+    if (message.content.split('|').length === 1) return { content: 'Correct usage: /choose item1|item2|...', error: true }
     const choices = args.join(' ').split('|')
     return `I choose: ${choices[Math.floor(Math.random() * choices.length)]}`
   }
@@ -128,10 +128,10 @@ export const handleRepeat: Command = {
     const number = +args.shift()
     if (isNaN(number)) return 'Correct usage: /repeat <number of times> <string to repeat>'
     else if (number * args.join(' ').length >= 2001) {
-      return 'To prevent spam, your excessive message has not been repeated.'
+      return { content: 'To prevent spam, your excessive message has not been repeated.', error: true }
     } else if (
       args.join(' ') === '_' || args.join(' ') === '*' || args.join(' ') === '~'
-    ) return 'This is known to lag users and is disabled.'
+    ) return { content: 'This is known to lag users and is disabled.', error: true }
     // Generate the repeated string.
     let generatedMessage = ''
     for (let x = 0; x < number; x++) { generatedMessage += args.join(' ') }
@@ -153,14 +153,14 @@ export const handleRandom: Command = {
     // If argument length is 1 and the argument is a number..
     if (args.length === 1 && !isNaN(+args[0])) {
       const number = +args[0]
-      return `The number.. is.. ${Math.floor(Math.random() * 10) + number}`
+      return `The number.. is.. ${Math.floor(Math.random() * number)}`
       // If argument length is 2 and both arguments are numbers..
     } else if (args.length === 2 && !isNaN(+args[0]) && !isNaN(+args[1])) {
       const number1 = +args[0]
       const number2 = +args[1]
       return `The number.. is.. ${Math.floor(Math.random() * (number2 - number1)) + number1}`
     } else if (args.length >= 1) {
-      return 'Correct usage: /random (optional start number) (optional end number)'
+      return { content: 'Correct usage: /random (optional start number) (optional end number)', error: true }
     }
     return `The number.. is.. ${Math.floor(Math.random() * 10)}`
   }
@@ -179,9 +179,9 @@ More info here: https://mathjs.org/docs/expressions/syntax.html`,
   },
   generator: (message, args) => {
     try {
-      return `${eva(args.join(' ').split(',').join('.').split('÷').join('/').toLowerCase())}`
+      return `${evaluate(args.join(' ').split(',').join('.').split('÷').join('/').toLowerCase())}`
     } catch (e) {
-      return 'Invalid expression >_<'
+      return { content: 'Invalid expression >_<', error: true }
     }
   }
 }

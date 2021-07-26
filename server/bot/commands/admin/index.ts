@@ -43,7 +43,7 @@ export const handlePurge: Command = {
     // Check if usage is correct.
     if (
       isNaN(+args[0]) || args.length !== 1 || +args[0] <= 0 || +args[0] > 100
-    ) { return 'Correct usage: /purge <number greater than 0 and less than 100>' }
+    ) { return { content: 'Correct usage: /purge <number greater than 0 and less than 100>', error: true } }
     // Check bot for permissions.
     const permission = (message.channel as GuildTextableChannel).permissionsOf(client.user.id)
     if (!permission.has('manageMessages')) {
@@ -59,7 +59,7 @@ export const handlePurge: Command = {
     try {
       const reason = args.join(' ') || 'Purge'
       await client.deleteMessages(message.channel.id, messages.map(i => i.id), reason)
-    } catch (e) { return 'Could not delete messages. Are the messages older than 2 weeks?' }
+    } catch (e) { return { content: 'Could not delete messages. Are the messages older than 2 weeks?', error: true } }
   }
 }
 
@@ -76,13 +76,13 @@ export const handleKick: Command = {
   generator: async (message, args, { client }) => {
     // Find the user ID.
     let user = getUser(message, args.shift())
-    if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
+    if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // If the user cannot kick the person..
     if (
       checkRolePosition(message.member.guild.members.get(user.id)) >=
       checkRolePosition(message.member)
     ) {
-      return `You cannot kick this person, you ${getInsult()}.`
+      return { content: `You cannot kick this person, you ${getInsult()}.`, error: true }
     }
     // Now we kick the person.
     const f = parseSilentDelete(args)
@@ -91,8 +91,8 @@ export const handleKick: Command = {
       message.member.guild.members.get(user.id) &&
       (checkRolePosition(message.member.guild.members.get(user.id)) >=
         checkRolePosition(message.member.guild.members.get(client.user.id)) ||
-        !message.member.guild.members.get(client.user.id).permission.has('banMembers'))
-    ) return `I cannot kick this person, you ${getInsult()}.`
+        !message.member.guild.members.get(client.user.id).permissions.has('banMembers'))
+    ) return { content: `I cannot kick this person, you ${getInsult()}.`, error: true }
     // Notify the user.
     let dm
     if (!f.silent) {

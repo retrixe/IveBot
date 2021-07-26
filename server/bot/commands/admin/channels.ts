@@ -15,10 +15,10 @@ export const handleDeletechannel: Command = {
   generator: async (message, args, { client }) => {
     // Get the channel ID.
     const channel = getChannel(message, args.shift())
-    if (!channel) return `Specify a valid channel, you ${getInsult()}!`
+    if (!channel) return { content: `Specify a valid channel, you ${getInsult()}!`, error: true }
     // If no permission to manage channels, say it.
-    if (!message.member.guild.members.get(client.user.id).permission.has('manageChannels')) {
-      return 'I can\'t even delete that channel, you ' + getInsult() + '.'
+    if (!message.member.guild.members.get(client.user.id).permissions.has('manageChannels')) {
+      return { content: 'I can\'t even delete that channel, you ' + getInsult() + '.', error: true }
     }
     // Delete it.
     try {
@@ -45,10 +45,10 @@ export const handleEditchannel: Command = {
   generator: async (message, args, { client }) => {
     // Get the channel ID.
     const channel = getChannel(message, args.shift())
-    if (!channel) return `Specify a valid channel, you ${getInsult()}!`
+    if (!channel) return { content: `Specify a valid channel, you ${getInsult()}!`, error: true }
     // If no permission to manage channel, say it.
     if (!channel.permissionsOf(client.user.id).has('manageChannels')) {
-      return 'I can\'t edit that channel, you ' + getInsult() + '.'
+      return { content: 'I can\'t edit that channel, you ' + getInsult() + '.', error: true }
     }
     // Get the operations.
     const ops: string[] = args.join(' ').split('|')

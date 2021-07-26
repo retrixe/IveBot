@@ -47,6 +47,7 @@ export const handleToken: Command = {
 
 export const handleVersion: Command = {
   name: 'version',
+  aliases: ['ver'],
   opts: {
     description: 'Current running version of IveBot.',
     fullDescription: 'Current running version of IveBot.',
@@ -54,7 +55,7 @@ export const handleVersion: Command = {
     example: '/version',
     argsRequired: false
   },
-  generator: () => `**IveBot ${version}**`
+  generator: `**IveBot ${version}**`
 }
 
 export const handleAbout: Command = {
@@ -66,15 +67,14 @@ export const handleAbout: Command = {
     example: '/about',
     argsRequired: false
   },
-  generator: () => `**IveBot ${version}**
+  generator: `**IveBot ${version}**
 IveBot is a Discord bot written with Eris and care.
 Unlike most other dumb bots, IveBot was not written with discord.js and has 0% copied code.
 Built with community feedback mainly, IveBot does a lot of random stuff and fun.
-IveBot 3.0 is planned to be a port to Eris with multiple new features and a complete rewrite.
+IveBot 4.0 is planned to revamp the dashboard, make the code a lot more maintainable and use intents.
 For information on what IveBot can do, type **/help** or **/halp**.
 The source code can be found here: <https://github.com/retrixe/IveBot>
 For noobs, this bot is licensed and protected by law. Copy code and I will sue you for a KitKat.`
-
 }
 
 export const handleUptime: Command = {
@@ -131,7 +131,7 @@ export const handlePing: Command = {
     if (args.length === 1 && testPilots.includes(message.author.id)) {
       try {
         return execSync('ping -c 1 ' + args[0], { encoding: 'utf8' }).split('\n')[1]
-      } catch (e) { return 'Looks like pinging the website failed.' }
+      } catch (e) { return { content: 'Looks like pinging the website failed.', error: true } }
     }
     // Get the time before sending the message.
     const startTime = Date.now()
@@ -171,7 +171,8 @@ export const handleEval: Command = {
       const res = inspect(await Promise.resolve(eval(toEval)), false, 0)
       // const res = eval(`(async () => { const a = ${toEval}; return a })()`)
       message.addReaction('✅')
-      return res !== 'undefined' ? `${'```'}${res}${'```'}`.replace(client.token, 'censored') : undefined
+      const token = (client as unknown as { _token: string })._token
+      return res !== 'undefined' ? `${'```'}${res}${'```'}`.replace(token, 'censored') : undefined
     } catch (e) {
       const channel = await client.getDMChannel(host)
       message.addReaction('❌')
@@ -214,11 +215,11 @@ getContent/getCleanContent(messageID), createMessage(content), getReactions(mess
       })
       const res = inspect(await Promise.resolve(result), false, 0)
       message.addReaction('✅')
-      return res !== 'undefined' ? `${'```'}${res}${'```'}` : undefined
+      const token = (context.client as unknown as { _token: string })._token
+      return res !== 'undefined' ? `${'```'}${res.replace(token, '')}${'```'}` : undefined
     } catch (e) {
       message.addReaction('❌')
-      return `**Error:**
-${e}`
+      return { content: `**Error:**\n${e}`, error: true }
     }
   }
 }
@@ -238,7 +239,7 @@ export const handleCreationtime: Command = {
       let id = args[0]
       id = (id.length === 17 || id.length === 18) && !isNaN(+id) ? id : getIdFromMention(args[0])
       if ((id.length !== 17 && id.length !== 18) || isNaN(+id)) {
-        return `Provide an valid ID or mention, you ${getInsult()}.`
+        return { content: `Provide an valid ID or mention, you ${getInsult()}.`, error: true }
       }
       return moment((new Base(id)).createdAt).format('YYYY/MM/DD, hh:mm:ss A')
     } else {

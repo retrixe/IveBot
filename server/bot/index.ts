@@ -23,13 +23,13 @@ export const guildMemberAdd = (client: Client, db: Db, tempDB: DB) => async (
   // If there's autorole enabled..
   if (serverSettings.joinAutorole) {
     // For each role..
-    serverSettings.joinAutorole.split('|').forEach((role: string) => {
+    serverSettings.joinAutorole.split('|').forEach(async (role: string) => {
       try {
         const roleName = role.startsWith('bot-') ? role.substr(4) : role
         const roleObj = member.guild.roles.find(element => element.name === roleName)
         if (!role || !roleObj) return
-        if (role.startsWith('bot-') && member.user.bot) member.addRole(roleObj.id)
-        else if (!role.startsWith('bot-') && !member.user.bot) member.addRole(roleObj.id)
+        if (role.startsWith('bot-') && member.user.bot) await member.addRole(roleObj.id)
+        else if (!role.startsWith('bot-') && !member.user.bot) await member.addRole(roleObj.id)
       } catch (e) {}
     })
   }
@@ -112,6 +112,10 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
   // Auto responses and easter eggs.
   if (command.startsWith('is dot a good boy')) sendResponse('Shame on you. He\'s undefined.')
   else if (command.startsWith('iphone x')) sendResponse(`You don't deserve it. 😎`)
+  else if (command.startsWith('iphone 11')) sendResponse(`You don't deserve it. 😎`)
+  else if (command.startsWith('iphone 12')) sendResponse(`You don't deserve it. 😎`)
+  else if (command.startsWith('iphone 13')) sendResponse(`You don't deserve it. 😎`)
+  else if (command.startsWith('iphone se')) sendResponse(`lol peasant`)
   else if (command.startsWith('triggered')) sendResponse('Ah, pathetic people again.')
   else if (command.startsWith('ayy')) sendResponse('lmao')
   // Handle answers to gunfight.

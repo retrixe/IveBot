@@ -1,5 +1,5 @@
 // Flow our types.
-import { Client, Message, MessageContent, EmbedOptions } from 'eris'
+import { AdvancedMessageContent, Client, Message } from 'eris'
 import CommandParser from '../client'
 import { Db } from 'mongodb'
 import { TriviaSession } from '../commands/trivia'
@@ -33,13 +33,10 @@ export type DB = {
 }
 
 export type Context = { tempDB: DB, db: Db, commandParser: CommandParser, client: Client }
-export type IveBotCommandGeneratorFunction = (msg: Message, args: string[], ctx: Context) => string | void | {
-    content?: string;
-    tts?: boolean;
-    disableEveryone?: boolean;
-    embed?: EmbedOptions;
-} | Promise<MessageContent> | Promise<void>
-export type IveBotCommandGenerator = IveBotCommandGeneratorFunction|MessageContent
+export type CommandResponse = string | AdvancedMessageContent & { error?: boolean }
+export type IveBotCommandGeneratorFunction = (msg: Message, args: string[], ctx: Context) =>
+  void | Promise<void> | CommandResponse | Promise<CommandResponse>
+export type IveBotCommandGenerator = IveBotCommandGeneratorFunction|string|AdvancedMessageContent
 export type Command = {
   opts: CommandOptions,
   aliases?: string[],

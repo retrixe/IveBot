@@ -1,5 +1,5 @@
 // All the types!
-import { Message } from 'eris'
+import Eris, { Message, GuildTextableChannel, Constants } from 'eris'
 import { Command } from '../imports/types'
 // All the needs!
 import { getIdFromMention, getInsult, getUser } from '../imports/tools'
@@ -24,7 +24,7 @@ export const handleServerinfo: Command = {
     let guild = args.length ? client.guilds.find(
       i => i.members.has(message.author.id) && i.id === args[0]
     ) : message.member.guild
-    if (!guild) return `Specify a valid mutual guild, ${getInsult()}.`
+    if (!guild) return { content: `Specify a valid mutual guild, ${getInsult()}.`, error: true }
     // Owner.
     const owner = guild.members.get(guild.ownerID)
     // Nitro Boosting support.
@@ -102,9 +102,10 @@ export const handleUserinfo: Command = {
     if (!user && message.author.id === host && [18, 17].includes(toGet.length) && !isNaN(+toGet)) {
       try { user = await client.getRESTUser(toGet) } catch (e) { }
     }
-    if (!user) return `Specify a valid member of this guild, ${getInsult()}.`
+    if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // Display information.
     const member = message.member.guild.members.get(user.id)
+    // TODO: Add publicFlags, game, premiumSince, custom-status. Support per-server pfp, about me, banner.
     const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
       (a, b) => a.position > b.position ? -1 : 1
     ).find(i => i.color !== 0) || { color: 0 }).color : 0
@@ -113,33 +114,109 @@ export const handleUserinfo: Command = {
       embed: {
         author: { name: `User info`, icon_url: user.avatarURL },
         title: `${user.username}#${user.discriminator}` + (user.bot ? ' (Bot account)' : ''),
-        description: user.mention,
+        description: user.mention + (member && member.pending ? ' (pending guild screening)' : ''),
         thumbnail: { url: user.dynamicAvatarURL('png', 2048) },
         color,
         fields: [
           { name: 'Status', value: member && member.status ? member.status : 'N/A', inline: true },
           // { name: 'Join Position }
-          // { name: 'Name', value: user.username, inline: true },
-          // { name: 'Discriminator', value: user.discriminator, inline: true },
           {
             name: 'Joined server at',
             value: member ? moment(member.joinedAt).format('DD/MM/YYYY, hh:mm:ss A') : 'N/A',
             inline: true
           },
-          { name: 'User ID', value: user.id, inline: true },
           {
             name: 'Registered at',
             value: moment(user.createdAt).format('DD/MM/YYYY, hh:mm:ss A'),
             inline: true
           },
+          // Game...
+          // Badges...
+          // Boosting since..
           {
             name: `Roles (${member ? member.roles.length : 'N/A'})`,
             value: member ? member.roles.map(i => member.guild.roles.get(i)).sort(
               (a, b) => a.position > b.position ? -1 : 1
             ).map(i => `<@&${i.id}>`).join(' ') : 'N/A'
-          }
-          // { name: 'Permissions' }
-        ]
+          },
+          { name: 'Permissions', value: member ? 'Run `/perms <user>` to get their permissions!' : 'N/A' }
+        ],
+        footer: { text: 'User ID: ' + user.id }
+      }
+    }
+  }
+}
+
+export const handlePermissions: Command = {
+  name: 'permissions',
+  aliases: ['perms'],
+  opts: {
+    description: 'Displays a particular member\'s permissions.',
+    fullDescription: 'Displays a particular member\'s permissions.',
+    example: '/permissions voldemort#6931',
+    usage: '/permissions (--ignore-admin) (user by ID/mention/username)',
+    argsRequired: false,
+    guildOnly: true,
+    requirements: { permissions: { manageRoles: true } }
+  },
+  generator: async (message, args, { client }) => {
+    const ignoreAdmin = args.includes('--ignore-admin')
+    if (ignoreAdmin) args.splice(args.indexOf('--ignore-admin'), 1)
+    // Find the user ID.
+    const toGet = args.length === 0 ? message.author.id : args.shift()
+    let user = getUser(message, toGet)
+    if (!user && message.author.id === host && [18, 17].includes(toGet.length) && !isNaN(+toGet)) {
+      try { user = await client.getRESTUser(toGet) } catch (e) { }
+    }
+    if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
+    // Display permission info.
+    const member = message.member.guild.members.get(user.id)
+    const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
+      (a, b) => a.position > b.position ? -1 : 1
+    ).find(i => i.color !== 0) || { color: 0 }).color : 0
+    const permissions = member.permissions
+    const permissionKeys = Object.keys(permissions.json) as (keyof Constants['Permissions'])[]
+    const channelPerm = (message.channel as GuildTextableChannel).permissionsOf(user.id)
+    return {
+      content: `✅ **Permissions of ${user.username}:**`,
+      embed: {
+        author: {
+          name: `${user.username}#${user.discriminator}'s permissions`,
+          icon_url: user.avatarURL
+        },
+        description: user.mention,
+        color,
+        fields: [
+          {
+            name: 'Guild Permissions',
+            value: message.member.guild.ownerID === user.id && !ignoreAdmin
+              ? 'Owner! (use `/perms --ignore-admin` to show perms regardless)'
+              : permissions.has('administrator') && !ignoreAdmin
+                ? 'Administrator! (use `/perms --ignore-admin` to show perms regardless)'
+                : permissionKeys
+                  .filter(perm => permissions.has(perm))
+                  .map(perm => (perm.substr(0, 1).toUpperCase() + perm.substr(1))
+                    .replace(/[A-Z]+/g, s => ' ' + s))
+                  .join(', ').replace('TTSMessages', 'TTS Messages')
+          },
+          !(message.member.guild.ownerID === user.id || permissions.has('administrator')) || ignoreAdmin
+            ? {
+              name: 'Channel Permissions',
+              value: (
+                permissionKeys
+                  .filter(perm => !permissions.has(perm) && channelPerm.has(perm))
+                  .map(perm => (perm.substr(0, 1).toUpperCase() + perm.substr(1))
+                    .replace(/[A-Z]+/g, s => ' ' + s))
+                  .join(', ') +
+                permissionKeys
+                  .filter(perm => permissions.has(perm) && !channelPerm.has(perm))
+                  .map(perm => '**!(' + (perm.substr(0, 1).toUpperCase() + perm.substr(1))
+                    .replace(/[^(][A-Z]+/g, s => s.substr(0, 1) + ' ' + s.substr(1)) + ')**')
+                  .join(', ')
+              ).replace('TTSMessages', 'TTS Messages')
+            } : { name: '', value: '' }
+        ].filter(e => !!e.value),
+        footer: { text: 'User ID: ' + user.id }
       }
     }
   }
@@ -199,17 +276,17 @@ export const handleSay: Command = {
     ) {
       if (message.member && !message.member.guild.channels.get(possibleChannel)
         .permissionsOf(message.member.id).has('sendMessages')
-      ) return `**You don't have enough permissions for that, you ${getInsult()}.**`
+      ) return { content: `**You don't have enough permissions for that, you ${getInsult()}.**`, error: true }
       args.shift()
       if (args.join(' ') === 'pls adim me') args = ['no']
       tempDB.say[message.channelMentions[0]] = (
         await client.createMessage(message.channelMentions[0], {
           content: args.join(' '),
           allowedMentions: {
-            everyone: message.member && message.member.permission.has('mentionEveryone'),
+            everyone: message.member && message.member.permissions.has('mentionEveryone'),
             users: true,
             roles: message.member && (
-              message.member.permission.has('mentionEveryone') ||
+              message.member.permissions.has('mentionEveryone') ||
               message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)
             )
           }
@@ -222,10 +299,10 @@ export const handleSay: Command = {
     return {
       content: args.join(' '),
       allowedMentions: {
-        everyone: message.member && message.member.permission.has('mentionEveryone'),
+        everyone: message.member && message.member.permissions.has('mentionEveryone'),
         users: true,
         roles: message.member && (
-          message.member.permission.has('mentionEveryone') ||
+          message.member.permissions.has('mentionEveryone') ||
           message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)
         )
       }
@@ -255,10 +332,10 @@ export const handleType: Command = {
     ) {
       if (message.member && !message.member.guild.channels.get(possibleChannel)
         .permissionsOf(message.member.id).has('sendMessages')
-      ) return `**You don't have enough permissions for that, you ${getInsult()}.**`
+      ) return { content: `**You don't have enough permissions for that, you ${getInsult()}.**`, error: true }
       args.shift()
       if (args.join(' ') === 'pls adim me') args = ['no']
-      message.channel.sendTyping()
+      await client.sendChannelTyping(message.channelMentions[0])
       await (ms => new Promise(resolve => setTimeout(resolve, ms)))(
         args.join(' ').length * 120 > 8000 ? 8000 : args.join(' ').length * 120
       )
@@ -266,10 +343,10 @@ export const handleType: Command = {
         await client.createMessage(message.channelMentions[0], {
           content: args.join(' '),
           allowedMentions: {
-            everyone: message.member && message.member.permission.has('mentionEveryone'),
+            everyone: message.member && message.member.permissions.has('mentionEveryone'),
             users: true,
             roles: message.member && (
-              message.member.permission.has('mentionEveryone') ||
+              message.member.permissions.has('mentionEveryone') ||
               message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)
             )
           }
@@ -279,17 +356,17 @@ export const handleType: Command = {
     }
     // Send the message.
     if (args.join(' ') === 'pls adim me') args = ['no']
-    message.channel.sendTyping()
+    await message.channel.sendTyping()
     await (ms => new Promise(resolve => setTimeout(resolve, ms)))(
       args.join(' ').length * 120 > 8000 ? 8000 : args.join(' ').length * 120
     )
     return {
       content: args.join(' '),
       allowedMentions: {
-        everyone: message.member && message.member.permission.has('mentionEveryone'),
+        everyone: message.member && message.member.permissions.has('mentionEveryone'),
         users: true,
         roles: message.member && (
-          message.member.permission.has('mentionEveryone') ||
+          message.member.permissions.has('mentionEveryone') ||
           message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)
         )
       }
@@ -308,7 +385,7 @@ export const handleRemindme: Command = {
   },
   generator: async (message, args, { db }) => {
     if (args.length < 2 || !ms(args[0])) {
-      return 'Correct usage: /remindme <time in 1d|1h|1m|1s> <description>'
+      return { content: 'Correct usage: /remindme <time in 1d|1h|1m|1s> <description>', error: true }
     }
     let channel = false
     if (args[1] === '-c' || args[1] === '--channel') channel = true
@@ -318,13 +395,13 @@ export const handleRemindme: Command = {
           type: 'reminder',
           time: Date.now() + ms(args[0]),
           user: message.author.id,
-          target: channel ? message.channel.id : 'dm',
+          target: channel ? message.channel.id : (await message.author.getDMChannel()).id,
           message: `⏰${
             channel ? message.author.mention + ' ' : ''
           } ${args.slice(channel ? 2 : 1).join(' ')}\nReminder set ${args[0]} ago.`
         })
         if (res.insertedCount !== 1) return 'Failed to add a reminder to the database!'
-      } catch (e) { return 'Failed to add a reminder to the database!' }
+      } catch (e) { return 'Failed to add a reminder to the database!' + channel ? '' : ' Can I DM you?' }
     } else {
       setTimeout(async () => {
         channel
@@ -337,6 +414,48 @@ export const handleRemindme: Command = {
       }, ms(args[0]))
     }
     return `You will be reminded in ${args[0]} through a ${channel ? 'mention' : 'DM'}.`
+  }
+}
+
+export const handleReminderlist: Command = {
+  name: 'reminderlist',
+  aliases: ['remindmelist', 'remindlist', 'rmlist', 'rml'],
+  opts: {
+    description: 'List the reminders I\'ve set.',
+    fullDescription: 'List the reminders I\'ve set.',
+    usage: '/reminderlist',
+    example: '/reminderlist',
+    argsRequired: false
+  },
+  generator: async (message, args, { db }) => {
+    // If improper arguments were provided, then we must inform the user.
+    if (args.length > 0 && message.author.id !== host) return { content: 'Correct usage: /reminderlist', error: true }
+    // Now find the user ID.
+    let user = args[0] && getUser(message, args[0])
+    if (!user && args.length) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
+    else if (!user) user = message.author
+    // Get a list of reminders.
+    const id = user.id
+    const reminders = await db.collection('tasks').find({ type: 'reminder', user: id }).toArray()
+    // If the person has no reminders..
+    if (reminders.length === 0) return '**No** reminders found.'
+    // Generate the response.
+    const format = 'dddd, MMMM Do YYYY, h:mm:ss A' // Date format.
+    return {
+      content: `⏰ **Reminders for ${user.username}#${user.discriminator}:**`,
+      embed: {
+        color: 0x00AE86,
+        type: 'rich',
+        title: 'Reminders',
+        // This function generates the fields.
+        fields: reminders.map((reminder, index) => ({
+          name: `Reminder ${index + 1}`,
+          value: `**Due time:** ${moment(reminder.time).format(format)}
+**Channel:** <#${reminder.target}>
+**Message:** ${reminder.message.substring(1, reminder.message.lastIndexOf('\n')).trim()}`
+        }))
+      }
+    }
   }
 }
 
@@ -438,7 +557,7 @@ export const handleChangeserverregion: Command = {
     invalidUsageMessage: 'Correct usage: /changeserverregion <valid server region, /listserverregion>'
   },
   generator: async (message, args, { client }) => {
-    if (!message.member.guild.members.get(client.user.id).permission.has('manageGuild')) {
+    if (!message.member.guild.members.get(client.user.id).permissions.has('manageGuild')) {
       return 'I require the Manage Server permission to do that..'
     }
     try {
@@ -468,20 +587,20 @@ export const handleEdit: Command = {
       message.channelMentions[0] === possibleChannel ||
       (message.member && message.member.guild.channels.has(possibleChannel))
     ) {
-      if (message.member && !message.member.guild.channels.get(possibleChannel)
-        .permissionsOf(message.member.id).has('sendMessages')
-      ) return `**You don't have enough permissions for that, you ${getInsult()}.**`
+      // if (message.member && !message.member.guild.channels.get(possibleChannel)
+      //   .permissionsOf(message.member.id).has('sendMessages')
+      // ) return `**You don't have enough permissions for that, you ${getInsult()}.**`
       const messageID = args.slice(1).shift()
       try {
         await client.editMessage(possibleChannel, messageID, args.slice(1).join(' '))
-      } catch (e) { return 'Nothing to edit.' }
+      } catch (e) { return { content: 'Nothing to edit.', error: true } }
       return
     }
     // Edit the message.
     const messageID = args.shift()
     try {
       await client.editMessage(message.channel.id, messageID, args.join(' '))
-    } catch (e) { return 'Nothing to edit.' }
+    } catch (e) { return { content: 'Nothing to edit.', error: true } }
   }
 }
 
@@ -503,18 +622,61 @@ export const handleEditLastSay: Command = {
       message.channelMentions[0] === possibleChannel ||
       (message.member && message.member.guild.channels.has(possibleChannel))
     ) {
-      if (message.member && message.member.guild.channels.get(possibleChannel)
+      if (message.member && !message.member.guild.channels.get(possibleChannel)
         .permissionsOf(message.member.id).has('sendMessages')
-      ) return `**You don't have enough permissions for that, you ${getInsult()}.**`
+      ) return { content: `**You don't have enough permissions for that, you ${getInsult()}.**`, error: true }
       // Edit the message.
       try {
         await client.editMessage(possibleChannel, tempDB.say[possibleChannel], args.slice(1).join(' '))
-      } catch (e) { return 'Nothing to edit.' }
+      } catch (e) { return { content: 'Nothing to edit.', error: true } }
       return
     }
     // Edit the message.
     try {
       await client.editMessage(message.channel.id, tempDB.say[message.channel.id], args.join(' '))
-    } catch (e) { return 'Nothing to edit.' }
+    } catch (e) { return { content: 'Nothing to edit.', error: true } }
+  }
+}
+
+export const handleSuppress: Command = {
+  name: 'suppress',
+  opts: {
+    requirements: {
+      permissions: { manageMessages: true },
+      custom: (message) => (
+        (message.channel as GuildTextableChannel)
+          .permissionsOf(message.author.id).has('manageMessages')
+      )
+    },
+    description: 'Suppress or unsuppress embeds in a message.',
+    fullDescription: 'Suppress or unsuppress embeds in a message.',
+    usage: '/suppress (channel) <message ID or link>',
+    example: '/suppress #general 123456789012345678'
+  },
+  generator: async (message, args) => {
+    let msg
+    let channel
+    if (args.length === 1) {
+      const regex = /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
+      if (regex.test(args[0])) {
+        const split = args[0].split('/')
+        channel = message.member.guild.channels.get(split[5]) as GuildTextableChannel
+        if (!channel || channel.type !== 0) return { content: `That's not a real channel, you ${getInsult()}.`, error: true }
+        msg = channel.messages.get(split[6]) || await channel.getMessage(split[6])
+      } else {
+        msg = message.channel.messages.get(args[0]) || await message.channel.getMessage(args[0])
+        channel = message.channel
+      }
+    } else if (args.length === 2) {
+      channel = message.member.guild.channels.get(getIdFromMention(args[0])) as GuildTextableChannel
+      if (channel && channel.type === 0) {
+        msg = channel.messages.get(args[1]) || await channel.getMessage(args[1])
+      } else return { content: `That's not a real channel, you ${getInsult()}.`, error: true }
+    } else return { content: 'Correct usage: /suppress (channel) <message ID or link>', error: true }
+
+    if (msg) {
+      await msg.edit({ flags: msg.flags ^ Eris.Constants.MessageFlags.SUPPRESS_EMBEDS })
+      message.addReaction('✅')
+    } else return { content: `That's not a real message, you ${getInsult()}.`, error: true }
   }
 }

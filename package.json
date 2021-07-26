@@ -1,6 +1,6 @@
 {
   "name": "ivebot",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "The bot that created the iPhone X.",
   "main": "server/index.ts",
   "scripts": {
@@ -13,18 +13,19 @@
   "author": "Ibrahim Ansari <ansari.ibrahim1@gmail.com>",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=6.5.0"
+    "node": ">=10.4.0"
   },
   "dependencies": {
     "@material-ui/core": "^3.0.1",
     "@material-ui/icons": "^3.0.1",
     "apollo-boost": "^0.1.4",
-    "eris": "^0.13.3",
+    "eris": "^0.15.1",
+    "fuse.js": "^6.4.6",
     "graphql": "^14.0.2",
     "graphql-yoga": "^1.16.7",
     "isomorphic-unfetch": "^2.0.0",
     "json5": "^0.5.1",
-    "mathjs": "^4.1.1",
+    "mathjs": "^9.4.3",
     "moment": "^2.24.0",
     "mongodb": "^3.0.6",
     "next": "^8.1.0",

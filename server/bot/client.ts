@@ -1,5 +1,5 @@
 import { Message, MessageContent, Client, GuildTextableChannel } from 'eris'
-import { DB, Command as IveBotCommand, IveBotCommandGenerator, Context } from './imports/types'
+import { DB, Command as IveBotCommand, IveBotCommandGenerator, Context, CommandResponse } from './imports/types'
 import { Db } from 'mongodb'
 import { getInsult } from './imports/tools'
 import botCallback from '.'
@@ -56,7 +56,8 @@ export class Command {
     this.postGenerator = command.postGenerator
     // Options.
     this.argsRequired = command.opts.argsRequired === undefined || command.opts.argsRequired
-    this.invalidUsageMessage = command.opts.invalidUsageMessage || 'Invalid usage.'
+    const defaultUsageMessage = 'Invalid usage, correct usage: ' + command.opts.usage
+    this.invalidUsageMessage = command.opts.invalidUsageMessage || defaultUsageMessage
     this.errorMessage = command.opts.errorMessage || 'IveBot has experienced an internal error.'
     // No impl for next.
     this.caseInsensitive = command.opts.caseInsensitive === undefined || command.opts.caseInsensitive
@@ -86,8 +87,8 @@ export class Command {
     if (message.channel.type !== 0) return userIDs || custom
     const permissions = this.requirements.permissions
       ? isEquivalent(Object.assign( // Assign the required permissions onto the member's permission.
-        message.member.permission.json, this.requirements.permissions
-      ), message.member.permission.json) // This should eval true if user has permissions.
+        message.member.permissions.json, this.requirements.permissions
+      ), message.member.permissions.json) // This should eval true if user has permissions.
       : false
     // If any of these are true, it's a go.
     return userIDs || custom || permissions
@@ -95,7 +96,7 @@ export class Command {
 
   async execute (context: Context, message: Message, args: string[]) {
     // Define 2 vars.
-    let messageToSend: MessageContent | void | Promise<MessageContent> | Promise<void>
+    let messageToSend: CommandResponse | void | Promise<CommandResponse> | Promise<void>
     // If it's a function, we call it first.
     if (typeof this.generator === 'function') messageToSend = this.generator(message, args, context)
     else messageToSend = this.generator
@@ -147,7 +148,7 @@ export default class CommandParser {
       // We check for arguments.
     } else if (args.length === 0 && command.argsRequired) {
       message.channel.createMessage(command.invalidUsageMessage)
-      return
+      return true
     }
     // Delete the message if needed.
     try {
@@ -163,6 +164,7 @@ export default class CommandParser {
         .permissionsOf(this.client.user.id).has('sendMessages')) || message.channel.type === 1)
     ) sent = await message.channel.createMessage(this.disableEveryone(messageToSend))
     if (command.postGenerator) command.postGenerator(message, args, sent, context)
+    return typeof messageToSend === 'object' ? messageToSend.error : false
   }
 
   disableEveryone = (message: MessageContent) => {
@@ -233,17 +235,19 @@ export default class CommandParser {
       if (commandExec === keys[i].toLowerCase() || (
         this.commands[keys[i]].aliases && this.commands[keys[i]].aliases.includes(commandExec)
       )) {
-        // We mark the command as evaluated and schedule a removal of the ID in 30 seconds.
-        this.evaluatedMessages.push(message.id)
-        setTimeout(() => {
-          this.evaluatedMessages.splice(this.evaluatedMessages.findIndex(i => i === message.id), 1)
-        }, 30000)
         // Execute command.
         try {
           const executeFirst = process.hrtime() // Initial high-precision time.
-          await this.executeCommand(this.commands[keys[i]], message)
+          const error = await this.executeCommand(this.commands[keys[i]], message)
           const executeSecond = process.hrtime(executeFirst) // Time difference.
           this.saveAnalytics(executeSecond, keys[i]) // Send analytics.
+          // We mark the command as evaluated and schedule a removal of the ID in 30 seconds.
+          if (!error) {
+            this.evaluatedMessages.push(message.id)
+            setTimeout(() => {
+              this.evaluatedMessages.splice(this.evaluatedMessages.findIndex(i => i === message.id), 1)
+            }, 30000)
+          } // TODO: else add it to erroredMessage, and edit that message on re-eval.
         } catch (e) {
           // On error, we tell the user of an unknown error and log it for our reference.
           message.channel.createMessage(this.commands[keys[i]].errorMessage)
@@ -259,6 +263,7 @@ export default class CommandParser {
   async onMessageUpdate (message: Message, oldMessage?: Message) {
     // We won't bother with a lot of messages..
     if (message.content && !message.content.startsWith('/')) return
+    else if (!message.editedTimestamp) return
     else if (this.evaluatedMessages.includes(message.id)) return
     else if (!oldMessage || Date.now() - message.timestamp > 30000) return
     else if (message.editedTimestamp - message.timestamp > 30000) return
@@ -272,17 +277,19 @@ export default class CommandParser {
       if (commandExec === keys[i].toLowerCase() || (
         this.commands[keys[i]].aliases && this.commands[keys[i]].aliases.includes(commandExec)
       )) {
-        // We mark the command as evaluated and schedule a removal of the ID in 30 seconds.
-        this.evaluatedMessages.push(message.id)
-        setTimeout(() => {
-          this.evaluatedMessages.splice(this.evaluatedMessages.findIndex(i => i === message.id), 1)
-        }, 30000)
         // Execute command.
         try {
           const executeFirst = process.hrtime() // Initial high precision time.
-          await this.executeCommand(this.commands[keys[i]], message)
+          const error = await this.executeCommand(this.commands[keys[i]], message)
           const executeSecond = process.hrtime(executeFirst) // Time difference.
           this.saveAnalytics(executeSecond, keys[i]) // Send analytics.
+          if (!error) {
+            // We mark the command as evaluated and schedule a removal of the ID in 30 seconds.
+            this.evaluatedMessages.push(message.id)
+            setTimeout(() => {
+              this.evaluatedMessages.splice(this.evaluatedMessages.findIndex(i => i === message.id), 1)
+            }, 30000)
+          }
         } catch (e) {
           // On error, we tell the user of an unknown error and log it for our reference.
           message.channel.createMessage(this.commands[keys[i]].errorMessage)
