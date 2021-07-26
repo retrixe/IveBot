@@ -23,7 +23,7 @@ export const guildMemberAdd = (client: Client, db: Db, tempDB: DB) => async (
   // If there's autorole enabled..
   if (serverSettings.joinAutorole) {
     // For each role..
-    serverSettings.joinAutorole.split('|').forEach((role: string) => {
+    serverSettings.joinAutorole.split('|').forEach(async (role: string) => {
       try {
         const roleName = role.startsWith('bot-') ? role.substr(4) : role
         const roleObj = member.guild.roles.find(element => element.name === roleName)
