@@ -3,7 +3,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "jsx": "react",
-    "target": "es2016",
+    "target": "es2018",
     "noImplicitAny": true,
     "removeComments": false,
     "preserveConstEnums": true,

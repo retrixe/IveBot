@@ -1,6 +1,6 @@
 # IveBot
 
-The bot that created the iPhone X. It's strictly private. You may run it locally,  but it's not a useful bot to others and tailored for a specific need.
+The bot that created the iPhone X. It's strictly private. You may run it locally, but it's not a useful bot to others and tailored for a specific need.
 
 **Requires Node.js 10.4.0 or higher.**
 
