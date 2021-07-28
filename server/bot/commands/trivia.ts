@@ -1,12 +1,10 @@
 import { Message, GuildTextableChannel, TextableChannel, User, EmbedOptions, Client } from 'eris'
 import { Command, DB } from '../imports/types'
-import fs from 'fs'
-import { promisify } from 'util'
 import { getInsult } from '../imports/tools'
+import fs from 'fs'
 
 async function parseTriviaList (fileName: string) {
-  const readFile = promisify(fs.readFile)
-  const data = await readFile(`./triviaLists/${fileName}.txt`, 'utf8')
+  const data = await fs.promises.readFile(`./triviaLists/${fileName}.txt`, 'utf8')
   const triviaList = data.split('\n')
   return triviaList
     .map(el => el.replace('\n', '').split('`'))
@@ -48,7 +46,7 @@ export class TriviaSession {
     this.client = client
   }
 
-  async sendScores () {
+  getScores () {
     const currentScores = Object.values(this.scores).sort((a: number, b: number) => b - a)
     const member = this.message.member.guild.members.get(this.client.user.id)
     const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
@@ -58,33 +56,30 @@ export class TriviaSession {
       title: 'Scores',
       color,
       timestamp: new Date().toISOString(),
-      fields: []
-    }
-    currentScores.forEach(score => {
-      embed.fields.push({
+      fields: currentScores.map(score => ({
         name: Object.keys(this.scores).find(key => this.scores[key] === score),
-        value: String(score),
+        value: score.toString(),
         inline: true
-      })
-    })
+      }))
+    }
     return { embed }
   }
 
   async endGame () {
     this.status = 'stop'
     delete this.tempDB.trivia[this.channel.id]
-    if (this.scores) { this.channel.createMessage(await this.sendScores()) }
+    if (this.scores) await this.channel.createMessage(this.getScores())
   }
 
   async newQuestion () {
     for (let i of Object.values(this.scores)) {
       if (i === this.settings.maxScore) {
-        this.endGame()
+        await this.endGame()
         return true
       }
     }
     if (!this.questionList) {
-      this.endGame()
+      await this.endGame()
       return true
     }
     this.currentLine = this.questionList[Math.floor(Math.random() * this.questionList.length)]
@@ -100,7 +95,7 @@ export class TriviaSession {
         if (msg.includes('asss')) {
           msg.replace('asss', 'asses')
         }
-        this.channel.createMessage(msg)
+        await this.channel.createMessage(msg)
         await this.endGame()
         return true
       }
@@ -110,7 +105,7 @@ export class TriviaSession {
     if (this.status === 'correct answer') {
       this.status = 'new question'
       await new Promise(resolve => setTimeout(resolve, 1000))
-      if (this.status !== 'stop') { this.newQuestion() }
+      if (this.status !== 'stop') await this.newQuestion()
     } else if (this.status === 'stop') {
       return true
     } else {
@@ -129,10 +124,10 @@ export class TriviaSession {
         }
       }
       this.currentLine = null
-      this.channel.createMessage(message)
-      this.channel.sendTyping()
+      await this.channel.createMessage(message)
+      await this.channel.sendTyping()
       await new Promise(resolve => setTimeout(resolve, 1000))
-      if (this.status !== 'stop') { this.newQuestion() }
+      if (this.status !== 'stop') await this.newQuestion()
     }
   }
 
@@ -220,7 +215,7 @@ export const handleTrivia: Command = {
     if (args.length === 1 && ['scores', 'score', 'leaderboard'].includes(args[0])) {
       const session = tempDB.trivia[message.channel.id]
       if (session) {
-        message.channel.createMessage(await session.sendScores())
+        await message.channel.createMessage(session.getScores())
       } else {
         return 'There is no trivia session ongoing in this channel.'
       }
@@ -235,15 +230,8 @@ export const handleTrivia: Command = {
       const embed: EmbedOptions = {
         title: 'Available trivia lists',
         color,
-        fields: []
+        fields: lists.map(name => ({ name, value: '_ _', inline: true }))
       }
-      lists.forEach(list => {
-        embed.fields.push({
-          name: list,
-          value: '_ _',
-          inline: true
-        })
-      })
       return { embed }
     } else if (args.length === 1 && args[0] === 'stop') {
       const session = tempDB.trivia[message.channel.id]
@@ -269,7 +257,7 @@ export const handleTrivia: Command = {
         }
         const t = new TriviaSession(triviaList, message, botPlays, timeLimit, maxScore, revealAnswer, tempDB, client)
         tempDB.trivia[message.channel.id] = t
-        t.newQuestion()
+        await t.newQuestion()
       } else {
         return 'A trivia session is already ongoing in this channel.'
       }
