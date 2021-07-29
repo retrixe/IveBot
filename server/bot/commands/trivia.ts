@@ -5,41 +5,36 @@ import fs from 'fs'
 
 async function parseTriviaList (fileName: string) {
   const data = await fs.promises.readFile(`./triviaLists/${fileName}.txt`, 'utf8')
-  const triviaList = data.split('\n')
+  const triviaList = new Map<string, string[]>()
+  data.split('\n').forEach(el => {
+    const splitEl = el.split('`').map(ans => ans.trim()).filter(ans => !!ans)
+    if (splitEl.length >= 2) triviaList.set(splitEl[0], splitEl.slice(1))
+  })
   return triviaList
-    .map(el => el.replace('\n', '').split('`'))
-    .filter(el => el.length >= 2 && el[0])
-    .map(el => ({
-      question: el[0],
-      answers: el.slice(1).map(ans => ans.trim())
-    }))
 }
 
 export class TriviaSession {
-  settings: { maxScore: number, timeout: number, delay: number, botPlays: boolean, revealAnswer: boolean }
+  settings: { maxScore: number, timeout: number, timeLimit: number, botPlays: boolean, revealAnswer: boolean }
   currentLine: {question: string, answers: string[]}
   channel: TextableChannel
   author: User
   message: Message
   questionList: {question: string, answers: string[]}[]
-  scores: { [char: string]: number } = {}
+  scores: { [id: string]: number } = {}
   status = ''
-  timer: number
-  timeout: number
-  count: number
+  timer: number = null
+  timeout: number = Date.now()
+  count: number = 0
   tempDB: DB
   client: Client
 
-  constructor (triviaList: {question: string, answers: string[]}[], message: Message, botPlays: boolean, timeLimit: number, maxScore: number, revealAnswers: boolean, tempDB: DB, client: Client) {
+  constructor (triviaList: Map<string, string[]>, message: Message, botPlays: boolean, timeLimit: number, maxScore: number, revealAnswer: boolean, tempDB: DB, client: Client) {
     this.channel = message.channel
     this.author = message.author
     this.message = message
     this.questionList = triviaList
     this.status = 'new question'
-    this.settings = { maxScore: maxScore, timeout: 120000, delay: timeLimit, botPlays: botPlays, revealAnswer: revealAnswers }
-    this.timer = null
-    this.count = 0
-    this.timeout = Date.now()
+    this.settings = { maxScore: maxScore, timeout: 120000, timeLimit, botPlays, revealAnswer }
     this.tempDB = tempDB
     this.client = client
   }
@@ -85,9 +80,9 @@ export class TriviaSession {
     this.status = 'waiting for answer'
     this.count += 1
     this.timer = Date.now()
-    this.channel.createMessage(`**Question number ${this.count}!**\n\n${this.currentLine.question}`)
+    await this.channel.createMessage(`**Question number ${this.count}!**\n\n${this.currentLine.question}`)
 
-    while (this.status !== 'correct answer' && (Date.now() - this.timer) <= this.settings.delay) {
+    while (this.status !== 'correct answer' && (Date.now() - this.timer) <= this.settings.timeLimit) {
       if (Date.now() - this.timeout >= this.settings.timeout) {
         const msg = `If you ${getInsult()}s aren't going to play then I might as well stop.`
         if (msg.includes('asss')) {
@@ -142,17 +137,15 @@ export class TriviaSession {
     for (let i = 0; i < this.currentLine.answers.length; i++) {
       let answer = this.currentLine.answers[i].toLowerCase()
       let guess = message.content.toLowerCase()
-      if (!(answer.includes(' '))) { // Strict answer checking for one word answers
+      if (!answer.includes(' ')) { // Strict answer checking for one word answers
         const guessWords = guess.split(' ')
         for (let j = 0; j < guessWords.length; j++) {
           if (guessWords[j] === answer) {
             hasGuessed = true
           }
         }
-      } else {
-        if (guess.includes(answer)) { // The answer has spaces, checkign isn't as strict
-          hasGuessed = true
-        }
+      } else if (guess.includes(answer)) { // The answer has spaces, checking isn't as strict
+        hasGuessed = true
       }
     }
 
@@ -164,7 +157,7 @@ export class TriviaSession {
       } else {
         this.scores[message.author.username] += 1
       }
-      this.channel.createMessage(`You got it ${message.author.username}! **+1** to you!`)
+      await this.channel.createMessage(`You got it ${message.author.username}! **+1** to you!`)
     }
   }
 }
@@ -216,7 +209,7 @@ export const handleTrivia: Command = {
     if (args.length === 1 && ['scores', 'score', 'leaderboard'].includes(args[0])) {
       const session = tempDB.trivia[message.channel.id]
       if (session) {
-        await message.channel.createMessage(session.getScores())
+        return session.getScores()
       } else {
         return 'There is no trivia session ongoing in this channel.'
       }
