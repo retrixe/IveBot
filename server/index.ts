@@ -24,6 +24,7 @@ import { guildMemberAdd, guildMemberRemove, guildDelete, guildBanAdd } from './b
 // Get the token needed.
 import 'json5/lib/require'
 import { token, mongoURL } from '../config.json5'
+import { ServerResponse } from 'http'
 
 // If production is explicitly specified via flag..
 if (process.argv[2] === '--production') process.env.NODE_ENV = 'production'
@@ -143,8 +144,8 @@ app.prepare().then(() => {
   })
 
   // On recieving GET on the / endpoint, render /index with Next.js instead of / for SEO.
-  server.express.get('/', (req, res) => app.render(req, res, '/', req.query))
+  server.express.get('/', (req, res) => app.render(req, res as ServerResponse, '/', req.query))
   // On recieving GET on other endpoints, handle with Next.js.
-  server.express.get('*', (req, res) => handle(req, res))
+  server.express.get('*', (req, res) => handle(req, res as ServerResponse))
 })
 /* SERVER CODE ENDS HERE */

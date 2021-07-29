@@ -16,8 +16,6 @@ async function parseTriviaList (fileName: string) {
 }
 
 export class TriviaSession {
-  revealMessages = ['I know this: ', 'Easy: ', 'Of course, it\'s: ']
-  failMessages = ['You suck at this', 'That was trivial, really', 'Moving on...']
   settings: { maxScore: number, timeout: number, delay: number, botPlays: boolean, revealAnswer: boolean }
   currentLine: {question: string, answers: string[]}
   channel: TextableChannel
@@ -102,6 +100,9 @@ export class TriviaSession {
       await new Promise(resolve => setTimeout(resolve, 1000)) // Wait for answer or timeout
     }
 
+    const revealMessages = ['I know this: ', 'Easy: ', 'Of course, it\'s: ']
+    const failMessages = ['You suck at this', 'That was trivial, really', 'Moving on...']
+
     if (this.status === 'correct answer') {
       this.status = 'new question'
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -111,9 +112,9 @@ export class TriviaSession {
     } else {
       let message: string
       if (this.settings.revealAnswer) {
-        message = this.revealMessages[Math.floor(Math.random() * this.revealMessages.length)] + this.currentLine.answers[0]
+        message = revealMessages[Math.floor(Math.random() * revealMessages.length)] + this.currentLine.answers[0]
       } else {
-        message = this.failMessages[Math.floor(Math.random() * this.failMessages.length)]
+        message = failMessages[Math.floor(Math.random() * failMessages.length)]
       }
       if (this.settings.botPlays) {
         message += '\n**+1** for me!'
@@ -220,8 +221,7 @@ export const handleTrivia: Command = {
         return 'There is no trivia session ongoing in this channel.'
       }
     } else if (args.length === 1 && args[0] === 'list') {
-      const readdir = promisify(fs.readdir)
-      let lists = await readdir('./triviaLists/')
+      let lists = await fs.promises.readdir('./triviaLists/')
       lists = lists.map(list => list.slice(0, -4))
       const member = message.member.guild.members.get(client.user.id)
       const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
