@@ -24,7 +24,7 @@ import { guildMemberAdd, guildMemberRemove, guildDelete, guildBanAdd } from './b
 // Get the token needed.
 import 'json5/lib/require'
 import { token, mongoURL } from '../config.json5'
-import { ServerResponse } from 'http'
+import { ServerResponse } from 'http' // TODO: Do away with this.
 
 // If production is explicitly specified via flag..
 if (process.argv[2] === '--production') process.env.NODE_ENV = 'production'

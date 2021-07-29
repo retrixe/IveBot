@@ -3,6 +3,8 @@
   "version": "3.1.0",
   "description": "The bot that created the iPhone X.",
   "main": "server/index.ts",
+  "private": true,
+  "repository": "https://github.com/retrixe/IveBot.git",
   "scripts": {
     "lint": "eslint . --ext .js,.ts,.tsx && tsc --noEmit && graphql-schema-linter server/schema.graphql",
     "start": "node lib/index.js --production",
@@ -38,7 +40,7 @@
     "@babel/core": "^7.1.6",
     "@types/mongodb": "^3.0.12",
     "@types/next": "^2.4.7",
-    "@types/node": "^16.4.6",
+    "@types/node": "^16.4.7",
     "@types/react": "^16.0.36",
     "@typescript-eslint/eslint-plugin": "^1.5.0",
     "@typescript-eslint/parser": "^1.5.0",

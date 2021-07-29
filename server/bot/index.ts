@@ -102,7 +102,7 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
     ) return
   } catch (e) {}
   // Content of message and sendResponse.
-  const sendResponse = (m: string) => client.createMessage(message.channel.id, m)
+  const sendResponse = message.channel.createMessage
   const command = message.content.toLowerCase()
   // Handle answers to trivia
   const session = tempDB.trivia[message.channel.id]
@@ -110,14 +110,14 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
     session.checkAnswer(message)
   }
   // Auto responses and easter eggs.
-  if (command.startsWith('is dot a good boy')) sendResponse('Shame on you. He\'s undefined.')
-  else if (command.startsWith('iphone x')) sendResponse(`You don't deserve it. 😎`)
-  else if (command.startsWith('iphone 11')) sendResponse(`You don't deserve it. 😎`)
-  else if (command.startsWith('iphone 12')) sendResponse(`You don't deserve it. 😎`)
-  else if (command.startsWith('iphone 13')) sendResponse(`You don't deserve it. 😎`)
-  else if (command.startsWith('iphone se')) sendResponse(`lol peasant`)
-  else if (command.startsWith('triggered')) sendResponse('Ah, pathetic people again.')
-  else if (command.startsWith('ayy')) sendResponse('lmao')
+  if (command.startsWith('is dot a good boy')) await sendResponse('Shame on you. He\'s undefined.')
+  else if (command.startsWith('iphone x')) await sendResponse(`You don't deserve it. 😎`)
+  else if (command.startsWith('iphone 11')) await sendResponse(`You don't deserve it. 😎`)
+  else if (command.startsWith('iphone 12')) await sendResponse(`You don't deserve it. 😎`)
+  else if (command.startsWith('iphone 13')) await sendResponse(`You don't deserve it. 😎`)
+  else if (command.startsWith('iphone se')) await sendResponse(`lol peasant`)
+  else if (command.startsWith('triggered')) await sendResponse('Ah, pathetic people again.')
+  else if (command.startsWith('ayy')) await sendResponse('lmao')
   // Handle answers to gunfight.
   else if (['fire', 'water', 'gun', 'dot'].includes(command)) {
     const key = Object.keys(tempDB.gunfight).find(i => (
@@ -126,7 +126,7 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
     if (!key) return
     const gunfight = tempDB.gunfight[key]
     if (!gunfight || !gunfight.wordSaid || gunfight.randomWord !== command) return
-    sendResponse(`${message.author.mention} won!`)
+    await message.channel.createMessage(`${message.author.mention} won!`)
     delete tempDB.gunfight[key]
   }
 
@@ -152,7 +152,7 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
       // If no text was found.
       if (!result.responses[0].fullTextAnnotation) return
       // Return our answer.
-      message.channel.createMessage({
+      await message.channel.createMessage({
         content: '**Text recognition result:**\n' + result.responses[0].fullTextAnnotation.text
       })
     } catch (e) {}
