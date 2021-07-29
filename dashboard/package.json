@@ -1,0 +1,18 @@
+{
+  "name": "ivebot-dashboard",
+  "version": "4.0.0-alpha.0",
+  "description": "Web dashboard for IveBot.",
+  "author": "Ibrahim Ansari <ansari.ibrahim1@gmail.com>",
+  "license": "Apache-2.0",
+  "private": true,
+  "repository": {
+    "url": "https://github.com/retrixe/IveBot.git",
+    "directory": "dashboard"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.12.2",
+    "next": "^11.0.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  }
+}
