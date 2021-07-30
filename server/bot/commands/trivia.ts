@@ -15,13 +15,13 @@ async function parseTriviaList (fileName: string) {
 
 export class TriviaSession {
   settings: { maxScore: number, timeout: number, timeLimit: number, botPlays: boolean, revealAnswer: boolean }
-  currentLine: {question: string, answers: string[]}
+  currentQuestion: [string, string[]]
   channel: TextableChannel
   author: User
   message: Message
-  questionList: {question: string, answers: string[]}[]
+  questionList: Map<string, string[]>
   scores: { [id: string]: number } = {}
-  status = ''
+  stopped: boolean = false
   timer: number = null
   timeout: number = Date.now()
   count: number = 0
@@ -33,14 +33,13 @@ export class TriviaSession {
     this.author = message.author
     this.message = message
     this.questionList = triviaList
-    this.status = 'new question'
     this.settings = { maxScore: maxScore, timeout: 120000, timeLimit, botPlays, revealAnswer }
     this.tempDB = tempDB
     this.client = client
   }
 
   getScores () {
-    const currentScores = Object.values(this.scores).sort((a: number, b: number) => b - a)
+    const currentScores = Object.entries(this.scores).sort(([, a], [, b]) => b - a)
     const member = this.message.member.guild.members.get(this.client.user.id)
     const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
       (a, b) => a.position > b.position ? -1 : 1
@@ -49,9 +48,9 @@ export class TriviaSession {
       title: 'Scores',
       color,
       timestamp: new Date().toISOString(),
-      fields: currentScores.map(score => ({
-        name: Object.keys(this.scores).find(key => this.scores[key] === score),
-        value: score.toString(),
+      fields: currentScores.map(player => ({
+        name: this.message.member.guild.members.get(player[0]).username,
+        value: player[1].toString(),
         inline: true
       }))
     }
@@ -59,9 +58,9 @@ export class TriviaSession {
   }
 
   async endGame () {
-    this.status = 'stop'
+    this.stopped = true
     delete this.tempDB.trivia[this.channel.id]
-    if (this.scores) await this.channel.createMessage(this.getScores())
+    if (Object.keys(this.scores).length !== 0) await this.channel.createMessage(this.getScores())
   }
 
   async newQuestion () {
@@ -75,20 +74,15 @@ export class TriviaSession {
       await this.endGame()
       return true
     }
-    this.currentLine = this.questionList[Math.floor(Math.random() * this.questionList.length)]
-    this.questionList.splice(this.questionList.indexOf(this.currentLine), 1)
-    this.status = 'waiting for answer'
+    this.currentQuestion = Array.from(this.questionList.entries())[Math.floor(Math.random() * this.questionList.size)]
+    this.questionList.delete(this.currentQuestion[0])
     this.count += 1
     this.timer = Date.now()
-    await this.channel.createMessage(`**Question number ${this.count}!**\n\n${this.currentLine.question}`)
+    await this.channel.createMessage(`**Question number ${this.count}!**\n\n${this.currentQuestion[0]}`)
 
-    while (this.status !== 'correct answer' && (Date.now() - this.timer) <= this.settings.timeLimit) {
+    while (this.currentQuestion !== null && (Date.now() - this.timer) <= this.settings.timeLimit) {
       if (Date.now() - this.timeout >= this.settings.timeout) {
-        const msg = `If you ${getInsult()}s aren't going to play then I might as well stop.`
-        if (msg.includes('asss')) {
-          msg.replace('asss', 'asses')
-        }
-        await this.channel.createMessage(msg)
+        await this.channel.createMessage(`If you ${getInsult(true)} aren't going to play then I might as well stop.`)
         await this.endGame()
         return true
       }
@@ -98,44 +92,43 @@ export class TriviaSession {
     const revealMessages = ['I know this: ', 'Easy: ', 'Of course, it\'s: ']
     const failMessages = ['You suck at this', 'That was trivial, really', 'Moving on...']
 
-    if (this.status === 'correct answer') {
-      this.status = 'new question'
+    if (this.currentQuestion === null) {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      if (this.status !== 'stop') await this.newQuestion()
-    } else if (this.status === 'stop') {
+      if (this.stopped === false) await this.newQuestion()
+    } else if (this.stopped) {
       return true
     } else {
       let message: string
       if (this.settings.revealAnswer) {
-        message = revealMessages[Math.floor(Math.random() * revealMessages.length)] + this.currentLine.answers[0]
+        message = revealMessages[Math.floor(Math.random() * revealMessages.length)] + this.currentQuestion[1][0]
       } else {
         message = failMessages[Math.floor(Math.random() * failMessages.length)]
       }
       if (this.settings.botPlays) {
         message += '\n**+1** for me!'
-        if (!this.scores['Jony Ive']) {
-          this.scores['Jony Ive'] = 1
+        if (!this.scores[this.client.user.id]) {
+          this.scores[this.client.user.id] = 1
         } else {
-          this.scores['Jony Ive'] += 1
+          this.scores[this.client.user.id] += 1
         }
       }
-      this.currentLine = null
+      this.currentQuestion = null
       await this.channel.createMessage(message)
       await this.channel.sendTyping()
       await new Promise(resolve => setTimeout(resolve, 1000))
-      if (this.status !== 'stop') await this.newQuestion()
+      if (this.stopped === false) await this.newQuestion()
     }
   }
 
-  checkAnswer (message: Message) {
-    if (message.author.bot || this.currentLine === null) {
+  async checkAnswer (message: Message) {
+    if (message.author.bot || this.currentQuestion === null) {
       return false
     }
     this.timeout = Date.now()
     let hasGuessed = false
 
-    for (let i = 0; i < this.currentLine.answers.length; i++) {
-      let answer = this.currentLine.answers[i].toLowerCase()
+    for (let i = 0; i < this.currentQuestion[1].length; i++) {
+      let answer = this.currentQuestion[1][i].toLowerCase()
       let guess = message.content.toLowerCase()
       if (!answer.includes(' ')) { // Strict answer checking for one word answers
         const guessWords = guess.split(' ')
@@ -150,12 +143,11 @@ export class TriviaSession {
     }
 
     if (hasGuessed) {
-      this.currentLine = null
-      this.status = 'correct answer'
-      if (!this.scores[message.author.username]) {
-        this.scores[message.author.username] = 1
+      this.currentQuestion = null
+      if (!this.scores[message.author.id]) {
+        this.scores[message.author.id] = 1
       } else {
-        this.scores[message.author.username] += 1
+        this.scores[message.author.id] += 1
       }
       await this.channel.createMessage(`You got it ${message.author.username}! **+1** to you!`)
     }
@@ -166,8 +158,8 @@ export const handleTrivia: Command = {
   name: 'trivia',
   opts: {
     description: 'Start a trivia session',
-    fullDescription: 'Start a trivia session\nDefault settings are:\nIve gains points: false\nSeconds to answer: 15\nPoints needed to win: 30\nReveal answer on timeout: true',
-    usage: '/trivia <topic> (--bot-plays=true|false) (--time-limit=<time longer than 4s>) (--max-score=<points greater than 0>) (--reveal-answer=true|false)\n During a trivia session, the following commands may also be run:\n/trivia score\n/trivia stop',
+    fullDescription: 'Start a trivia session\nDefault settings are: Ive gains points: false, seconds to answer: 15, points needed to win: 30, reveal answer on timeout: true\nDuring a trivia session, the following commands may also be run:`/trivia score` or `/trivia leaderboard` and `/trivia stop`\nTo see available trivia genres, use `/trivia list`',
+    usage: '/trivia <topic> (--bot-plays=true|false) (--time-limit=<time longer than 4s>) (--max-score=<points greater than 0>) (--reveal-answer=true|false)',
     example: '/trivia greekmyth --bot-plays=true',
     guildOnly: true,
     argsRequired: true
