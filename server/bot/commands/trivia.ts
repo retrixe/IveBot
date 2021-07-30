@@ -140,6 +140,7 @@ export class TriviaSession {
     this.timeout = Date.now()
     let hasGuessed = false
 
+    // TODO: fuse.js for better pattern matching.
     for (let i = 0; i < this.currentQuestion[1].length; i++) {
       let answer = this.currentQuestion[1][i].toLowerCase()
       let guess = message.content.toLowerCase()
@@ -171,8 +172,11 @@ export const handleTrivia: Command = {
   name: 'trivia',
   opts: {
     description: 'Start a trivia game on a topic of your choice.',
-    fullDescription: 'Start a trivia game on a topic of your choice.\n**Default settings:** IveBot gains points: no, seconds to answer: 15, points needed to win: 30, reveal answer on timeout: yes',
-    usage: '/trivia <topic> (--bot-plays=true|false) (--time-limit=<time longer than 4s>) (--max-score=<points greater than 0>) (--reveal-answer=true|false)\nDuring a trivia game: /trivia (scoreboard/score/scores/stop)\nTo view available topics: /trivia list',
+    fullDescription: `Start a trivia game on a topic of your choice.
+**Default settings:** IveBot gains points: no, seconds to answer: 15, points needed to win: 30, reveal answer on timeout: yes`,
+    usage: `/trivia <topic> (--bot-plays=true|false) (--time-limit=<time longer than 4s>) (--max-score=<points greater than 0>) (--reveal-answer=true|false)
+**During a trivia game:** /trivia (scoreboard/score/scores/stop)
+**To view available topics:** /trivia list`,
     example: '/trivia greekmyth --bot-plays=true',
     guildOnly: true,
     argsRequired: true
@@ -183,6 +187,7 @@ export const handleTrivia: Command = {
     let maxScore = 30
     let revealAnswer = true
 
+    // TODO: Flag soup can be handled better.
     if (args.find(element => element.includes('--bot-plays='))) {
       if (args.find(element => element.includes('--bot-plays=')).split('=')[1] === 'true') {
         botPlays = true
