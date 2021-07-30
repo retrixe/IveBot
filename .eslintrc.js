@@ -14,7 +14,7 @@ module.exports = {
     'graphql/template-strings': ['error', {
       env: 'apollo',
       schemaString: require('fs').readFileSync(
-        require('path').resolve(__dirname, 'server/schema.graphql'),
+        require('path').resolve(__dirname, 'dashboard/schema.graphql'),
         { encoding: 'utf8' }
       )
     }],

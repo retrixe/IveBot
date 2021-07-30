@@ -17,7 +17,7 @@ class Index extends React.Component {
   state = { id: '' }
 
   componentDidMount () {
-    request('/graphql', `{
+    request('/api/graphql', `{
   getBotId
 }`
     ).then((data: { getBotId: string }) => this.setState({ id: data.getBotId }))

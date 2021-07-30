@@ -10,7 +10,7 @@ import ApolloClient, { gql } from 'apollo-boost'
 import { ApolloProvider, Query } from 'react-apollo'
 
 // Apollo Client definition.
-const client = new ApolloClient({ uri: `/graphql`, fetchOptions: { fetch } })
+const client = new ApolloClient({ uri: `/api/graphql`, fetchOptions: { fetch } })
 const rootURL = 'https://ivebot.now.sh' // Modify when self-hosting.
 
 class DashboardIndex extends React.Component {

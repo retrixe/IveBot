@@ -1,16 +1,4 @@
-/* My efforts to roll the bot and dashboard into one.
-The script has been as well documented as possible. */
-
-/* SERVER CODE STARTS HERE */
-// Import our express-based GraphQL server and next.
-import next from 'next'
-import { GraphQLServer } from 'graphql-yoga'
-// Import our resolvers.
-import resolvers from './resolvers'
-// Import types.
-import { DB, Command } from './bot/imports/types'
-/* SERVER CODE ENDS HERE */
-
+import 'json5/lib/require'
 // Tokens and stuff.
 import { Client } from 'eris'
 import CommandParser from './bot/client'
@@ -19,18 +7,17 @@ import { MongoClient } from 'mongodb'
 // Import fs.
 import { readdir, statSync } from 'fs'
 import { inspect } from 'util'
+// Import types.
+import { DB, Command } from './bot/imports/types'
 // Import the bot.
 import { guildMemberAdd, guildMemberRemove, guildDelete, guildBanAdd } from './bot'
 // Get the token needed.
-import 'json5/lib/require'
 import { token, mongoURL } from '../config.json5'
-import { ServerResponse } from 'http' // TODO: Do away with this.
 
 // If production is explicitly specified via flag..
 if (process.argv[2] === '--production') process.env.NODE_ENV = 'production'
 // Check for development environment.
 const dev = process.env.NODE_ENV !== 'production'
-const port = parseInt(process.env.PORT, 10) || 3000 // If port variable has been set.
 
 // Create a client to connect to Discord API Gateway.
 const client = new Client('Bot ' + token === 'dotenv' ? process.env.IVEBOT_TOKEN : token, {
@@ -121,31 +108,3 @@ client.on('error', (err: Error, id: string) => {
 const tempDB: DB = {
   gunfight: {}, say: {}, trivia: {}, link: {}, leave: [], mute: {}, cooldowns: { request: [] }
 }
-
-/* SERVER CODE STARTS HERE */
-// Initialize Next.js app.
-const app = next({ dev })
-const handle = app.getRequestHandler()
-// Prepare Next.js and then start server.
-app.prepare().then(() => {
-  const server = new GraphQLServer({
-    typeDefs: './server/schema.graphql',
-    resolvers: resolvers({ tempDB, client })
-  })
-
-  // Listen to requests on specified port.
-  server.start({
-    port,
-    endpoint: '/graphql',
-    playground: dev ? '/playground' : false,
-    subscriptions: '/subscriptions'
-  }, () => {
-    console.log(`> Ready on http://localhost:${port}`)
-  })
-
-  // On recieving GET on the / endpoint, render /index with Next.js instead of / for SEO.
-  server.express.get('/', (req, res) => app.render(req, res as ServerResponse, '/', req.query))
-  // On recieving GET on other endpoints, handle with Next.js.
-  server.express.get('*', (req, res) => handle(req, res as ServerResponse))
-})
-/* SERVER CODE ENDS HERE */

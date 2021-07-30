@@ -7,9 +7,9 @@
   "repository": "https://github.com/retrixe/IveBot.git",
   "scripts": {
     "prepare": "husky install",
-    "lint": "eslint . --ext .js,.ts,.tsx && tsc --noEmit && graphql-schema-linter server/schema.graphql",
+    "lint": "eslint . --ext .js,.ts,.tsx && tsc --noEmit && graphql-schema-linter dashboard/schema.graphql",
     "start": "node lib/index.js --production",
-    "build": "next build && tsc",
+    "build": "tsc",
     "dev": "nodemon server/index.ts",
     "mongo": "mongod --dbpath=database"
   },
@@ -21,8 +21,6 @@
   "dependencies": {
     "eris": "^0.15.1",
     "fuse.js": "^6.4.6",
-    "graphql": "^14.0.2",
-    "graphql-yoga": "^1.16.7",
     "json5": "^0.5.1",
     "mathjs": "^9.4.3",
     "moment": "^2.24.0",
