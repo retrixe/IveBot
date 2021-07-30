@@ -102,7 +102,7 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
     ) return
   } catch (e) {}
   // Content of message and sendResponse.
-  const sendResponse = message.channel.createMessage
+  const sendResponse = (content: string) => message.channel.createMessage(content)
   const command = message.content.toLowerCase()
   // Handle answers to trivia
   const session = tempDB.trivia[message.channel.id]
