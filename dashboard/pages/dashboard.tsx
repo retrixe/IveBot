@@ -3,11 +3,12 @@ import {
   AppBar, Toolbar, Button, Dialog, DialogTitle, DialogActions, DialogContent, DialogContentText,
   Typography, TextField, LinearProgress
 } from '@material-ui/core'
+import Head from 'next/head'
 import Link from 'next/link'
-import withRoot from '../components/withRoot'
-import Dashboard from '../components/dashboard'
-import ApolloClient, { gql } from 'apollo-boost'
-import { ApolloProvider, Query } from 'react-apollo'
+import Dashboard from '../imports/dashboard'
+import ApolloClient, { gql, OperationVariables } from 'apollo-boost'
+import { ApolloProvider, Query, QueryResult } from 'react-apollo'
+import { ServerInfo } from '../imports/graphqlTypes'
 
 // Apollo Client definition.
 const client = new ApolloClient({ uri: `/api/graphql`, fetchOptions: { fetch } })
@@ -35,12 +36,12 @@ query getAllCommonServers($token: String!) {
     return (
       <ApolloProvider client={client}>
         <>
-          <head>
+          <Head>
             <title>IveBot</title>
             <meta property='og:url' content={`${rootURL}/dashboard`} />
             <meta property='og:description' content={'IveBot\'s dashboard for managing settings.'} />
             <meta name='Description' content={'IveBot\'s dashboard for managing settings.'} />
-          </head>
+          </Head>
           {/* login dialog. */}
           <Dialog open={this.state.open} onClose={this.closeDialog}>
             <DialogTitle>Log In</DialogTitle>
@@ -72,7 +73,7 @@ query getAllCommonServers($token: String!) {
           <div style={{ padding: 10 }}>
             {this.state.token.length === 6 && !this.state.open
               ? <Query query={query} variables={{ token: this.state.token }}>
-                {({ loading, error, data }) => {
+                {({ loading, error, data }: QueryResult<{ getUserInfo: ServerInfo[] }, OperationVariables>) => {
                   if (error) {
                     return (
                       <Typography color='error'>
@@ -96,4 +97,4 @@ query getAllCommonServers($token: String!) {
   }
 }
 
-export default withRoot(DashboardIndex)
+export default DashboardIndex

@@ -2,9 +2,9 @@ import React from 'react'
 import {
   AppBar, Toolbar, Button, Typography, SvgIcon, IconButton
 } from '@material-ui/core'
+import Head from 'next/head'
 import Link from 'next/link'
 import { request } from 'graphql-request'
-import withRoot from '../components/withRoot'
 
 const GitHubLogo = () => (
   <SvgIcon>
@@ -17,21 +17,21 @@ class Index extends React.Component {
   state = { id: '' }
 
   componentDidMount () {
-    request('/api/graphql', `{
+    request<{ getBotId: string }>('/api/graphql', `{
   getBotId
 }`
-    ).then((data: { getBotId: string }) => this.setState({ id: data.getBotId }))
+    ).then(data => this.setState({ id: data.getBotId }))
   }
 
   render () {
     return (
       <div style={{ marginRight: 16, marginLeft: 16 }}>
-        <head>
+        <Head>
           <title>IveBot</title>
           <meta property='og:url' content={`${rootURL}/`} />
           <meta property='og:description' content='IveBot is a multi-purpose Discord bot.' />
           <meta name='Description' content='IveBot is a multi-purpose Discord bot.' />
-        </head>
+        </Head>
         <AppBar>
           <Toolbar>
             <Typography variant='h6' color='inherit' style={{ flex: 1 }}>IveBot</Typography>
@@ -66,4 +66,4 @@ IveBot is 100% open source and always will be.</Typography>
   }
 }
 
-export default withRoot(Index)
+export default Index

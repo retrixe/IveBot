@@ -4,27 +4,20 @@ import {
   LinearProgress, withWidth
 } from '@material-ui/core'
 import ArrowBack from '@material-ui/icons/ArrowBack'
-import { Query } from 'react-apollo'
+import { Query, QueryResult } from 'react-apollo'
 import Settings from './settings'
-import { gql } from 'apollo-boost'
+import { gql, OperationVariables } from 'apollo-boost'
+import { ServerInfo, ServerSettings } from './graphqlTypes'
 
 interface Props {
-  data: Array<{
-    perms: boolean, icon: string, serverId: string, name: string, channels: {
-      name: string, id: string
-    }[]
-  }>,
+  data: Array<ServerInfo>,
   token: string
 }
 interface State {
-  selected: boolean | {
-    perms: boolean, icon: string, serverId: string, name: string, channels: {
-      name: string, id: string
-    }[]
-  }
+  selected: boolean | ServerInfo
 }
 class DashboardIndex extends React.Component<Props, State> {
-  constructor (props) {
+  constructor (props: Props) {
     super(props)
     this.state = {
       selected: false
@@ -84,7 +77,7 @@ query getServerSettings($server: String!, $token: String!) {
           </div>
           <Divider />
           <Query pollInterval={30000} query={query} variables={{ server: element.serverId, token: this.props.token }}>
-            {({ loading, error, data, refetch }) => {
+            {({ loading, error, data, refetch }: QueryResult<{ serverSettings: ServerSettings }, OperationVariables>) => {
               if (error) {
                 return (
                   <Typography color='error'>

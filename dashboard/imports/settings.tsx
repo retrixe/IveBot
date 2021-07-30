@@ -3,8 +3,8 @@ import {
   Typography, Button, LinearProgress, Divider, Input, InputLabel, FormGroup, FormControlLabel,
   FormControl, FormHelperText, Switch, Select, MenuItem
 } from '@material-ui/core'
-import { Mutation } from 'react-apollo'
-import { gql } from 'apollo-boost'
+import { Mutation, MutationResult } from 'react-apollo'
+import { FetchResult, gql } from 'apollo-boost'
 
 interface Props {
   data: {
@@ -33,7 +33,7 @@ interface State {
   }
 }
 export default class Settings extends React.Component<Props, State> {
-  constructor (props) {
+  constructor (props: Props) {
     super(props); this.state = {
       role: this.props.data.addRoleForAll,
       joinAutorole: this.props.data.joinAutorole,
@@ -78,7 +78,7 @@ mutation variables(
         joinLeaveMessages: this.state.joinLeaveMessages,
         ocrOnSend: this.state.ocrOnSend
       }}>
-        {(updateSettings, { loading, error }) => (
+        {(updateSettings: () => Promise<void | FetchResult<{}, Record<string, {}>, Record<string, {}>>>, { loading, error }: MutationResult<{}>) => (
           <>
             <br />
             <Typography variant='h6' gutterBottom>Public Roles</Typography>
@@ -132,7 +132,7 @@ mutation variables(
               <Select value={this.state.joinLeaveMessages.channel} fullWidth margin='dense'
                 onChange={e => this.setState({
                   joinLeaveMessages: {
-                    ...this.state.joinLeaveMessages, channel: e.target.value
+                    ...this.state.joinLeaveMessages, channel: e.target.value as string
                   }
                 })}
               >
