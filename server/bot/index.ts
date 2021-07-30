@@ -107,7 +107,7 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
   // Handle answers to trivia
   const session = tempDB.trivia[message.channel.id]
   if (session) {
-    session.checkAnswer(message)
+    await session.checkAnswer(message)
   }
   // Auto responses and easter eggs.
   if (command.startsWith('is dot a good boy')) await sendResponse('Shame on you. He\'s undefined.')

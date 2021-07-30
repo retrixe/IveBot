@@ -206,8 +206,7 @@ export const handleTrivia: Command = {
         return 'There is no trivia session ongoing in this channel.'
       }
     } else if (args.length === 1 && args[0] === 'list') {
-      let lists = await fs.promises.readdir('./triviaLists/')
-      lists = lists.map(list => list.slice(0, -4))
+      const lists = await fs.promises.readdir('./triviaLists/')
       const member = message.member.guild.members.get(client.user.id)
       const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
         (a, b) => a.position > b.position ? -1 : 1
@@ -215,7 +214,7 @@ export const handleTrivia: Command = {
       const embed: EmbedOptions = {
         title: 'Available trivia lists',
         color,
-        fields: lists.map(name => ({ name, value: '_ _', inline: true }))
+        fields: lists.map(name => ({ name: name.replace('.txt', ''), value: '_ _', inline: true }))
       }
       return { embed }
     } else if (args.length === 1 && args[0] === 'stop') {
