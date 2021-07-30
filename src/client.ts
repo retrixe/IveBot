@@ -6,14 +6,14 @@ import botCallback from './events'
 
 function isEquivalent (a: { [index: string]: boolean }, b: { [index: string]: boolean }) {
   // Create arrays of property names
-  var aProps = Object.getOwnPropertyNames(a)
-  var bProps = Object.getOwnPropertyNames(b)
+  const aProps = Object.getOwnPropertyNames(a)
+  const bProps = Object.getOwnPropertyNames(b)
 
   // If number of properties is different, objects are not equivalent
   if (aProps.length !== bProps.length) return false
 
-  for (var i = 0; i < aProps.length; i++) {
-    var propName = aProps[i]
+  for (let i = 0; i < aProps.length; i++) {
+    const propName = aProps[i]
 
     // If values of same property are not equal, objects are not equivalent
     if (a[propName] !== b[propName]) return false
@@ -102,7 +102,7 @@ export class Command {
     else messageToSend = this.generator
     // We don't process Promises because we unconditionally return a Promise.
     // Async functions returning arrays aren't supported.
-    return messageToSend
+    return await messageToSend
   }
 }
 
@@ -112,7 +112,7 @@ export default class CommandParser {
   tempDB: DB
   db: Db
   evaluatedMessages: string[]
-  analytics: { name: string, totalUse: number, averageExecTime: number[] }[]
+  analytics: Array<{ name: string, totalUse: number, averageExecTime: number[] }>
 
   constructor (client: Client, tempDB: DB, db: Db) {
     this.commands = {}
@@ -123,7 +123,7 @@ export default class CommandParser {
     this.evaluatedMessages = []
     this.onMessage = this.onMessage.bind(this)
     this.onMessageUpdate = this.onMessageUpdate.bind(this)
-    setInterval(() => this.sendAnalytics(), 30000)
+    setInterval(async () => await this.sendAnalytics(), 30000)
   }
 
   registerCommand = (command: IveBotCommand) => {
@@ -196,8 +196,7 @@ export default class CommandParser {
   async sendAnalytics () {
     const analytics = this.db.collection('analytics')
     // Iterate over every command we have information stored locally.
-    for (let index in this.analytics) {
-      const command = this.analytics[index]
+    for (const command of this.analytics) {
       // Get the data for the selected command.
       const statistics = await analytics.findOne({ name: command.name })
       // If the command was not stored, we store our analytics directly.
@@ -215,9 +214,9 @@ export default class CommandParser {
           $set: { averageExecTime }
         })
       }
-      // Clear analytics for the specific index.
-      this.analytics[index].totalUse = 0
-      this.analytics[index].averageExecTime = [0, 0]
+      // Clear analytics for the command.
+      command.totalUse = 0
+      command.averageExecTime = [0, 0]
     }
   }
 

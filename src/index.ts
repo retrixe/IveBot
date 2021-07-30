@@ -31,7 +31,7 @@ client.connect()
 
 // Create a MongoDB instance.
 MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (err, mongoDB) => {
-  if (err) throw new Error('Error:\n' + err)
+  if (err) throw err
   console.log('Bot connected successfully to MongoDB.')
   const db = mongoDB.db('ivebot')
   // When a server loses a member, it will callback.

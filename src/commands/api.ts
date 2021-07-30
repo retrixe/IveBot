@@ -65,7 +65,7 @@ export const handleOcr: Command = {
             body: JSON.stringify({
               name: 'IveBot /ocr result', files: [{ content: { format: 'text', value: text } }]
             })
-          }).then(e => e.json())
+          }).then(async e => await e.json())
           hastebin = result.id
           deletionKey = result.deletion_key
         }
@@ -156,7 +156,7 @@ export const handleCat: Command = {
   generator: async () => {
     try {
       // Fetch a cat and process it (this sounds funny to me idk why)
-      const { file } = await (await fetch(`http://aws.random.cat/meow`)).json()
+      const { file } = await (await fetch('http://aws.random.cat/meow')).json()
       // Send it.
       return { embed: { image: { url: file }, color: 0x123456 }, content: '🐱' }
     } catch (e) {
@@ -225,31 +225,31 @@ export const handleApod: Command = {
     if (date.isValid()) {
       const dateStr = date.format('YYYY-MM-DD')
       // Fetch a picture or video.
-      try { // eslint-disable-next-line camelcase
-        const { media_type, url, title, explanation } = await (await fetch(
+      try {
+        const { media_type: mediaType, url, title, explanation } = await (await fetch(
           `https://api.nasa.gov/planetary/apod?api_key=${NASAtoken}&date=${dateStr}`
-        )).json() // eslint-disable-next-line camelcase
-        return media_type === 'video'
+        )).json()
+        return mediaType === 'video'
           ? `**${title}**\n${explanation}\n${url.split('embed/').join('watch?v=')}`
           : {
-            content: `**${title}**\n${explanation}`,
-            embed: { image: { url }, color: 0x2361BE }
-          }
+              content: `**${title}**\n${explanation}`,
+              embed: { image: { url }, color: 0x2361BE }
+            }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
     } else if (args.length) {
       return { content: 'Invalid date.', error: true }
     }
     // Fetch a picture or video.
-    try { // eslint-disable-next-line camelcase
-      const { media_type, url, hdurl, title, explanation } = await (await fetch(
+    try {
+      const { media_type: mediaType, url, hdurl, title, explanation } = await (await fetch(
         `https://api.nasa.gov/planetary/apod?api_key=${NASAtoken}`
-      )).json() // eslint-disable-next-line camelcase
-      return media_type === 'video'
+      )).json()
+      return mediaType === 'video'
         ? `**${title}**\n${explanation}\n${url.split('embed/').join('watch?v=')}`
         : {
-          content: `**${title}**\n${explanation}`,
-          embed: { image: { url: hdurl }, color: 0x2361BE }
-        }
+            content: `**${title}**\n${explanation}`,
+            embed: { image: { url: hdurl }, color: 0x2361BE }
+          }
     } catch (err) { return `Something went wrong 👾 Error: ${err}` }
   }
 }
@@ -304,7 +304,7 @@ export const handleDog: Command = {
     }
     // Fetch a random picture.
     try {
-      const { message } = await (await fetch(`http://dog.ceo/api/breeds/image/random`)).json()
+      const { message } = await (await fetch('http://dog.ceo/api/breeds/image/random')).json()
       return { embed: { image: { url: message }, color: 0x654321 }, content: '🐕' }
     } catch (err) { return `Something went wrong 👾 Error: ${err}` }
   }
@@ -393,7 +393,7 @@ export const handleNamemc: Command = {
           }
         }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
-    } catch (e) { return { content: `Enter a valid Minecraft username (account must be premium)`, error: true } }
+    } catch (e) { return { content: 'Enter a valid Minecraft username (account must be premium)', error: true } }
   }
 }
 
@@ -424,8 +424,10 @@ export const handleCurrency: Command = {
           description: Object.keys(currency.rates).toString().split(',').join(', '),
           color: 0x666666,
           title: '💲 Currency symbols',
-          fields: [{ name: 'Tip', value: `Symbols are usually (but NOT ALWAYS) the country 2 \
-letter code + the first letter of the currency name.` }]
+          fields: [{
+            name: 'Tip', value: 'Symbols are usually (but NOT ALWAYS) the country 2 \
+letter code + the first letter of the currency name.'
+          }]
         }
       }
     }
@@ -448,11 +450,12 @@ letter code + the first letter of the currency name.` }]
 
 // Our weather and define types.
 /* eslint-disable camelcase */
-type Weather = { cod: string, coord: { lon: number, lat: number }, weather: Array<{
-  main: string,
-  description: string,
-  icon: string
-}>, main: { temp: number, temp_min: number, temp_max: number, humidity: number, pressure: number },
+interface Weather {
+  cod: string, coord: { lon: number, lat: number }, weather: Array<{
+    main: string,
+    description: string,
+    icon: string
+  }>, main: { temp: number, temp_min: number, temp_max: number, humidity: number, pressure: number },
   visibility: number, wind: { speed: number, deg: number },
   clouds: { all: number }, rain: { '3h': number }, snow: { '3h': number }
 }
@@ -460,8 +463,8 @@ type Categories = Array<{
   lexicalCategory: { id: string, text: string },
   entries: Array<{
     senses: Array<{
-      definitions: Array<string>,
-      shortDefinitions?: Array<string>,
+      definitions: string[],
+      shortDefinitions?: string[],
       examples: Array<{ text: string }>,
       registers: Array<{ id: string, text: string }>
     }>
@@ -550,7 +553,7 @@ export const handleDefine: Command = {
   },
   generator: async (message, args) => {
     // Setup request to find word.
-    const headers = { 'app_id': oxfordAPI.appId, 'app_key': oxfordAPI.appKey, Accept: 'application/json' }
+    const headers = { app_id: oxfordAPI.appId, app_key: oxfordAPI.appKey, Accept: 'application/json' }
     // Search for the word, destructure for results, and then pass them on to our second request.
     try {
       const r = await (await fetch(
@@ -604,7 +607,8 @@ export const handleDefine: Command = {
                       (sense.shortDefinitions || sense.definitions)[0]
                     ),
                     value: sense.examples && sense.examples[0].text
-                      ? `e.g. ${sense.examples[0].text}` : 'No example is available.'
+                      ? `e.g. ${sense.examples[0].text}`
+                      : 'No example is available.'
                   })
                   // Add 1 to the index.
                   a += 1

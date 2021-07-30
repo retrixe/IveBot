@@ -23,7 +23,7 @@ export const handleToken: Command = {
     setTimeout(async () => { try { await sent.delete() } catch (e) {} }, 30000)
   },
   generator: async (message, args, { tempDB, client }) => {
-    let secureToken = randomBytes(3).toString('hex')
+    const secureToken = randomBytes(3).toString('hex')
     tempDB.link[secureToken] = message.author.id
     // The DM part.
     try {

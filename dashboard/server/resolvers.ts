@@ -12,7 +12,7 @@ import { host, mongoURL } from '../config.json5'
 // Create a MongoDB instance.
 let db: Db
 MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (err, client) => {
-  if (err) throw new Error('Error:\n' + err)
+  if (err) throw err
   console.log('GraphQL server connected successfully to MongoDB.')
   db = client.db('ivebot')
 })
@@ -33,12 +33,14 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
         addRoleForAll, joinLeaveMessages, joinAutorole, ocrOnSend
       } = await getServerSettings(db, serverId)
       // Insert default values for all properties.
-      joinLeaveMessages = joinLeaveMessages ? {
-        channel: joinLeaveMessages.channel || '',
-        joinMessage: joinLeaveMessages.joinMessage || '',
-        leaveMessage: joinLeaveMessages.leaveMessage || '',
-        banMessage: joinLeaveMessages.banMessage || ''
-      } : { channel: '', joinMessage: '', leaveMessage: '', banMessage: '' }
+      joinLeaveMessages = joinLeaveMessages
+        ? {
+            channel: joinLeaveMessages.channel || '',
+            joinMessage: joinLeaveMessages.joinMessage || '',
+            leaveMessage: joinLeaveMessages.leaveMessage || '',
+            banMessage: joinLeaveMessages.banMessage || ''
+          }
+        : { channel: '', joinMessage: '', leaveMessage: '', banMessage: '' }
       addRoleForAll = addRoleForAll || ''
       ocrOnSend = ocrOnSend || false
       joinAutorole = joinAutorole || ''
@@ -51,8 +53,8 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
     // Get user info.
     getUserInfo: (_: string, { linkToken }: { linkToken: string }) => {
       if (ctx.tempDB.link[linkToken]) {
-        let servers: Array<{
-          perms: boolean, icon: string, serverId: string, name: string,
+        const servers: Array<{
+          perms: boolean; icon: string; serverId: string; name: string;
           channels: Array<{ id: string, name: string }>
         }> = []
         // Send back mutual servers.
@@ -66,7 +68,8 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
                 id: i.id, name: i.name
               })),
               perms: host === ctx.tempDB.link[linkToken]
-                ? true : guild.members.get(ctx.tempDB.link[linkToken]).permissions.has('manageGuild')
+                ? true
+                : guild.members.get(ctx.tempDB.link[linkToken]).permissions.has('manageGuild')
             })
           }
         })
@@ -77,12 +80,12 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
     // Get user info.
     getOAuthUserInfo: async (_: string, { token }: { token: string }) => {
       // Get info about the user.
-      type Base = { id: string }
+      interface Base { id: string }
       const headers = { Authorization: `Bearer ${token}` }
-      const guilds: Array<Base> = await (await fetch(`${api}/users/@me/guilds`, { headers })).json()
+      const guilds: Base[] = await (await fetch(`${api}/users/@me/guilds`, { headers })).json()
       const { id }: Base = await (await fetch(`${api}/users/@me`, { headers })).json()
       // Generate the server info.
-      let servers: Array<{
+      const servers: Array<{
         perms: boolean, icon: string, serverId: string, name: string,
         channels: Array<{ id: string, name: string }>
       }> = []
@@ -108,7 +111,7 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
     editServerSettings: async (
       _: string, { input }: { input: {
         serverId: string, linkToken: string, addRoleForAll: string, joinAutorole: string,
-        joinLeaveMessages: { channel: string, joinMessage: string, leaveMessage: string },
+        joinLeaveMessages: { channel: string, joinMessage: string, leaveMessage: string }
         ocrOnSend: boolean
       } }
     ) => {
@@ -119,18 +122,22 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
         .find(t => t.id === serverId).members.get(ctx.tempDB.link[linkToken])
       if (member.permissions.has('manageGuild') || host === ctx.tempDB.link[linkToken]) {
         await getServerSettings(db, serverId)
-        await db.collection('servers').updateOne({ serverID: serverId }, { $set: {
-          addRoleForAll: addRoleForAll || undefined,
-          joinAutorole: joinAutorole || undefined,
-          ocrOnSend,
-          joinLeaveMessages: joinLeaveMessages ? {
-            channel: '',
-            joinMessage: '',
-            leaveMessage: '',
-            banMessage: '',
-            ...joinLeaveMessages
-          } : undefined
-        } })
+        await db.collection('servers').updateOne({ serverID: serverId }, {
+          $set: {
+            addRoleForAll: addRoleForAll || undefined,
+            joinAutorole: joinAutorole || undefined,
+            ocrOnSend,
+            joinLeaveMessages: joinLeaveMessages
+              ? {
+                  channel: '',
+                  joinMessage: '',
+                  leaveMessage: '',
+                  banMessage: '',
+                  ...joinLeaveMessages
+                }
+              : undefined
+          }
+        })
         return getServerSettings(db, serverId)
       } else return { serverId: 'Forbidden.' }
     }

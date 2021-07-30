@@ -12,13 +12,13 @@ export const handleWarn: Command = {
     usage: '/warn <user by ID/username/mention> <reason>',
     example: '/warn voldemort you is suck',
     guildOnly: true,
-    requirements: { permissions: { 'manageMessages': true } }
+    requirements: { permissions: { manageMessages: true } }
   },
   generator: async (message, args, { client, db }) => {
     // If improper arguments were provided, then we must inform the user.
     if (args.length < 2) return { content: 'Correct usage: /warn <user> <reason>', error: true }
     // Now find the user ID.
-    let user = getUser(message, args[0])
+    const user = getUser(message, args[0])
     if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // Respect role order.
     if (
@@ -68,7 +68,7 @@ export const handleWarnings: Command = {
     guildOnly: true,
     argsRequired: false,
     requirements: {
-      permissions: { 'manageMessages': true },
+      permissions: { manageMessages: true },
       custom: (message) => (
         message.content.split(' ').length === 1 ||
         getUser(message, message.content.split(' ')[1]).id === message.author.id
@@ -121,13 +121,13 @@ export const handleClearwarns: Command = {
     usage: '/clearwarns <user by ID/username/mention>',
     guildOnly: true,
     example: '/clearwarns voldemort',
-    requirements: { permissions: { 'manageMessages': true } }
+    requirements: { permissions: { manageMessages: true } }
   },
   generator: async (message, args, { db }) => {
     // If improper arguments were provided, then we must inform the user.
     if (args.length !== 1) return { content: 'Correct usage: /clearwarns <user>', error: true }
     // Now find the user ID.
-    let user = getUser(message, args.shift())
+    const user = getUser(message, args.shift())
     if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // Respect role order.
     if (
@@ -156,13 +156,13 @@ export const handleRemovewarn: Command = {
     usage: '/removewarn <user by ID/username/mention> <warning ID>',
     guildOnly: true,
     example: '/removewarn voldemort 5adf7a0e825aa7005a4e7be2',
-    requirements: { permissions: { 'manageMessages': true } }
+    requirements: { permissions: { manageMessages: true } }
   },
   generator: async (message, args, { db }) => {
     // If improper arguments were provided, then we must inform the user.
     if (args.length !== 2) return { content: 'Correct usage: /removewarn <user> <warning ID>', error: true }
     // Now find the user ID.
-    let user = getUser(message, args.shift())
+    const user = getUser(message, args.shift())
     if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // Respect role order.
     if (

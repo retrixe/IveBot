@@ -42,19 +42,23 @@ class Index extends React.Component {
           </Toolbar>
         </AppBar>
         <br /><br /><br /><br />
-        <Button href={
+        <Button
+          href={
           `https://discordapp.com/oauth2/authorize?client_id=${this.state.id}&scope=bot&permissions=8`
-        } fullWidth>Add IveBot to your server</Button>
+        } fullWidth
+        >Add IveBot to your server
+        </Button>
         <hr />
         <Typography align='center' variant='h4'>
-IveBot is not just a multipurpose Discord bot.
+          IveBot is not just a multipurpose Discord bot.
         </Typography>
         <Typography align='center' variant='h4'>
-It is THE multipurpose Discord bot.
+          It is THE multipurpose Discord bot.
         </Typography>
         <hr />
         <Typography>Intended as a Discord bot driven by the community,
-IveBot is 100% open source and always will be.</Typography>
+          IveBot is 100% open source and always will be.
+        </Typography>
         <Typography>IveBot also provides an API for other bots to authenticate
           and communicate with.
         </Typography>

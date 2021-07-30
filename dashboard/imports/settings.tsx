@@ -5,33 +5,26 @@ import {
 } from '@material-ui/core'
 import { Mutation, MutationResult } from 'react-apollo'
 import { FetchResult, gql } from 'apollo-boost'
+import { ServerInfo, ServerSettings } from './graphqlTypes'
 
 interface Props {
-  data: {
-    addRoleForAll: string, joinAutorole: string, ocrOnSend: boolean, joinLeaveMessages: {
-      channel: string,
-      joinMessage: string,
-      leaveMessage: string,
-      banMessage: string
-    }
-  },
-  token: string,
-  server: { perms: boolean, icon: string, serverId: string, name: string, channels: {
-    name: string, id: string
-  }[] },
+  data: ServerSettings
+  token: string
+  server: ServerInfo
   refetch: Function
 }
 interface State {
-  role: string,
-  joinAutorole: string,
-  ocrOnSend: boolean,
+  role: string
+  joinAutorole: string
+  ocrOnSend: boolean
   joinLeaveMessages: {
-    channel: string,
-    joinMessage: string,
-    leaveMessage: string,
+    channel: string
+    joinMessage: string
+    leaveMessage: string
     banMessage: string
   }
 }
+
 export default class Settings extends React.Component<Props, State> {
   constructor (props: Props) {
     super(props); this.state = {
@@ -70,15 +63,20 @@ mutation variables(
 }
     `
     return (
-      <Mutation mutation={mutation} variables={{
-        token: this.props.token,
-        role: this.state.role,
-        server: this.props.server.serverId,
-        joinAutorole: this.state.joinAutorole,
-        joinLeaveMessages: this.state.joinLeaveMessages,
-        ocrOnSend: this.state.ocrOnSend
-      }}>
-        {(updateSettings: () => Promise<void | FetchResult<{}, Record<string, {}>, Record<string, {}>>>, { loading, error }: MutationResult<{}>) => (
+      <Mutation
+        mutation={mutation} variables={{
+          token: this.props.token,
+          role: this.state.role,
+          server: this.props.server.serverId,
+          joinAutorole: this.state.joinAutorole,
+          joinLeaveMessages: this.state.joinLeaveMessages,
+          ocrOnSend: this.state.ocrOnSend
+        }}
+      >
+        {(
+          updateSettings: () => Promise<void | FetchResult<{}, Record<string, {}>, Record<string, {}>>>,
+          { loading, error }: MutationResult<{}>
+        ) => (
           <>
             <br />
             <Typography variant='h6' gutterBottom>Public Roles</Typography>
@@ -96,7 +94,8 @@ mutation variables(
               <InputLabel>Role Names</InputLabel>
               <Input
                 value={this.state.role} fullWidth
-                onChange={e => this.setState({ role: e.target.value })} margin='dense' />
+                onChange={e => this.setState({ role: e.target.value })} margin='dense'
+              />
               <FormHelperText>Leave blank to disable public roles</FormHelperText>
             </FormControl>
             <br /><br />
@@ -117,7 +116,8 @@ mutation variables(
               <InputLabel>Role Names</InputLabel>
               <Input
                 value={this.state.joinAutorole} fullWidth
-                onChange={e => this.setState({ joinAutorole: e.target.value })} margin='dense' />
+                onChange={e => this.setState({ joinAutorole: e.target.value })} margin='dense'
+              />
               <FormHelperText>Leave blank to disable autorole</FormHelperText>
             </FormControl>
             <br /><br /><Divider /><br />
@@ -129,7 +129,8 @@ mutation variables(
             <Typography gutterBottom>Ensure the channel name is correct.</Typography>
             <FormControl fullWidth>
               <InputLabel>Channel Name</InputLabel>
-              <Select value={this.state.joinLeaveMessages.channel} fullWidth margin='dense'
+              <Select
+                value={this.state.joinLeaveMessages.channel} fullWidth margin='dense'
                 onChange={e => this.setState({
                   joinLeaveMessages: {
                     ...this.state.joinLeaveMessages, channel: e.target.value as string
@@ -152,18 +153,24 @@ mutation variables(
               <InputLabel>Join Message</InputLabel>
               <Input
                 value={this.state.joinLeaveMessages.joinMessage} fullWidth
-                onChange={e => this.setState({ joinLeaveMessages: {
-                  ...this.state.joinLeaveMessages, joinMessage: e.target.value
-                } })} margin='dense' />
+                onChange={e => this.setState({
+                  joinLeaveMessages: {
+                    ...this.state.joinLeaveMessages, joinMessage: e.target.value
+                  }
+                })} margin='dense'
+              />
             </FormControl>
             <div style={{ height: 10 }} />
             <FormControl fullWidth>
               <InputLabel>Leave Message</InputLabel>
               <Input
                 value={this.state.joinLeaveMessages.leaveMessage} fullWidth
-                onChange={e => this.setState({ joinLeaveMessages: {
-                  ...this.state.joinLeaveMessages, leaveMessage: e.target.value
-                } })} margin='dense' />
+                onChange={e => this.setState({
+                  joinLeaveMessages: {
+                    ...this.state.joinLeaveMessages, leaveMessage: e.target.value
+                  }
+                })} margin='dense'
+              />
             </FormControl>
             <div style={{ height: 10 }} />
             <FormControl fullWidth>
@@ -174,7 +181,8 @@ mutation variables(
                   joinLeaveMessages: {
                     ...this.state.joinLeaveMessages, banMessage: e.target.value
                   }
-                })} margin='dense' />
+                })} margin='dense'
+              />
             </FormControl>
             <br /><br />
             <Typography variant='h6' gutterBottom>Text Recognition on Image Send</Typography>
@@ -182,7 +190,8 @@ mutation variables(
             <FormGroup row>
               <FormControlLabel
                 control={
-                  <Switch color='secondary' checked={this.state.ocrOnSend}
+                  <Switch
+                    color='secondary' checked={this.state.ocrOnSend}
                     onChange={() => this.setState({ ocrOnSend: !this.state.ocrOnSend })}
                   />
                 }
@@ -195,10 +204,13 @@ mutation variables(
             </Typography>
             <div style={{ height: 10 }} />
             <Button size='small'>Cancel</Button>
-            <Button size='small' onClick={async () => {
-              await updateSettings()
-              this.props.refetch()
-            }}>Save</Button>
+            <Button
+              size='small' onClick={async () => {
+                await updateSettings()
+                this.props.refetch()
+              }}
+            >Save
+            </Button>
             {loading && <><br /><LinearProgress color='secondary' variant='query' /></>}
             {error && <><br /><Typography color='error'>Error :( Please try again</Typography></>}
           </>

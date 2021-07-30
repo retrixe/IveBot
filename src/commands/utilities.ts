@@ -21,18 +21,22 @@ export const handleServerinfo: Command = {
 
   generator: async (message, args, { client }) => {
     // Check if a guild was specified.
-    let guild = args.length ? client.guilds.find(
-      i => i.members.has(message.author.id) && i.id === args[0]
-    ) : message.member.guild
+    const guild = args.length
+      ? client.guilds.find(
+        i => i.members.has(message.author.id) && i.id === args[0]
+      )
+      : message.member.guild
     if (!guild) return { content: `Specify a valid mutual guild, ${getInsult()}.`, error: true }
     // Owner.
     const owner = guild.members.get(guild.ownerID)
     // Nitro Boosting support.
-    const boost = guild.premiumSubscriptionCount ? [{
-      name: '<:boost:602100826214760452> Boost Status',
-      value: `Level ${guild.premiumTier || 0} with ${guild.premiumSubscriptionCount} Boosts`,
-      inline: true
-    }] : []
+    const boost = guild.premiumSubscriptionCount
+      ? [{
+          name: '<:boost:602100826214760452> Boost Status',
+          value: `Level ${guild.premiumTier || 0} with ${guild.premiumSubscriptionCount} Boosts`,
+          inline: true
+        }]
+      : []
     // Display information.
     return {
       content: `⌨ **Server info on ${guild.name}:**`,
@@ -106,13 +110,15 @@ export const handleUserinfo: Command = {
     // Display information.
     const member = message.member.guild.members.get(user.id)
     // TODO: Add publicFlags, game, premiumSince, custom-status. Support per-server pfp, about me, banner.
-    const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
-      (a, b) => a.position > b.position ? -1 : 1
-    ).find(i => i.color !== 0) || { color: 0 }).color : 0
+    const color = member
+      ? (member.roles.map(i => member.guild.roles.get(i)).sort(
+          (a, b) => a.position > b.position ? -1 : 1
+        ).find(i => i.color !== 0) || { color: 0 }).color
+      : 0
     return {
       content: `👥 **Userinfo on ${user.username}:**`,
       embed: {
-        author: { name: `User info`, icon_url: user.avatarURL },
+        author: { name: 'User info', icon_url: user.avatarURL },
         title: `${user.username}#${user.discriminator}` + (user.bot ? ' (Bot account)' : ''),
         description: user.mention + (member && member.pending ? ' (pending guild screening)' : ''),
         thumbnail: { url: user.dynamicAvatarURL('png', 2048) },
@@ -135,9 +141,11 @@ export const handleUserinfo: Command = {
           // Boosting since..
           {
             name: `Roles (${member ? member.roles.length : 'N/A'})`,
-            value: member ? member.roles.map(i => member.guild.roles.get(i)).sort(
-              (a, b) => a.position > b.position ? -1 : 1
-            ).map(i => `<@&${i.id}>`).join(' ') : 'N/A'
+            value: member
+              ? member.roles.map(i => member.guild.roles.get(i)).sort(
+                (a, b) => a.position > b.position ? -1 : 1
+              ).map(i => `<@&${i.id}>`).join(' ')
+              : 'N/A'
           },
           { name: 'Permissions', value: member ? 'Run `/perms <user>` to get their permissions!' : 'N/A' }
         ],
@@ -171,11 +179,13 @@ export const handlePermissions: Command = {
     if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // Display permission info.
     const member = message.member.guild.members.get(user.id)
-    const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
-      (a, b) => a.position > b.position ? -1 : 1
-    ).find(i => i.color !== 0) || { color: 0 }).color : 0
+    const color = member
+      ? (member.roles.map(i => member.guild.roles.get(i)).sort(
+          (a, b) => a.position > b.position ? -1 : 1
+        ).find(i => i.color !== 0) || { color: 0 }).color
+      : 0
     const permissions = member.permissions
-    const permissionKeys = Object.keys(permissions.json) as (keyof Constants['Permissions'])[]
+    const permissionKeys = Object.keys(permissions.json) as Array<keyof Constants['Permissions']>
     const channelPerm = (message.channel as GuildTextableChannel).permissionsOf(user.id)
     return {
       content: `✅ **Permissions of ${user.username}:**`,
@@ -201,20 +211,21 @@ export const handlePermissions: Command = {
           },
           !(message.member.guild.ownerID === user.id || permissions.has('administrator')) || ignoreAdmin
             ? {
-              name: 'Channel Permissions',
-              value: (
-                permissionKeys
-                  .filter(perm => !permissions.has(perm) && channelPerm.has(perm))
-                  .map(perm => (perm.substr(0, 1).toUpperCase() + perm.substr(1))
-                    .replace(/[A-Z]+/g, s => ' ' + s))
-                  .join(', ') +
+                name: 'Channel Permissions',
+                value: (
+                  permissionKeys
+                    .filter(perm => !permissions.has(perm) && channelPerm.has(perm))
+                    .map(perm => (perm.substr(0, 1).toUpperCase() + perm.substr(1))
+                      .replace(/[A-Z]+/g, s => ' ' + s))
+                    .join(', ') +
                 permissionKeys
                   .filter(perm => permissions.has(perm) && !channelPerm.has(perm))
                   .map(perm => '**!(' + (perm.substr(0, 1).toUpperCase() + perm.substr(1))
                     .replace(/[^(][A-Z]+/g, s => s.substr(0, 1) + ' ' + s.substr(1)) + ')**')
                   .join(', ')
-              ).replace('TTSMessages', 'TTS Messages')
-            } : { name: '', value: '' }
+                ).replace('TTSMessages', 'TTS Messages')
+              }
+            : { name: '', value: '' }
         ].filter(e => !!e.value),
         footer: { text: 'User ID: ' + user.id }
       }
@@ -336,7 +347,7 @@ export const handleType: Command = {
       args.shift()
       if (args.join(' ') === 'pls adim me') args = ['no']
       await client.sendChannelTyping(message.channelMentions[0])
-      await (ms => new Promise(resolve => setTimeout(resolve, ms)))(
+      await (async ms => await new Promise(resolve => setTimeout(resolve, ms)))(
         args.join(' ').length * 120 > 8000 ? 8000 : args.join(' ').length * 120
       )
       tempDB.say[message.channelMentions[0]] = (
@@ -357,7 +368,7 @@ export const handleType: Command = {
     // Send the message.
     if (args.join(' ') === 'pls adim me') args = ['no']
     await message.channel.sendTyping()
-    await (ms => new Promise(resolve => setTimeout(resolve, ms)))(
+    await (async ms => await new Promise(resolve => setTimeout(resolve, ms)))(
       args.join(' ').length * 120 > 8000 ? 8000 : args.join(' ').length * 120
     )
     return {
@@ -410,7 +421,7 @@ export const handleRemindme: Command = {
           )
           : (await message.author.getDMChannel()).createMessage(
             `⏰ ${args.slice(1).join(' ')}\nReminder set ${args[0]} ago.`
-          )
+            )
       }, ms(args[0]))
     }
     return `You will be reminded in ${args[0]} through a ${channel ? 'mention' : 'DM'}.`

@@ -10,7 +10,7 @@ export const handleAddemoji: Command = {
     usage: '/addemoji <name> <link or attached image>',
     example: '/addemoji whateverURLmeh',
     guildOnly: true,
-    requirements: { permissions: { 'manageEmojis': true } }
+    requirements: { permissions: { manageEmojis: true } }
   },
   generator: async (message, args, { client }) => {
     // Get the URL.
@@ -28,11 +28,13 @@ export const handleAddemoji: Command = {
     } catch (e) { return { content: `Invalid image URL, you ${getInsult()}`, error: true } }
     // If emoji larger than 384 KB (in case)
     if (image === false || (image.byteLength / 1024) >= 384) {
-      return { content: `Your emoji is larger than 256 KB, resize your image!
+      return {
+        content: `Your emoji is larger than 256 KB, resize your image!
 I recommend using <https://picresize.com/> if the emoji is JPG.
 Set step 2 to No Change, set Max Filesize to 255 in step 4 and set to Best quality.
 After checking image format as JPG, resize, View Image and use the URL to the image here.`,
-      error: true }
+        error: true
+      }
     }
     // Check the slots.
     const isGif = check([0x47, 0x49, 0x46], image)
@@ -53,11 +55,13 @@ After checking image format as JPG, resize, View Image and use the URL to the im
       else mention = `<:${emoji.name}:${emoji.id}>`
       return `Emoji successfully added \\o/ (${mention})`
     } catch (e) {
-      return { content: `Emoji could not be added. Is the emoji larger than 256 kB?
+      return {
+        content: `Emoji could not be added. Is the emoji larger than 256 kB?
 I recommend using <https://picresize.com/> if the emoji is JPG and too large.
 Set step 2 to No Change, set Max Filesize to 255 in step 4 and set to Best quality.
 After checking image format as JPG, resize, View Image and use the URL to the image here.`,
-      error: true }
+        error: true
+      }
     }
   }
 }
@@ -71,7 +75,7 @@ export const handleDeleteemoji: Command = {
     usage: '/deleteEmoji <custom emoji by ID/mention/name>',
     example: '/deleteEmoji <:tom:402567029963489281>',
     guildOnly: true,
-    requirements: { permissions: { 'manageEmojis': true } }
+    requirements: { permissions: { manageEmojis: true } }
   },
   generator: async (message, args, { client }) => {
     // Check bot permissions.
@@ -102,7 +106,7 @@ export const handleEditemoji: Command = {
     usage: '/editEmoji <custom emoji by ID/mention/name> <new name>',
     example: '/editEmoji tim tim2',
     guildOnly: true,
-    requirements: { permissions: { 'manageEmojis': true } }
+    requirements: { permissions: { manageEmojis: true } }
   },
   generator: async (message, args, { client }) => {
     // Check if enough arguments were provided.

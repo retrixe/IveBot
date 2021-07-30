@@ -13,12 +13,12 @@ export function checkRolePosition (
   const rolesInServer = member.guild.roles
   // Iterate over roles.
   let highestRolePosition = 0
-  for (let roleIndex in rolesOfUser) {
-    if (rolesInServer.get(rolesOfUser[roleIndex]).position > highestRolePosition) {
+  for (const role of rolesOfUser) {
+    if (rolesInServer.get(role).position > highestRolePosition) {
       if (
-        !considerMutedRole && rolesInServer.get(rolesOfUser[roleIndex]).name === 'Muted'
+        !considerMutedRole && rolesInServer.get(role).name === 'Muted'
       ) continue
-      highestRolePosition = rolesInServer.find(e => rolesOfUser[roleIndex] === e.id).position
+      highestRolePosition = rolesInServer.find(e => role === e.id).position
     }
   }
   return highestRolePosition

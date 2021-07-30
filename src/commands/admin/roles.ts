@@ -24,14 +24,14 @@ export const handleGiverole: Command = {
     else if (user && !manageRoles) return insult // Permission check.
     else args.shift()
     // Now find the role.
-    let role = message.member.guild.roles.find(
+    const role = message.member.guild.roles.find(
       a => a.name.toLowerCase() === args.join(' ').toLowerCase() || args.join(' ') === a.id
     )
     const isPublicRole = role && publicRoles.split('|').includes(role.name)
     if (!role) return { content: 'You have provided an invalid role name/ID, you ' + getInsult() + '.', error: true }
     // Can the user manage this role?
     if (role.position >= checkRolePosition(message.member) && !isPublicRole
-    ) return { content: `You cannot give this role. Pfft, overestimating their own powers now.`, error: true }
+    ) return { content: 'You cannot give this role. Pfft, overestimating their own powers now.', error: true }
     // Can the bot manage this role?
     if (
       role.position >= checkRolePosition(message.member.guild.members.get(client.user.id)) ||
@@ -42,10 +42,12 @@ export const handleGiverole: Command = {
       ? message.member.guild.members.get(user.id).roles
       : message.member.roles
     if (rolesOfMember.includes(role.id)) {
-      return { content: user.id === message.author.id // Ternary statement.
-        ? `You ${getInsult()}, you already have the specified role.`
-        : `You ${getInsult()}, that person already has the specified role.`,
-      error: true }
+      return {
+        content: user.id === message.author.id // Ternary statement.
+          ? `You ${getInsult()}, you already have the specified role.`
+          : `You ${getInsult()}, that person already has the specified role.`,
+        error: true
+      }
     }
     try {
       await client.addGuildMemberRole(
@@ -53,10 +55,12 @@ export const handleGiverole: Command = {
       )
     } catch (e) {
       return user.id === message.author.id // Ternary statement.
-        ? 'Could not give you the role.' : 'Could not give role to user.'
+        ? 'Could not give you the role.'
+        : 'Could not give role to user.'
     }
     return user.id === message.author.id // Ternary statement.
-      ? `Gave you the role **${role.name}**.` : `Gave role **${role.name}** to ${user.mention}.`
+      ? `Gave you the role **${role.name}**.`
+      : `Gave role **${role.name}** to ${user.mention}.`
   }
 }
 
@@ -82,14 +86,14 @@ export const handleTakerole: Command = {
     else if (!manageRoles && user) return insult // Permission check.
     else args.shift()
     // Now find the role.
-    let role = message.member.guild.roles.find(
+    const role = message.member.guild.roles.find(
       a => a.name.toLowerCase() === args.join(' ').toLowerCase() || args.join(' ') === a.id
     )
     const isPublicRole = role && publicRoles.split('|').includes(role.name)
     if (!role) return { content: 'You have provided an invalid role name/ID, you ' + getInsult() + '.', error: true }
     // Can the user manage this role?
     if (role.position >= checkRolePosition(message.member) && !isPublicRole
-    ) return { content: `You cannot take this role. Pfft, overestimating their own powers now.`, error: true }
+    ) return { content: 'You cannot take this role. Pfft, overestimating their own powers now.', error: true }
     // Can the bot manage this role?
     if (
       role.position >= checkRolePosition(message.member.guild.members.get(client.user.id)) ||
@@ -100,10 +104,12 @@ export const handleTakerole: Command = {
       ? message.member.guild.members.get(user.id).roles
       : message.member.roles
     if (!rolesOfMember.includes(role.id)) {
-      return { content: user.id === message.author.id // Ternary statement.
-        ? `You ${getInsult()}, you don't have the specified role.`
-        : `You ${getInsult()}, that person doesn't have the specified role.`,
-      error: true }
+      return {
+        content: user.id === message.author.id // Ternary statement.
+          ? `You ${getInsult()}, you don't have the specified role.`
+          : `You ${getInsult()}, that person doesn't have the specified role.`,
+        error: true
+      }
     }
     try {
       await client.removeGuildMemberRole(
@@ -111,10 +117,12 @@ export const handleTakerole: Command = {
       )
     } catch (e) {
       return user.id === message.author.id // Ternary statement.
-        ? 'Could not take the role from you.' : 'Could not take role from the user.'
+        ? 'Could not take the role from you.'
+        : 'Could not take role from the user.'
     }
     return user.id === message.author.id // Ternary statement.
-      ? `Took the role **${role.name}** from you.` : `Took role **${role.name}** from ${user.mention}.`
+      ? `Took the role **${role.name}** from you.`
+      : `Took role **${role.name}** from ${user.mention}.`
   }
 }
 
@@ -127,7 +135,7 @@ export const handleNotify: Command = {
     example: '/notify Helper testing',
     guildOnly: true,
     deleteCommand: true,
-    requirements: { permissions: { 'manageRoles': true } }
+    requirements: { permissions: { manageRoles: true } }
   },
   generator: async (message, args, { client }) => {
     // Find the role.

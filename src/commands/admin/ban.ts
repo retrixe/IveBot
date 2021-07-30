@@ -24,7 +24,7 @@ export const handleBan: Command = {
     usage: '/ban <user by ID/username/mention> (--silent|-s) (--delete|-d) (reason)',
     guildOnly: true,
     example: '/ban voldemort you is suck',
-    requirements: { permissions: { 'banMembers': true } }
+    requirements: { permissions: { banMembers: true } }
   },
   aliases: ['banana', 'nuke'],
   generator: async (message, args, { client }) => {
@@ -92,7 +92,7 @@ export const handleUnban: Command = {
     usage: '/unban <user by ID/username/mention> (reason)',
     example: '/unban voldemort wrong person',
     guildOnly: true,
-    requirements: { permissions: { 'banMembers': true } }
+    requirements: { permissions: { banMembers: true } }
   },
   generator: async (message, args, { client }) => {
     // Check bot for permissions.

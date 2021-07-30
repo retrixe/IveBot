@@ -32,7 +32,7 @@ export const handlePurge: Command = {
     guildOnly: true,
     deleteCommand: true,
     requirements: {
-      permissions: { 'manageMessages': true },
+      permissions: { manageMessages: true },
       custom: (message) => (
         (message.channel as GuildTextableChannel)
           .permissionsOf(message.author.id).has('manageMessages')
@@ -50,7 +50,7 @@ export const handlePurge: Command = {
       return `I lack permission to purge messages in this channel, you ${getInsult()}.`
     }
     // Pre-defined variables.
-    let messages: Array<Message>
+    let messages: Message[]
     // Get the list of messages.
     try {
       messages = await client.getMessages(message.channel.id, +args.shift(), message.id)
@@ -71,11 +71,11 @@ export const handleKick: Command = {
     usage: '/kick <user by ID/username/mention> (--silent|-s) (--delete|-d) (reason)',
     guildOnly: true,
     example: '/kick voldemort you is suck',
-    requirements: { permissions: { 'kickMembers': true } }
+    requirements: { permissions: { kickMembers: true } }
   },
   generator: async (message, args, { client }) => {
     // Find the user ID.
-    let user = getUser(message, args.shift())
+    const user = getUser(message, args.shift())
     if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // If the user cannot kick the person..
     if (
@@ -132,7 +132,7 @@ export const handleSlowmode: Command = {
     guildOnly: true,
     example: '/slowmode off',
     requirements: {
-      permissions: { 'manageChannels': true },
+      permissions: { manageChannels: true },
       custom: (message) => (
         (message.channel as GuildTextableChannel)
           .permissionsOf(message.author.id).has('manageChannels') ||

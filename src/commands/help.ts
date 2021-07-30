@@ -74,15 +74,19 @@ const generateDocs = (command: Command) => {
     const permissions = command.requirements.permissions
       ? `Needs the permissions: ${Object.keys(command.requirements.permissions).map(perm => (
         perm.substr(0, 1).toUpperCase() + perm.substr(1)
-      ).replace(/[A-Z]+/g, s => ' ' + s).trim()).join(', ').replace('TTSMessages', 'TTS Messages')} | ` : ''
+      ).replace(/[A-Z]+/g, s => ' ' + s).trim()).join(', ').replace('TTSMessages', 'TTS Messages')} | `
+      : ''
     const roleNames = command.requirements.roleNames
-      ? `Needs the roles: ${command.requirements.roleNames.join(', ')} | ` : ''
+      ? `Needs the roles: ${command.requirements.roleNames.join(', ')} | `
+      : ''
     const roleIDs = command.requirements.roleIDs ? 'Usable by users with a certain role | ' : ''
     const userIDs = command.requirements.userIDs ? 'Usable by certain users | ' : ''
     const custom = command.requirements.custom
-      ? '\n**Requirements:** Has some unknown permission checks | ' : ''
+      ? '\n**Requirements:** Has some unknown permission checks | '
+      : ''
     requirements = custom || (permissions || roleIDs || roleNames || userIDs
-      ? `\n**Requirements:** ${custom}${permissions}${roleIDs}${roleNames}${userIDs}` : '')
+      ? `\n**Requirements:** ${custom}${permissions}${roleIDs}${roleNames}${userIDs}`
+      : '')
   }
 
   if (command.aliases && command.aliases.length) {

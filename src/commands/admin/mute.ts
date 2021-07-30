@@ -13,11 +13,11 @@ export const handleMute: Command = {
     usage: '/mute <user by ID/username/mention> (time limit) (reason)',
     example: '/mute voldemort 1h bored',
     guildOnly: true,
-    requirements: { permissions: { 'manageMessages': true } }
+    requirements: { permissions: { manageMessages: true } }
   },
   generator: async (message, args, { client, tempDB, db }) => {
     // Find the user ID.
-    let user = getUser(message, args.shift())
+    const user = getUser(message, args.shift())
     if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // Respect role order.
     if (
@@ -131,11 +131,11 @@ export const handleUnmute: Command = {
     usage: '/unmute <user by ID/username/mention> (reason)',
     guildOnly: true,
     example: '/unmute voldemort wrong person',
-    requirements: { permissions: { 'manageMessages': true } }
+    requirements: { permissions: { manageMessages: true } }
   },
   generator: (message, args, { client, tempDB }) => {
     // Find the user ID.
-    let user = getUser(message, args.shift())
+    const user = getUser(message, args.shift())
     if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // Respect role order.
     if (
@@ -149,15 +149,15 @@ export const handleUnmute: Command = {
     const rolesOfServer = message.member.guild.roles
     const guildID = message.member.guild.id
     // Iterate over the roles.
-    for (let roleIndex in roles) {
-      if (rolesOfServer.get(roles[roleIndex]).name === 'Muted') {
+    for (const role of roles) {
+      if (rolesOfServer.get(role).name === 'Muted') {
         // Remove the mute persist.
         if (tempDB.mute[guildID] && tempDB.mute[guildID].includes(user.id)) {
           tempDB.mute[guildID].splice(tempDB.mute[guildID].findIndex((i) => i === user.id), 1)
         }
         // Take the role.
         client.removeGuildMemberRole(
-          message.member.guild.id, user.id, roles[roleIndex], args.join(' ')
+          message.member.guild.id, user.id, role, args.join(' ')
         )
         return 'Unmuted.'
       }

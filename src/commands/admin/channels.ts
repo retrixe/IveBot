@@ -10,7 +10,7 @@ export const handleDeletechannel: Command = {
     usage: '/deletechannel <channel by ID/mention/name> (reason)',
     example: '/deletechannel ok Accidentally made.',
     guildOnly: true,
-    requirements: { permissions: { 'manageChannels': true } }
+    requirements: { permissions: { manageChannels: true } }
   },
   generator: async (message, args, { client }) => {
     // Get the channel ID.
@@ -34,13 +34,13 @@ export const handleEditchannel: Command = {
   aliases: ['ec'],
   opts: {
     description: 'Edit a channel\'s settings.',
-    fullDescription: `Edit a channel's settings with ease.`,
+    fullDescription: 'Edit a channel\'s settings with ease.',
     usage: '/editchannel <channel by ID/mention/name> (name-<channel name>) ' +
     '(topic-<channel topic>) (nsfw-<true/false>) (bitrate-<8 to 96 kbps>) ' +
     '(userLimit-<0 to 99>) (rateLimitPerUser-<0 to 120>)',
     example: '/ec general topic-All topics allowed here.',
     guildOnly: true,
-    requirements: { permissions: { 'manageChannels': true } }
+    requirements: { permissions: { manageChannels: true } }
   },
   generator: async (message, args, { client }) => {
     // Get the channel ID.
@@ -56,10 +56,8 @@ export const handleEditchannel: Command = {
     const operationTypes = [
       'name', 'topic', 'rateLimitPerUser', 'nsfw', 'bitrate', 'userLimit'
     ]
-    const failedOps: { name: string, value: string }[] = []
-    for (let num in ops) {
-      // Get operation name.
-      const operation = ops[num]
+    const failedOps: Array<{ name: string, value: string }> = []
+    for (const operation of ops) {
       const opArr = operation.split('-')
       const name = opArr.shift()
       const value = opArr.join('-')

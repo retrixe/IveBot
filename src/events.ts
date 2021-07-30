@@ -103,7 +103,7 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
     ) return
   } catch (e) {}
   // Content of message and sendResponse.
-  const sendResponse = (content: string) => message.channel.createMessage(content)
+  const sendResponse = async (content: string) => await message.channel.createMessage(content)
   const command = message.content.toLowerCase()
   // Handle answers to trivia
   const session = tempDB.trivia[message.channel.id]
@@ -112,11 +112,11 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
   }
   // Auto responses and easter eggs.
   if (command.startsWith('is dot a good boy')) await sendResponse('Shame on you. He\'s undefined.')
-  else if (command.startsWith('iphone x')) await sendResponse(`You don't deserve it. 😎`)
-  else if (command.startsWith('iphone 11')) await sendResponse(`You don't deserve it. 😎`)
-  else if (command.startsWith('iphone 12')) await sendResponse(`You don't deserve it. 😎`)
-  else if (command.startsWith('iphone 13')) await sendResponse(`You don't deserve it. 😎`)
-  else if (command.startsWith('iphone se')) await sendResponse(`lol peasant`)
+  else if (command.startsWith('iphone x')) await sendResponse('You don\'t deserve it. 😎')
+  else if (command.startsWith('iphone 11')) await sendResponse('You don\'t deserve it. 😎')
+  else if (command.startsWith('iphone 12')) await sendResponse('You don\'t deserve it. 😎')
+  else if (command.startsWith('iphone 13')) await sendResponse('You don\'t deserve it. 😎')
+  else if (command.startsWith('iphone se')) await sendResponse('lol peasant')
   else if (command.startsWith('triggered')) await sendResponse('Ah, pathetic people again.')
   else if (command.startsWith('ayy')) await sendResponse('lmao')
   // Handle answers to gunfight.

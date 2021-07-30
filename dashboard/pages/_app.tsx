@@ -16,7 +16,7 @@ export default function MyApp (props: { Component: React.ElementType, pageProps:
   }, [])
 
   return (
-    <React.Fragment>
+    <>
       <Head>
         <title>IveBot</title>
         <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
@@ -26,6 +26,6 @@ export default function MyApp (props: { Component: React.ElementType, pageProps:
         <CssBaseline />
         <Component {...pageProps} />
       </ThemeProvider>
-    </React.Fragment>
+    </>
   )
 }

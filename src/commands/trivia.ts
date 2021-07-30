@@ -48,15 +48,19 @@ export class TriviaSession {
       const second = values.filter(num => num !== first).reduce(maxReduce, 0)
       const third = values.filter(num => num !== first && num !== second).reduce(maxReduce, 0)
       currentScores.forEach(([id, b]) => {
-        medals[id] = first && b === first ? '🥇 '
-          : second && b === second ? '🥈 '
+        medals[id] = first && b === first
+          ? '🥇 '
+          : second && b === second
+            ? '🥈 '
             : third && b === third ? '🥉 ' : ''
       })
     }
     const member = this.message.member.guild.members.get(this.client.user.id)
-    const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
-      (a, b) => a.position > b.position ? -1 : 1
-    ).find(i => i.color !== 0) || { color: 0 }).color : 0
+    const color = member
+      ? (member.roles.map(i => member.guild.roles.get(i)).sort(
+          (a, b) => a.position > b.position ? -1 : 1
+        ).find(i => i.color !== 0) || { color: 0 }).color
+      : 0
     const embed: EmbedOptions = {
       title: 'Scores',
       color,
@@ -77,7 +81,7 @@ export class TriviaSession {
   }
 
   async newQuestion () {
-    for (let i of Object.values(this.scores)) {
+    for (const i of Object.values(this.scores)) {
       if (i === this.settings.maxScore) {
         await this.endGame()
         return true
@@ -107,7 +111,7 @@ export class TriviaSession {
 
     if (this.currentQuestion === null) {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      if (this.stopped === false) await this.newQuestion()
+      if (!this.stopped) await this.newQuestion()
     } else if (this.stopped) {
       return true
     } else {
@@ -129,7 +133,7 @@ export class TriviaSession {
       await this.channel.createMessage(message)
       await this.channel.sendTyping()
       await new Promise(resolve => setTimeout(resolve, 1000))
-      if (this.stopped === false) await this.newQuestion()
+      if (!this.stopped) await this.newQuestion()
     }
   }
 
@@ -142,8 +146,8 @@ export class TriviaSession {
 
     // TODO: fuse.js for better pattern matching.
     for (let i = 0; i < this.currentQuestion[1].length; i++) {
-      let answer = this.currentQuestion[1][i].toLowerCase()
-      let guess = message.content.toLowerCase()
+      const answer = this.currentQuestion[1][i].toLowerCase()
+      const guess = message.content.toLowerCase()
       if (!answer.includes(' ')) { // Strict answer checking for one word answers
         const guessWords = guess.split(' ')
         for (let j = 0; j < guessWords.length; j++) {
@@ -226,9 +230,11 @@ export const handleTrivia: Command = {
     } else if (args.length === 1 && args[0] === 'list') {
       const lists = await fs.promises.readdir('./triviaLists/')
       const member = message.member.guild.members.get(client.user.id)
-      const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
-        (a, b) => a.position > b.position ? -1 : 1
-      ).find(i => i.color !== 0) || { color: 0 }).color : 0
+      const color = member
+        ? (member.roles.map(i => member.guild.roles.get(i)).sort(
+            (a, b) => a.position > b.position ? -1 : 1
+          ).find(i => i.color !== 0) || { color: 0 }).color
+        : 0
       const embed: EmbedOptions = {
         title: 'Available trivia lists',
         color,

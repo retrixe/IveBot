@@ -4,7 +4,7 @@ import CommandParser from '../client'
 import { Db } from 'mongodb'
 import { TriviaSession } from '../commands/trivia'
 
-export type DB = {
+export interface DB {
   gunfight: {
     [key: string]: {
       randomWord: string,
@@ -29,22 +29,22 @@ export type DB = {
     [index: string]: string
   },
   cooldowns: { request: string[] },
-  leave: Array<string>
+  leave: string[]
 }
 
-export type Context = { tempDB: DB, db: Db, commandParser: CommandParser, client: Client }
+export interface Context { tempDB: DB, db: Db, commandParser: CommandParser, client: Client }
 export type CommandResponse = string | AdvancedMessageContent & { error?: boolean }
 export type IveBotCommandGeneratorFunction = (msg: Message, args: string[], ctx: Context) =>
-  void | Promise<void> | CommandResponse | Promise<CommandResponse>
+void | Promise<void> | CommandResponse | Promise<CommandResponse>
 export type IveBotCommandGenerator = IveBotCommandGeneratorFunction|string|AdvancedMessageContent
-export type Command = {
+export interface Command {
   opts: CommandOptions,
   aliases?: string[],
   name: string,
   generator: IveBotCommandGenerator,
   postGenerator?: (message: Message, args: string[], sent?: Message, ctx?: Context) => void
 }
-export type CommandOptions = {
+export interface CommandOptions {
   argsRequired?: boolean
   caseInsensitive?: boolean
   deleteCommand?: boolean

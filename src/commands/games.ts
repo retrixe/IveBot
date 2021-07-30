@@ -84,7 +84,7 @@ export const handleZalgo: Command = {
     example: '/zalgo sup'
   },
   generator: (message, args) => {
-    let textToZalgo = args.join(' ').split('')
+    const textToZalgo = args.join(' ').split('')
     let newMessage = ''
     textToZalgo.forEach(element => {
       newMessage += element
@@ -108,7 +108,7 @@ export const handleDezalgo: Command = {
   generator: (message, args) => {
     let newMessage = ''
     args.join(' ').split('').forEach(element => {
-      if (characters.indexOf(element) === -1) newMessage += element
+      if (!characters.includes(element)) newMessage += element
     })
     return newMessage
   }

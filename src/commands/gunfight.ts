@@ -90,7 +90,7 @@ export const handleAccept: Command = {
     tempDB.gunfight[gunfightToAccept].accepted = true
     tempDB.gunfight[gunfightToAccept].randomWord = words[Math.floor(Math.random() * words.length)]
     client.createMessage(
-      message.channel.id, `Within 20 seconds, you will be asked to say a random word.`
+      message.channel.id, 'Within 20 seconds, you will be asked to say a random word.'
     )
     const timestamp = tempDB.gunfight[gunfightToAccept].timestamp
     // Let's wait for random amount under 20s and call a random word.
