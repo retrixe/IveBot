@@ -5,7 +5,7 @@ import { Command } from '../imports/types'
 import { getIdFromMention, getInsult, getUser } from '../imports/tools'
 import ms from 'ms'
 import 'json5/lib/require'
-import { host, testPilots } from '../../../config.json5'
+import { host, testPilots } from '../../config.json5'
 import moment from 'moment'
 
 export const handleServerinfo: Command = {
@@ -400,7 +400,7 @@ export const handleRemindme: Command = {
             channel ? message.author.mention + ' ' : ''
           } ${args.slice(channel ? 2 : 1).join(' ')}\nReminder set ${args[0]} ago.`
         })
-        if (res.insertedCount !== 1) return 'Failed to add a reminder to the database!'
+        if (!res.acknowledged) return 'Failed to add a reminder to the database!'
       } catch (e) { return 'Failed to add a reminder to the database!' + channel ? '' : ' Can I DM you?' }
     } else {
       setTimeout(async () => {

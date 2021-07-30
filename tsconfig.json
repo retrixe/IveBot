@@ -14,7 +14,7 @@
     "esModuleInterop": true
   },
   "include": [
-    "server/**/*.ts",
+    "src/**/*.ts",
     "index.d.ts"
   ],
   "exclude": [

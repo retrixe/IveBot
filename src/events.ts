@@ -6,7 +6,7 @@ import { Db } from 'mongodb'
 // Database reading function.
 import { getServerSettings } from './imports/tools'
 // Tokens and stuffs.
-import { cvAPIkey } from '../../config.json5'
+import { cvAPIkey } from '../config.json5'
 
 // When a server gains a member, this function will be called.
 export const guildMemberAdd = (client: Client, db: Db, tempDB: DB) => async (
@@ -102,7 +102,7 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
     ) return
   } catch (e) {}
   // Content of message and sendResponse.
-  const sendResponse = message.channel.createMessage
+  const sendResponse = (content: string) => message.channel.createMessage(content)
   const command = message.content.toLowerCase()
   // Handle answers to trivia
   const session = tempDB.trivia[message.channel.id]

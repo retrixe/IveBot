@@ -1,6 +1,6 @@
 import { Command as IveBotCommand } from '../imports/types'
 import { zeroWidthSpace, getInsult } from '../imports/tools'
-import { rootURL } from '../../../config.json5'
+import { rootURL } from '../../config.json5'
 import { Command } from '../client'
 
 const generalHelp = {

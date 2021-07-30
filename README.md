@@ -75,7 +75,7 @@ It's planned to have some nifty commands like /assistant which directly communic
 - `/purge`
 - `/slowmode`
 
-[Complete list of commands along with their descriptions available here.](https://github.com/retrixe/IveBot/blob/master/server/bot/commands/help.ts#L6)
+[Complete list of commands along with their descriptions available here.](https://github.com/retrixe/IveBot/blob/master/src/commands/help.ts#L6)
 
 </details>
 <hr />

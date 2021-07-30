@@ -9,7 +9,7 @@ import { zeroWidthSpace, getInsult, fetchLimited, getIdFromMention } from '../im
 import 'json5/lib/require'
 import {
   NASAtoken, fixerAPIkey, weatherAPIkey, oxfordAPI, cvAPIkey
-} from '../../../config.json5'
+} from '../../config.json5'
 
 export const handleOcr: Command = {
   name: 'ocr',

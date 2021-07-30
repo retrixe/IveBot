@@ -1,16 +1,16 @@
 import 'json5/lib/require'
 // Tokens and stuff.
 import { Client } from 'eris'
-import CommandParser from './bot/client'
 // Get MongoDB.
 import { MongoClient } from 'mongodb'
 // Import fs.
 import { readdir, statSync } from 'fs'
 import { inspect } from 'util'
 // Import types.
-import { DB, Command } from './bot/imports/types'
+import { DB, Command } from './imports/types'
 // Import the bot.
-import { guildMemberAdd, guildMemberRemove, guildDelete, guildBanAdd } from './bot'
+import CommandParser from './client'
+import { guildMemberAdd, guildMemberRemove, guildDelete, guildBanAdd } from './events'
 // Get the token needed.
 import { token, mongoURL } from '../config.json5'
 
@@ -30,9 +30,7 @@ const client = new Client('Bot ' + token === 'dotenv' ? process.env.IVEBOT_TOKEN
 client.connect()
 
 // Create a MongoDB instance.
-MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, {
-  useNewUrlParser: true
-}, (err, mongoDB) => {
+MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (err, mongoDB) => {
   if (err) throw new Error('Error:\n' + err)
   console.log('Bot connected successfully to MongoDB.')
   const db = mongoDB.db('ivebot')
@@ -46,8 +44,8 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, {
   const commandParser = new CommandParser(client, tempDB, db)
   client.on('messageCreate', commandParser.onMessage)
   client.on('messageUpdate', commandParser.onMessageUpdate)
-  // Register all commands in bot/commands onto the CommandParser.
-  const toRead = dev ? './server/bot/commands/' : './lib/bot/commands/'
+  // Register all commands in src/commands onto the CommandParser.
+  const toRead = dev ? './src/commands/' : './lib/commands/'
   readdir(toRead, (err, commandFiles) => {
     // Handle any errors.
     if (err) { console.error(err); throw new Error('Commands could not be retrieved.') }
@@ -57,7 +55,7 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, {
     commandFiles.forEach(commandFile => {
       // If it's a file..
       if (statSync(toRead + commandFile).isFile() && (commandFile.endsWith('.ts') || commandFile.endsWith('.js'))) {
-        const commands: { [index: string]: Command } = require('./bot/commands/' + commandFile)
+        const commands: { [index: string]: Command } = require('./commands/' + commandFile)
         // ..and there are commands..
         if (!Object.keys(commands).length) return
         // ..register the commands.

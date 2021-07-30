@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { ObjectID } from 'mongodb'
+import { ObjectId } from 'mongodb'
 import { Command } from '../../imports/types'
 import { getUser, getInsult } from '../../imports/tools'
 import { checkRolePosition } from '../../imports/permissions'
@@ -174,7 +174,7 @@ export const handleRemovewarn: Command = {
     // Remove the warning of the person internally.
     try {
       const warn = await db.collection('warnings').findOne({
-        _id: new ObjectID(args[0]), serverID: message.member.guild.id
+        _id: new ObjectId(args[0]), serverID: message.member.guild.id
       })
       if (!warn) return { content: 'This warning does not exist..', error: true }
       else if (warn.warnedID !== user.id) {
@@ -182,7 +182,7 @@ export const handleRemovewarn: Command = {
       }
       try {
         await db.collection('warnings').deleteOne({
-          _id: new ObjectID(args[0]), serverID: message.member.guild.id
+          _id: new ObjectId(args[0]), serverID: message.member.guild.id
         })
       } catch (e) { return `Something went wrong 👾 Error: ${e}` }
     } catch (err) { return `Something went wrong 👾 Error: ${err}` }

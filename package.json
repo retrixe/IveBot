@@ -2,7 +2,7 @@
   "name": "ivebot",
   "version": "3.2.0",
   "description": "The bot that created the iPhone X.",
-  "main": "server/index.ts",
+  "main": "src/index.ts",
   "private": true,
   "repository": "https://github.com/retrixe/IveBot.git",
   "scripts": {
@@ -10,7 +10,7 @@
     "lint": "eslint . --ext .js,.ts,.tsx && tsc --noEmit && graphql-schema-linter dashboard/schema.graphql",
     "start": "node lib/index.js --production",
     "build": "tsc",
-    "dev": "nodemon server/index.ts",
+    "dev": "nodemon src/index.ts",
     "mongo": "mongod --dbpath=database"
   },
   "author": "Ibrahim Ansari <ansari.ibrahim1@gmail.com>",
@@ -24,12 +24,11 @@
     "json5": "^0.5.1",
     "mathjs": "^9.4.3",
     "moment": "^2.24.0",
-    "mongodb": "^3.0.6",
+    "mongodb": "^4.0.1",
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {
     "@babel/core": "^7.1.6",
-    "@types/mongodb": "^3.0.12",
     "@types/node": "^16.4.7",
     "@types/node-fetch": "^2.5.12",
     "@typescript-eslint/eslint-plugin": "^1.5.0",
