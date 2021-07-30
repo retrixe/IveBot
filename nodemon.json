@@ -1,5 +1,5 @@
 {
-  "ignore": ["lib", ".next", "pages", "node_modules", ".git"],
+  "ignore": ["lib", "dashboard", "node_modules", ".git"],
   "execMap": {
     "ts": "ts-node"
   }

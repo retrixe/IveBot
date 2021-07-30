@@ -4,7 +4,6 @@ import {
   Typography, TextField, LinearProgress
 } from '@material-ui/core'
 import Link from 'next/link'
-import fetch from 'isomorphic-unfetch'
 import withRoot from '../components/withRoot'
 import Dashboard from '../components/dashboard'
 import ApolloClient, { gql } from 'apollo-boost'

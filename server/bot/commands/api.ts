@@ -1,7 +1,7 @@
 // All the types!
 import { Command } from '../imports/types'
 // All the tools!
-import fetch from 'isomorphic-unfetch'
+import fetch from 'node-fetch'
 import moment from 'moment'
 import Fuse from 'fuse.js'
 import { zeroWidthSpace, getInsult, fetchLimited, getIdFromMention } from '../imports/tools'
