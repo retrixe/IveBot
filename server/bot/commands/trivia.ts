@@ -38,8 +38,19 @@ export class TriviaSession {
     this.client = client
   }
 
-  getScores () {
+  getScores (addMedals = false) {
     const currentScores = Object.entries(this.scores).sort(([, a], [, b]) => b - a)
+    const medals: { [id: string]: string } = {}
+    if (addMedals) {
+      const maxReduce = (a, b) => Math.max(a || 0, b || 0)
+      const values = Object.values(this.scores)
+      const first = values.reduce(maxReduce)
+      const second = values.filter(num => num !== first).reduce(maxReduce)
+      const third = values.filter(num => num !== first && num !== second).reduce(maxReduce)
+      currentScores.forEach(([id, b]) => {
+        medals[id] = b === first ? '🥇 ' : b === second ? '🥈 ' : b === third ? '🥉 ' : ''
+      })
+    }
     const member = this.message.member.guild.members.get(this.client.user.id)
     const color = member ? (member.roles.map(i => member.guild.roles.get(i)).sort(
       (a, b) => a.position > b.position ? -1 : 1
@@ -49,7 +60,7 @@ export class TriviaSession {
       color,
       timestamp: new Date().toISOString(),
       fields: currentScores.map(player => ({
-        name: this.message.member.guild.members.get(player[0]).username,
+        name: (medals[player[0]] || '') + this.message.member.guild.members.get(player[0]).username,
         value: player[1].toString(),
         inline: true
       }))
@@ -60,7 +71,7 @@ export class TriviaSession {
   async endGame () {
     this.stopped = true
     delete this.tempDB.trivia[this.channel.id]
-    if (Object.keys(this.scores).length !== 0) await this.channel.createMessage(this.getScores())
+    if (Object.keys(this.scores).length > 0) await this.channel.createMessage(this.getScores(true))
   }
 
   async newQuestion () {
@@ -157,9 +168,9 @@ export class TriviaSession {
 export const handleTrivia: Command = {
   name: 'trivia',
   opts: {
-    description: 'Start a trivia session',
-    fullDescription: 'Start a trivia session\nDefault settings are: Ive gains points: false, seconds to answer: 15, points needed to win: 30, reveal answer on timeout: true\nDuring a trivia session, the following commands may also be run:`/trivia score` or `/trivia leaderboard` and `/trivia stop`\nTo see available trivia genres, use `/trivia list`',
-    usage: '/trivia <topic> (--bot-plays=true|false) (--time-limit=<time longer than 4s>) (--max-score=<points greater than 0>) (--reveal-answer=true|false)',
+    description: 'Start a trivia game on a topic of your choice.',
+    fullDescription: 'Start a trivia game on a topic of your choice.\nDefault settings: IveBot gains points: no, seconds to answer: 15, points needed to win: 30, reveal answer on timeout: yes',
+    usage: '/trivia <topic> (--bot-plays=true|false) (--time-limit=<time longer than 4s>) (--max-score=<points greater than 0>) (--reveal-answer=true|false)\nDuring a trivia game: /trivia (scoreboard/score/scores/stop)\nTo view available topics: /trivia list',
     example: '/trivia greekmyth --bot-plays=true',
     guildOnly: true,
     argsRequired: true

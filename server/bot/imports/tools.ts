@@ -64,10 +64,9 @@ export const getInsult = (plural = false) => {
     'pathetic lifeform', 'ungrateful bastard', 'idiotic slimeball', 'worthless ass', 'dumb dolt',
     'one pronged fork', 'withered oak', 'two pump chump', 'oompa loompa'
   ]
+
   const insult = insults[Math.floor(Math.random() * insults.length)]
-  if (plural) insult.concat('s')
-  if (insult.includes('asss')) insult.replace('asss', 'asses')
-  return insult
+  return plural ? insult.replace('ass', 'asse') + 's' : insult
 }
 
 export const fetchLimited = async (url: string, limit: number, opts = {}): Promise<false | Buffer> => {

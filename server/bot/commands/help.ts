@@ -14,7 +14,7 @@ const generalHelp = {
 \`/randomword\` - Returns a random word.
 \`/choose\` - Choose between multiple options.
 \`/reverse\` - Reverse a sentence.
-\`/trivia\` - Start a trivia session.
+\`/trivia\` - Start a trivia game on a topic of your choice.
 \`/8ball\` - Random answers to random questions.
 \`/repeat\` - Repeat a string.
 \`/calculate\` - Calculate an expression.
