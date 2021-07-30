@@ -3,15 +3,20 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "jsx": "react",
-    "target": "es2018",
+    "lib": [
+      "es2019",
+      "es2020.promise",
+      "es2020.bigint",
+      "es2020.string"
+    ],
+    "target": "es2019",
     "noImplicitAny": true,
-    "removeComments": false,
-    "preserveConstEnums": true,
     "sourceMap": true,
     "outDir": "lib/",
     "pretty": true,
     "skipLibCheck": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
     "src/**/*.ts",

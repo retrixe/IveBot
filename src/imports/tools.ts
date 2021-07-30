@@ -3,6 +3,7 @@ import { get } from 'http'
 import { parse } from 'url'
 import { Db } from 'mongodb'
 import { Message } from 'eris'
+import fetch from 'node-fetch'
 
 export const getIdFromMention = (mention: string) => {
   const f = mention.substring(2, mention.length - 1).replace('!', '').replace('&', '').split(':')

@@ -2,6 +2,7 @@
 import { DB } from './imports/types'
 import { Member, Message, Client, User, Guild, GuildTextableChannel } from 'eris'
 import { Db } from 'mongodb'
+import fetch from 'node-fetch'
 
 // Database reading function.
 import { getServerSettings } from './imports/tools'

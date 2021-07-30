@@ -1,6 +1,6 @@
 {
   "name": "ivebot",
-  "version": "3.2.0",
+  "version": "4.0.0-alpha.0",
   "description": "The bot that created the iPhone X.",
   "main": "src/index.ts",
   "private": true,
@@ -8,7 +8,7 @@
   "scripts": {
     "prepare": "husky install",
     "lint": "eslint . --ext .js,.ts,.tsx && tsc --noEmit && graphql-schema-linter dashboard/schema.graphql",
-    "start": "node lib/index.js --production",
+    "start": "node --enable-source-maps lib/index.js --production",
     "build": "tsc",
     "dev": "nodemon src/index.ts",
     "mongo": "mongod --dbpath=database"
@@ -28,7 +28,6 @@
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.1.6",
     "@types/node": "^16.4.7",
     "@types/node-fetch": "^2.5.12",
     "@typescript-eslint/eslint-plugin": "^1.5.0",
