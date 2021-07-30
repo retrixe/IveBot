@@ -104,6 +104,11 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
   // Content of message and sendResponse.
   const sendResponse = message.channel.createMessage
   const command = message.content.toLowerCase()
+  // Handle answers to trivia
+  const session = tempDB.trivia[message.channel.id]
+  if (session) {
+    await session.checkAnswer(message)
+  }
   // Auto responses and easter eggs.
   if (command.startsWith('is dot a good boy')) await sendResponse('Shame on you. He\'s undefined.')
   else if (command.startsWith('iphone x')) await sendResponse(`You don't deserve it. 😎`)

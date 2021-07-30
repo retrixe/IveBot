@@ -75,6 +75,8 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, {
         if (!Object.keys(commands).length) return
         // ..register the commands.
         Object.keys(commands).forEach((commandName: string) => {
+          // exclude TriviaSession from commands
+          if (commandName === 'TriviaSession') return
           const command = commands[commandName]
           commandParser.registerCommand(command)
         })
@@ -117,7 +119,7 @@ client.on('error', (err: Error, id: string) => {
 
 // Create a database to handle certain stuff.
 const tempDB: DB = {
-  gunfight: {}, say: {}, link: {}, leave: [], mute: {}, cooldowns: { request: [] }
+  gunfight: {}, say: {}, trivia: {}, link: {}, leave: [], mute: {}, cooldowns: { request: [] }
 }
 
 /* SERVER CODE STARTS HERE */

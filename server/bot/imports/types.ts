@@ -2,6 +2,7 @@
 import { AdvancedMessageContent, Client, Message } from 'eris'
 import CommandParser from '../client'
 import { Db } from 'mongodb'
+import { TriviaSession } from '../commands/trivia'
 
 export type DB = {
   gunfight: {
@@ -16,6 +17,9 @@ export type DB = {
   say: {
     // Channels.
     [index: string]: string
+  },
+  trivia: {
+    [index: string]: TriviaSession
   },
   mute: {
     // Servers with userIDs contained.

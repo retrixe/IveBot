@@ -59,12 +59,13 @@ export const getChannel = (message: Message, arg: string) => {
 }
 
 // Fresh insults. They come and go, I suppose.
-export const getInsult = () => {
+export const getInsult = (plural = false) => {
   const insults = [
     'pathetic lifeform', 'ungrateful bastard', 'idiotic slimeball', 'worthless ass', 'dumb dolt',
     'one pronged fork', 'withered oak', 'two pump chump', 'oompa loompa'
   ]
-  return insults[Math.floor(Math.random() * insults.length)]
+  const insult = insults[Math.floor(Math.random() * insults.length)]
+  return plural ? insult.replace('ass', 'asse') + 's' : insult
 }
 
 export const fetchLimited = async (url: string, limit: number, opts = {}): Promise<false | Buffer> => {
