@@ -64,7 +64,6 @@ export const getInsult = (plural = false) => {
     'pathetic lifeform', 'ungrateful bastard', 'idiotic slimeball', 'worthless ass', 'dumb dolt',
     'one pronged fork', 'withered oak', 'two pump chump', 'oompa loompa'
   ]
-
   const insult = insults[Math.floor(Math.random() * insults.length)]
   return plural ? insult.replace('ass', 'asse') + 's' : insult
 }

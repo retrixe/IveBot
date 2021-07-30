@@ -21,10 +21,10 @@ export class TriviaSession {
   message: Message
   questionList: Map<string, string[]>
   scores: { [id: string]: number } = {}
-  stopped: boolean = false
+  stopped = false
   timer: number = null
-  timeout: number = Date.now()
-  count: number = 0
+  timeout = Date.now()
+  count = 0
   tempDB: DB
   client: Client
 
@@ -42,13 +42,15 @@ export class TriviaSession {
     const currentScores = Object.entries(this.scores).sort(([, a], [, b]) => b - a)
     const medals: { [id: string]: string } = {}
     if (addMedals) {
-      const maxReduce = (a, b) => Math.max(a || 0, b || 0)
+      const maxReduce = (a: number, b: number) => Math.max(a || 0, b || 0)
       const values = Object.values(this.scores)
       const first = values.reduce(maxReduce)
-      const second = values.filter(num => num !== first).reduce(maxReduce)
-      const third = values.filter(num => num !== first && num !== second).reduce(maxReduce)
+      const second = values.filter(num => num !== first).reduce(maxReduce, 0)
+      const third = values.filter(num => num !== first && num !== second).reduce(maxReduce, 0)
       currentScores.forEach(([id, b]) => {
-        medals[id] = b === first ? '🥇 ' : b === second ? '🥈 ' : b === third ? '🥉 ' : ''
+        medals[id] = first && b === first ? '🥇 '
+          : second && b === second ? '🥈 '
+            : third && b === third ? '🥉 ' : ''
       })
     }
     const member = this.message.member.guild.members.get(this.client.user.id)
@@ -169,7 +171,7 @@ export const handleTrivia: Command = {
   name: 'trivia',
   opts: {
     description: 'Start a trivia game on a topic of your choice.',
-    fullDescription: 'Start a trivia game on a topic of your choice.\nDefault settings: IveBot gains points: no, seconds to answer: 15, points needed to win: 30, reveal answer on timeout: yes',
+    fullDescription: 'Start a trivia game on a topic of your choice.\n**Default settings:** IveBot gains points: no, seconds to answer: 15, points needed to win: 30, reveal answer on timeout: yes',
     usage: '/trivia <topic> (--bot-plays=true|false) (--time-limit=<time longer than 4s>) (--max-score=<points greater than 0>) (--reveal-answer=true|false)\nDuring a trivia game: /trivia (scoreboard/score/scores/stop)\nTo view available topics: /trivia list',
     example: '/trivia greekmyth --bot-plays=true',
     guildOnly: true,
@@ -190,7 +192,7 @@ export const handleTrivia: Command = {
     }
     if (args.find(element => element.includes('--time-limit='))) {
       if (+args.find(element => element.includes('--time-limit=')).split('=')[1] > 4) {
-        timeLimit = +args.find(element => element.includes('--time-limit=')).split('=')[1]
+        timeLimit = +args.find(element => element.includes('--time-limit=')).split('=')[1] * 1000
       } else {
         return 'Invalid usage. It must be a number greater than 4.'
       }
