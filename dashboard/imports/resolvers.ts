@@ -3,7 +3,8 @@ import { MongoClient, Db } from 'mongodb'
 import { JwtPayload, verify, sign } from 'jsonwebtoken'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { AuthenticationError, ForbiddenError } from 'apollo-server-micro'
-import { host, mongoUrl, jwtSecret, clientId, clientSecret } from '../../config.json'
+import config from '../config.json'
+const { host, mongoUrl, jwtSecret, clientId, clientSecret } = config
 
 // Create a MongoDB instance.
 let db: Db
@@ -22,6 +23,8 @@ const getServerSettings = async (serverID: string) => {
     await db.collection('servers').insertOne({ serverID })
     serverSettings = { serverID }
   }
+  serverSettings.id = serverSettings.serverID
+  delete serverSettings.serverID
   return serverSettings
 }
 
@@ -31,7 +34,8 @@ interface ResolverContext {
 }
 
 const authenticateRequest = async (req: NextApiRequest, res: NextApiResponse): Promise<string> => {
-  const token = req.cookies['ivebot-oauth']
+  const token = req.cookies['Discord-OAuth']
+  console.log(token)
   if (!token) throw new AuthenticationError('No auth cookie received!')
   // Check if it's a JWT token issued by us.
   try {
@@ -67,7 +71,7 @@ const authenticateRequest = async (req: NextApiRequest, res: NextApiResponse): P
         }).then(async (res) => await res.json())
 
         const token = sign({ accessToken, refreshToken, scope: decoded.scope }, jwtSecret, { expiresIn })
-        res.setHeader('Set-Cookie', `Discord-OAuth="${token}"; HttpOnly; SameSite=Lax; Secure`)
+        res.setHeader('Set-Cookie', `Discord-OAuth="${token}"; Max-Age=2678400; HttpOnly; SameSite=Lax; Secure`)
         return accessToken
       } catch (e) { throw new AuthenticationError('The provided auth token has expired!') }
     }
@@ -82,8 +86,8 @@ export default {
       const accessToken = await authenticateRequest(context.req, context.res)
       const client = new Client(`Bearer ${accessToken}`, { restMode: true })
       const self = await client.getSelf()
-      const member = await client.getRESTGuildMember(id, self.id) // TODO: Handle error.
-      if (member.permissions.has('manageGuild') || host === self.id) {
+      // const member = await client.getRESTGuildMember(id, self.id) // TODO: Handle error.
+      if (/* member.permissions.has('manageGuild') || */ host === self.id) {
         const serverSettings = await getServerSettings(id)
         // Insert default values for all properties.
         const defaultJoinMsgs = { channel: '', joinMessage: '', leaveMessage: '', banMessage: '' }
@@ -112,19 +116,19 @@ export default {
       const client = new Client(`Bearer ${accessToken}`, { restMode: true })
       const guilds = await client.getRESTGuilds()
       const self = await client.getSelf()
-      return (await Promise.all(guilds
+      return (guilds
         // TODO: .filter(guild => ctx.client.guilds.has(guild.id))
-        .map(async guild => {
-          const selfMember = await client.getRESTGuildMember(guild.id, self.id) // TODO: Error.
+        .map(guild => {
+          // const selfMember = await client.getRESTGuildMember(guild.id, self.id) // TODO: Error.
           return {
             id: guild.id,
             name: guild.name,
             icon: guild.iconURL || 'no icon',
             channels: guild.channels.filter(i => i.type === 0)
               .map(i => ({ id: i.id, name: i.name })),
-            perms: host === self.id || selfMember.permissions.has('manageGuild')
+            perms: host === self.id // || selfMember.permissions.has('manageGuild')
           }
-        })))
+        }))
     }
   },
   Mutation: {
@@ -144,8 +148,8 @@ export default {
       const accessToken = await authenticateRequest(context.req, context.res)
       const client = new Client(`Bearer ${accessToken}`, { restMode: true })
       const self = await client.getSelf()
-      const member = await client.getRESTGuildMember(id, self.id) // TODO: Handle error.
-      if (member.permissions.has('manageGuild') || host === self.id) {
+      // const member = await client.getRESTGuildMember(id, self.id) // TODO: Handle error.
+      if (/* member.permissions.has('manageGuild') || */host === self.id) {
         const serverSettings = await getServerSettings(id)
         // Insert default values for all properties.
         const defaultJoinMsgs = { channel: '', joinMessage: '', leaveMessage: '', banMessage: '' }

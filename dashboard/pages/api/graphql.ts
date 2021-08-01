@@ -1,7 +1,7 @@
 import { ApolloServer, gql } from 'apollo-server-micro'
 import { readFileSync } from 'fs'
 import { NextApiRequest, NextApiResponse } from 'next'
-import resolvers from '../../imports/server/resolvers'
+import resolvers from '../../imports/resolvers'
 
 const typeDefs = gql(readFileSync('schema.graphql', { encoding: 'utf8' }))
 

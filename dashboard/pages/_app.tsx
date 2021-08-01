@@ -1,7 +1,9 @@
 import React from 'react'
 import Head from 'next/head'
-import { ThemeProvider } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
+import { ThemeProvider } from '@material-ui/core/styles'
+import { useApollo } from '../imports/apolloClient'
+import { ApolloProvider } from '@apollo/client'
 import theme from '../imports/theme'
 
 export default function MyApp (props: { Component: React.ElementType, pageProps: {} }) {
@@ -24,7 +26,9 @@ export default function MyApp (props: { Component: React.ElementType, pageProps:
       <ThemeProvider theme={theme}>
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
-        <Component {...pageProps} />
+        <ApolloProvider client={useApollo(pageProps)}>
+          <Component {...pageProps} />
+        </ApolloProvider>
       </ThemeProvider>
     </>
   )

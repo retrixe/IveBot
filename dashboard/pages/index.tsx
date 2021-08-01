@@ -18,7 +18,7 @@ class Index extends React.Component<{ rootUrl: string, clientId: string }, {}> {
       <div style={{ marginRight: 16, marginLeft: 16 }}>
         <Head>
           <title>IveBot</title>
-          <meta property='og:url' content={`${this.props.rootUrl}/`} />
+          <meta property='og:url' content={this.props.rootUrl} />
           <meta property='og:description' content='IveBot is a multi-purpose Discord bot.' />
           <meta name='Description' content='IveBot is a multi-purpose Discord bot.' />
         </Head>
@@ -28,7 +28,11 @@ class Index extends React.Component<{ rootUrl: string, clientId: string }, {}> {
             <a href='https://github.com/retrixe/IveBot' target='_blank' rel='noopener noreferrer'>
               <IconButton color='default'><GitHubLogo /></IconButton>
             </a>
-            <Link href='/dashboard'><Button color='inherit'>Dashboard</Button></Link>
+            <Link passHref href='/dashboard'>
+              <a style={{ textDecoration: 'none', color: 'inherit' }}>
+                <Button color='inherit'>Dashboard</Button>
+              </a>
+            </Link>
           </Toolbar>
         </AppBar>
         <br /><br /><br /><br />
