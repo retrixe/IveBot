@@ -36,6 +36,11 @@ const DashboardPage = (props: { rootUrl: string }) => {
   const loginWithOauth = () => {
     if (loggedOut) window.location.pathname = '/api/oauth'
   }
+  const logout = async () => {
+    const res = await fetch('/api/logout', { method: 'POST' })
+    if (res.ok) window.location.reload()
+  }
+
   return (
     <>
       <Head>
@@ -54,7 +59,7 @@ const DashboardPage = (props: { rootUrl: string }) => {
           </Link>
           {loggedOut
             ? <Button color='inherit' onClick={loginWithOauth}>Login</Button>
-            : <Button color='inherit' onClick={() => { /* TODO */ }}>Logout</Button>}
+            : <Button color='inherit' onClick={logout}>Logout</Button>}
         </Toolbar>
       </AppBar>
       <br /><br /><br /><br />

@@ -4,7 +4,7 @@ import { JwtPayload, verify, sign } from 'jsonwebtoken'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { AuthenticationError, ForbiddenError } from 'apollo-server-micro'
 import config from '../config.json'
-const { host, mongoUrl, jwtSecret, clientId, clientSecret } = config
+const { host, rootUrl, mongoUrl, jwtSecret, clientId, clientSecret } = config
 
 // Create a MongoDB instance.
 let db: Db
@@ -33,9 +33,9 @@ interface ResolverContext {
   res: NextApiResponse
 }
 
+const secure = rootUrl.startsWith('https') && process.env.NODE_ENV !== 'development' ? '; Secure' : ''
 const authenticateRequest = async (req: NextApiRequest, res: NextApiResponse): Promise<string> => {
   const token = req.cookies['Discord-OAuth']
-  console.log(token)
   if (!token) throw new AuthenticationError('No auth cookie received!')
   // Check if it's a JWT token issued by us.
   try {
@@ -71,7 +71,7 @@ const authenticateRequest = async (req: NextApiRequest, res: NextApiResponse): P
         }).then(async (res) => await res.json())
 
         const token = sign({ accessToken, refreshToken, scope: decoded.scope }, jwtSecret, { expiresIn })
-        res.setHeader('Set-Cookie', `Discord-OAuth="${token}"; Max-Age=2678400; HttpOnly; SameSite=Lax; Secure`)
+        res.setHeader('Set-Cookie', `Discord-OAuth="${token}"; Max-Age=2678400; HttpOnly; SameSite=Lax${secure}`)
         return accessToken
       } catch (e) { throw new AuthenticationError('The provided auth token has expired!') }
     }

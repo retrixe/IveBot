@@ -8,7 +8,7 @@ It includes many different and useful commands, from games to tools, utilities, 
 
 It's planned to have some nifty commands like /assistant which directly communicates with the Google Assistant gRPC API. You heard that, Google Assistant in a Discord bot.
 
-1.0 and 2.0 used discord.io while 3.0 uses Eris and is much more refined and full-featured. It is highly recommended to use 3.0 as older versions are unsupported and may not connect to Discord's API gateway anymore.
+1.0/2.0 used discord.io while 3.0 uses Eris and is much more refined and full-featured. It is highly recommended to use 3.0 as older versions are unsupported and may not connect to Discord's API gateway anymore. 4.0 is in development to separate the dashboard from the bot and make use of many new Discord features.
 
 <hr />
 <details><summary>Commands</summary>
@@ -107,3 +107,7 @@ Make a file named `config.json5` in the top-level directory. It should be someth
 ```
 
 You can use comments in JSON5. If you're using a deployment service like Now which supports secrets, then you can secure your token and MongoDB database URL by setting the value of both keys to `dotenv` and then setting the IVEBOT_TOKEN environment variable to your token and the MONGO_URL env variable to the MongoDB instance URL.
+
+## Dashboard Configuration
+
+Since 4.0 onwards, the dashboard has been separated and needs to run separately. Refer to the README.md in the `dashboard/` folder.

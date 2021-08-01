@@ -4,6 +4,7 @@ import config from '../../config.json'
 const { rootUrl, clientId, clientSecret, jwtSecret } = config
 
 const scope = ['identify', 'guilds'].join(' ')
+const secure = rootUrl.startsWith('https') && process.env.NODE_ENV !== 'development' ? '; Secure' : ''
 const REDIRECT_URI = `${rootUrl}/api/oauth`
 const OAUTH_QS = new URLSearchParams({
   client_id: clientId,
@@ -45,6 +46,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const token = sign({ accessToken, refreshToken, scope }, jwtSecret, { expiresIn })
-  res.setHeader('Set-Cookie', `Discord-OAuth="${token}"; HttpOnly; Max-Age=2678400; SameSite=Lax; Secure`)
+  res.setHeader('Set-Cookie', `Discord-OAuth="${token}"; HttpOnly; Max-Age=2678400; SameSite=Lax${secure}`)
   res.redirect('/dashboard')
 }

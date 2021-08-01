@@ -7,7 +7,7 @@
   "repository": "https://github.com/retrixe/IveBot.git",
   "scripts": {
     "prepare": "husky install",
-    "lint": "eslint . && tsc --noEmit && graphql-schema-linter dashboard/schema.graphql && cd dashboard",
+    "lint": "eslint . && tsc --noEmit && graphql-schema-linter && cd dashboard && tsc",
     "start": "node --enable-source-maps lib/index.js --production",
     "build": "tsc",
     "dev": "nodemon src/index.ts",
@@ -43,10 +43,24 @@
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "graphql": "^15.5.1",
-    "graphql-schema-linter": "^0.0.28",
+    "graphql-schema-linter": "^2.0.1",
     "husky": "^7.0.1",
     "nodemon": "^2.0.12",
     "ts-node": "^10.1.0",
     "typescript": "^4.3.5"
+  },
+  "graphql-schema-linter": {
+    "rules": [
+      "arguments-have-descriptions", "defined-types-are-used",
+      "deprecations-have-a-reason", "descriptions-are-capitalized",
+      "enum-values-all-caps", "enum-values-have-descriptions",
+      "enum-values-sorted-alphabetically", "fields-are-camel-cased",
+      "fields-have-descriptions", "input-object-fields-sorted-alphabetically",
+      "input-object-values-are-camel-cased", "input-object-values-have-descriptions",
+      "interface-fields-sorted-alphabetically",
+      "types-are-capitalized", "types-have-descriptions"
+    ],
+    "disabledRules": ["type-fields-sorted-alphabetically"],
+    "schemaPaths": ["dashboard/schema.graphql"]
   }
 }
