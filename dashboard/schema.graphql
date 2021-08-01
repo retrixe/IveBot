@@ -52,10 +52,8 @@ type Query {
   serverSettings(serverId: String!, linkToken: String!): ServerSetting!
   # Get the user for a link code.
   getUserInfo(linkToken: String!): [Server!]!
-  # Get the user for an OAuth token.
-  getOAuthUserInfo(linkToken: String!): [Server!]!
-  # Get bot ID.
-  getBotId: String!
+  # Get the current user's servers.
+  getUserServers: [Server!]!
 }
 
 # Input for modifying join/leave messages.

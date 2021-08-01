@@ -9,12 +9,12 @@ import Dashboard from '../imports/dashboard'
 import ApolloClient, { gql, OperationVariables } from 'apollo-boost'
 import { ApolloProvider, Query, QueryResult } from 'react-apollo'
 import { ServerInfo } from '../imports/graphqlTypes'
+import { readFile } from 'fs/promises'
 
 // Apollo Client definition.
 const client = new ApolloClient({ uri: '/api/graphql', fetchOptions: { fetch } })
-const rootURL = 'https://ivebot.now.sh' // Modify when self-hosting.
 
-class DashboardIndex extends React.Component {
+class DashboardIndex extends React.Component<{ rootUrl: string }> {
   state = { open: false, token: '' }
   handleOpenDialog = () => this.setState({ open: true })
   handleCloseDialog = () => this.setState({ open: false })
@@ -38,7 +38,7 @@ query getAllCommonServers($token: String!) {
         <>
           <Head>
             <title>IveBot</title>
-            <meta property='og:url' content={`${rootURL}/dashboard`} />
+            <meta property='og:url' content={`${this.props.rootUrl}/dashboard`} />
             <meta property='og:description' content={'IveBot\'s dashboard for managing settings.'} />
             <meta name='Description' content={'IveBot\'s dashboard for managing settings.'} />
           </Head>
@@ -99,6 +99,11 @@ query getAllCommonServers($token: String!) {
       </ApolloProvider>
     )
   }
+}
+
+export async function getStaticProps () {
+  const { rootUrl } = JSON.parse(await readFile('config.json', { encoding: 'utf8' }))
+  return { props: { rootUrl: rootUrl ?? '' } }
 }
 
 export default DashboardIndex

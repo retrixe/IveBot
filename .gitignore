@@ -1,10 +1,10 @@
 # Configuration
+config.json
 config.json5
 package-lock.json
 
 # Built files.
 lib/
-dist
 database/
 .next/
 

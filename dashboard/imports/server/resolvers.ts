@@ -1,37 +1,92 @@
-// Import permission checks and function to retrieve server settings.
-import { getServerSettings } from './bot/imports/tools'
-// Get types.
-import { DB } from './bot/imports/types'
 import { Client } from 'eris'
-// Get MongoDB.
-import { MongoClient, Db } from 'mongodb'
-// Who's the host? He gets special permission.
-import 'json5/lib/require'
-import { host, mongoURL } from '../config.json5'
+// import { MongoClient, Db } from 'mongodb'
+import { JwtPayload, verify, sign } from 'jsonwebtoken'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { AuthenticationError } from 'apollo-server-micro'
+import { host, jwtSecret, clientId, clientSecret } from '../../config.json'
 
 // Create a MongoDB instance.
-let db: Db
-MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (err, client) => {
-  if (err != null) throw err
+/* let db: Db
+MongoClient.connect(mongoUrl === 'dotenv' ? process.env.MONGO_URL || '' : mongoUrl, (err, client) => {
+  if (err || !client) throw err || new Error('MongoDB client is undefined!')
   console.log('GraphQL server connected successfully to MongoDB.')
   db = client.db('ivebot')
 })
 
-// A constant.
-const api = 'https://discordapp.com/api/v7'
+// Helper functions.
+const getServerSettings = async (serverID: string) => {
+  // Get serverSettings through query.
+  let serverSettings = await db.collection('servers').findOne({ serverID })
+  if (!serverSettings) {
+    // Initialize server settings.
+    await db.collection('servers').insertOne({ serverID })
+    serverSettings = { serverID }
+  }
+  return serverSettings
+} */
+
+interface ResolverContext {
+  req: NextApiRequest
+  res: NextApiResponse
+}
+
+const authenticateRequest = async (req: NextApiRequest, res: NextApiResponse): Promise<string> => {
+  const token = req.cookies['ivebot-oauth']
+  if (!token) throw new AuthenticationError('No auth cookie received!')
+  // Check if it's a JWT token issued by us.
+  try {
+    const decoded: JwtPayload | undefined = await new Promise((resolve, reject) => {
+      verify(token, jwtSecret, {}, (err, decoded) => (err ? reject(err) : resolve(decoded)))
+    })
+    if (!decoded?.accessToken) throw new AuthenticationError('Invalid JWT token in cookie!')
+    return decoded.accessToken
+  } catch (e) {
+    // If expired, try refresh token to create a new one, else throw AuthenticationError.
+    if (e.name === 'TokenExpiredError') {
+      const decoded: JwtPayload | undefined = await new Promise((resolve, reject) => {
+        verify(token, jwtSecret, { ignoreExpiration: true }, (err, decoded) => (
+          err ? reject(err) : resolve(decoded)
+        ))
+      })
+      if (!decoded?.refreshToken || !decoded.scope) {
+        throw new AuthenticationError('Invalid JWT token in cookie!')
+      }
+      try {
+        const body = new URLSearchParams({
+          client_id: clientId,
+          client_secret: clientSecret,
+          grant_type: 'refresh_token',
+          refresh_token: decoded.refreshToken
+        }).toString()
+        const {
+          access_token: accessToken,
+          refresh_token: refreshToken,
+          expires_in: expiresIn
+        } = await fetch('https://discord.com/api/v8/oauth2/token', {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, method: 'POST', body
+        }).then(async (res) => await res.json())
+
+        const token = sign({ accessToken, refreshToken, scope: decoded.scope }, jwtSecret, { expiresIn })
+        res.setHeader('Set-Cookie', `Discord-OAuth="${token}"; HttpOnly; SameSite=Lax; Secure`)
+        return accessToken
+      } catch (e) { throw new AuthenticationError('The provided auth token has expired!') }
+    }
+    throw new AuthenticationError('Invalid JWT token in cookie!')
+  }
+}
 
 // Set up resolvers.
-export default (ctx: { tempDB: DB, client: Client }) => ({
-  // Queries.
+export default {
   Query: {
     serverSettings: async (
       _: string, { serverId, linkToken }: { serverId: string, linkToken: string }
     ) => {
+      /*
       const member = ctx.client.guilds
         .find(t => t.id === serverId).members.get(ctx.tempDB.link[linkToken])
       let {
         addRoleForAll, joinLeaveMessages, joinAutorole, ocrOnSend
-      } = await getServerSettings(db, serverId)
+      } = await getServerSettings(serverId)
       // Insert default values for all properties.
       joinLeaveMessages = joinLeaveMessages
         ? {
@@ -49,9 +104,11 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
         (member != null) && (member.permissions.has('manageGuild') || host === ctx.tempDB.link[linkToken])
       ) return { serverId, addRoleForAll, joinLeaveMessages, joinAutorole, ocrOnSend }
       else return { serverId: 'Forbidden.' }
+      */
     },
     // Get user info.
     getUserInfo: (_: string, { linkToken }: { linkToken: string }) => {
+      /*
       if (ctx.tempDB.link[linkToken]) {
         const servers: Array<{
           perms: boolean; icon: string; serverId: string; name: string;
@@ -76,36 +133,31 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
         return servers
       }
       return [{ serverId: 'Unavailable: invalid link token.', icon: 'no icon' }]
+      */
     },
-    // Get user info.
-    getOAuthUserInfo: async (_: string, { token }: { token: string }) => {
-      // Get info about the user.
-      interface Base { id: string }
-      const headers = { Authorization: `Bearer ${token}` }
-      const guilds: Base[] = await (await fetch(`${api}/users/@me/guilds`, { headers })).json()
-      const { id }: Base = await (await fetch(`${api}/users/@me`, { headers })).json()
-      // Generate the server info.
+    getUserServers: async (parent: string, args: {}, context: ResolverContext) => {
+      const accessToken = await authenticateRequest(context.req, context.res)
+      const client = new Client(`Bearer ${accessToken}`, { restMode: true })
+      const guilds = await client.getRESTGuilds()
+      const self = await client.getSelf()
       const servers: Array<{
         perms: boolean, icon: string, serverId: string, name: string,
         channels: Array<{ id: string, name: string }>
-      }> = []
-      guilds.forEach(server => {
-        if (ctx.client.guilds.has(server.id)) {
-          const guild = ctx.client.guilds.get(server.id)
-          servers.push({
+      }> = (await Promise.all(guilds // TODO: .filter(guild => ctx.client.guilds.has(guild.id))
+        .map(async guild => {
+          const selfMember = await client.getRESTGuildMember(guild.id, self.id)
+          return {
             serverId: guild.id,
             name: guild.name,
             icon: guild.iconURL || 'no icon',
             channels: guild.channels.filter(i => i.type === 0).map(i => ({
               id: i.id, name: i.name
             })),
-            perms: host === id || guild.members.get(id).permissions.has('manageGuild')
-          })
-        }
-      })
+            perms: host === self.id || selfMember.permissions.has('manageGuild')
+          }
+        })))
       return servers
-    },
-    getBotId: () => ctx.client.user.id
+    }
   },
   Mutation: {
     editServerSettings: async (
@@ -115,6 +167,7 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
         ocrOnSend: boolean
       } }
     ) => {
+      /*
       const {
         serverId, linkToken, addRoleForAll, joinAutorole, joinLeaveMessages, ocrOnSend
       } = input
@@ -140,6 +193,7 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
         })
         return getServerSettings(db, serverId)
       } else return { serverId: 'Forbidden.' }
+      */
     }
   }
-})
+}

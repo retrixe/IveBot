@@ -20,6 +20,7 @@ module.exports = {
     }],
     // Make TypeScript ESLint less strict.
     '@typescript-eslint/no-misused-promises': 'off',
+    '@typescript-eslint/triple-slash-reference': 'off',
     '@typescript-eslint/member-delimiter-style': 'off',
     '@typescript-eslint/strict-boolean-expressions': 'off',
     '@typescript-eslint/restrict-template-expressions': 'off',

@@ -1,0 +1,49 @@
+import { sign } from 'jsonwebtoken'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { rootUrl, clientId, clientSecret, jwtSecret } from '../../config.json'
+
+const scope = ['identify'].join(' ')
+const REDIRECT_URI = `${rootUrl}/api/oauth`
+const OAUTH_QS = new URLSearchParams({
+  client_id: clientId,
+  redirect_uri: REDIRECT_URI,
+  response_type: 'code',
+  scope
+}).toString()
+const OAUTH_URI = `https://discord.com/api/oauth2/authorize?${OAUTH_QS}`
+
+export default async (req: NextApiRequest, res: NextApiResponse) => {
+  if (req.method !== 'GET') return res.redirect('/')
+  const { code, error } = req.query
+
+  if (error) { // TODO
+    return res.redirect(`/?error=${req.query.error}`)
+  } else if (!code || typeof code !== 'string') {
+    return res.redirect(OAUTH_URI)
+  }
+
+  const body = new URLSearchParams({
+    client_id: clientId,
+    client_secret: clientSecret,
+    grant_type: 'authorization_code',
+    redirect_uri: REDIRECT_URI,
+    code,
+    scope
+  }).toString()
+
+  const {
+    access_token: accessToken,
+    refresh_token: refreshToken,
+    expires_in: expiresIn
+  } = await fetch('https://discord.com/api/v8/oauth2/token', {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, method: 'POST', body
+  }).then(async (res) => await res.json())
+
+  if (!accessToken || typeof accessToken !== 'string') {
+    return res.redirect(OAUTH_URI)
+  }
+
+  const token = sign({ accessToken, refreshToken, scope }, jwtSecret, { expiresIn })
+  res.setHeader('Set-Cookie', `Discord-OAuth="${token}"; HttpOnly; SameSite=Lax; Secure`)
+  res.redirect('/')
+}
