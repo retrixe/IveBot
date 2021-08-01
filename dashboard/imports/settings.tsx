@@ -212,7 +212,7 @@ mutation variables(
             >Save
             </Button>
             {loading && <><br /><LinearProgress color='secondary' variant='query' /></>}
-            {error && <><br /><Typography color='error'>Error :( Please try again</Typography></>}
+            {(error != null) && <><br /><Typography color='error'>Error :( Please try again</Typography></>}
           </>
         )}
       </Mutation>

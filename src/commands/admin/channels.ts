@@ -93,7 +93,7 @@ export const handleEditchannel: Command = {
         } catch (e) { failedOps.push({ name: `❌ ${operation}`, value: e.toString() }) }
       }
     }
-    if (failedOps.length) {
+    if (failedOps.length > 0) {
       return {
         content: 'Some operations failed to execute..',
         embed: { color: 0x696969, fields: failedOps }

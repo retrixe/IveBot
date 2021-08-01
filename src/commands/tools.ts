@@ -144,7 +144,7 @@ export const handlePing: Command = {
     // Get latency.
     const e = l < 200 ? `latency of **${l}ms** 🚅🔃` : `latency of **${l}ms** 🔃`
     // Edit the message with the latency.
-    sent.edit(`Aha! IveBot ${version} is connected to your server with a ${e}`)
+    await sent.edit(`Aha! IveBot ${version} is connected to your server with a ${e}`)
   }
 }
 
@@ -156,7 +156,7 @@ export const handleEval: Command = {
     usage: '/eval <code in codeblock or not>',
     example: '/eval ```js\nconsole.log(\'ji\')\n```',
     requirements: { userIDs: [host] }
-  }, // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  },
   generator: async (message, args, { client, tempDB, db, commandParser }) => {
     try {
       let toEval = args.join(' ')
@@ -170,13 +170,13 @@ export const handleEval: Command = {
       // eslint-disable-next-line no-eval
       const res = inspect(await Promise.resolve(eval(toEval)), false, 0)
       // const res = eval(`(async () => { const a = ${toEval}; return a })()`)
-      message.addReaction('✅')
+      message.addReaction('✅').catch(() => {}) // Ignore error.
       const token = (client as unknown as { _token: string })._token
       return res !== 'undefined' ? `${'```'}${res}${'```'}`.replace(token, 'censored') : undefined
     } catch (e) {
       const channel = await client.getDMChannel(host)
-      message.addReaction('❌')
-      channel.createMessage(`**Error:**
+      message.addReaction('❌').catch(() => {}) // Ignore error.
+      await channel.createMessage(`**Error:**
 ${e}`)
     }
   }
@@ -214,11 +214,11 @@ getContent/getCleanContent(messageID), createMessage(content), getReactions(mess
         getReactions: async (id: string) => (await message.channel.getMessage(id)).reactions
       })
       const res = inspect(await Promise.resolve(result), false, 0)
-      message.addReaction('✅')
+      message.addReaction('✅').catch(() => {}) // Ignore error.
       const token = (context.client as unknown as { _token: string })._token
       return res !== 'undefined' ? `${'```'}${res.replace(token, '')}${'```'}` : undefined
     } catch (e) {
-      message.addReaction('❌')
+      message.addReaction('❌').catch(() => {}) // Ignore error.
       return { content: `**Error:**\n${e}`, error: true }
     }
   }
@@ -233,7 +233,7 @@ export const handleCreationtime: Command = {
     usage: '/creationtime <ID or mention>',
     example: '/creationtime 383591525944262656'
   },
-  generator: async (message, args) => {
+  generator: (message, args) => {
     if (args.length === 1) {
       // Just parse it normally.
       let id = args[0]

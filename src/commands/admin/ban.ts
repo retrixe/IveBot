@@ -56,30 +56,28 @@ export const handleBan: Command = {
       checkRolePosition(message.member.guild.members.get(client.user.id)) ||
       !message.member.guild.members.get(client.user.id).permissions.has('banMembers'))
     ) return { content: `I cannot ban this person, you ${getInsult()}.`, error: true }
-    let dm
+    try {
+      await client.banGuildMember(message.member.guild.id, user.id, 0, args.join(' '))
+    } catch (e) {
+      return 'That person could not be banned.'
+    }
     try {
       if (!f.silent) {
-        dm = await client.createMessage((await client.getDMChannel(user.id)).id,
+        await (await client.getDMChannel(user.id)).createMessage(
           f.args.length !== 0
             ? `You have been banned from ${message.member.guild.name} for ${f.args.join(' ')}.`
             : `You have been banned from ${message.member.guild.name}.`
         )
       }
     } catch (e) {}
-    try {
-      await client.banGuildMember(message.member.guild.id, user.id, 0, args.join(' '))
-    } catch (e) {
-      if (dm) dm.delete()
-      return 'That person could not be banned.'
-    }
     // WeChill
     if (message.member.guild.id === '402423671551164416') {
-      client.createMessage('402437089557217290', f.args.length !== 0
+      await client.createMessage('402437089557217290', f.args.length !== 0
         ? `**${user.username}#${user.discriminator}** has been banned for **${f.args.join(' ')}**.`
         : `**${user.username}#${user.discriminator}** has been banned for not staying chill >:L `
       )
     }
-    if (f.delete) message.delete()
+    if (f.delete) message.delete().catch(() => {}) // Ignore error.
     if (!f.silent) return `**${user.username}#${user.discriminator}** has been banned. **rip.**`
   }
 }

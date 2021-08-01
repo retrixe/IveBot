@@ -12,7 +12,7 @@ import { host, mongoURL } from '../config.json5'
 // Create a MongoDB instance.
 let db: Db
 MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (err, client) => {
-  if (err) throw err
+  if (err != null) throw err
   console.log('GraphQL server connected successfully to MongoDB.')
   db = client.db('ivebot')
 })
@@ -46,7 +46,7 @@ export default (ctx: { tempDB: DB, client: Client }) => ({
       joinAutorole = joinAutorole || ''
       // Check for permissions, and then send server settings.
       if (
-        member && (member.permissions.has('manageGuild') || host === ctx.tempDB.link[linkToken])
+        (member != null) && (member.permissions.has('manageGuild') || host === ctx.tempDB.link[linkToken])
       ) return { serverId, addRoleForAll, joinLeaveMessages, joinAutorole, ocrOnSend }
       else return { serverId: 'Forbidden.' }
     },

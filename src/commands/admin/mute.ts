@@ -57,16 +57,17 @@ export const handleMute: Command = {
               a.id, role.id, 0,
               Constants.Permissions.sendMessages | Constants.Permissions.addReactions,
               'role'
-            )
+            ).catch(() => {}) // Ignore error.
           } else if (a.type === 2) {
             client.editChannelPermission(a.id, role.id, 0, Constants.Permissions.voiceSpeak, 'role')
+              .catch(() => {}) // Ignore error.
           } else if (a.type === 4) {
             client.editChannelPermission(
               a.id, role.id, 0,
               Constants.Permissions.sendMessages |
               Constants.Permissions.addReactions | Constants.Permissions.voiceSpeak,
               'role'
-            )
+            ).catch(() => {}) // Ignore error.
           }
         })
       } catch (e) { return 'I cannot set permissions for the Muted role.' }
@@ -133,7 +134,7 @@ export const handleUnmute: Command = {
     example: '/unmute voldemort wrong person',
     requirements: { permissions: { manageMessages: true } }
   },
-  generator: (message, args, { client, tempDB }) => {
+  generator: async (message, args, { client, tempDB }) => {
     // Find the user ID.
     const user = getUser(message, args.shift())
     if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
@@ -156,7 +157,7 @@ export const handleUnmute: Command = {
           tempDB.mute[guildID].splice(tempDB.mute[guildID].findIndex((i) => i === user.id), 1)
         }
         // Take the role.
-        client.removeGuildMemberRole(
+        await client.removeGuildMemberRole(
           message.member.guild.id, user.id, role, args.join(' ')
         )
         return 'Unmuted.'

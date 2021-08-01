@@ -20,7 +20,7 @@ class Index extends React.Component {
     request<{ getBotId: string }>('/api/graphql', `{
   getBotId
 }`
-    ).then(data => this.setState({ id: data.getBotId }))
+    ).then(data => this.setState({ id: data.getBotId })).catch(error => console.error(error))
   }
 
   render () {

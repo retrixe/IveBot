@@ -7,28 +7,28 @@ import { TriviaSession } from '../commands/trivia'
 export interface DB {
   gunfight: {
     [key: string]: {
-      randomWord: string,
-      timestamp: number,
-      channelID: string,
-      accepted: boolean,
+      randomWord: string
+      timestamp: number
+      channelID: string
+      accepted: boolean
       wordSaid: boolean
     }
-  },
+  }
   say: {
     // Channels.
     [index: string]: string
-  },
+  }
   trivia: {
     [index: string]: TriviaSession
-  },
+  }
   mute: {
     // Servers with userIDs contained.
     [index: string]: string[]
-  },
+  }
   link: {
     [index: string]: string
-  },
-  cooldowns: { request: string[] },
+  }
+  cooldowns: { request: string[] }
   leave: string[]
 }
 
@@ -38,10 +38,10 @@ export type IveBotCommandGeneratorFunction = (msg: Message, args: string[], ctx:
 void | Promise<void> | CommandResponse | Promise<CommandResponse>
 export type IveBotCommandGenerator = IveBotCommandGeneratorFunction|string|AdvancedMessageContent
 export interface Command {
-  opts: CommandOptions,
-  aliases?: string[],
-  name: string,
-  generator: IveBotCommandGenerator,
+  opts: CommandOptions
+  aliases?: string[]
+  name: string
+  generator: IveBotCommandGenerator
   postGenerator?: (message: Message, args: string[], sent?: Message, ctx?: Context) => void
 }
 export interface CommandOptions {
@@ -58,10 +58,10 @@ export interface CommandOptions {
   example: string
   hidden?: boolean
   requirements?: {
-    userIDs?: string[],
-    roleNames?: string[],
-    custom?: (message: Message) => boolean,
-    permissions?: {},
+    userIDs?: string[]
+    roleNames?: string[]
+    custom?: (message: Message) => boolean
+    permissions?: {}
     roleIDs?: string[]
   }
 }

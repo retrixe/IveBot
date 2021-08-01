@@ -143,7 +143,7 @@ export const handleEmojiimage: Command = {
     example: '/emojiImage <:tom:402567029963489281>',
     guildOnly: true
   },
-  generator: async (message, args) => {
+  generator: (message, args) => {
     // Get emoji ID.
     const found = message.member.guild.emojis.find(i => (i.name === args[0] || i.id === args[0]))
     const emoji = args[0].startsWith('<') ? getIdFromMention(args[0]) : (found ? found.id : undefined)

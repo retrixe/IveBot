@@ -76,7 +76,7 @@ query getAllCommonServers($token: String!) {
               ? (
                 <Query query={query} variables={{ token: this.state.token }}>
                   {({ loading, error, data }: QueryResult<{ getUserInfo: ServerInfo[] }, OperationVariables>) => {
-                    if (error) {
+                    if (error != null) {
                       return (
                         <Typography color='error'>
                           Could not fetch data. Refresh the page and try again.
@@ -85,7 +85,7 @@ query getAllCommonServers($token: String!) {
                         </Typography>
                       )
                     }
-                    if (loading || !data) return <LinearProgress color='secondary' variant='query' />
+                    if (loading || (data == null)) return <LinearProgress color='secondary' variant='query' />
                     return <Dashboard data={data.getUserInfo} token={this.state.token} />
                   }}
                 </Query>

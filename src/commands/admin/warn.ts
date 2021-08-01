@@ -39,7 +39,8 @@ export const handleWarn: Command = {
     client.createMessage(
       (await client.getDMChannel(user.id)).id,
       `You have been warned in ${message.member.guild.name} for: ${args.join(' ')}.`
-    )
+    ).catch(() => {}) // Ignore error.
+    // WeChill
     if (message.member.guild.id === '402423671551164416') {
       client.createMessage('402435742925848578', {
         content: `**${user.username}#${user.discriminator}** has been warned:`,
@@ -51,7 +52,7 @@ export const handleWarn: Command = {
   *| Moderator:** ${message.author.username}#${message.author.discriminator} **| Reason:** ${args.join(' ')}
   *| Date:** ${moment(new Date().toUTCString()).format('dddd, MMMM Do YYYY, h:mm:ss A')}`
         }
-      })
+      }).catch(() => {}) // Ignore error.
     }
     return `**${user.username}#${user.discriminator}** has been warned. **lol.**`
   }
@@ -80,7 +81,7 @@ export const handleWarnings: Command = {
     if (args.length > 1) return { content: 'Correct usage: /warnings (user by ID/username/mention)', error: true }
     // Now find the user ID.
     let user = args[0] && getUser(message, args[0])
-    if (!user && args.length) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
+    if (!user && (args.length > 0)) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     else if (!user) user = message.author
     // Get a list of warnings.
     const warns = await db.collection('warnings').find({

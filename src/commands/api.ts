@@ -29,7 +29,7 @@ export const handleOcr: Command = {
     try {
       // Check if a message link was passed.
       const regex = /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
-      let url = args.length ? args.join('%20') : message.attachments[0].url
+      let url = (args.length > 0) ? args.join('%20') : message.attachments[0].url
       if (regex.test(url)) {
         const split = url.split('/')
         const mess = await client.getMessage(split[split.length - 2], split.pop())
@@ -77,7 +77,7 @@ export const handleOcr: Command = {
         content: hastebin
           ? `🤔 **Text recognition result uploaded to paste.gg${!useHastebin ? ' due to length' : ''}:**
 https://paste.gg/p/anonymous/${hastebin} (use this key to delete: \`${deletionKey}\`)`
-          : '🤔 **Text recognition result:**\n' + text,
+          : `🤔 **Text recognition result:**\n${text}`,
         embed: {
           color: 0x666666,
           author: {
@@ -111,7 +111,7 @@ export const handleHastebin: Command = {
     try {
       // Check if a message link was passed.
       const regex = /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
-      let url = args.length ? args.join('%20') : message.attachments[0].url
+      let url = (args.length > 0) ? args.join('%20') : message.attachments[0].url
       if (regex.test(url)) {
         const split = url.split('/')
         const mess = await client.getMessage(split[split.length - 2], split.pop())
@@ -128,7 +128,7 @@ export const handleHastebin: Command = {
         body: JSON.stringify({
           name: 'IveBot paste.gg upload',
           files: [{
-            name: message.attachments.length ? message.attachments[0].filename : 'pastefile1',
+            name: (message.attachments.length > 0) ? message.attachments[0].filename : 'pastefile1',
             content: { format: 'text', value: text.toString('utf8') }
           }]
         })
@@ -236,7 +236,7 @@ export const handleApod: Command = {
               embed: { image: { url }, color: 0x2361BE }
             }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
-    } else if (args.length) {
+    } else if (args.length > 0) {
       return { content: 'Invalid date.', error: true }
     }
     // Fetch a picture or video.
@@ -327,9 +327,9 @@ export const handleUrban: Command = {
         `http://api.urbandictionary.com/v0/define?term=${args.join(' ')}`
       )).json()
       try {
-        let response = list[0].definition.trim()
+        let response: string = list[0].definition.trim()
         if (response.length > 1900) {
-          const splitRes = response.split('')
+          const splitRes: string[] = response.split('')
           response = ''
           for (let i = 0; i < 595; i += 1) response += splitRes[i]
           response += '[...]'
@@ -377,7 +377,7 @@ export const handleNamemc: Command = {
           `https://api.mojang.com/user/profiles/${id}/names`
         )).json()
         return {
-          content: '**Minecraft history and skin for ' + name + ':**',
+          content: `**Minecraft history and skin for ${name}:**`,
           embed: {
             color: 0x00AE86,
             title: 'Skin and Name History',
@@ -449,11 +449,10 @@ letter code + the first letter of the currency name.'
 }
 
 // Our weather and define types.
-/* eslint-disable camelcase */
 interface Weather {
   cod: string, coord: { lon: number, lat: number }, weather: Array<{
-    main: string,
-    description: string,
+    main: string
+    description: string
     icon: string
   }>, main: { temp: number, temp_min: number, temp_max: number, humidity: number, pressure: number },
   visibility: number, wind: { speed: number, deg: number },
@@ -463,9 +462,9 @@ type Categories = Array<{
   lexicalCategory: { id: string, text: string },
   entries: Array<{
     senses: Array<{
-      definitions: string[],
-      shortDefinitions?: string[],
-      examples: Array<{ text: string }>,
+      definitions: string[]
+      shortDefinitions?: string[]
+      examples: Array<{ text: string }>
       registers: Array<{ id: string, text: string }>
     }>
   }>
@@ -517,8 +516,8 @@ ${weather.main.temp}${temp}/${weather.main.temp_max}${temp}/${weather.main.temp_
           value: `${weather.wind.speed} m/s | ${weather.wind.deg}°
 **(speed | direction)**`,
           inline: true
-        }, { name: 'Pressure 🍃', value: weather.main.pressure + ' millibars', inline: true },
-        { name: 'Humidity 💧', value: weather.main.humidity + '%', inline: true },
+        }, { name: 'Pressure 🍃', value: `${weather.main.pressure} millibars`, inline: true },
+        { name: 'Humidity 💧', value: `${weather.main.humidity}%`, inline: true },
         {
           name: 'Cloud cover 🌥',
           value: weather.clouds ? `${weather.clouds.all}% of sky` : 'N/A',
@@ -658,7 +657,7 @@ export const handleXkcd: Command = {
         const res = fuse.search(args.slice(1).join(' '), { limit: 3 }).map(e => (
           noimageposts.includes(e.item.id) ? { ...e.item, id: e.item.id + '(no image)' } : e.item
         ))
-        if (!res.length) return { content: 'No results were found for your search criteria!', error: true }
+        if (res.length === 0) return { content: 'No results were found for your search criteria!', error: true }
         const res1 = 'https://xkcd.com/' + res[0].id
         const res2 = res[1] ? `\n2. <https://xkcd.com/${res[1].id}>` : ''
         const res3 = res[2] ? `\n3. <https://xkcd.com/${res[2].id}>` : ''

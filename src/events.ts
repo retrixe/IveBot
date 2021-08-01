@@ -135,7 +135,7 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
   if (!message.member) return
   const serverSettings = await getServerSettings(db, message.member.guild.id)
   // Text recognition on image send \o/
-  if (message.attachments.length && serverSettings.ocrOnSend) {
+  if ((message.attachments.length > 0) && serverSettings.ocrOnSend) {
     // Get the image and convert it to Base64.
     try {
       const image = Buffer.from(await (await fetch(
@@ -154,7 +154,7 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
       if (!result.responses[0].fullTextAnnotation) return
       // Return our answer.
       await message.channel.createMessage({
-        content: '**Text recognition result:**\n' + result.responses[0].fullTextAnnotation.text
+        content: `**Text recognition result:**\n${result.responses[0].fullTextAnnotation.text}`
       })
     } catch (e) {}
   }

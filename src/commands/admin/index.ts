@@ -94,30 +94,28 @@ export const handleKick: Command = {
         !message.member.guild.members.get(client.user.id).permissions.has('banMembers'))
     ) return { content: `I cannot kick this person, you ${getInsult()}.`, error: true }
     // Notify the user.
-    let dm
+    try {
+      await client.kickGuildMember(message.member.guild.id, user.id, args.join(' '))
+    } catch (e) {
+      return 'I am unable to kick that user.'
+    }
     if (!f.silent) {
       try {
-        dm = await client.createMessage((await client.getDMChannel(user.id)).id,
+        await (await client.getDMChannel(user.id)).createMessage(
           f.args.length !== 0
             ? `You have been kicked from ${message.member.guild.name} for ${f.args.join(' ')}.`
             : `You have been kicked from ${message.member.guild.name}.`
         )
-      } catch (e) {}
-    }
-    try {
-      await client.kickGuildMember(message.member.guild.id, user.id, args.join(' '))
-    } catch (e) {
-      if (dm) dm.delete()
-      return 'I am unable to kick that user.'
+      } catch (e) { }
     }
     // WeChill
     if (message.member.guild.id === '402423671551164416') {
-      client.createMessage('402437089557217290', f.args.length !== 0
+      await client.createMessage('402437089557217290', f.args.length !== 0
         ? `**${user.username}#${user.discriminator}** has been kicked for **${f.args.join(' ')}**.`
         : `**${user.username}#${user.discriminator}** has been kicked for not staying chill >:L `
       )
     }
-    if (f.delete) message.delete('Deleted kick command.')
+    if (f.delete) message.delete('Deleted kick command.').catch(() => {}) // Ignore error.
     if (!f.silent) return `**${user.username}#${user.discriminator}** has been kicked. **rip.**`
   }
 }

@@ -84,7 +84,7 @@ query getServerSettings($server: String!, $token: String!) {
           <Divider />
           <Query pollInterval={30000} query={query} variables={{ server: element.serverId, token: this.props.token }}>
             {({ loading, error, data, refetch }: QueryResult<{ serverSettings: ServerSettings }, OperationVariables>) => {
-              if (error) {
+              if (error != null) {
                 return (
                   <Typography color='error'>
                     Could not fetch data. Refresh the page and try again.
@@ -93,7 +93,7 @@ query getServerSettings($server: String!, $token: String!) {
                   </Typography>
                 )
               }
-              if (loading || !data) return <LinearProgress color='secondary' variant='query' />
+              if (loading || (data == null)) return <LinearProgress color='secondary' variant='query' />
               return (
                 <Settings
                   refetch={refetch}

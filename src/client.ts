@@ -42,9 +42,9 @@ export class Command {
   hidden: boolean
   requirements: {
     userIDs?: string[]
-    roleNames?: string[],
-    custom?: (message: Message) => boolean,
-    permissions?: {},
+    roleNames?: string[]
+    custom?: (message: Message) => boolean
+    permissions?: {}
     roleIDs?: string[]
   }
 
@@ -141,13 +141,13 @@ export default class CommandParser {
     else if (command.dmOnly && message.channel.type !== 1) return
     // Check for permissions.
     else if (!command.requirementsCheck(message)) {
-      message.channel.createMessage(
+      await message.channel.createMessage(
         `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
       )
       return
       // We check for arguments.
     } else if (args.length === 0 && command.argsRequired) {
-      message.channel.createMessage(command.invalidUsageMessage)
+      await message.channel.createMessage(command.invalidUsageMessage)
       return true
     }
     // Delete the message if needed.
@@ -176,7 +176,7 @@ export default class CommandParser {
     } else return message
   }
 
-  async saveAnalytics (timeTaken: [number, number], name: string) {
+  saveAnalytics (timeTaken: [number, number], name: string) {
     // Get the local command info.
     let commandInfo = this.analytics.find(i => i.name === name)
     // If there is no info for the command then insert an object for it.
@@ -200,16 +200,16 @@ export default class CommandParser {
       // Get the data for the selected command.
       const statistics = await analytics.findOne({ name: command.name })
       // If the command was not stored, we store our analytics directly.
-      if (!statistics) analytics.insertOne(command)
+      if (!statistics) await analytics.insertOne(command)
       // Else, we update existing command data in the database.
       else {
         // Calculate the average execution time and update the database.
         const averageExecTime = statistics.averageExecTime.map((i: number, index: number) => (
           (
             (i * statistics.totalUse) + (command.averageExecTime[index] * command.totalUse)
-          ) / (statistics.totalUse + command.totalUse)
+          ) / (statistics.totalUse as number + command.totalUse)
         ))
-        analytics.updateOne({ name: command.name }, {
+        await analytics.updateOne({ name: command.name }, {
           $inc: { totalUse: command.totalUse },
           $set: { averageExecTime }
         })
@@ -222,7 +222,7 @@ export default class CommandParser {
 
   async onMessage (message: Message) {
     if (message.content && !message.content.startsWith('/')) {
-      botCallback(message, this.client, this.tempDB, this.db)
+      await botCallback(message, this.client, this.tempDB, this.db)
       return // Don't process it if it's not a command.
     }
     const commandExec = message.content.split(' ')[0].substr(1).toLowerCase()
@@ -249,13 +249,13 @@ export default class CommandParser {
           } // TODO: else add it to erroredMessage, and edit that message on re-eval.
         } catch (e) {
           // On error, we tell the user of an unknown error and log it for our reference.
-          message.channel.createMessage(this.commands[keys[i]].errorMessage)
+          await message.channel.createMessage(this.commands[keys[i]].errorMessage)
           console.error(e)
         }
         return
       }
     }
-    botCallback(message, this.client, this.tempDB, this.db)
+    await botCallback(message, this.client, this.tempDB, this.db)
   }
 
   // For evaluating messages which weren't evaluated.
@@ -291,7 +291,7 @@ export default class CommandParser {
           }
         } catch (e) {
           // On error, we tell the user of an unknown error and log it for our reference.
-          message.channel.createMessage(this.commands[keys[i]].errorMessage)
+          await message.channel.createMessage(this.commands[keys[i]].errorMessage)
           console.error(e)
         }
         return

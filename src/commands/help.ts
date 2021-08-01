@@ -89,7 +89,7 @@ const generateDocs = (command: Command) => {
       : '')
   }
 
-  if (command.aliases && command.aliases.length) {
+  if (command.aliases && (command.aliases.length > 0)) {
     return `
 **Usage:** ${command.usage}
 **Aliases:** ${command.aliases.map(i => '/' + i).join(', ')}

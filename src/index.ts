@@ -20,13 +20,15 @@ if (process.argv[2] === '--production') process.env.NODE_ENV = 'production'
 const dev = process.env.NODE_ENV !== 'production'
 
 // Create a client to connect to Discord API Gateway.
-const client = new Client('Bot ' + token === 'dotenv' ? process.env.IVEBOT_TOKEN : token, {
+const client = new Client(`Bot ${token === 'dotenv' ? process.env.IVEBOT_TOKEN : token}`, {
   allowedMentions: { everyone: false, roles: true, users: true },
   autoreconnect: true,
   restMode: true
 })
 
 // Connect ASAP, hopefully before the server starts.
+// TODO: Use top-level await for this and MongoDB.
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 client.connect()
 
 // Create a MongoDB instance.
@@ -57,7 +59,7 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (e
       if (statSync(toRead + commandFile).isFile() && (commandFile.endsWith('.ts') || commandFile.endsWith('.js'))) {
         const commands: { [index: string]: Command } = require('./commands/' + commandFile)
         // ..and there are commands..
-        if (!Object.keys(commands).length) return
+        if (Object.keys(commands).length === 0) return
         // ..register the commands.
         Object.keys(commands).forEach((commandName: string) => {
           // exclude TriviaSession from commands
@@ -73,6 +75,7 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (e
     const tasks = await db.collection('tasks').find({ time: { $lte: Date.now() + 60000 } }).toArray()
     if (tasks) {
       tasks.forEach(task => setTimeout(() => {
+        // TODO: What if no perms?
         if (task.type === 'unmute') {
           client.removeGuildMemberRole(task.guild, task.user, task.target, 'Muted for fixed duration.')
             .catch(e => e.res.statusCode !== 404 && console.error(e))
@@ -81,6 +84,7 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (e
             .catch(e => e.res.statusCode !== 404 && console.error(e))
         }
         db.collection('tasks').deleteOne({ _id: task._id })
+          .catch(error => console.error('Failed to remove task from database.', error))
       }, task.time - Date.now()))
     }
   }, 60000)

@@ -19,9 +19,9 @@ export const handleServerinfo: Command = {
     argsRequired: false
   },
 
-  generator: async (message, args, { client }) => {
+  generator: (message, args, { client }) => {
     // Check if a guild was specified.
-    const guild = args.length
+    const guild = (args.length > 0)
       ? client.guilds.find(
         i => i.members.has(message.author.id) && i.id === args[0]
       )
@@ -247,13 +247,13 @@ export const handleRequest: Command = {
     if (!testPilots.includes(author.id) &&
       host !== author.id && tempDB.cooldowns.request.includes(author.id)
     ) return 'This command is cooling down right now. Try again later.'
-    client.createMessage((await client.getDMChannel(host)).id,
+    await client.createMessage((await client.getDMChannel(host)).id,
       `${author.username}#${author.discriminator} with ID ${author.id}: ${args.join(' ')}`
     )
     // Add cooldown.
     if (!testPilots.includes(author.id) && host !== author.id) {
       tempDB.cooldowns.request.push(author.id)
-      setTimeout(async () => (tempDB.cooldowns.request.splice(
+      setTimeout(() => (tempDB.cooldowns.request.splice(
         tempDB.cooldowns.request.findIndex(i => i === author.id), 1
       )), ms('1 day'))
     }
@@ -412,16 +412,16 @@ export const handleRemindme: Command = {
           } ${args.slice(channel ? 2 : 1).join(' ')}\nReminder set ${args[0]} ago.`
         })
         if (!res.acknowledged) return 'Failed to add a reminder to the database!'
-      } catch (e) { return 'Failed to add a reminder to the database!' + channel ? '' : ' Can I DM you?' }
+      } catch (e) { return 'Failed to add a reminder to the database!' + (channel ? '' : ' Can I DM you?') }
     } else {
       setTimeout(async () => {
-        channel
+        await (channel
           ? message.channel.createMessage(
             `⏰ ${message.author.mention} ${args.slice(2).join(' ')}\nReminder set ${args[0]} ago.`
           )
           : (await message.author.getDMChannel()).createMessage(
             `⏰ ${args.slice(1).join(' ')}\nReminder set ${args[0]} ago.`
-            )
+            ))
       }, ms(args[0]))
     }
     return `You will be reminded in ${args[0]} through a ${channel ? 'mention' : 'DM'}.`
@@ -443,7 +443,7 @@ export const handleReminderlist: Command = {
     if (args.length > 0 && message.author.id !== host) return { content: 'Correct usage: /reminderlist', error: true }
     // Now find the user ID.
     let user = args[0] && getUser(message, args[0])
-    if (!user && args.length) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
+    if (!user && (args.length > 0)) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     else if (!user) user = message.author
     // Get a list of reminders.
     const id = user.id
@@ -512,19 +512,16 @@ export const handleLeave: Command = {
   name: 'leave',
   generator: async (message, args, { tempDB, client }) => {
     if (!tempDB.leave.includes(message.author.id)) {
-      client.createMessage(
-        message.channel.id,
-        'Are you sure you want to leave the server? ' +
-        'You will require an invite link to join back. Type /leave to confirm.'
-      )
       tempDB.leave.push(message.author.id)
       setTimeout(async () => {
         if (tempDB.leave.findIndex(i => i === message.author.id) === -1) return
-        client.createMessage(
+        await client.createMessage(
           message.channel.id, message.author.mention + ' your leave request has timed out.'
         )
         tempDB.leave.splice(tempDB.leave.findIndex(i => i === message.author.id), 1)
       }, 30000)
+      return 'Are you sure you want to leave the server? ' +
+        'You will require an invite link to join back. Type /leave to confirm.'
     } else if (tempDB.leave.includes(message.author.id)) {
       tempDB.leave.splice(tempDB.leave.findIndex(i => i === message.author.id), 1)
       try {
@@ -687,7 +684,7 @@ export const handleSuppress: Command = {
 
     if (msg) {
       await msg.edit({ flags: msg.flags ^ Eris.Constants.MessageFlags.SUPPRESS_EMBEDS })
-      message.addReaction('✅')
+      message.addReaction('✅').catch(() => {}) // Ignore error.
     } else return { content: `That's not a real message, you ${getInsult()}.`, error: true }
   }
 }

@@ -19,18 +19,20 @@ module.exports = {
       )
     }],
     // Make TypeScript ESLint less strict.
-    '@typescript-eslint/member-delimiter-style': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/strict-boolean-expressions': 'off',
-    '@typescript-eslint/restrict-plus-operands': 'off',
-    '@typescript-eslint/no-floating-promises': 'off',
     '@typescript-eslint/no-misused-promises': 'off',
+    '@typescript-eslint/member-delimiter-style': 'off',
+    '@typescript-eslint/strict-boolean-expressions': 'off',
     '@typescript-eslint/restrict-template-expressions': 'off',
-    '@typescript-eslint/prefer-optional-chain': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    // Disable some interfering rules.
     '@typescript-eslint/prefer-nullish-coalescing': 'off',
-    '@typescript-eslint/no-var-requires': 'off',
+    '@typescript-eslint/prefer-optional-chain': 'off',
     '@typescript-eslint/no-invalid-void-type': 'off',
     '@typescript-eslint/no-dynamic-delete': 'off',
+    '@typescript-eslint/no-var-requires': 'off',
+    // Set strict rules regarding async/await.
+    '@typescript-eslint/await-thenable': 'error',
+    '@typescript-eslint/require-await': 'error',
     // Allow no-multi-str.
     'no-multi-str': 'off'
   }
