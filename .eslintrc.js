@@ -11,13 +11,13 @@ module.exports = {
     project: './tsconfig.json'
   },
   rules: {
-    'graphql/template-strings': ['error', {
-      env: 'apollo',
-      schemaString: require('fs').readFileSync(
-        require('path').resolve(__dirname, 'dashboard/schema.graphql'),
-        { encoding: 'utf8' }
-      )
-    }],
+    // 'graphql/template-strings': ['error', {
+    //   env: 'apollo',
+    //   schemaString: require('fs').readFileSync(
+    //     require('path').resolve(__dirname, 'dashboard/schema.graphql'),
+    //     { encoding: 'utf8' }
+    //   )
+    // }],
     // Make TypeScript ESLint less strict.
     '@typescript-eslint/no-misused-promises': 'off',
     '@typescript-eslint/triple-slash-reference': 'off',

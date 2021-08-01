@@ -1,5 +1,4 @@
 import { Command } from '../imports/types'
-import { randomBytes } from 'crypto'
 import { version } from '../../package.json'
 import { execSync } from 'child_process'
 import moment from 'moment'
@@ -9,41 +8,6 @@ import { runInNewContext } from 'vm'
 import { inspect } from 'util'
 import { getIdFromMention, getInsult } from '../imports/tools'
 import { Base } from 'eris'
-
-export const handleToken: Command = {
-  name: 'token',
-  opts: {
-    description: 'Links your Discord to IveBot Web.',
-    fullDescription: 'Links your Discord to IveBot Web (do not share, or your account may be hacked)',
-    usage: '/token',
-    example: '/token',
-    argsRequired: false
-  },
-  postGenerator: (a, b, sent) => {
-    setTimeout(async () => { try { await sent.delete() } catch (e) {} }, 30000)
-  },
-  generator: async (message, args, { tempDB, client }) => {
-    const secureToken = randomBytes(3).toString('hex')
-    tempDB.link[secureToken] = message.author.id
-    // The DM part.
-    try {
-      const dm = await client.getDMChannel(message.author.id)
-      try {
-        const dmMessage = await dm.createMessage({
-          content: '**DO NOT SHARE THIS WITH ANYONE >_<** | Your token is:',
-          embed: {
-            color: 0x17ac86,
-            title: secureToken
-          }
-        })
-        setTimeout(async () => { await dmMessage.delete() }, 30000)
-      } catch (e) { return 'There was an error processing your request (unable to DM token)' }
-    } catch (e) { return 'There was an error processing your request (unable to DM)' }
-    // The non-DM part.
-    return 'The token has been DMed ✅' +
-        ' | **It will be deleted after 30 seconds.** | **DO NOT SHARE THIS WITH ANYONE >_<**'
-  }
-}
 
 export const handleVersion: Command = {
   name: 'version',

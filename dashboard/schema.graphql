@@ -18,10 +18,20 @@ type Channel {
   id: String!
 }
 
+# Info about a Discord user via OAuth.
+type User {
+  # Discord username#discriminator.
+  identifier: String!
+  # Discord ID.
+  id: String!
+  # Discord profile picture.
+  avatar: String!
+}
+
 # Server type.
 type Server {
   # ID of server.
-  serverId: String!
+  id: String!
   # Permission to manage it?
   perms: Boolean
   # Icon of server.
@@ -35,7 +45,7 @@ type Server {
 # Server specific settings.
 type ServerSetting {
   # Server ID.
-  serverId: String!
+  id: String!
   # If add role is enabled for everyone.
   addRoleForAll: String
   # If join/leave messages are enabled, and if so, what message and channel.
@@ -49,9 +59,9 @@ type ServerSetting {
 # Enable queries.
 type Query {
   # Query server settings.
-  serverSettings(serverId: String!, linkToken: String!): ServerSetting!
-  # Get the user for a link code.
-  getUserInfo(linkToken: String!): [Server!]!
+  getServerSettings(id: String!): ServerSetting!
+  # Get the user's username, discriminator and avatar.
+  getUserInfo: User!
   # Get the current user's servers.
   getUserServers: [Server!]!
 }
@@ -70,10 +80,6 @@ input JoinLeaveMessagesInput {
 
 # Input for editServerSettings mutation.
 input EditServerSettingsInput {
-  # Server ID of the server.
-  serverId: String!
-  # Token of the user by whom the operation is performed.
-  linkToken: String!
   # Enable public roles through this setting.
   addRoleForAll: String
   # Edit join autorole through this setting.
@@ -87,7 +93,7 @@ input EditServerSettingsInput {
 # Enable mutations.
 type Mutation {
   # Edit server settings.
-  editServerSettings(input: EditServerSettingsInput!): ServerSetting!
+  editServerSettings(id: String!, newSettings: EditServerSettingsInput!): ServerSetting!
 }
 
 # Final schema.

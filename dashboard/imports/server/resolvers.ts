@@ -1,12 +1,12 @@
 import { Client } from 'eris'
-// import { MongoClient, Db } from 'mongodb'
+import { MongoClient, Db } from 'mongodb'
 import { JwtPayload, verify, sign } from 'jsonwebtoken'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { AuthenticationError } from 'apollo-server-micro'
-import { host, jwtSecret, clientId, clientSecret } from '../../config.json'
+import { AuthenticationError, ForbiddenError } from 'apollo-server-micro'
+import { host, mongoUrl, jwtSecret, clientId, clientSecret } from '../../config.json'
 
 // Create a MongoDB instance.
-/* let db: Db
+let db: Db
 MongoClient.connect(mongoUrl === 'dotenv' ? process.env.MONGO_URL || '' : mongoUrl, (err, client) => {
   if (err || !client) throw err || new Error('MongoDB client is undefined!')
   console.log('GraphQL server connected successfully to MongoDB.')
@@ -23,7 +23,7 @@ const getServerSettings = async (serverID: string) => {
     serverSettings = { serverID }
   }
   return serverSettings
-} */
+}
 
 interface ResolverContext {
   req: NextApiRequest
@@ -78,122 +78,88 @@ const authenticateRequest = async (req: NextApiRequest, res: NextApiResponse): P
 // Set up resolvers.
 export default {
   Query: {
-    serverSettings: async (
-      _: string, { serverId, linkToken }: { serverId: string, linkToken: string }
-    ) => {
-      /*
-      const member = ctx.client.guilds
-        .find(t => t.id === serverId).members.get(ctx.tempDB.link[linkToken])
-      let {
-        addRoleForAll, joinLeaveMessages, joinAutorole, ocrOnSend
-      } = await getServerSettings(serverId)
-      // Insert default values for all properties.
-      joinLeaveMessages = joinLeaveMessages
-        ? {
-            channel: joinLeaveMessages.channel || '',
-            joinMessage: joinLeaveMessages.joinMessage || '',
-            leaveMessage: joinLeaveMessages.leaveMessage || '',
-            banMessage: joinLeaveMessages.banMessage || ''
-          }
-        : { channel: '', joinMessage: '', leaveMessage: '', banMessage: '' }
-      addRoleForAll = addRoleForAll || ''
-      ocrOnSend = ocrOnSend || false
-      joinAutorole = joinAutorole || ''
-      // Check for permissions, and then send server settings.
-      if (
-        (member != null) && (member.permissions.has('manageGuild') || host === ctx.tempDB.link[linkToken])
-      ) return { serverId, addRoleForAll, joinLeaveMessages, joinAutorole, ocrOnSend }
-      else return { serverId: 'Forbidden.' }
-      */
+    getServerSettings: async (parent: string, { id }: { id: string }, context: ResolverContext) => {
+      const accessToken = await authenticateRequest(context.req, context.res)
+      const client = new Client(`Bearer ${accessToken}`, { restMode: true })
+      const self = await client.getSelf()
+      const member = await client.getRESTGuildMember(id, self.id) // TODO: Handle error.
+      if (member.permissions.has('manageGuild') || host === self.id) {
+        const serverSettings = await getServerSettings(id)
+        // Insert default values for all properties.
+        const defaultJoinMsgs = { channel: '', joinMessage: '', leaveMessage: '', banMessage: '' }
+        return {
+          id,
+          joinAutorole: '',
+          addRoleForAll: '',
+          ocrOnSend: false,
+          ...serverSettings,
+          joinLeaveMessages: { ...defaultJoinMsgs, ...(serverSettings.joinLeaveMessages || {}) }
+        }
+      } else throw new ForbiddenError('You are not allowed to access this server\'s settings!')
     },
-    // Get user info.
-    getUserInfo: (_: string, { linkToken }: { linkToken: string }) => {
-      /*
-      if (ctx.tempDB.link[linkToken]) {
-        const servers: Array<{
-          perms: boolean; icon: string; serverId: string; name: string;
-          channels: Array<{ id: string, name: string }>
-        }> = []
-        // Send back mutual servers.
-        ctx.client.guilds.forEach(guild => {
-          if (guild.members.has(ctx.tempDB.link[linkToken])) {
-            servers.push({
-              serverId: guild.id,
-              name: guild.name,
-              icon: guild.iconURL || 'no icon',
-              channels: guild.channels.filter(i => i.type === 0).map(i => ({
-                id: i.id, name: i.name
-              })),
-              perms: host === ctx.tempDB.link[linkToken]
-                ? true
-                : guild.members.get(ctx.tempDB.link[linkToken]).permissions.has('manageGuild')
-            })
-          }
-        })
-        return servers
+    getUserInfo: async (parent: string, args: {}, context: ResolverContext) => {
+      const accessToken = await authenticateRequest(context.req, context.res)
+      const client = new Client(`Bearer ${accessToken}`, { restMode: true })
+      const self = await client.getSelf()
+      return {
+        identifier: `${self.username}#${self.discriminator}`,
+        avatar: self.avatarURL,
+        id: self.id
       }
-      return [{ serverId: 'Unavailable: invalid link token.', icon: 'no icon' }]
-      */
     },
     getUserServers: async (parent: string, args: {}, context: ResolverContext) => {
       const accessToken = await authenticateRequest(context.req, context.res)
       const client = new Client(`Bearer ${accessToken}`, { restMode: true })
       const guilds = await client.getRESTGuilds()
       const self = await client.getSelf()
-      const servers: Array<{
-        perms: boolean, icon: string, serverId: string, name: string,
-        channels: Array<{ id: string, name: string }>
-      }> = (await Promise.all(guilds // TODO: .filter(guild => ctx.client.guilds.has(guild.id))
+      return (await Promise.all(guilds
+        // TODO: .filter(guild => ctx.client.guilds.has(guild.id))
         .map(async guild => {
-          const selfMember = await client.getRESTGuildMember(guild.id, self.id)
+          const selfMember = await client.getRESTGuildMember(guild.id, self.id) // TODO: Error.
           return {
-            serverId: guild.id,
+            id: guild.id,
             name: guild.name,
             icon: guild.iconURL || 'no icon',
-            channels: guild.channels.filter(i => i.type === 0).map(i => ({
-              id: i.id, name: i.name
-            })),
+            channels: guild.channels.filter(i => i.type === 0)
+              .map(i => ({ id: i.id, name: i.name })),
             perms: host === self.id || selfMember.permissions.has('manageGuild')
           }
         })))
-      return servers
     }
   },
   Mutation: {
     editServerSettings: async (
-      _: string, { input }: { input: {
-        serverId: string, linkToken: string, addRoleForAll: string, joinAutorole: string,
-        joinLeaveMessages: { channel: string, joinMessage: string, leaveMessage: string }
-        ocrOnSend: boolean
-      } }
+      parent: string,
+      { id, newSettings }: {
+        id: string
+        newSettings: {
+          addRoleForAll: string
+          joinAutorole: string
+          joinLeaveMessages: { channel: string, joinMessage: string, leaveMessage: string }
+          ocrOnSend: boolean
+        }
+      },
+      context: ResolverContext
     ) => {
-      /*
-      const {
-        serverId, linkToken, addRoleForAll, joinAutorole, joinLeaveMessages, ocrOnSend
-      } = input
-      const member = ctx.client.guilds
-        .find(t => t.id === serverId).members.get(ctx.tempDB.link[linkToken])
-      if (member.permissions.has('manageGuild') || host === ctx.tempDB.link[linkToken]) {
-        await getServerSettings(db, serverId)
-        await db.collection('servers').updateOne({ serverID: serverId }, {
+      const accessToken = await authenticateRequest(context.req, context.res)
+      const client = new Client(`Bearer ${accessToken}`, { restMode: true })
+      const self = await client.getSelf()
+      const member = await client.getRESTGuildMember(id, self.id) // TODO: Handle error.
+      if (member.permissions.has('manageGuild') || host === self.id) {
+        const serverSettings = await getServerSettings(id)
+        // Insert default values for all properties.
+        const defaultJoinMsgs = { channel: '', joinMessage: '', leaveMessage: '', banMessage: '' }
+        await db.collection('servers').updateOne({ serverID: id }, {
           $set: {
-            addRoleForAll: addRoleForAll || undefined,
-            joinAutorole: joinAutorole || undefined,
-            ocrOnSend,
-            joinLeaveMessages: joinLeaveMessages
-              ? {
-                  channel: '',
-                  joinMessage: '',
-                  leaveMessage: '',
-                  banMessage: '',
-                  ...joinLeaveMessages
-                }
-              : undefined
+            joinAutorole: '',
+            addRoleForAll: '',
+            ocrOnSend: false,
+            ...serverSettings,
+            joinLeaveMessages: { ...defaultJoinMsgs, ...(serverSettings.joinLeaveMessages || {}) }
           }
         })
-        return getServerSettings(db, serverId)
-      } else return { serverId: 'Forbidden.' }
-      */
+        return await getServerSettings(id)
+      } else throw new ForbiddenError('You are not allowed to access this server\'s settings!')
     }
   }
 }

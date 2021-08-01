@@ -108,5 +108,5 @@ client.on('error', (err: Error, id: string) => {
 
 // Create a database to handle certain stuff.
 const tempDB: DB = {
-  gunfight: {}, say: {}, trivia: {}, link: {}, leave: [], mute: {}, cooldowns: { request: [] }
+  gunfight: {}, say: {}, trivia: {}, leave: [], mute: {}, cooldowns: { request: [] }
 }

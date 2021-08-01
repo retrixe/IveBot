@@ -25,9 +25,6 @@ export interface DB {
     // Servers with userIDs contained.
     [index: string]: string[]
   }
-  link: {
-    [index: string]: string
-  }
   cooldowns: { request: string[] }
   leave: string[]
 }
