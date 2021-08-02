@@ -23,11 +23,12 @@ export const getServerSettings = async (db: Db, serverID: string): Promise<Docum
 
 export const zeroWidthSpace = '​'
 
-export const getUser = (message: Message, arg: string): User => {
-  if (!arg || typeof arg !== 'string') return
+export const getUser = (message: Message, arg: string): User | undefined => {
+  if (!arg || typeof arg !== 'string' || !message.member) return
   const mentions = message.mentions
   const guild = message.member.guild
-  if (guild.members.has(arg)) return guild.members.get(arg).user
+  const member = guild.members.get(arg)
+  if (member) return member.user
   else if ((mentions.length > 0) && mentions[0].id === getIdFromMention(arg)) return mentions[0]
   // Filter members then use .find for order of precedence.
   const lower = arg.toLowerCase()
@@ -45,8 +46,8 @@ export const getUser = (message: Message, arg: string): User => {
   if (nickname) return nickname.user
 }
 
-export const getChannel = (message: Message, arg: string): GuildChannel => {
-  if (!arg || typeof arg !== 'string') return
+export const getChannel = (message: Message, arg: string): GuildChannel | undefined => {
+  if (!arg || typeof arg !== 'string' || !message.member) return
   const mentions = message.channelMentions
   const guild = message.member.guild
   if (guild.channels.has(arg)) return guild.channels.get(arg)
@@ -72,8 +73,8 @@ export const getInsult = (plural = false): string => {
 export const fetchLimited = async (url: string, limit: number, opts = {}): Promise<false | Buffer> => {
   const byteLimit = limit * 1024 * 1024
   try {
-    const contentLength = (await fetch(url, { method: 'HEAD' })).headers.get('content-length')
-    if (+contentLength > byteLimit) return false
+    const contentLength = (await fetch(url, { method: 'HEAD' })).headers.get('content-length') || '-1'
+    if (!isNaN(+contentLength) && +contentLength > byteLimit) return false
   } catch (e) {} // Understandable that this may fail.
   // Create a Promise which resolves on stream finish.
   return await new Promise((resolve, reject) => {
@@ -81,7 +82,8 @@ export const fetchLimited = async (url: string, limit: number, opts = {}): Promi
     const data: Buffer[] = []
     const parsedUrl = new URL(url)
     const req = (parsedUrl.protocol === 'https:' ? https.get : get)({ ...parsedUrl, ...opts }, (res) => {
-      if (!isNaN(+res.headers['content-length']) && +res.headers['content-length'] > byteLimit) {
+      const contentLength = res.headers['content-length'] || '-1'
+      if (!isNaN(+contentLength) && +contentLength > byteLimit) {
         req.abort()
         resolve(false)
       }

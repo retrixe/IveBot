@@ -16,7 +16,8 @@ export const guildMemberAdd = (client: Client, db: Db, tempDB: DB) => async (
   // Mute persist.
   try {
     if (tempDB.mute[guild.id].includes(member.id)) {
-      await member.addRole(guild.roles.find((role) => role.name === 'Muted').id, 'Persisting mute.')
+      const role = guild.roles.find((role) => role.name === 'Muted')
+      if (role) await member.addRole(role.id, 'Persisting mute.')
     }
   } catch (e) {}
   // Get server settings.

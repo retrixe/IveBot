@@ -25,7 +25,7 @@ function isEquivalent (a: { [index: string]: boolean }, b: { [index: string]: bo
 
 export class Command {
   name: string
-  aliases: string[]
+  aliases?: string[]
   generator: IveBotCommandGenerator
   postGenerator?: (message: Message, args: string[], sent?: Message, ctx?: Context) => void
   argsRequired: boolean
@@ -40,7 +40,7 @@ export class Command {
   invalidUsageMessage: string
   errorMessage: string
   hidden: boolean
-  requirements: {
+  requirements?: {
     userIDs?: string[]
     roleNames?: string[]
     custom?: (message: Message) => boolean
@@ -61,15 +61,15 @@ export class Command {
     this.errorMessage = command.opts.errorMessage || 'IveBot has experienced an internal error.'
     // No impl for next.
     this.caseInsensitive = command.opts.caseInsensitive === undefined || command.opts.caseInsensitive
-    this.deleteCommand = command.opts.deleteCommand
-    this.guildOnly = command.opts.guildOnly
-    this.dmOnly = command.opts.dmOnly
+    this.deleteCommand = command.opts.deleteCommand || false
+    this.guildOnly = command.opts.guildOnly || false
+    this.dmOnly = command.opts.dmOnly || false
     // For help.
     this.description = command.opts.description
     this.fullDescription = command.opts.fullDescription
     this.usage = command.opts.usage
     this.example = command.opts.example
-    this.hidden = command.opts.hidden // Unimplemented in help.
+    this.hidden = command.opts.hidden || false // Unimplemented in help.
     // Requirements.
     this.requirements = command.opts.requirements
     // No cooldown implementation.
@@ -85,7 +85,7 @@ export class Command {
     const custom = this.requirements.custom ? this.requirements.custom(message) : false
     // If it's not a guild there are no permissions.
     if (message.channel.type !== 0) return userIDs || custom
-    const permissions = this.requirements.permissions
+    const permissions = this.requirements.permissions && message.member
       ? isEquivalent(Object.assign( // Assign the required permissions onto the member's permission.
         message.member.permissions.json, this.requirements.permissions
       ), message.member.permissions.json) // This should eval true if user has permissions.
@@ -112,14 +112,14 @@ export default class CommandParser {
   tempDB: DB
   db: Db
   evaluatedMessages: string[]
-  analytics: Array<{ name: string, totalUse: number, averageExecTime: number[] }>
+  analytics: { [name: string]: { totalUse: number, averageExecTime: number[] } }
 
   constructor (client: Client, tempDB: DB, db: Db) {
     this.commands = {}
     this.client = client
     this.tempDB = tempDB
     this.db = db
-    this.analytics = []
+    this.analytics = {}
     this.evaluatedMessages = []
     this.onMessage = this.onMessage.bind(this)
     this.onMessageUpdate = this.onMessageUpdate.bind(this)
@@ -137,14 +137,14 @@ export default class CommandParser {
     }
     const args = message.content.trim().split(' ').filter(i => i).slice(1)
     // Guild and DM only.
-    if (command.guildOnly && message.channel.type !== 0) return
-    else if (command.dmOnly && message.channel.type !== 1) return
+    if (command.guildOnly && message.channel.type !== 0) return false
+    else if (command.dmOnly && message.channel.type !== 1) return false
     // Check for permissions.
     else if (!command.requirementsCheck(message)) {
       await message.channel.createMessage(
         `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
       )
-      return
+      return false
       // We check for arguments.
     } else if (args.length === 0 && command.argsRequired) {
       await message.channel.createMessage(command.invalidUsageMessage)
@@ -164,7 +164,7 @@ export default class CommandParser {
         .permissionsOf(this.client.user.id).has('sendMessages')) || message.channel.type === 1)
     ) sent = await message.channel.createMessage(this.disableEveryone(messageToSend))
     if (command.postGenerator) command.postGenerator(message, args, sent, context)
-    return typeof messageToSend === 'object' ? messageToSend.error : false
+    return typeof messageToSend === 'object' ? messageToSend.error || false : false
   }
 
   disableEveryone = (message: MessageContent): MessageContent => {
@@ -178,27 +178,28 @@ export default class CommandParser {
 
   saveAnalytics (timeTaken: [number, number], name: string): void {
     // Get the local command info.
-    let commandInfo = this.analytics.find(i => i.name === name)
+    let commandInfo = this.analytics[name]
     // If there is no info for the command then insert an object for it.
     if (!commandInfo) {
-      this.analytics.push({ name, averageExecTime: [0, 0], totalUse: 0 })
-      commandInfo = this.analytics.find(i => i.name === name)
+      this.analytics[name] = { averageExecTime: [0, 0], totalUse: 0 }
+      commandInfo = this.analytics[name]
     }
     // Calculate the average time of execution taken.
     const averageExecTime = commandInfo.averageExecTime.map((i: number, index: number) => (
       ((i * commandInfo.totalUse) + timeTaken[index]) / (commandInfo.totalUse + 1)
     ))
     // Update local cache with analytics.
-    this.analytics[this.analytics.indexOf(commandInfo)].totalUse += 1
-    this.analytics[this.analytics.indexOf(commandInfo)].averageExecTime = averageExecTime
+    this.analytics[name].totalUse += 1
+    this.analytics[name].averageExecTime = averageExecTime
   }
 
   async sendAnalytics (): Promise<void> {
     const analytics = this.db.collection('analytics')
     // Iterate over every command we have information stored locally.
-    for (const command of this.analytics) {
+    for (const commandName in this.analytics) {
+      const command = this.analytics[commandName]
       // Get the data for the selected command.
-      const statistics = await analytics.findOne({ name: command.name })
+      const statistics = await analytics.findOne({ name: commandName })
       // If the command was not stored, we store our analytics directly.
       if (!statistics) await analytics.insertOne(command)
       // Else, we update existing command data in the database.
@@ -209,7 +210,7 @@ export default class CommandParser {
             (i * statistics.totalUse) + (command.averageExecTime[index] * command.totalUse)
           ) / (statistics.totalUse as number + command.totalUse)
         ))
-        await analytics.updateOne({ name: command.name }, {
+        await analytics.updateOne({ name: commandName }, {
           $inc: { totalUse: command.totalUse },
           $set: { averageExecTime }
         })
@@ -231,9 +232,8 @@ export default class CommandParser {
     // Check for the command in this.commands.
     const keys = Object.keys(this.commands)
     for (let i = 0; i < keys.length; i++) {
-      if (commandExec === keys[i].toLowerCase() || (
-        this.commands[keys[i]].aliases && this.commands[keys[i]].aliases.includes(commandExec)
-      )) {
+      if (commandExec === keys[i].toLowerCase() ||
+        this.commands[keys[i]].aliases?.includes(commandExec)) {
         // Execute command.
         try {
           const executeFirst = process.hrtime() // Initial high-precision time.
@@ -273,9 +273,8 @@ export default class CommandParser {
     // Check for the command in this.commands.
     const keys = Object.keys(this.commands)
     for (let i = 0; i < keys.length; i++) {
-      if (commandExec === keys[i].toLowerCase() || (
-        this.commands[keys[i]].aliases && this.commands[keys[i]].aliases.includes(commandExec)
-      )) {
+      if (commandExec === keys[i].toLowerCase() ||
+        this.commands[keys[i]].aliases?.includes(commandExec)) {
         // Execute command.
         try {
           const executeFirst = process.hrtime() // Initial high precision time.

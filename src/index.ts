@@ -32,8 +32,8 @@ const client = new Client(`Bot ${token === 'dotenv' ? process.env.IVEBOT_TOKEN :
 client.connect()
 
 // Create a MongoDB instance.
-MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (err, mongoDB) => {
-  if (err) throw err
+MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL || '' : mongoURL, (err, mongoDB) => {
+  if (err || !mongoDB) throw err
   console.log('Bot connected successfully to MongoDB.')
   const db = mongoDB.db('ivebot')
   const bubbleWrap = <F extends (...args: any[]) => any>(func: F) =>
