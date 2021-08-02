@@ -25,8 +25,8 @@ export interface JoinLeaveMessages extends ApolloBase {
 
 export interface ServerSettings extends ApolloBase {
   joinLeaveMessages: JoinLeaveMessages
-  addRoleForAll: string
   joinAutorole: string
+  publicRoles: string
   ocrOnSend: boolean
   id: string
 }

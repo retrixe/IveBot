@@ -10,13 +10,13 @@ export const getIdFromMention = (mention: string): string => {
   return f[f.length - 1]
 }
 
-export const getServerSettings = async (db: Db, serverID: string): Promise<Document> => {
+export const getServerSettings = async (db: Db, id: string): Promise<Document> => {
   // Get serverSettings through query.
-  let serverSettings = await db.collection('servers').find({ serverID }).toArray()
+  let serverSettings = await db.collection('servers').find({ id }).toArray()
   if (serverSettings.length === 0) {
     // Initialize server settings.
-    await db.collection('servers').insertOne({ serverID })
-    serverSettings = await db.collection('servers').find({ serverID }).toArray()
+    await db.collection('servers').insertOne({ id })
+    serverSettings = await db.collection('servers').find({ id }).toArray()
   }
   return serverSettings[0]
 }

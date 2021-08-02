@@ -17,17 +17,14 @@ MongoClient.connect(mongoUrl === 'dotenv' ? process.env.MONGO_URL || '' : mongoU
 const botClient = new Client(`Bot ${botToken}`, { restMode: true })
 
 // Helper functions.
-const getServerSettings = async (serverID: string): Promise<Document> => {
+const getServerSettings = async (id: string): Promise<Document> => {
   // Get serverSettings through query.
-  let serverSettings = await db.collection('servers').findOne({ serverID })
+  const serverSettings = await db.collection('servers').findOne({ id })
   if (!serverSettings) {
     // Initialize server settings.
-    await db.collection('servers').insertOne({ serverID })
-    serverSettings = { serverID }
+    await db.collection('servers').insertOne({ id })
   }
-  serverSettings.id = serverSettings.serverID
-  delete serverSettings.serverID
-  return serverSettings
+  return serverSettings || { id }
 }
 
 interface ResolverContext {
@@ -104,7 +101,7 @@ export default {
         return {
           id,
           joinAutorole: '',
-          addRoleForAll: '',
+          publicRoles: '',
           ocrOnSend: false,
           ...serverSettings,
           joinLeaveMessages: { ...defaultJoinMsgs, ...(serverSettings.joinLeaveMessages || {}) }
@@ -153,7 +150,7 @@ export default {
       { id, newSettings }: {
         id: string
         newSettings: {
-          addRoleForAll: string
+          publicRoles: string
           joinAutorole: string
           joinLeaveMessages: { channel: string, joinMessage: string, leaveMessage: string }
           ocrOnSend: boolean
@@ -177,10 +174,10 @@ export default {
         const serverSettings = await getServerSettings(id)
         // Insert default values for all properties.
         const defaultJoinMsgs = { channel: '', joinMessage: '', leaveMessage: '', banMessage: '' }
-        await db.collection('servers').updateOne({ serverID: id }, {
+        await db.collection('servers').updateOne({ id }, {
           $set: {
             joinAutorole: '',
-            addRoleForAll: '',
+            publicRoles: '',
             ocrOnSend: false,
             ...serverSettings,
             joinLeaveMessages: { ...defaultJoinMsgs, ...(serverSettings.joinLeaveMessages || {}) }

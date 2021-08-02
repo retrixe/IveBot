@@ -47,7 +47,7 @@ type ServerSetting {
   """Server ID."""
   id: String!
   """If add role is enabled for everyone."""
-  addRoleForAll: String
+  publicRoles: String
   """If join autorole is enabled, and if so, what role."""
   joinAutorole: String
   """If join/leave messages are enabled, and if so, what message and channel."""
@@ -83,14 +83,14 @@ input JoinLeaveMessagesInput {
 
 """Input for editServerSettings mutation."""
 input EditServerSettingsInput {
-  """Enable public roles through this setting."""
-  addRoleForAll: String
   """Edit join autorole through this setting."""
   joinAutorole: String
   """Edit join leave messages through this setting."""
   joinLeaveMessages: JoinLeaveMessagesInput
   """Edit text recognition on image send through this setting."""
   ocrOnSend: Boolean
+  """Enable public roles through this setting."""
+  publicRoles: String
 }
 
 """Enable mutations."""

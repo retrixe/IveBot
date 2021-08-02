@@ -30,10 +30,10 @@ export const handleWarn: Command = {
     // Warn the person internally.
     args.shift()
     await db.collection('warnings').insertOne({
-      warnedID: user.id,
-      warnerID: message.author.id,
+      warnedId: user.id,
+      warnerId: message.author.id,
       reason: args.join(' '),
-      serverID: message.member.guild.id,
+      serverId: message.member.guild.id,
       date: new Date().toUTCString()
     })
     client.createMessage(
@@ -85,7 +85,7 @@ export const handleWarnings: Command = {
     else if (!user) user = message.author
     // Get a list of warnings.
     const warns = await db.collection('warnings').find({
-      warnedID: user.id, serverID: message.member.guild.id
+      warnedId: user.id, serverId: message.member.guild.id
     }).toArray()
     // If the person has no warnings..
     if (warns.length === 0) return '**No** warnings found.'
@@ -100,8 +100,8 @@ export const handleWarnings: Command = {
         // This function generates the fields.
         fields: warns.map((warning, index) => {
           // If we could find the warner then we specify his/her username+discriminator else ID.
-          const warner = client.users.get(warning.warnerID)
-          const mod = warner ? `${warner.username}#${warner.discriminator}` : warning.warnerID
+          const warner = client.users.get(warning.warnerId)
+          const mod = warner ? `${warner.username}#${warner.discriminator}` : warning.warnerId
           return {
             name: `Warning ${index + 1}`,
             value: `**| Moderator:** ${mod} **| Reason:** ${warning.reason}
@@ -140,7 +140,7 @@ export const handleClearwarns: Command = {
     // Clear the warns of the person internally.
     try {
       await db.collection('warnings').deleteMany({
-        warnedID: user.id, serverID: message.member.guild.id
+        warnedId: user.id, serverId: message.member.guild.id
       })
     } catch (err) { return `Something went wrong 👾 Error: ${err}` }
     // Return response.
@@ -175,15 +175,15 @@ export const handleRemovewarn: Command = {
     // Remove the warning of the person internally.
     try {
       const warn = await db.collection('warnings').findOne({
-        _id: new ObjectId(args[0]), serverID: message.member.guild.id
+        _id: new ObjectId(args[0]), serverId: message.member.guild.id
       })
       if (!warn) return { content: 'This warning does not exist..', error: true }
-      else if (warn.warnedID !== user.id) {
+      else if (warn.warnedId !== user.id) {
         return { content: 'This warning does not belong to the specified user..', error: true }
       }
       try {
         await db.collection('warnings').deleteOne({
-          _id: new ObjectId(args[0]), serverID: message.member.guild.id
+          _id: new ObjectId(args[0]), serverId: message.member.guild.id
         })
       } catch (e) { return `Something went wrong 👾 Error: ${e}` }
     } catch (err) { return `Something went wrong 👾 Error: ${err}` }

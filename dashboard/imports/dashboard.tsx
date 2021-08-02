@@ -27,7 +27,7 @@ const GET_SERVER_SETTINGS = gql`
   query GetServerSettings($id: String!) {
     serverSettings: getServerSettings(id: $id) {
       id
-      addRoleForAll
+      publicRoles
       joinAutorole
       joinLeaveMessages {
         channel

@@ -12,7 +12,7 @@ const EDIT_SERVER_SETTINGS = gql`
   ) {
     editServerSettings(id: $id, newSettings: $newSettings) {
       id
-      addRoleForAll
+      publicRoles
       joinAutorole
       ocrOnSend
       joinLeaveMessages {
@@ -33,7 +33,7 @@ const Settings = (props: { data: ServerSettings, server: ServerInfo }): JSX.Elem
   const setJoinLeaveMessages = (e: Partial<JoinLeaveMessages>): void => setServerSettings(s => ({
     ...s, joinLeaveMessages: { ...(s.joinLeaveMessages || {}), ...e }
   }))
-  const setAddRoleForAll = (e: string): void => setServerSettings(s => ({ ...s, addRoleForAll: e }))
+  const setpublicRoles = (e: string): void => setServerSettings(s => ({ ...s, publicRoles: e }))
   const setJoinAutorole = (e: string): void => setServerSettings(s => ({ ...s, joinAutorole: e }))
   const toggleOcrOnSend = (): void => setServerSettings(s => ({ ...s, ocrOnSend: !s.ocrOnSend }))
 
@@ -54,8 +54,8 @@ const Settings = (props: { data: ServerSettings, server: ServerInfo }): JSX.Elem
       <FormControl fullWidth>
         <InputLabel>Role Names</InputLabel>
         <Input
-          value={serverSettings.addRoleForAll || ''} fullWidth
-          onChange={e => setAddRoleForAll(e.target.value)} margin='dense'
+          value={serverSettings.publicRoles || ''} fullWidth
+          onChange={e => setpublicRoles(e.target.value)} margin='dense'
         />
         <FormHelperText>Leave blank to disable public roles</FormHelperText>
       </FormControl>

@@ -16,7 +16,7 @@ export const handleGiverole: Command = {
     const manageRoles = message.member.permissions.has('manageRoles')
     // Check user for permissions.
     const insult = `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
-    const publicRoles = (await getServerSettings(db, message.member.guild.id)).addRoleForAll || ''
+    const publicRoles = (await getServerSettings(db, message.member.guild.id)).publicRoles || ''
     if (!manageRoles && !publicRoles) return insult
     // Now find the user ID.
     let user = getUser(message, args[0])
@@ -78,7 +78,7 @@ export const handleTakerole: Command = {
     const manageRoles = message.member.permissions.has('manageRoles')
     // Check user for permissions.
     const insult = `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
-    const publicRoles = (await getServerSettings(db, message.member.guild.id)).addRoleForAll || ''
+    const publicRoles = (await getServerSettings(db, message.member.guild.id)).publicRoles || ''
     if (!manageRoles && !publicRoles) return insult
     // Now find the user ID.
     let user = getUser(message, args[0])
