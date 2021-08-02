@@ -22,7 +22,7 @@ export class TriviaSession {
   questionList: Map<string, string[]>
   scores: { [id: string]: number } = {}
   stopped = false
-  timer: number = null
+  timer: number | null = null
   timeout = Date.now()
   count = 0
   tempDB: DB
@@ -177,49 +177,47 @@ export const handleTrivia: Command = {
   opts: {
     description: 'Start a trivia game on a topic of your choice.',
     fullDescription: `Start a trivia game on a topic of your choice.
-**Default settings:** IveBot gains points: no, seconds to answer: 15, points needed to win: 30, reveal answer on timeout: yes`,
-    usage: `/trivia <topic> (--bot-plays=true|false) (--time-limit=<time longer than 4s>) (--max-score=<points greater than 0>) (--reveal-answer=true|false)
-**During a trivia game:** /trivia (scoreboard/score/scores/stop)
+**Default settings:** IveBot plays: no, seconds to answer: 15, points to win: 30, reveal answer: yes`,
+    usage: `/trivia <topic> (botplays) (revealanswer) (timelimit=<5 seconds or more>) (pointstowin=<1 point or more>)
+**During a trivia game:** /trivia (scoreboard/score/scores/stop/end)
 **To view available topics:** /trivia list`,
-    example: '/trivia greekmyth --bot-plays=true',
+    example: '/trivia greekmyth --bot-plays',
     guildOnly: true,
     argsRequired: true
   },
-  generator: async (message: Message, args: string[], { tempDB, client }) => {
+  generator: async (message, args, { tempDB, client }) => {
     let botPlays = false
     let timeLimit = 15000
     let maxScore = 30
     let revealAnswer = true
 
-    // TODO: Flag soup can be handled better.
-    if (args.find(element => element.includes('--bot-plays='))) {
-      if (args.find(element => element.includes('--bot-plays=')).split('=')[1] === 'true') {
+    const botPlaysFlag = args.find(element => element.startsWith('botplays=') || element === 'botplays')
+    if (botPlaysFlag) {
+      if (botPlaysFlag.split('=')[1] === 'true' || botPlaysFlag === 'botplays') {
         botPlays = true
-      } else if (args.find(element => element === '--bot-plays=').split('=')[1] !== 'false') {
-        return 'Invalid usage. It must be either true or false.'
+      } else if (botPlaysFlag.split('=')[1] !== 'false') {
+        return 'Invalid usage. `botplays` must be either true or false.'
       }
     }
-    if (args.find(element => element.includes('--time-limit='))) {
-      if (+args.find(element => element.includes('--time-limit=')).split('=')[1] > 4) {
-        timeLimit = +args.find(element => element.includes('--time-limit=')).split('=')[1] * 1000
-      } else {
-        return 'Invalid usage. It must be a number greater than 4.'
-      }
+    const timeLimitFlag = args.find(element => element.startsWith('timelimit='))?.split('=')
+    if (timeLimitFlag) {
+      if (!isNaN(+timeLimitFlag[1]) && +timeLimitFlag[1] > 4) timeLimit = +timeLimitFlag[1] * 1000
+      else return 'Invalid usage. `timelimit` must be a number greater than 4.'
     }
-    if (args.find(element => element.includes('--max-score='))) {
-      if (+args.find(element => element.includes('--max-score=')).split('=')[1] > 0) {
-        maxScore = +args.find(element => element.includes('--max-score')).split('=')[1]
-      } else {
-        return 'Invalid usage. It must be a number greater than 0.'
-      }
+    const maxScoreFlag = args.find(element => element.startsWith('pointstowin='))?.split('=')
+    if (maxScoreFlag) {
+      if (+maxScoreFlag[1] > 0) maxScore = +maxScoreFlag[1]
+      else return 'Invalid usage. `pointstowin` must be a number greater than 0.'
     }
-    if (args.find(element => element.includes('--reveal-answer='))) {
-      if (args.find(element => element.includes('--reveal-answer=')).split('=')[1] === 'false') {
+    const revealAnswerFlag = args.find(element => element.startsWith('revealanswer=') || element === 'revealanswer')
+    if (revealAnswerFlag) {
+      if (revealAnswerFlag.split('=')[1] === 'false') {
         revealAnswer = false
-      } else if (args.find(element => element === '--reveal-answer=').split('=')[1] !== 'true') {
-        return 'Invalid usage. It must be either true or false.'
+      } else if (revealAnswerFlag.includes('=') && revealAnswerFlag.split('=')[1] !== 'true') {
+        return 'Invalid usage. `revealanswer` must be either true or false.'
       }
     }
+
     if (args.length === 1 && ['scores', 'score', 'leaderboard'].includes(args[0])) {
       const session = tempDB.trivia[message.channel.id]
       if (session) {
@@ -235,13 +233,11 @@ export const handleTrivia: Command = {
             (a, b) => a.position > b.position ? -1 : 1
           ).find(i => i.color !== 0) || { color: 0 }).color
         : 0
-      const embed: EmbedOptions = {
-        title: 'Available trivia lists',
-        color,
-        fields: lists.map(name => ({ name: name.replace('.txt', ''), value: '_ _', inline: true }))
+      return {
+        content: '❔ **Available trivia topics:**',
+        embed: { color, description: lists.map(name => `**${name.replace('.txt', '')}**`).join(', ') }
       }
-      return { embed }
-    } else if (args.length === 1 && args[0] === 'stop') {
+    } else if (args.length === 1 && (args[0] === 'stop' || args[0] === 'end')) {
       const session = tempDB.trivia[message.channel.id]
       const channel = message.channel as GuildTextableChannel
       if (session) {

@@ -8,6 +8,7 @@ Starting the dashboard itself is identical to IveBot itself i.e. via `yarn build
 
 ```json
 {
+  "botToken": "<insert Discord bot token here>",
   "clientId": "<insert Discord client ID here>",
   "clientSecret": "<insert Discord client secret here>",
   "jwtSecret": "<randomised token to sign JWT and talk with IveBot, the longer the better>",
