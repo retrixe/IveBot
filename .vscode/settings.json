@@ -14,11 +14,11 @@
       ]
     },
     "eslint.enable": true,
-    "tslint.enable": false,
-    "eslint.packageManager": "yarn",
     "eslint.autoFixOnSave": true,
+    "eslint.packageManager": "yarn",
     "typescript.tsdk": "node_modules/typescript/lib",
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": true
-    }
+    },
+    "typescript.preferences.importModuleSpecifierEnding": "js"
   }

@@ -1,13 +1,13 @@
-import { Command } from '../../imports/types'
-import { getInsult, getUser } from '../../imports/tools'
-import { checkRolePosition } from '../../imports/permissions'
+import { Command } from '../../imports/types.js'
+import { getInsult, getUser } from '../../imports/tools.js'
+import { checkRolePosition } from '../../imports/permissions.js'
 import { Message, GuildTextableChannel } from 'eris'
-export { handleAddemoji, handleDeleteemoji, handleEditemoji, handleEmojiimage } from './emoji'
-export { handleWarn, handleWarnings, handleClearwarns, handleRemovewarn } from './warn'
-export { handleGiverole, handleTakerole, handleNotify } from './roles'
-export { handleDeletechannel, handleEditchannel } from './channels'
-export { handleMute, handleUnmute } from './mute'
-export { handleBan, handleUnban } from './ban'
+export { handleAddemoji, handleDeleteemoji, handleEditemoji, handleEmojiimage } from './emoji.js'
+export { handleWarn, handleWarnings, handleClearwarns, handleRemovewarn } from './warn.js'
+export { handleGiverole, handleTakerole, handleNotify } from './roles.js'
+export { handleDeletechannel, handleEditchannel } from './channels.js'
+export { handleMute, handleUnmute } from './mute.js'
+export { handleBan, handleUnban } from './ban.js'
 
 const parseSilentDelete = (args: string[]): { args: string[], silent: boolean, delete: boolean } => {
   const data = { args, silent: false, delete: false }

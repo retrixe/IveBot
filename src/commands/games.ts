@@ -1,4 +1,4 @@
-import { Command } from '../imports/types'
+import { Command } from '../imports/types.js'
 import { evaluate } from 'mathjs'
 
 // Zalgo characters.

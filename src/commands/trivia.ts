@@ -1,6 +1,6 @@
 import { Message, GuildTextableChannel, TextableChannel, User, EmbedOptions, Client } from 'eris'
-import { Command, DB } from '../imports/types'
-import { getInsult } from '../imports/tools'
+import { Command, DB } from '../imports/types.js'
+import { getInsult } from '../imports/tools.js'
 import fs from 'fs'
 
 async function parseTriviaList (fileName: string): Promise<Map<string, string[]>> {

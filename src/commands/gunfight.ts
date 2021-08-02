@@ -1,7 +1,7 @@
 // All the types!
-import { Command } from '../imports/types'
+import { Command } from '../imports/types.js'
 // All the tools!
-import { getUser } from '../imports/tools'
+import { getUser } from '../imports/tools.js'
 
 export const handleGunfight: Command = {
   name: 'gunfight',

@@ -1,6 +1,6 @@
-import { Command } from '../../imports/types'
-import { checkRolePosition } from '../../imports/permissions'
-import { getInsult, getUser } from '../../imports/tools'
+import { Command } from '../../imports/types.js'
+import { checkRolePosition } from '../../imports/permissions.js'
+import { getInsult, getUser } from '../../imports/tools.js'
 import { Constants } from 'eris'
 import ms from 'ms'
 

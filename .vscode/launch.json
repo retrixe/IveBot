@@ -5,39 +5,46 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "chrome",
+      "name": "Attach to Chrome",
+      "port": 9222,
+      "request": "attach",
+      "type": "pwa-chrome",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
+      "type": "pwa-chrome",
       "request": "launch",
-      "name": "Next: Chrome",
+      "name": "Launch Chrome",
       "url": "http://localhost:3000",
       "webRoot": "${workspaceRoot}"
     },
     {
       "type": "node",
-      "request": "launch",
-      "name": "Next: Node",
-      "runtimeArgs": [
-        "--inspect", "-r", "ts-node/register", "${workspaceFolder}/server/index.ts"
+      "request": "attach",
+      "name": "Attach to IveBot/Next.js",
+      "skipFiles": [
+        "<node_internals>/**"
       ],
       "port": 9229
     },
     {
       "type": "node",
       "request": "launch",
-      "name": "Next: Node (Integrated Terminal)",
+      "name": "Launch IveBot",
       "runtimeArgs": [
-        "--inspect", "-r", "ts-node/register", "${workspaceFolder}/server/index.ts"
+        "--inspect", "--loader", "ts-node/esm", "${workspaceFolder}/src/index.ts"
+      ],
+      "port": 9229
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch IveBot (Integrated Terminal)",
+      "runtimeArgs": [
+        "--inspect", "--loader", "ts-node/esm", "${workspaceFolder}/src/index.ts"
       ],
       "port": 9229,
       "console": "integratedTerminal"
-    }
-  ],
-  "compounds": [
-    {
-      "name": "Next: Full",
-      "configurations": [
-        "Next: Node",
-        "Next: Chrome"
-      ]
     }
   ]
 }

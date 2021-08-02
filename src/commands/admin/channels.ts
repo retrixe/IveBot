@@ -1,5 +1,5 @@
-import { Command } from '../../imports/types'
-import { getChannel, getInsult } from '../../imports/tools'
+import { Command } from '../../imports/types.js'
+import { getChannel, getInsult } from '../../imports/tools.js'
 
 export const handleDeletechannel: Command = {
   name: 'deleteChannel',

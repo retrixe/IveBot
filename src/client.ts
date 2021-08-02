@@ -1,8 +1,8 @@
 import { Message, MessageContent, Client, GuildTextableChannel } from 'eris'
-import { DB, Command as IveBotCommand, IveBotCommandGenerator, Context, CommandResponse } from './imports/types'
+import { DB, Command as IveBotCommand, IveBotCommandGenerator, Context, CommandResponse } from './imports/types.js'
 import { Db } from 'mongodb'
-import { getInsult } from './imports/tools'
-import botCallback from './events'
+import { getInsult } from './imports/tools.js'
+import botCallback from './events.js'
 
 function isEquivalent (a: { [index: string]: boolean }, b: { [index: string]: boolean }): boolean {
   // Create arrays of property names

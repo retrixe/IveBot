@@ -1,6 +1,6 @@
-import { Command } from '../../imports/types'
-import { checkRolePosition } from '../../imports/permissions'
-import { getInsult, getUser, getServerSettings } from '../../imports/tools'
+import { Command } from '../../imports/types.js'
+import { checkRolePosition } from '../../imports/permissions.js'
+import { getInsult, getUser, getServerSettings } from '../../imports/tools.js'
 
 export const handleGiverole: Command = {
   name: 'giverole',

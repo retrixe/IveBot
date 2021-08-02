@@ -1,11 +1,10 @@
 // All the types!
 import Eris, { Message, GuildTextableChannel, Constants } from 'eris'
-import { Command } from '../imports/types'
+import { Command } from '../imports/types.js'
 // All the needs!
-import { getIdFromMention, getInsult, getUser } from '../imports/tools'
+import { getIdFromMention, getInsult, getUser } from '../imports/tools.js'
 import ms from 'ms'
-import 'json5/lib/require'
-import { host, testPilots } from '../../config.json5'
+import { host, testPilots } from '../config.js'
 import moment from 'moment'
 
 export const handleServerinfo: Command = {

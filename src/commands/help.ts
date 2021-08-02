@@ -1,7 +1,7 @@
-import { Command as IveBotCommand } from '../imports/types'
-import { zeroWidthSpace, getInsult } from '../imports/tools'
-import { rootURL } from '../../config.json5'
-import { Command } from '../client'
+import { Command as IveBotCommand } from '../imports/types.js'
+import { zeroWidthSpace, getInsult } from '../imports/tools.js'
+import { rootURL } from '../config.js'
+import { Command } from '../client.js'
 
 const generalHelp = {
   description: `**Jony Ive can do many commands 📡**

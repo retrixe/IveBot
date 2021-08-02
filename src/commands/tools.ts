@@ -1,13 +1,13 @@
-import { Command } from '../imports/types'
-import { version } from '../../package.json'
+import { Command } from '../imports/types.js'
 import { execSync } from 'child_process'
 import moment from 'moment'
-import 'json5/lib/require'
-import { host, testPilots } from '../../config.json5'
+import { host, testPilots } from '../config.js'
 import { runInNewContext } from 'vm'
 import { inspect } from 'util'
-import { getIdFromMention, getInsult } from '../imports/tools'
+import { getIdFromMention, getInsult } from '../imports/tools.js'
 import { Base } from 'eris'
+import { readFile } from 'fs/promises'
+const { version }: { version: string } = JSON.parse(await readFile('package.json', { encoding: 'utf8' }))
 
 export const handleVersion: Command = {
   name: 'version',

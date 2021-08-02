@@ -1,8 +1,8 @@
 // Flow our types.
 import { AdvancedMessageContent, Client, Message } from 'eris'
-import CommandParser from '../client'
+import CommandParser from '../client.js'
 import { Db } from 'mongodb'
-import { TriviaSession } from '../commands/trivia'
+import { TriviaSession } from '../commands/trivia.js'
 
 export interface DB {
   gunfight: {

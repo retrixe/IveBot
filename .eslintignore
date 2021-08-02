@@ -1,4 +1,5 @@
 lib/
 .eslintrc.js
+.eslintrc.cjs
 node_modules/
 next.config.js

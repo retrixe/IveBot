@@ -1,17 +1,5 @@
-declare module '*config.json5' {
-  export const weatherAPIkey: string
-  export const fixerAPIkey: string
-  export const cvAPIkey: string
-  export const host: string
-  export const NASAtoken: string
-  export const oxfordAPI: { appKey: string, appId: string }
-  export const testPilots: string[]
-  export const mongoURL: string
-  export const rootURL: string
-  export const token: string
-  export default {
-    weatherAPIkey, fixerAPIkey, cvAPIkey, host, NASAtoken, oxfordAPI, testPilots, mongoURL, rootURL, token
-  }
+declare module 'json5' {
+  export const parse: (text: string, reviver?: (this: any, key: string, value: any) => any) => any
 }
 
 declare module 'ms' {

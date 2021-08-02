@@ -1,7 +1,7 @@
 import { User } from 'eris'
-import { Command } from '../../imports/types'
-import { checkRolePosition } from '../../imports/permissions'
-import { getInsult, getUser } from '../../imports/tools'
+import { Command } from '../../imports/types.js'
+import { checkRolePosition } from '../../imports/permissions.js'
+import { getInsult, getUser } from '../../imports/tools.js'
 
 const parseSilentDelete = (args: string[]): { args: string[], silent: boolean, delete: boolean } => {
   const data = { args, silent: false, delete: false }

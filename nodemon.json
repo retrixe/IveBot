@@ -1,6 +1,6 @@
 {
   "ignore": ["lib", "dashboard", "node_modules", ".git"],
   "execMap": {
-    "ts": "ts-node --files"
+    "ts": "node --loader ts-node/esm"
   }
 }

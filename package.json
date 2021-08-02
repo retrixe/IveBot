@@ -3,6 +3,7 @@
   "version": "4.0.0-alpha.0",
   "description": "The bot that created the iPhone X.",
   "main": "src/index.ts",
+  "type": "module",
   "private": true,
   "repository": "https://github.com/retrixe/IveBot.git",
   "scripts": {
@@ -16,7 +17,7 @@
   "author": "Ibrahim Ansari <ansari.ibrahim1@gmail.com>",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=10.4.0"
+    "node": ">=12.20.0"
   },
   "dependencies": {
     "eris": "^0.15.1",

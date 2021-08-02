@@ -10,7 +10,7 @@
     "directory": "dashboard"
   },
   "scripts": {
-    "dev": "next",
+    "dev": "NODE_OPTIONS='--inspect' next",
     "lint": "tsc",
     "build": "next build",
     "start": "next start"

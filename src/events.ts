@@ -1,13 +1,13 @@
 // We need types.
-import { DB } from './imports/types'
+import { DB } from './imports/types.js'
 import { Member, Message, Client, User, Guild, GuildTextableChannel } from 'eris'
 import { Db } from 'mongodb'
 import fetch from 'node-fetch'
 
 // Database reading function.
-import { getServerSettings } from './imports/tools'
+import { getServerSettings } from './imports/tools.js'
 // Tokens and stuffs.
-import { cvAPIkey } from '../config.json5'
+import { cvAPIkey } from './config.js'
 
 // When a server gains a member, this function will be called.
 export const guildMemberAdd = (client: Client, db: Db, tempDB: DB) => async (

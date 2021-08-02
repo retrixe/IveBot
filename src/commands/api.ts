@@ -1,15 +1,12 @@
 // All the types!
-import { Command } from '../imports/types'
+import { Command } from '../imports/types.js'
 // All the tools!
 import fetch from 'node-fetch'
 import moment from 'moment'
 import Fuse from 'fuse.js'
-import { zeroWidthSpace, getInsult, fetchLimited, getIdFromMention } from '../imports/tools'
+import { zeroWidthSpace, getInsult, fetchLimited, getIdFromMention } from '../imports/tools.js'
 // Get the NASA API token.
-import 'json5/lib/require'
-import {
-  NASAtoken, fixerAPIkey, weatherAPIkey, oxfordAPI, cvAPIkey
-} from '../../config.json5'
+import { NASAtoken, fixerAPIkey, weatherAPIkey, oxfordAPI, cvAPIkey } from '../config.js'
 
 export const handleOcr: Command = {
   name: 'ocr',
