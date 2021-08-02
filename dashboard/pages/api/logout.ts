@@ -20,7 +20,7 @@ const getToken = async (req: NextApiRequest): Promise<string | undefined> => {
   } catch (e) {}
 }
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' })
 
   const token = await getToken(req)
@@ -35,5 +35,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   res.setHeader('Set-Cookie', `Discord-OAuth="removed"; expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax${secure}`)
-  res.status(204).send(undefined)
+  return res.status(204).send(undefined)
 }

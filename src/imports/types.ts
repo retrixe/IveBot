@@ -25,8 +25,8 @@ export interface DB {
     // Servers with userIDs contained.
     [index: string]: string[]
   }
-  cooldowns: { request: string[] }
-  leave: string[]
+  cooldowns: { request: Set<string> }
+  leave: Set<string>
 }
 
 export interface Context { tempDB: DB, db: Db, commandParser: CommandParser, client: Client }

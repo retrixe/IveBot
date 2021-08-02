@@ -4,7 +4,7 @@ import { Db } from 'mongodb'
 import { getInsult } from './imports/tools'
 import botCallback from './events'
 
-function isEquivalent (a: { [index: string]: boolean }, b: { [index: string]: boolean }) {
+function isEquivalent (a: { [index: string]: boolean }, b: { [index: string]: boolean }): boolean {
   // Create arrays of property names
   const aProps = Object.getOwnPropertyNames(a)
   const bProps = Object.getOwnPropertyNames(b)
@@ -76,7 +76,7 @@ export class Command {
     // No reaction implementation.
   }
 
-  requirementsCheck (message: Message) {
+  requirementsCheck (message: Message): boolean {
     if (!this.requirements) return true
     // No role name or ID impl.
     const userIDs = this.requirements.userIDs // If it doesn't exist it's a pass.
@@ -94,7 +94,7 @@ export class Command {
     return userIDs || custom || permissions
   }
 
-  async execute (context: Context, message: Message, args: string[]) {
+  async execute (context: Context, message: Message, args: string[]): Promise<CommandResponse | void> {
     // Define 2 vars.
     let messageToSend: CommandResponse | void | Promise<CommandResponse> | Promise<void>
     // If it's a function, we call it first.
@@ -123,14 +123,14 @@ export default class CommandParser {
     this.evaluatedMessages = []
     this.onMessage = this.onMessage.bind(this)
     this.onMessageUpdate = this.onMessageUpdate.bind(this)
-    setInterval(async () => await this.sendAnalytics(), 30000)
+    setInterval(() => { this.sendAnalytics().catch(console.error) }, 30000)
   }
 
-  registerCommand = (command: IveBotCommand) => {
+  registerCommand = (command: IveBotCommand): void => {
     this.commands[command.name] = new Command(command)
   }
 
-  async executeCommand (command: Command, message: Message) {
+  async executeCommand (command: Command, message: Message): Promise<boolean> {
     // We give our generators what they need.
     const context: Context = {
       tempDB: this.tempDB, db: this.db, commandParser: this, client: this.client
@@ -167,7 +167,7 @@ export default class CommandParser {
     return typeof messageToSend === 'object' ? messageToSend.error : false
   }
 
-  disableEveryone = (message: MessageContent) => {
+  disableEveryone = (message: MessageContent): MessageContent => {
     if (typeof message !== 'string' && !message.allowedMentions) {
       message.allowedMentions = { everyone: false, roles: true, users: true }
       return message
@@ -176,7 +176,7 @@ export default class CommandParser {
     } else return message
   }
 
-  saveAnalytics (timeTaken: [number, number], name: string) {
+  saveAnalytics (timeTaken: [number, number], name: string): void {
     // Get the local command info.
     let commandInfo = this.analytics.find(i => i.name === name)
     // If there is no info for the command then insert an object for it.
@@ -193,7 +193,7 @@ export default class CommandParser {
     this.analytics[this.analytics.indexOf(commandInfo)].averageExecTime = averageExecTime
   }
 
-  async sendAnalytics () {
+  async sendAnalytics (): Promise<void> {
     const analytics = this.db.collection('analytics')
     // Iterate over every command we have information stored locally.
     for (const command of this.analytics) {
@@ -220,7 +220,7 @@ export default class CommandParser {
     }
   }
 
-  async onMessage (message: Message) {
+  async onMessage (message: Message): Promise<void> {
     if (message.content && !message.content.startsWith('/')) {
       await botCallback(message, this.client, this.tempDB, this.db)
       return // Don't process it if it's not a command.
@@ -259,7 +259,7 @@ export default class CommandParser {
   }
 
   // For evaluating messages which weren't evaluated.
-  async onMessageUpdate (message: Message, oldMessage?: Message) {
+  async onMessageUpdate (message: Message, oldMessage?: Message): Promise<void> {
     // We won't bother with a lot of messages..
     if (message.content && !message.content.startsWith('/')) return
     else if (!message.editedTimestamp) return

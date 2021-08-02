@@ -16,7 +16,7 @@ export const handleAddemoji: Command = {
     // Get the URL.
     const url = args.length > 1 ? args.splice(1).join('%20') : message.attachments[0].url
     // This can check the first bits of the Buffer.
-    const check = (header: number[], buf: Buffer) => {
+    const check = (header: number[], buf: Buffer): boolean => {
       for (let i = 0; i < header.length; i++) { if (header[i] !== buf[i]) return false }
       return true
     }

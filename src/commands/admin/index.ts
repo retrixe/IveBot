@@ -9,7 +9,7 @@ export { handleDeletechannel, handleEditchannel } from './channels'
 export { handleMute, handleUnmute } from './mute'
 export { handleBan, handleUnban } from './ban'
 
-const parseSilentDelete = (args: string[]) => {
+const parseSilentDelete = (args: string[]): { args: string[], silent: boolean, delete: boolean } => {
   const data = { args, silent: false, delete: false }
   if ([0, 1].includes(data.args.indexOf('--silent')) || [0, 1].includes(data.args.indexOf('-s'))) {
     data.silent = true

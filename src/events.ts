@@ -95,7 +95,7 @@ export const guildDelete = (db: Db) => async (guild: Guild) => {
 }
 
 // When client recieves a message, it will callback.
-export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
+export default async (message: Message, client: Client, tempDB: DB, db: Db): Promise<void> => {
   try {
     if ( // If there are no permissions do not do anything.
       !(message.channel as GuildTextableChannel)
@@ -103,7 +103,7 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db) => {
     ) return
   } catch (e) {}
   // Content of message and sendResponse.
-  const sendResponse = async (content: string) => await message.channel.createMessage(content)
+  const sendResponse = async (content: string): Promise<Message> => await message.channel.createMessage(content)
   const command = message.content.toLowerCase()
   // Handle answers to trivia
   const session = tempDB.trivia[message.channel.id]

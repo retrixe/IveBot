@@ -14,7 +14,7 @@ const OAUTH_QS = new URLSearchParams({
 }).toString()
 const OAUTH_URI = `https://discord.com/api/oauth2/authorize?${OAUTH_QS}`
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default async (req: NextApiRequest, res: NextApiResponse): Promise<NextApiResponse> => {
   if (req.method !== 'GET') return res.redirect('/dashboard')
   const { code, error } = req.query
 
@@ -47,5 +47,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   const token = sign({ accessToken, refreshToken, scope }, jwtSecret, { expiresIn })
   res.setHeader('Set-Cookie', `Discord-OAuth="${token}"; HttpOnly; Max-Age=2678400; SameSite=Lax${secure}`)
-  res.redirect('/dashboard')
+  return res.redirect('/dashboard')
 }

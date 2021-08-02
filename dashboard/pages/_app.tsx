@@ -6,7 +6,7 @@ import { useApollo } from '../imports/apolloClient'
 import { ApolloProvider } from '@apollo/client'
 import theme from '../imports/theme'
 
-export default function MyApp (props: { Component: React.ElementType, pageProps: {} }) {
+export default function MyApp (props: { Component: React.ElementType, pageProps: {} }): JSX.Element {
   const { Component, pageProps } = props
 
   React.useEffect(() => {

@@ -1,16 +1,16 @@
 import https from 'https'
 import { URL } from 'url'
 import { get } from 'http'
-import { Db } from 'mongodb'
-import { Message } from 'eris'
 import fetch from 'node-fetch'
+import { Db, Document } from 'mongodb'
+import { GuildChannel, Message, User } from 'eris'
 
-export const getIdFromMention = (mention: string) => {
+export const getIdFromMention = (mention: string): string => {
   const f = mention.substring(2, mention.length - 1).replace('!', '').replace('&', '').split(':')
   return f[f.length - 1]
 }
 
-export const getServerSettings = async (db: Db, serverID: string) => {
+export const getServerSettings = async (db: Db, serverID: string): Promise<Document> => {
   // Get serverSettings through query.
   let serverSettings = await db.collection('servers').find({ serverID }).toArray()
   if (serverSettings.length === 0) {
@@ -23,7 +23,7 @@ export const getServerSettings = async (db: Db, serverID: string) => {
 
 export const zeroWidthSpace = '​'
 
-export const getUser = (message: Message, arg: string) => {
+export const getUser = (message: Message, arg: string): User => {
   if (!arg || typeof arg !== 'string') return
   const mentions = message.mentions
   const guild = message.member.guild
@@ -45,7 +45,7 @@ export const getUser = (message: Message, arg: string) => {
   if (nickname) return nickname.user
 }
 
-export const getChannel = (message: Message, arg: string) => {
+export const getChannel = (message: Message, arg: string): GuildChannel => {
   if (!arg || typeof arg !== 'string') return
   const mentions = message.channelMentions
   const guild = message.member.guild
@@ -60,7 +60,7 @@ export const getChannel = (message: Message, arg: string) => {
 }
 
 // Fresh insults. They come and go, I suppose.
-export const getInsult = (plural = false) => {
+export const getInsult = (plural = false): string => {
   const insults = [
     'pathetic lifeform', 'ungrateful bastard', 'idiotic slimeball', 'worthless ass', 'dumb dolt',
     'one pronged fork', 'withered oak', 'two pump chump', 'oompa loompa'

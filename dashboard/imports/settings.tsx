@@ -25,17 +25,17 @@ const EDIT_SERVER_SETTINGS = gql`
   }
 `
 
-const Settings = (props: { data: ServerSettings, server: ServerInfo }) => {
+const Settings = (props: { data: ServerSettings, server: ServerInfo }): JSX.Element => {
   const [editServerSettings, { loading, error }] = useMutation(EDIT_SERVER_SETTINGS)
   const [serverSettings, setServerSettings] = useState<ServerSettings>({ ...props.data })
   // useEffect(() => setServerSettings({ ...props.data }), [props.data])?
 
-  const setJoinLeaveMessages = (e: Partial<JoinLeaveMessages>) => setServerSettings(s => ({
+  const setJoinLeaveMessages = (e: Partial<JoinLeaveMessages>): void => setServerSettings(s => ({
     ...s, joinLeaveMessages: { ...(s.joinLeaveMessages || {}), ...e }
   }))
-  const setAddRoleForAll = (e: string) => setServerSettings(s => ({ ...s, addRoleForAll: e }))
-  const setJoinAutorole = (e: string) => setServerSettings(s => ({ ...s, joinAutorole: e }))
-  const toggleOcrOnSend = () => setServerSettings(s => ({ ...s, ocrOnSend: !s.ocrOnSend }))
+  const setAddRoleForAll = (e: string): void => setServerSettings(s => ({ ...s, addRoleForAll: e }))
+  const setJoinAutorole = (e: string): void => setServerSettings(s => ({ ...s, joinAutorole: e }))
+  const toggleOcrOnSend = (): void => setServerSettings(s => ({ ...s, ocrOnSend: !s.ocrOnSend }))
 
   return (
     <>

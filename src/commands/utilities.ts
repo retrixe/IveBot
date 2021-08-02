@@ -245,17 +245,15 @@ export const handleRequest: Command = {
   generator: async ({ author }, args, { client, tempDB }) => {
     // Check for cooldown.
     if (!testPilots.includes(author.id) &&
-      host !== author.id && tempDB.cooldowns.request.includes(author.id)
+      host !== author.id && tempDB.cooldowns.request.has(author.id)
     ) return 'This command is cooling down right now. Try again later.'
     await client.createMessage((await client.getDMChannel(host)).id,
       `${author.username}#${author.discriminator} with ID ${author.id}: ${args.join(' ')}`
     )
     // Add cooldown.
     if (!testPilots.includes(author.id) && host !== author.id) {
-      tempDB.cooldowns.request.push(author.id)
-      setTimeout(() => (tempDB.cooldowns.request.splice(
-        tempDB.cooldowns.request.findIndex(i => i === author.id), 1
-      )), ms('1 day'))
+      tempDB.cooldowns.request.add(author.id)
+      setTimeout(() => tempDB.cooldowns.request.delete(author.id), ms('1 day'))
     }
     // Confirm the request.
     return `${author.mention}, what a pathetic idea. It has been DMed to the main developer \
@@ -414,14 +412,14 @@ export const handleRemindme: Command = {
         if (!res.acknowledged) return 'Failed to add a reminder to the database!'
       } catch (e) { return 'Failed to add a reminder to the database!' + (channel ? '' : ' Can I DM you?') }
     } else {
-      setTimeout(async () => {
-        await (channel
-          ? message.channel.createMessage(
-            `⏰ ${message.author.mention} ${args.slice(2).join(' ')}\nReminder set ${args[0]} ago.`
-          )
-          : (await message.author.getDMChannel()).createMessage(
-            `⏰ ${args.slice(1).join(' ')}\nReminder set ${args[0]} ago.`
-            ))
+      setTimeout(() => {
+        (async () => {
+          const textChannel = channel ? message.channel : await message.author.getDMChannel()
+          const firstLine = channel
+            ? `${message.author.mention} ${args.slice(2).join(' ')}`
+            : args.slice(1).join(' ')
+          await textChannel.createMessage(`⏰ ${firstLine}\nReminder set ${args[0]} ago.`)
+        })().catch(() => {})
       }, ms(args[0]))
     }
     return `You will be reminded in ${args[0]} through a ${channel ? 'mention' : 'DM'}.`
@@ -511,19 +509,18 @@ export const handleLeave: Command = {
   },
   name: 'leave',
   generator: async (message, args, { tempDB, client }) => {
-    if (!tempDB.leave.includes(message.author.id)) {
-      tempDB.leave.push(message.author.id)
-      setTimeout(async () => {
-        if (tempDB.leave.findIndex(i => i === message.author.id) === -1) return
-        await client.createMessage(
-          message.channel.id, message.author.mention + ' your leave request has timed out.'
-        )
-        tempDB.leave.splice(tempDB.leave.findIndex(i => i === message.author.id), 1)
+    if (!tempDB.leave.has(message.author.id)) {
+      tempDB.leave.add(message.author.id)
+      setTimeout(() => {
+        if (!tempDB.leave.has(message.author.id)) return
+        message.channel.createMessage(message.author.mention + ' your leave request has timed out.')
+          .then(() => tempDB.leave.delete(message.author.id))
+          .catch(() => tempDB.leave.delete(message.author.id))
       }, 30000)
       return 'Are you sure you want to leave the server? ' +
         'You will require an invite link to join back. Type /leave to confirm.'
-    } else if (tempDB.leave.includes(message.author.id)) {
-      tempDB.leave.splice(tempDB.leave.findIndex(i => i === message.author.id), 1)
+    } else {
+      tempDB.leave.delete(message.author.id)
       try {
         await client.kickGuildMember(message.member.guild.id, message.author.id, 'Used /leave.')
       } catch (e) {

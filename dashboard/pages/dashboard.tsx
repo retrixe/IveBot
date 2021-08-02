@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Dashboard from '../imports/dashboard'
 import { DiscordUser, ServerInfo } from '../imports/graphqlTypes'
 import { readFile } from 'fs/promises'
+import { GetStaticProps } from 'next'
 
 const GET_USER_DATA = gql`
   query GetUserData {
@@ -26,17 +27,17 @@ const GET_USER_DATA = gql`
   }
 `
 
-const DashboardPage = (props: { rootUrl: string }) => {
+const DashboardPage = (props: { rootUrl: string }): JSX.Element => {
   const { loading, error, data } = useQuery<{
     servers: ServerInfo[]
     user: Omit<DiscordUser, 'id'>
   }>(GET_USER_DATA)
 
   const loggedOut = error?.graphQLErrors[0]?.extensions?.code === 'UNAUTHENTICATED'
-  const loginWithOauth = () => {
+  const loginWithOauth = (): void => {
     if (loggedOut) window.location.pathname = '/api/oauth'
   }
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     const res = await fetch('/api/logout', { method: 'POST' })
     if (res.ok) window.location.reload()
   }
@@ -90,7 +91,7 @@ const DashboardPage = (props: { rootUrl: string }) => {
   )
 }
 
-export async function getStaticProps () {
+export const getStaticProps: GetStaticProps = async () => {
   const { rootUrl } = JSON.parse(await readFile('config.json', { encoding: 'utf8' }))
   return { props: { rootUrl: rootUrl ?? '' } }
 }

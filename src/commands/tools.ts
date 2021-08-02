@@ -140,8 +140,7 @@ export const handleEval: Command = {
     } catch (e) {
       const channel = await client.getDMChannel(host)
       message.addReaction('❌').catch(() => {}) // Ignore error.
-      await channel.createMessage(`**Error:**
-${e}`)
+      await channel.createMessage(`**Error:**\n${e}`)
     }
   }
 }

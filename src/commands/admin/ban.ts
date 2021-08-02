@@ -3,7 +3,7 @@ import { Command } from '../../imports/types'
 import { checkRolePosition } from '../../imports/permissions'
 import { getInsult, getUser } from '../../imports/tools'
 
-const parseSilentDelete = (args: string[]) => {
+const parseSilentDelete = (args: string[]): { args: string[], silent: boolean, delete: boolean } => {
   const data = { args, silent: false, delete: false }
   if ([0, 1].includes(data.args.indexOf('--silent')) || [0, 1].includes(data.args.indexOf('-s'))) {
     data.silent = true

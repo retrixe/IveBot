@@ -1,5 +1,5 @@
 import { Client } from 'eris'
-import { MongoClient, Db } from 'mongodb'
+import { MongoClient, Db, Document } from 'mongodb'
 import { JwtPayload, verify, sign } from 'jsonwebtoken'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { AuthenticationError, ForbiddenError } from 'apollo-server-micro'
@@ -15,7 +15,7 @@ MongoClient.connect(mongoUrl === 'dotenv' ? process.env.MONGO_URL || '' : mongoU
 })
 
 // Helper functions.
-const getServerSettings = async (serverID: string) => {
+const getServerSettings = async (serverID: string): Promise<Document> => {
   // Get serverSettings through query.
   let serverSettings = await db.collection('servers').findOne({ serverID })
   if (!serverSettings) {

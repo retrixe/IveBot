@@ -68,7 +68,7 @@ TP \`/request\` - Request a specific feature.
   ]
 }
 
-const generateDocs = (command: Command) => {
+const generateDocs = (command: Command): string => {
   let requirements = ''
   if (command.requirements) {
     const permissions = command.requirements.permissions
@@ -119,7 +119,7 @@ export const handleHelp: IveBotCommand = {
   generator: async (message, args, { commandParser }) => {
     const commands = commandParser.commands
     const command = args.join(' ').split('/').join('').toLowerCase()
-    const check = (i: string) => (
+    const check = (i: string): boolean => (
       // First checks for name, 2nd for aliases.
       commands[i].name.toLowerCase() === command ||
       (commands[i].aliases && commands[i].aliases.includes(command))

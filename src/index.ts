@@ -36,16 +36,18 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (e
   if (err) throw err
   console.log('Bot connected successfully to MongoDB.')
   const db = mongoDB.db('ivebot')
+  const bubbleWrap = <F extends (...args: any[]) => any>(func: F) =>
+    (...args: Parameters<F>) => { func(...args).catch(console.error) }
   // When a server loses a member, it will callback.
-  client.on('guildMemberAdd', guildMemberAdd(client, db, tempDB))
-  client.on('guildMemberRemove', guildMemberRemove(client, db))
-  client.on('guildBanAdd', guildBanAdd(client, db))
+  client.on('guildMemberAdd', bubbleWrap(guildMemberAdd(client, db, tempDB)))
+  client.on('guildMemberRemove', bubbleWrap(guildMemberRemove(client, db)))
+  client.on('guildBanAdd', bubbleWrap(guildBanAdd(client, db)))
   // When the bot leaves a server, it will callback.
-  client.on('guildDelete', guildDelete(db))
+  client.on('guildDelete', bubbleWrap(guildDelete(db)))
   // Register the commandParser.
   const commandParser = new CommandParser(client, tempDB, db)
-  client.on('messageCreate', commandParser.onMessage)
-  client.on('messageUpdate', commandParser.onMessageUpdate)
+  client.on('messageCreate', bubbleWrap(commandParser.onMessage))
+  client.on('messageUpdate', bubbleWrap(commandParser.onMessageUpdate))
   // Register all commands in src/commands onto the CommandParser.
   const toRead = dev ? './src/commands/' : './lib/commands/'
   readdir(toRead, (err, commandFiles) => {
@@ -71,22 +73,23 @@ MongoClient.connect(mongoURL === 'dotenv' ? process.env.MONGO_URL : mongoURL, (e
     })
   })
   // Register setInterval to fulfill delayed tasks.
-  setInterval(async () => {
-    const tasks = await db.collection('tasks').find({ time: { $lte: Date.now() + 60000 } }).toArray()
-    if (tasks) {
-      tasks.forEach(task => setTimeout(() => {
+  setInterval(() => {
+    db.collection('tasks').find({ time: { $lte: Date.now() + 60000 } }).toArray().then(tasks => {
+      if (tasks && tasks.length) {
+        tasks.forEach(task => setTimeout(() => {
         // TODO: What if no perms?
-        if (task.type === 'unmute') {
-          client.removeGuildMemberRole(task.guild, task.user, task.target, 'Muted for fixed duration.')
-            .catch(e => e.res.statusCode !== 404 && console.error(e))
-        } else if (task.type === 'reminder') {
-          client.createMessage(task.target, task.message)
-            .catch(e => e.res.statusCode !== 404 && console.error(e))
-        }
-        db.collection('tasks').deleteOne({ _id: task._id })
-          .catch(error => console.error('Failed to remove task from database.', error))
-      }, task.time - Date.now()))
-    }
+          if (task.type === 'unmute') {
+            client.removeGuildMemberRole(task.guild, task.user, task.target, 'Muted for fixed duration.')
+              .catch(e => e.res.statusCode !== 404 && console.error(e))
+          } else if (task.type === 'reminder') {
+            client.createMessage(task.target, task.message)
+              .catch(e => e.res.statusCode !== 404 && console.error(e))
+          }
+          db.collection('tasks').deleteOne({ _id: task._id })
+            .catch(error => console.error('Failed to remove task from database.', error))
+        }, task.time - Date.now()))
+      }
+    }).catch(console.error)
   }, 60000)
 })
 
@@ -108,5 +111,5 @@ client.on('error', (err: Error, id: string) => {
 
 // Create a database to handle certain stuff.
 const tempDB: DB = {
-  gunfight: {}, say: {}, trivia: {}, leave: [], mute: {}, cooldowns: { request: [] }
+  gunfight: {}, say: {}, trivia: {}, leave: new Set(), mute: {}, cooldowns: { request: new Set() }
 }

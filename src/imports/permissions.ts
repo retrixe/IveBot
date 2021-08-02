@@ -4,7 +4,7 @@ import { Member } from 'eris'
 // Export function.
 export function checkRolePosition (
   member: Member, considerOwnership: boolean = true, considerMutedRole: boolean = true
-) {
+): number {
   // If owner, return.
   if (member.guild.ownerID === member.id && considerOwnership) return 9999
   // Get roles of user.

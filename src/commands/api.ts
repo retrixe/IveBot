@@ -136,7 +136,7 @@ export const handleHastebin: Command = {
       if (!req.ok) return 'Failed to upload text to paste.gg!'
       // Parse the response.
       const res = await req.json()
-      const { id, deletion_key: deletionKey } = res.result
+      const { id, deletion_key: deletionKey }: { id: string, deletion_key: string } = res.result
       return id
         ? `**paste.gg URL:**\nhttps://paste.gg/p/anonymous/${id}\nDeletion key: ${deletionKey}`
         : 'Failed to upload text to paste.gg!'
@@ -206,6 +206,14 @@ export const handleRobohash: Command = {
   }
 }
 
+interface ApodResponse {
+  url: string
+  hdurl: string
+  title: string
+  media_type: string
+  explanation: string
+}
+
 export const handleApod: Command = {
   name: 'astronomy-picture-of-the-day',
   aliases: ['apod'],
@@ -226,7 +234,7 @@ export const handleApod: Command = {
       const dateStr = date.format('YYYY-MM-DD')
       // Fetch a picture or video.
       try {
-        const { media_type: mediaType, url, title, explanation } = await (await fetch(
+        const { media_type: mediaType, url, title, explanation }: ApodResponse = await (await fetch(
           `https://api.nasa.gov/planetary/apod?api_key=${NASAtoken}&date=${dateStr}`
         )).json()
         return mediaType === 'video'
@@ -241,7 +249,7 @@ export const handleApod: Command = {
     }
     // Fetch a picture or video.
     try {
-      const { media_type: mediaType, url, hdurl, title, explanation } = await (await fetch(
+      const { media_type: mediaType, url, hdurl, title, explanation }: ApodResponse = await (await fetch(
         `https://api.nasa.gov/planetary/apod?api_key=${NASAtoken}`
       )).json()
       return mediaType === 'video'
@@ -368,7 +376,7 @@ export const handleNamemc: Command = {
       // Fetch the UUID and name of the user and parse it to JSON.
       const member = message.member && message.member.guild.members.get(getIdFromMention(args[0]))
       const username = member ? (member.nick || member.username) : args[0]
-      const { id, name } = await (await fetch(
+      const { id, name }: { id: string, name: string } = await (await fetch(
         `https://api.mojang.com/users/profiles/minecraft/${username}`
       )).json()
       // Fetch the previous names as well.
@@ -450,16 +458,22 @@ letter code + the first letter of the currency name.'
 
 // Our weather and define types.
 interface Weather {
-  cod: string, coord: { lon: number, lat: number }, weather: Array<{
+  cod: string
+  coord: { lon: number, lat: number }
+  weather: Array<{
     main: string
     description: string
     icon: string
-  }>, main: { temp: number, temp_min: number, temp_max: number, humidity: number, pressure: number },
-  visibility: number, wind: { speed: number, deg: number },
-  clouds: { all: number }, rain: { '3h': number }, snow: { '3h': number }
+  }>
+  main: { temp: number, temp_min: number, temp_max: number, humidity: number, pressure: number }
+  visibility: number
+  wind: { speed: number, deg: number }
+  clouds: { all: number }
+  rain: { '3h': number }
+  snow: { '3h': number }
 }
 type Categories = Array<{
-  lexicalCategory: { id: string, text: string },
+  lexicalCategory: { id: string, text: string }
   entries: Array<{
     senses: Array<{
       definitions: string[]
@@ -575,7 +589,7 @@ export const handleDefine: Command = {
         // Now we create an embed based on the 1st entry.
         const fields: Array<{ name: string, value: string, inline?: boolean }> = []
         // Function to check for maximum number of fields in an embed, then push.
-        const safePush = (object: { name: string, value: string }) => {
+        const safePush = (object: { name: string, value: string }): void => {
           if (fields.length < 24) fields.push(object)
           else if (fields.length === 24) fields.push({ name: '...too many definitions.', value: zeroWidthSpace })
         }

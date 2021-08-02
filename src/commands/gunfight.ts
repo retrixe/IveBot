@@ -42,17 +42,15 @@ export const handleGunfight: Command = {
       wordSaid: false
     }
     // The following will delete the gunfight if unaccepted within 30 seconds.
-    setTimeout(async () => {
+    setTimeout(() => {
       // Find the gunfight we pushed.
       const gunfightPushed = tempDB.gunfight[message.author.id + '-' + user.id]
       // Remove the object and send a response.
       if (gunfightPushed && !gunfightPushed.accepted && gunfightPushed.timestamp === timestamp) {
         const mention = message.author.mention
-        await client.createMessage(
-          message.channel.id,
-          `${mention}, your challenge to ${user.mention} has been cancelled.`
-        )
-        delete tempDB.gunfight[message.author.id + '-' + user.id]
+        message.channel.createMessage(`${mention}, your challenge to ${user.mention} has been cancelled.`)
+          .then(() => { delete tempDB.gunfight[message.author.id + '-' + user.id] })
+          .catch(() => { delete tempDB.gunfight[message.author.id + '-' + user.id] })
       }
     }, 30000)
     return `${user.mention}, say /accept to accept the challenge.`
@@ -89,19 +87,20 @@ export const handleAccept: Command = {
     tempDB.gunfight[gunfightToAccept].randomWord = words[Math.floor(Math.random() * words.length)]
     const timestamp = tempDB.gunfight[gunfightToAccept].timestamp
     // Let's wait for random amount under 20s and call a random word.
-    setTimeout(async () => {
-      try {
-        await message.channel.createMessage('Say ' + tempDB.gunfight[gunfightToAccept].randomWord + '!')
-      } catch (e) {}
-      tempDB.gunfight[gunfightToAccept].wordSaid = true
-      setTimeout(async () => {
-        if (tempDB.gunfight[gunfightToAccept] &&
-          tempDB.gunfight[gunfightToAccept].timestamp === timestamp &&
-          tempDB.gunfight[gunfightToAccept].channelID === message.channel.id) {
-          await message.channel.createMessage('Neither of you said the word so you both lose..')
-          delete tempDB.gunfight[gunfightToAccept]
-        }
-      }, 30000)
+    setTimeout(() => {
+      message.channel.createMessage('Say ' + tempDB.gunfight[gunfightToAccept].randomWord + '!')
+        .then(() => {
+          tempDB.gunfight[gunfightToAccept].wordSaid = true
+          setTimeout(() => {
+            if (tempDB.gunfight[gunfightToAccept] &&
+              tempDB.gunfight[gunfightToAccept].timestamp === timestamp &&
+              tempDB.gunfight[gunfightToAccept].channelID === message.channel.id) {
+              message.channel.createMessage('Neither of you said the word so you both lose..')
+                .then(() => { delete tempDB.gunfight[gunfightToAccept] })
+                .catch(() => { delete tempDB.gunfight[gunfightToAccept] })
+            }
+          }, 30000)
+        }).catch(() => { delete tempDB.gunfight[gunfightToAccept] })
     }, Math.floor(Math.random() * 20000 + 1000))
     return 'Within 20 seconds, you will be asked to say a random word.'
   }

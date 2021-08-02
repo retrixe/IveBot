@@ -6,7 +6,7 @@ import theme from '../imports/theme'
 const ico = 'https://cdn.discordapp.com/avatars/383591525944262656/7b826edf3e6dcb47dbbb1131aaf72710.jpg'
 
 class MyDocument extends Document {
-  render () {
+  render (): JSX.Element {
     return (
       <Html lang='en' dir='ltr'>
         <Head>

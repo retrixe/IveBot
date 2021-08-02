@@ -3,7 +3,7 @@ import { Command, DB } from '../imports/types'
 import { getInsult } from '../imports/tools'
 import fs from 'fs'
 
-async function parseTriviaList (fileName: string) {
+async function parseTriviaList (fileName: string): Promise<Map<string, string[]>> {
   const data = await fs.promises.readFile(`./triviaLists/${fileName}.txt`, 'utf8')
   const triviaList = new Map<string, string[]>()
   data.split('\n').forEach(el => {
@@ -38,11 +38,11 @@ export class TriviaSession {
     this.client = client
   }
 
-  getScores (addMedals = false) {
+  getScores (addMedals = false): { embed: EmbedOptions } {
     const currentScores = Object.entries(this.scores).sort(([, a], [, b]) => b - a)
     const medals: { [id: string]: string } = {}
     if (addMedals) {
-      const maxReduce = (a: number, b: number) => Math.max(a || 0, b || 0)
+      const maxReduce = (a: number, b: number): number => Math.max(a || 0, b || 0)
       const values = Object.values(this.scores)
       const first = values.reduce(maxReduce)
       const second = values.filter(num => num !== first).reduce(maxReduce, 0)
@@ -74,13 +74,13 @@ export class TriviaSession {
     return { embed }
   }
 
-  async endGame () {
+  async endGame (): Promise<void> {
     this.stopped = true
     delete this.tempDB.trivia[this.channel.id]
     if (Object.keys(this.scores).length > 0) await this.channel.createMessage(this.getScores(true))
   }
 
-  async newQuestion () {
+  async newQuestion (): Promise<boolean> {
     for (const i of Object.values(this.scores)) {
       if (i === this.settings.maxScore) {
         await this.endGame()
@@ -137,7 +137,7 @@ export class TriviaSession {
     }
   }
 
-  async checkAnswer (message: Message) {
+  async checkAnswer (message: Message): Promise<boolean> {
     if (message.author.bot || this.currentQuestion === null) {
       return false
     }

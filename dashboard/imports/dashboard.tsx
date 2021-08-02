@@ -27,7 +27,7 @@ const GET_SERVER_SETTINGS = gql`
 
 const Dashboard = (props: {
   data: { servers: ServerInfo[], user: Omit<DiscordUser, 'id'> }
-}) => {
+}): JSX.Element => {
   const [selectedServer, setSelectedServer] = useState<ServerInfo | null>(null)
   const [getServerSettings, { loading, data, error }] = useLazyQuery(GET_SERVER_SETTINGS)
 

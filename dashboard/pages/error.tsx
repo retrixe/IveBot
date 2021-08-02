@@ -4,8 +4,9 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Link from 'next/link'
 import { readFile } from 'fs/promises'
+import { GetStaticProps } from 'next'
 
-const ErrorPage = (props: { rootUrl: string }) => {
+const ErrorPage = (props: { rootUrl: string }): JSX.Element => {
   const router = useRouter()
   return (
     <>
@@ -40,7 +41,7 @@ const ErrorPage = (props: { rootUrl: string }) => {
   )
 }
 
-export async function getStaticProps () {
+export const getStaticProps: GetStaticProps = async () => {
   const { rootUrl } = JSON.parse(await readFile('config.json', { encoding: 'utf8' }))
   return { props: { rootUrl: rootUrl ?? '' } }
 }
