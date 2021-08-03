@@ -1,6 +1,7 @@
 import 'json5/lib/require.js'
 // Tokens and stuff.
-import { Client } from 'eris'
+import { AdvancedMessageContent, Client, MessageWebhookContent } from 'eris'
+import { SlashCommand, SlashCreator, GatewayServer } from 'slash-create'
 // Get MongoDB.
 import { MongoClient } from 'mongodb'
 // Import fs.
@@ -37,6 +38,32 @@ const client = new Client(`Bot ${token === 'dotenv' ? process.env.IVEBOT_TOKEN :
   autoreconnect: true,
   restMode: true
 })
+
+// Create slash-create creator.
+const creator = new SlashCreator({
+  applicationID: Buffer.from(token.split('.')[0], 'base64').toString(), token
+})
+creator.withServer(new GatewayServer(
+  (handler) => client.on('rawWS', (event) => {
+    if (event.t === 'INTERACTION_CREATE') handler(event.d as any)
+  }))
+)
+
+const commandToSlashCommand = (command: Command): SlashCommand => {
+  class IveBotSlashCommand extends SlashCommand {
+    constructor (creator: SlashCreator) {
+      super(creator, { name: command.name, description: command.opts.description, options: [] })
+    }
+
+    async run (): Promise<string | MessageWebhookContent | void> {
+      let response: string | AdvancedMessageContent | void
+      if (typeof command.generator !== 'function') return command.generator
+      else response = await Promise.resolve(command.generator(undefined, [], { client, db, tempDB, commandParser }))
+      return typeof response === 'object' ? { ...response, embeds: [response.embed] } : response
+    }
+  }
+  return new IveBotSlashCommand(creator)
+}
 
 // Create a cache to handle certain stuff.
 const tempDB: DB = {
@@ -80,9 +107,13 @@ for (const commandFile of commandFiles) {
       if (commandName === 'TriviaSession') return
       const command = commands[commandName]
       commandParser.registerCommand(command)
+      if (typeof command.generator !== 'function') creator.registerCommand(commandToSlashCommand(command))
+      else if (command.name === 'uptime') creator.registerCommand(commandToSlashCommand(command))
+      else if (command.name === 'cat') creator.registerCommand(commandToSlashCommand(command))
     })
   }
 }
+creator.syncCommands({ deleteCommands: true })
 
 // Register setInterval to fulfill delayed tasks.
 setInterval(() => {
