@@ -9,18 +9,24 @@ import { ServerInfo, DiscordUser } from './graphqlTypes'
 import Settings from './settings'
 
 const useStyles = makeStyles(theme => ({
-  root: { [theme.breakpoints.down('md')]: { flexDirection: 'column' } },
+  root: { [theme.breakpoints.down('sm')]: { flexDirection: 'column' } },
   banner: {
-    [theme.breakpoints.down('md')]: { width: '100%' },
-    [theme.breakpoints.up('lg')]: { width: '20%' }
+    display: 'flex',
+    alignItems: 'center',
+    flexDirection: 'column',
+    // [theme.breakpoints.down('xs')]: { alignItems: 'center' },
+    [theme.breakpoints.down('sm')]: { width: '100%' },
+    [theme.breakpoints.only('md')]: { width: '30%' },
+    [theme.breakpoints.only('lg')]: { width: '25%' },
+    [theme.breakpoints.only('xl')]: { width: '20%' }
   },
   image: {
     borderRadius: '50%',
     marginBottom: '1em',
-    [theme.breakpoints.down('md')]: { maxWidth: 256 },
-    [theme.breakpoints.up('lg')]: { width: '100%' }
+    [theme.breakpoints.down('sm')]: { maxWidth: 256 },
+    [theme.breakpoints.up('md')]: { width: '100%' }
   },
-  bannerText: { [theme.breakpoints.up('lg')]: { textAlign: 'center' }, wordWrap: 'break-word' }
+  bannerText: { [theme.breakpoints.up('md')]: { textAlign: 'center' }, wordWrap: 'break-word' }
 }))
 
 const GET_SERVER_SETTINGS = gql`
@@ -117,7 +123,7 @@ const Dashboard = (props: {
           {username}<span style={{ color: '#666' }}>#{props.data.user.identifier.split('#').pop()}</span>
         </Typography>
       </div>
-      <Paper style={{ marginLeft: '1%', marginRight: '2%', padding: 10, flex: 1 }}>{settings}</Paper>
+      <Paper style={{ marginLeft: '1%', marginRight: '1%', padding: 10, flex: 1 }}>{settings}</Paper>
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { Client } from 'eris'
 import { promisify } from 'util'
-import { MongoClient, Db, Document } from 'mongodb'
+import { MongoClient, Document } from 'mongodb'
 import { JwtPayload, verify, sign } from 'jsonwebtoken'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { randomBytes, createCipheriv, createDecipheriv, createHash } from 'crypto'
@@ -9,17 +9,15 @@ import config from '../config.json'
 const { host, rootUrl, mongoUrl, jwtSecret, clientId, clientSecret, botToken, botApiUrl } = config
 
 // Create a MongoDB instance.
-let db: Db
-MongoClient.connect(mongoUrl === 'dotenv' ? process.env.MONGO_URL || '' : mongoUrl, (err, client) => {
-  if (err || !client) throw err || new Error('MongoDB client is undefined!')
-  console.log('GraphQL server connected successfully to MongoDB.')
-  db = client.db('ivebot')
-})
+const mongodb = new MongoClient(mongoUrl === 'dotenv' ? process.env.MONGO_URL || '' : mongoUrl)
+mongodb.once('open', () => console.log('GraphQL server connected successfully to MongoDB.'))
+const db = mongodb.db('ivebot')
 
 const botClient = new Client(`Bot ${botToken}`, { restMode: true })
 
 // Helper functions.
 const getServerSettings = async (id: string): Promise<Document> => {
+  await mongodb.connect()
   // Get serverSettings through query.
   const serverSettings = await db.collection('servers').findOne({ id })
   if (!serverSettings) {

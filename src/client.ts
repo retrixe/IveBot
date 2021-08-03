@@ -201,7 +201,7 @@ export default class CommandParser {
       // Get the data for the selected command.
       const statistics = await analytics.findOne({ name: commandName })
       // If the command was not stored, we store our analytics directly.
-      if (!statistics) await analytics.insertOne(command)
+      if (!statistics) await analytics.insertOne({ name: commandName, ...command })
       // Else, we update existing command data in the database.
       else {
         // Calculate the average execution time and update the database.
