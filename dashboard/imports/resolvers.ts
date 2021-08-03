@@ -1,10 +1,12 @@
 import { Client } from 'eris'
+import { promisify } from 'util'
 import { MongoClient, Db, Document } from 'mongodb'
 import { JwtPayload, verify, sign } from 'jsonwebtoken'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { randomBytes, createCipheriv, createDecipheriv, createHash } from 'crypto'
 import { ApolloError, AuthenticationError, ForbiddenError } from 'apollo-server-micro'
 import config from '../config.json'
-const { host, rootUrl, mongoUrl, jwtSecret, clientId, clientSecret, botToken } = config
+const { host, rootUrl, mongoUrl, jwtSecret, clientId, clientSecret, botToken, botApiUrl } = config
 
 // Create a MongoDB instance.
 let db: Db
@@ -27,9 +29,48 @@ const getServerSettings = async (id: string): Promise<Document> => {
   return serverSettings || { id }
 }
 
-interface ResolverContext {
-  req: NextApiRequest
-  res: NextApiResponse
+const encryptionKey = createHash('sha256').update(jwtSecret).digest()
+const encrypt = async (data: Buffer): Promise<Buffer> => {
+  const iv = await promisify(randomBytes)(16)
+  const cipher = createCipheriv('aes-256-ctr', encryptionKey, iv)
+  return Buffer.concat([iv, cipher.update(data), cipher.final()])
+}
+const decrypt = (data: Buffer): Buffer => {
+  const cipher = createDecipheriv('aes-256-ctr', encryptionKey, data.slice(0, 16))
+  return Buffer.concat([cipher.update(data.slice(16)), cipher.final()])
+}
+const getMutualPermissionGuilds = async (id: string, guilds: string[], host = false
+): Promise<Array<{ id: string, perm: boolean }>> => {
+  if (botApiUrl) {
+    let body: Buffer
+    try {
+      body = await encrypt(Buffer.from(JSON.stringify({ id, guilds, host })))
+    } catch (e) { throw new ApolloError('Failed to encrypt IveBot request!') }
+    try {
+      const request = await fetch(`${botApiUrl}/private`, { method: 'POST', body })
+      if (!request.ok) throw new ApolloError('Failed to make request to IveBot private API!')
+      return JSON.parse(decrypt(Buffer.from(await request.arrayBuffer())).toString('utf8'))
+    } catch (e) { throw new ApolloError('Failed to make request to IveBot private API!') }
+  } else {
+    const mutualGuildsWithPerm: Array<{ id: string, perm: boolean }> = []
+    await Promise.all(guilds.map(async guild => {
+      try {
+        const fullGuild = await botClient.getRESTGuild(guild)
+        const selfMember = await botClient.getRESTGuildMember(guild, id)
+        mutualGuildsWithPerm.push({
+          id: guild, perm: host || fullGuild.permissionsOf(selfMember).has('manageGuild')
+        })
+      } catch (e) {
+        if (e.name === 'DiscordHTTPError') throw new ApolloError('Failed to make Discord request!')
+      }
+    }))
+    return mutualGuildsWithPerm
+  }
+}
+const checkUserGuildPerm = async (id: string, guild: string, host = false): Promise<boolean> => {
+  if (host) return true
+  const mutuals = await getMutualPermissionGuilds(id, [guild])
+  return mutuals.length === 1 && mutuals[0].perm
 }
 
 const secure = rootUrl.startsWith('https') && process.env.NODE_ENV !== 'development' ? '; Secure' : ''
@@ -79,22 +120,19 @@ const authenticateRequest = async (req: NextApiRequest, res: NextApiResponse): P
 }
 
 // Set up resolvers.
+interface ResolverContext {
+  req: NextApiRequest
+  res: NextApiResponse
+}
+
 export default {
   Query: {
     getServerSettings: async (parent: string, { id }: { id: string }, context: ResolverContext) => {
       const accessToken = await authenticateRequest(context.req, context.res)
       const client = new Client(`Bearer ${accessToken}`, { restMode: true })
       const self = await client.getSelf()
-      let hasPerm = false
-      try {
-        const fullGuild = await botClient.getRESTGuild(id)
-        const selfMember = await botClient.getRESTGuildMember(id, self.id)
-        hasPerm = fullGuild.permissionsOf(selfMember).has('manageGuild')
-      } catch (e) {
-        if (e.name === 'DiscordHTTPError') throw new ApolloError('Failed to make Discord request!')
-        throw new ForbiddenError('You are not allowed to access this server\'s settings!')
-      }
-      if (hasPerm || host === self.id) {
+      const hasPerm = await checkUserGuildPerm(self.id, id, host === self.id)
+      if (hasPerm) {
         const serverSettings = await getServerSettings(id)
         // Insert default values for all properties.
         const defaultJoinMsgs = { channel: '', joinMessage: '', leaveMessage: '', banMessage: '' }
@@ -123,25 +161,19 @@ export default {
       const client = new Client(`Bearer ${accessToken}`, { restMode: true })
       const guilds = await client.getRESTGuilds()
       const self = await client.getSelf()
-      return (await Promise.all(guilds
-        .map(async guild => {
-          /* TODO: Make a custom storage of all guilds IveBot is in to narrow down mutuals before
-          asking Discord. Current solution is slow and hits rate limits for users in many servers. */
-          let hasPerm = false
-          try {
-            const fullGuild = await botClient.getRESTGuild(guild.id)
-            const selfMember = await botClient.getRESTGuildMember(guild.id, self.id)
-            hasPerm = fullGuild.permissionsOf(selfMember).has('manageGuild')
-          } catch (e) { return }
-          return {
-            id: guild.id,
-            name: guild.name,
-            icon: guild.iconURL || 'no icon',
-            channels: guild.channels.filter(i => i.type === 0)
-              .map(i => ({ id: i.id, name: i.name })),
-            perms: host === self.id || hasPerm
-          }
-        }))).filter(e => !!e)
+      const mutuals = await getMutualPermissionGuilds(self.id, guilds.map(guild => guild.id), host === self.id)
+      return mutuals.map(mutual => {
+        const guild = guilds.find(e => e.id === mutual.id)
+        if (!guild) return null // Should never be hit.
+        return {
+          id: guild.id,
+          name: guild.name,
+          icon: guild.iconURL || 'no icon',
+          channels: guild.channels.filter(i => i.type === 0)
+            .map(i => ({ id: i.id, name: i.name })),
+          perms: mutual.perm
+        }
+      }).filter(e => !!e)
     }
   },
   Mutation: {
@@ -161,16 +193,8 @@ export default {
       const accessToken = await authenticateRequest(context.req, context.res)
       const client = new Client(`Bearer ${accessToken}`, { restMode: true })
       const self = await client.getSelf()
-      let hasPerm = false
-      try {
-        const fullGuild = await botClient.getRESTGuild(id)
-        const selfMember = await botClient.getRESTGuildMember(id, self.id)
-        hasPerm = fullGuild.permissionsOf(selfMember).has('manageGuild')
-      } catch (e) {
-        if (e.name === 'DiscordHTTPError') throw new ApolloError('Failed to make Discord request!')
-        throw new ForbiddenError('You are not allowed to access this server\'s settings!')
-      }
-      if (hasPerm || host === self.id) {
+      const hasPerm = await checkUserGuildPerm(self.id, id, host === self.id)
+      if (hasPerm) {
         const serverSettings = await getServerSettings(id)
         // Insert default values for all properties.
         const defaultJoinMsgs = { channel: '', joinMessage: '', leaveMessage: '', banMessage: '' }

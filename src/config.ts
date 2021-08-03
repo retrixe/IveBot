@@ -9,6 +9,7 @@ interface Config {
   NASAtoken: string
   oxfordAPI: { appKey: string, appId: string }
   testPilots: string[]
+  jwtSecret: string
   mongoURL: string
   rootURL: string
   token: string
@@ -17,7 +18,17 @@ interface Config {
 const config: Config = json5.parse(await readFile('config.json5', { encoding: 'utf8' }))
 
 export const {
-  weatherAPIkey, fixerAPIkey, cvAPIkey, host, NASAtoken, oxfordAPI, testPilots, mongoURL, rootURL, token
+  weatherAPIkey,
+  fixerAPIkey,
+  cvAPIkey,
+  host,
+  NASAtoken,
+  oxfordAPI,
+  testPilots,
+  jwtSecret,
+  mongoURL,
+  rootURL,
+  token
 } = config
 
 export default Config

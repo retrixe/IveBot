@@ -6,13 +6,15 @@ import { MongoClient } from 'mongodb'
 // Import fs.
 import { readdir, stat } from 'fs/promises'
 import { inspect } from 'util'
+import http from 'http'
+import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto'
 // Import types.
 import { DB, Command } from './imports/types.js'
 // Import the bot.
 import CommandParser from './client.js'
 import { guildMemberAdd, guildMemberRemove, guildDelete, guildBanAdd } from './events.js'
 // Get the token needed.
-import { token, mongoURL } from './config.js'
+import { token, mongoURL, jwtSecret } from './config.js'
 
 // If production is explicitly specified via flag..
 if (process.argv[2] === '--production') process.env.NODE_ENV = 'production'
@@ -110,3 +112,59 @@ client.on('error', (err: Error, id: string) => {
 
 // Connect to Discord.
 await client.connect()
+
+// Start private HTTP API for the dashboard.
+if (jwtSecret) {
+  const key = createHash('sha256').update(jwtSecret).digest()
+  const headers = (body: NodeJS.ArrayBufferView | string): {} => ({
+    'Content-Length': Buffer.byteLength(body), 'Content-Type': 'application/json'
+  })
+  const server = http.createServer((req, res) => {
+    if (req.method !== 'POST' || req.url !== '/private') return
+    let buffer = Buffer.from([])
+    req.on('data', chunk => {
+      buffer = Buffer.concat([buffer, Buffer.from(chunk)])
+      if (buffer.byteLength > 1024 * 8) req.destroy() // 8 kB limit
+    })
+    req.on('end', () => {
+      (async () => {
+        try {
+          const decipher = createDecipheriv('aes-256-ctr', key, buffer.slice(0, 16))
+          const data = Buffer.concat([decipher.update(buffer.slice(16)), decipher.final()])
+          const valid: Array<{ id: string, perm: boolean }> = []
+          const parsed: { id: string, host: boolean, guilds: string[] } = JSON.parse(data.toString('utf8'))
+          if (typeof parsed.id !== 'string' || !Array.isArray(parsed.guilds)) throw new Error()
+          await Promise.all(parsed.guilds.map(async id => {
+            if (typeof id !== 'string' || id.length <= 16) return
+            const guild = client.guilds.get(id)
+            if (!guild) return
+            else if (parsed.host) return valid.push({ id, perm: true }) // Fast path.
+            let member = guild.members.get(parsed.id)
+            if (!member) {
+              try {
+                member = await client.getRESTGuildMember(id, parsed.id)
+                guild.members.add(member) // Cache the member for faster lookups.
+              } catch (e) {} // TODO: Unable to retrieve member for the guild. Hm?
+            }
+            if (member) valid.push({ id, perm: guild.permissionsOf(member).has('manageGuild') })
+          }))
+          randomBytes(16, (err, iv) => {
+            if (err) {
+              const error = '{"error":"Internal Server Error!"}'
+              return res.writeHead(500, headers(error)).end(error)
+            }
+            const cipher = createCipheriv('aes-256-ctr', key, iv)
+            const data = Buffer.from(JSON.stringify(valid))
+            const aesData = Buffer.concat([iv, cipher.update(data), cipher.final()])
+            return res.writeHead(200, headers(aesData)).end(aesData)
+          })
+        } catch (e) {
+          const error = '{"error":"Invalid body!"}'
+          return res.writeHead(400, headers(error)).end(error)
+        }
+      })().catch(console.error)
+    })
+  }).listen(isNaN(+process.env.IVEBOT_API_PORT) ? 7331 : +process.env.IVEBOT_API_PORT, () => {
+    console.log('Listening for IveBot dashboard requests on', server.address())
+  })
+}
