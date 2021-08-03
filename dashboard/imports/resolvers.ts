@@ -37,8 +37,9 @@ const decrypt = (data: Buffer): Buffer => {
   const cipher = createDecipheriv('aes-256-ctr', encryptionKey, data.slice(0, 16))
   return Buffer.concat([cipher.update(data.slice(16)), cipher.final()])
 }
+interface TextChannel { id: string, name: string }
 const getMutualPermissionGuilds = async (id: string, guilds: string[], host = false
-): Promise<Array<{ id: string, perm: boolean }>> => {
+): Promise<Array<{ id: string, perm: boolean, textChannels: TextChannel[] }>> => {
   if (botApiUrl) {
     let body: Buffer
     try {
@@ -50,13 +51,16 @@ const getMutualPermissionGuilds = async (id: string, guilds: string[], host = fa
       return JSON.parse(decrypt(Buffer.from(await request.arrayBuffer())).toString('utf8'))
     } catch (e) { throw new ApolloError('Failed to make request to IveBot private API!') }
   } else {
-    const mutualGuildsWithPerm: Array<{ id: string, perm: boolean }> = []
+    const mutualGuildsWithPerm: Array<{ id: string, perm: boolean, textChannels: TextChannel[] }> = []
     await Promise.all(guilds.map(async guild => {
       try {
         const fullGuild = await botClient.getRESTGuild(guild)
         const selfMember = await botClient.getRESTGuildMember(guild, id)
+        const perm = host || fullGuild.permissionsOf(selfMember).has('manageGuild')
         mutualGuildsWithPerm.push({
-          id: guild, perm: host || fullGuild.permissionsOf(selfMember).has('manageGuild')
+          id: guild,
+          perm,
+          textChannels: perm ? fullGuild.channels.filter(c => c.type === 0).map(c => ({ id: c.id, name: c.name })) : []
         })
       } catch (e) {
         if (e.name === 'DiscordHTTPError') throw new ApolloError('Failed to make Discord request!')
@@ -167,8 +171,7 @@ export default {
           id: guild.id,
           name: guild.name,
           icon: guild.iconURL || 'no icon',
-          channels: guild.channels.filter(i => i.type === 0)
-            .map(i => ({ id: i.id, name: i.name })),
+          channels: mutual.textChannels,
           perms: mutual.perm
         }
       }).filter(e => !!e)

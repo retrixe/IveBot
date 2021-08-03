@@ -125,6 +125,11 @@ await client.connect()
 
 // Start private HTTP API for the dashboard.
 if (jwtSecret) {
+  interface DiscordServerResponse {
+    id: string
+    perm: boolean
+    textChannels: Array<{ id: string, name: string }>
+  }
   const key = createHash('sha256').update(jwtSecret).digest()
   const headers = (body: NodeJS.ArrayBufferView | string): {} => ({
     'Content-Length': Buffer.byteLength(body), 'Content-Type': 'application/json'
@@ -141,14 +146,20 @@ if (jwtSecret) {
         try {
           const decipher = createDecipheriv('aes-256-ctr', key, buffer.slice(0, 16))
           const data = Buffer.concat([decipher.update(buffer.slice(16)), decipher.final()])
-          const valid: Array<{ id: string, perm: boolean }> = []
+          const valid: DiscordServerResponse[] = []
           const parsed: { id: string, host: boolean, guilds: string[] } = JSON.parse(data.toString('utf8'))
           if (typeof parsed.id !== 'string' || !Array.isArray(parsed.guilds)) throw new Error()
           await Promise.all(parsed.guilds.map(async id => {
             if (typeof id !== 'string' || id.length <= 16) return
             const guild = client.guilds.get(id)
             if (!guild) return
-            else if (parsed.host) return valid.push({ id, perm: true }) // Fast path.
+            if (parsed.host) {
+              return valid.push({
+                id,
+                perm: true,
+                textChannels: guild.channels.filter(c => c.type === 0).map(c => ({ id: c.id, name: c.name }))
+              })
+            }
             let member = guild.members.get(parsed.id)
             if (!member) {
               try {
@@ -156,7 +167,11 @@ if (jwtSecret) {
                 guild.members.add(member) // Cache the member for faster lookups.
               } catch (e) {} // TODO: Unable to retrieve member for the guild. Hm?
             }
-            if (member) valid.push({ id, perm: guild.permissionsOf(member).has('manageGuild') })
+            if (member) {
+              const perm = guild.permissionsOf(member).has('manageGuild')
+              const textChannels = perm ? guild.channels.filter(c => c.type === 0) : []
+              valid.push({ id, perm, textChannels: textChannels.map(c => ({ id: c.id, name: c.name })) })
+            }
           }))
           randomBytes(16, (err, iv) => {
             if (err) {

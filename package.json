@@ -26,7 +26,8 @@
     "mathjs": "^9.4.3",
     "moment": "^2.24.0",
     "mongodb": "^4.0.1",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "slash-create": "^3.4.1"
   },
   "devDependencies": {
     "@types/node": "^16.4.7",
@@ -52,16 +53,27 @@
   },
   "graphql-schema-linter": {
     "rules": [
-      "arguments-have-descriptions", "defined-types-are-used",
-      "deprecations-have-a-reason", "descriptions-are-capitalized",
-      "enum-values-all-caps", "enum-values-have-descriptions",
-      "enum-values-sorted-alphabetically", "fields-are-camel-cased",
-      "fields-have-descriptions", "input-object-fields-sorted-alphabetically",
-      "input-object-values-are-camel-cased", "input-object-values-have-descriptions",
+      "arguments-have-descriptions",
+      "defined-types-are-used",
+      "deprecations-have-a-reason",
+      "descriptions-are-capitalized",
+      "enum-values-all-caps",
+      "enum-values-have-descriptions",
+      "enum-values-sorted-alphabetically",
+      "fields-are-camel-cased",
+      "fields-have-descriptions",
+      "input-object-fields-sorted-alphabetically",
+      "input-object-values-are-camel-cased",
+      "input-object-values-have-descriptions",
       "interface-fields-sorted-alphabetically",
-      "types-are-capitalized", "types-have-descriptions"
+      "types-are-capitalized",
+      "types-have-descriptions"
     ],
-    "disabledRules": ["type-fields-sorted-alphabetically"],
-    "schemaPaths": ["dashboard/schema.graphql"]
+    "disabledRules": [
+      "type-fields-sorted-alphabetically"
+    ],
+    "schemaPaths": [
+      "dashboard/schema.graphql"
+    ]
   }
 }
