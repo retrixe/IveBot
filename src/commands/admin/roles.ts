@@ -29,11 +29,12 @@ export const handleGiverole: Command = {
     )
     const isPublicRole = role && publicRoles.split('|').includes(role.name)
     if (!role) return { content: 'You have provided an invalid role name/ID, you ' + getInsult() + '.', error: true }
+    else if (!isPublicRole && !manageRoles) return insult
     // Can the user manage this role?
-    if (role.position >= checkRolePosition(message.member) && !isPublicRole
+    else if (role.position >= checkRolePosition(message.member) && !isPublicRole
     ) return { content: 'You cannot give this role. Pfft, overestimating their own powers now.', error: true }
     // Can the bot manage this role?
-    if (
+    else if (
       role.position >= checkRolePosition(message.member.guild.members.get(client.user.id)) ||
       !message.member.guild.members.get(client.user.id).permissions.has('manageRoles')
     ) return { content: `I lack permissions to give this role, you ${getInsult()}.`, error: true }
@@ -91,11 +92,12 @@ export const handleTakerole: Command = {
     )
     const isPublicRole = role && publicRoles.split('|').includes(role.name)
     if (!role) return { content: 'You have provided an invalid role name/ID, you ' + getInsult() + '.', error: true }
+    else if (!isPublicRole && !manageRoles) return insult
     // Can the user manage this role?
-    if (role.position >= checkRolePosition(message.member) && !isPublicRole
+    else if (role.position >= checkRolePosition(message.member) && !isPublicRole
     ) return { content: 'You cannot take this role. Pfft, overestimating their own powers now.', error: true }
     // Can the bot manage this role?
-    if (
+    else if (
       role.position >= checkRolePosition(message.member.guild.members.get(client.user.id)) ||
       !message.member.guild.members.get(client.user.id).permissions.has('manageRoles')
     ) return { content: `I lack permissions to take this role, you ${getInsult()}.`, error: true }
