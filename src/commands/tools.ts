@@ -50,6 +50,7 @@ export const handleUptime: Command = {
     example: '/uptime',
     argsRequired: false
   },
+  slashGenerator: true,
   generator: () => {
     const d = moment.duration(Math.floor(process.uptime() * 1000))
     const days = Math.floor(d.asDays())

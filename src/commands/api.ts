@@ -150,6 +150,7 @@ export const handleCat: Command = {
     example: '/cat',
     argsRequired: false
   },
+  slashGenerator: true,
   generator: async () => {
     try {
       // Fetch a cat and process it (this sounds funny to me idk why)

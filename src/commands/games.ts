@@ -1,3 +1,4 @@
+import { CommandOptionType } from 'slash-create'
 import { Command } from '../imports/types.js'
 import { evaluate } from 'mathjs'
 
@@ -29,7 +30,17 @@ export const handleChoose: Command = {
     description: 'Choose between multiple options.',
     fullDescription: 'Choose between multiple options.',
     example: '/choose cake|ice cream|pasta',
-    usage: '/choose <option 1>|(option 2)|(option 3)...'
+    usage: '/choose <option 1>|(option 2)|(option 3)...',
+    slashOptions: [{
+      name: 'choices',
+      description: 'The choices to choose from. Each option should be separated like: item1|item2',
+      required: true,
+      type: CommandOptionType.STRING
+    }]
+  },
+  slashGenerator: context => {
+    const choices = context.options.choices.split('|')
+    return `I choose: ${choices[Math.floor(Math.random() * choices.length)]}`
   },
   generator: (message, args) => {
     // Is it used correctly?
@@ -46,8 +57,15 @@ export const handleReverse: Command = {
     description: 'Reverse a sentence.',
     fullDescription: 'Reverse a sentence.',
     example: '/reverse hello',
-    usage: '/reverse <text>'
+    usage: '/reverse <text>',
+    slashOptions: [{
+      name: 'text',
+      description: 'The text to reverse.',
+      required: true,
+      type: CommandOptionType.STRING
+    }]
   },
+  slashGenerator: context => context.options.text.split('').reverse().join(''),
   generator: (message, args) => args.join(' ').split('').reverse().join('')
 }
 
@@ -58,8 +76,15 @@ export const handle8ball: Command = {
     fullDescription: 'Random answers to random questions.',
     usage: '/8ball <question>',
     example: '/8ball Will I flunk my exam?',
-    invalidUsageMessage: 'Please ask the 8ball a question.'
+    invalidUsageMessage: 'Please ask the 8ball a question.',
+    slashOptions: [{
+      name: 'question',
+      description: 'The question you wish to ask the 8ball.',
+      required: true,
+      type: CommandOptionType.STRING
+    }]
   },
+  slashGenerator: true,
   generator: () => {
     // Possible responses, taken from Diary Of A Wimpy Kid: Hard Luck.
     const responses = [
@@ -81,7 +106,23 @@ export const handleZalgo: Command = {
     description: 'The zalgo demon\'s writing.',
     fullDescription: 'The zalgo demon\'s handwriting.',
     usage: '/zalgo <text>',
-    example: '/zalgo sup'
+    example: '/zalgo sup',
+    slashOptions: [{
+      name: 'text',
+      description: 'The text to convert into the zalgo demon\'s handwriting.',
+      required: true,
+      type: CommandOptionType.STRING
+    }]
+  },
+  slashGenerator: context => {
+    let newMessage = ''
+    context.options.text.split('').forEach((element: string) => {
+      newMessage += element
+      for (let i = 0; i < Math.floor(Math.random() * 5) + 1; i++) {
+        newMessage += characters[Math.floor(Math.random() * characters.length)]
+      }
+    })
+    return newMessage.length >= 2000 ? context.options.text : newMessage
   },
   generator: (message, args) => {
     const textToZalgo = args.join(' ').split('')
@@ -103,7 +144,20 @@ export const handleDezalgo: Command = {
     description: 'The zalgo demon\'s writing.',
     fullDescription: 'Read the zalgo demon\'s writing.',
     usage: '/dezalgo <text>',
-    example: '/dezalgo ḥ̛̓e̖l̽͞҉lͦͅoͥ'
+    example: '/dezalgo ḥ̛̓e̖l̽͞҉lͦͅoͥ',
+    slashOptions: [{
+      name: 'text',
+      description: 'The zalgo demon\'s handwriting to be converted to regular text.',
+      required: true,
+      type: CommandOptionType.STRING
+    }]
+  },
+  slashGenerator: context => {
+    let newMessage = ''
+    context.options.text.split('').forEach((element: string) => {
+      if (!characters.includes(element)) newMessage += element
+    })
+    return newMessage
   },
   generator: (message, args) => {
     let newMessage = ''
@@ -121,7 +175,30 @@ export const handleRepeat: Command = {
     description: 'Repeat a string.',
     fullDescription: 'Repeat a string.',
     usage: '/repeat <number of times> <string to repeat>',
-    example: '/repeat 10 a'
+    example: '/repeat 10 a',
+    slashOptions: [{
+      name: 'number',
+      description: 'The number of times to repeat the text.',
+      required: true,
+      type: CommandOptionType.INTEGER
+    }, {
+      name: 'text',
+      description: 'The text to repeat as many times as you want.',
+      required: true,
+      type: CommandOptionType.STRING
+    }]
+  },
+  slashGenerator: context => {
+    const number = context.options.number
+    const text = context.options.text as string
+    if (number * text.length >= 2001) {
+      return { content: 'To prevent spam, your excessive message has not been repeated.', error: true }
+    } else if (text === '_' || text === '*' || text === '~') {
+      return { content: 'This is known to lag users and is disabled.', error: true }
+    }
+    let generatedMessage = ''
+    for (let x = 0; x < number; x++) { generatedMessage += text }
+    return generatedMessage
   },
   generator: (message, args) => {
     // All arguments.
@@ -147,7 +224,29 @@ export const handleRandom: Command = {
     fullDescription: 'Returns a random number, by default between 0 and 10.',
     usage: '/random (starting number) (ending number)',
     example: '/random 1 69',
-    argsRequired: false
+    argsRequired: false,
+    slashOptions: [{
+      name: 'start',
+      description: 'The number which the random number should be higher than or equal to.',
+      required: false,
+      type: CommandOptionType.INTEGER
+    }, {
+      name: 'end',
+      description: 'The number which the random number should be lower than.',
+      required: false,
+      type: CommandOptionType.INTEGER
+    }]
+  },
+  slashGenerator: context => {
+    if (typeof context.options.start === 'number' && typeof context.options.end === 'number') {
+      const number1 = context.options.start
+      const number2 = context.options.end
+      return `The number.. is.. ${Math.floor(Math.random() * (number2 - number1)) + number1}`
+    } else if (typeof context.options.end === 'number') {
+      return `The number.. is.. ${Math.floor(Math.random() * context.options.end)}`
+    } else if (typeof context.options.start === 'number') {
+      return { content: 'You must provide an end number if providing a start number.', error: true }
+    } else return `The number.. is.. ${Math.floor(Math.random() * 10)}`
   },
   generator: (message, args) => {
     // If argument length is 1 and the argument is a number..
@@ -175,7 +274,21 @@ export const handleCalculate: Command = {
 More info here: https://mathjs.org/docs/expressions/syntax.html`,
     usage: '/calculate <expression>',
     example: '/calculate 2 + 2',
-    invalidUsageMessage: 'Specify an expression >_<'
+    invalidUsageMessage: 'Specify an expression >_<',
+    slashOptions: [{
+      name: 'expression',
+      description: 'The math expression to be evaluated.',
+      required: true,
+      type: CommandOptionType.STRING
+    }]
+  },
+  slashGenerator: context => {
+    try {
+      const expr = context.options.expression
+      return `${evaluate(expr.split(',').join('.').split('÷').join('/').toLowerCase())}`
+    } catch (e) {
+      return { content: 'Invalid expression >_<', error: true }
+    }
   },
   generator: (message, args) => {
     try {
@@ -192,8 +305,17 @@ export const handleDistort: Command = {
     description: 'Pretty distorted text.',
     fullDescription: 'Pretty distorted text.',
     usage: '/distort <text>',
-    example: '/distort lol'
+    example: '/distort lol',
+    slashOptions: [{
+      name: 'text',
+      description: 'The text to be distorted.',
+      required: true,
+      type: CommandOptionType.STRING
+    }]
   },
+  slashGenerator: context => context.options.text.split(' ').map((i: string) => (
+    i.split('').join('*') + (i.length % 2 === 0 ? '*' : '')
+  )).join(' '),
   generator: (message, args) => args.map(i => (
     i.split('').join('*') + (i.length % 2 === 0 ? '*' : '')
   )).join(' ')

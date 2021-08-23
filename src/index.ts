@@ -1,7 +1,7 @@
 import 'json5/lib/require.js'
 // Tokens and stuff.
-import { AdvancedMessageContent, Client, MessageWebhookContent } from 'eris'
-import { SlashCommand, SlashCreator, GatewayServer } from 'slash-create'
+import { Client, MessageWebhookContent } from 'eris'
+import { SlashCommand, SlashCreator, GatewayServer, CommandContext } from 'slash-create'
 // Get MongoDB.
 import { MongoClient } from 'mongodb'
 // Import fs.
@@ -10,7 +10,7 @@ import { inspect } from 'util'
 import http from 'http'
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto'
 // Import types.
-import { DB, Command } from './imports/types.js'
+import { DB, Command, IveBotSlashGeneratorFunction } from './imports/types.js'
 // Import the bot.
 import CommandParser from './client.js'
 import { guildMemberAdd, guildMemberRemove, guildDelete, guildBanAdd } from './events.js'
@@ -52,14 +52,38 @@ creator.withServer(new GatewayServer(
 const commandToSlashCommand = (command: Command): SlashCommand => {
   class IveBotSlashCommand extends SlashCommand {
     constructor (creator: SlashCreator) {
-      super(creator, { name: command.name, description: command.opts.description, options: [] })
+      const reqs = command.opts.requirements
+      const defaultPermission = !(reqs && (reqs.userIDs || reqs.custom))
+      const requiredPermissions = []
+      if (reqs && reqs.permissions) {
+        // TODO: Does not support falsy permissions. Do we convert this to straightforward [] type?
+        for (const permission in reqs.permissions) {
+          if (reqs.permissions[permission]) {
+            const translatedName = permission.toLowerCase().split('_').map((value, index) => (
+              index === 0 ? value : value.substr(0, 1).toUpperCase() + value.substr(1)
+            ))
+            requiredPermissions.push(translatedName.join(''))
+          }
+        }
+      }
+      super(creator, {
+        name: command.name,
+        description: command.opts.description.replace(/</g, '').replace(/>/g, ''),
+        defaultPermission,
+        requiredPermissions,
+        options: command.opts.slashOptions || []
+      })
     }
 
-    async run (): Promise<string | MessageWebhookContent | void> {
-      let response: string | AdvancedMessageContent | void
+    async run (ctx: CommandContext): Promise<string | MessageWebhookContent | void> {
       if (typeof command.generator !== 'function') return command.generator
-      else response = await Promise.resolve(command.generator(undefined, [], { client, db, tempDB, commandParser }))
-      return typeof response === 'object' ? { ...response, embeds: [response.embed] } : response
+      const func: IveBotSlashGeneratorFunction = command.slashGenerator === true
+        ? command.generator as any
+        : command.slashGenerator
+      const response = await Promise.resolve(func(ctx, { client, db, tempDB, commandParser }))
+      return typeof response === 'object' && response.embed
+        ? { ...response, embeds: [response.embed] }
+        : response
     }
   }
   return new IveBotSlashCommand(creator)
@@ -79,7 +103,7 @@ console.log('Bot connected successfully to MongoDB.')
 const db = mongoClient.db('ivebot')
 const bubbleWrap = <F extends (...args: any[]) => any>(func: F) =>
   (...args: Parameters<F>) => { func(...args).catch(console.error) }
-  // When a server loses a member, it will callback.
+// When a server loses a member, it will callback.
 client.on('guildMemberAdd', bubbleWrap(guildMemberAdd(client, db, tempDB)))
 client.on('guildMemberRemove', bubbleWrap(guildMemberRemove(client, db)))
 client.on('guildBanAdd', bubbleWrap(guildBanAdd(client, db)))
@@ -107,13 +131,16 @@ for (const commandFile of commandFiles) {
       if (commandName === 'TriviaSession') return
       const command = commands[commandName]
       commandParser.registerCommand(command)
-      if (typeof command.generator !== 'function') creator.registerCommand(commandToSlashCommand(command))
-      else if (command.name === 'uptime') creator.registerCommand(commandToSlashCommand(command))
-      else if (command.name === 'cat') creator.registerCommand(commandToSlashCommand(command))
+      // TODO: Custom and user ID requirements not handled yet.
+      const reqs = command.opts.requirements
+      const hasCustomReqs = (reqs && (reqs.custom || reqs.userIDs))
+      if (!hasCustomReqs && (typeof command.generator !== 'function' || command.slashGenerator)) {
+        creator.registerCommand(commandToSlashCommand(command))
+      }
     })
   }
 }
-creator.syncCommands({ deleteCommands: true })
+creator.syncCommands()
 
 // Register setInterval to fulfill delayed tasks.
 setInterval(() => {
