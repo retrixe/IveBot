@@ -1,5 +1,6 @@
 // All the types!
-import Eris, { Message, GuildTextableChannel, Constants } from 'eris'
+import Eris, { Message, GuildTextableChannel, Constants, Guild } from 'eris'
+import { CommandOptionType } from 'slash-create'
 import { Command } from '../imports/types.js'
 // All the needs!
 import { getIdFromMention, getInsult, getUser } from '../imports/tools.js'
@@ -15,16 +16,26 @@ export const handleServerinfo: Command = {
     fullDescription: 'Displays info on the current servers (or other mutual servers).',
     example: '/serverinfo',
     usage: '/serverinfo (mutual server ID)',
-    argsRequired: false
+    argsRequired: false,
+    slashOptions: [{
+      name: 'server',
+      required: false,
+      description: 'A server you share with IveBot.',
+      type: CommandOptionType.STRING
+    }]
   },
 
+  slashGenerator: (context, { client }) => {
+    let guild = client.guilds.get(context.options.server || context.guildID)
+    if (context.options.server && guild && !guild.members.has(context.member.id)) guild = undefined
+    return handleServerinfo.commonGenerator(guild)
+  },
   generator: (message, args, { client }) => {
-    // Check if a guild was specified.
-    const guild = (args.length > 0)
-      ? client.guilds.find(
-        i => i.members.has(message.author.id) && i.id === args[0]
-      )
-      : message.member.guild
+    let guild = args.length > 0 ? client.guilds.get(args[0]) : message.member.guild
+    if (args.length > 0 && guild && !guild.members.has(message.author.id)) guild = undefined
+    return handleServerinfo.commonGenerator(guild)
+  },
+  commonGenerator: (guild: Guild) => {
     if (!guild) return { content: `Specify a valid mutual guild, ${getInsult()}.`, error: true }
     // Owner.
     const owner = guild.members.get(guild.ownerID)
@@ -239,7 +250,13 @@ export const handleRequest: Command = {
     description: 'Request a specific feature.',
     fullDescription: 'Request a feature. 24 hour cooldown except for test pilots.',
     usage: '/request <suggestion>',
-    example: '/request a /userinfo command.'
+    example: '/request a /userinfo command.',
+    slashOptions: [{
+      name: 'suggestion',
+      required: true,
+      type: CommandOptionType.STRING,
+      description: 'The feature you want to suggest, or the bug you wish to report. Please be detailed.'
+    }]
   },
   generator: async ({ author }, args, { client, tempDB }) => {
     // Check for cooldown.

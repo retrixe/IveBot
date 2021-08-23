@@ -44,6 +44,7 @@ export interface Command {
   generator: IveBotCommandGenerator
   postGenerator?: (message: Message, args: string[], sent?: Message, ctx?: Context) => void
   slashGenerator?: true | IveBotSlashGeneratorFunction
+  commonGenerator?: (...args: any[]) => CommandResponse | Promise<CommandResponse>
 }
 export interface CommandOptions {
   argsRequired?: boolean

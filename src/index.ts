@@ -1,7 +1,7 @@
 import 'json5/lib/require.js'
 // Tokens and stuff.
 import { Client, MessageWebhookContent } from 'eris'
-import { SlashCommand, SlashCreator, GatewayServer, CommandContext } from 'slash-create'
+import { SlashCommand, SlashCreator, GatewayServer, CommandContext, InteractionResponseFlags } from 'slash-create'
 // Get MongoDB.
 import { MongoClient } from 'mongodb'
 // Import fs.
@@ -76,14 +76,19 @@ const commandToSlashCommand = (command: Command): SlashCommand => {
     }
 
     async run (ctx: CommandContext): Promise<string | MessageWebhookContent | void> {
+      if (command.opts.guildOnly && !ctx.guildID) return 'This command can only be executed from a Discord guild!'
       if (typeof command.generator !== 'function') return command.generator
       const func: IveBotSlashGeneratorFunction = command.slashGenerator === true
         ? command.generator as any
         : command.slashGenerator
       const response = await Promise.resolve(func(ctx, { client, db, tempDB, commandParser }))
-      return typeof response === 'object' && response.embed
+      const embedResponse = typeof response === 'object' && response.embed
         ? { ...response, embeds: [response.embed] }
         : response
+      if (typeof embedResponse === 'object' && embedResponse.error) {
+        embedResponse.flags = InteractionResponseFlags.EPHEMERAL
+      }
+      return embedResponse
     }
   }
   return new IveBotSlashCommand(creator)

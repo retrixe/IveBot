@@ -114,18 +114,10 @@ export const handleZalgo: Command = {
       type: CommandOptionType.STRING
     }]
   },
-  slashGenerator: context => {
-    let newMessage = ''
-    context.options.text.split('').forEach((element: string) => {
-      newMessage += element
-      for (let i = 0; i < Math.floor(Math.random() * 5) + 1; i++) {
-        newMessage += characters[Math.floor(Math.random() * characters.length)]
-      }
-    })
-    return newMessage.length >= 2000 ? context.options.text : newMessage
-  },
-  generator: (message, args) => {
-    const textToZalgo = args.join(' ').split('')
+  generator: (message, args) => handleZalgo.commonGenerator(args.join(' ')),
+  slashGenerator: context => handleZalgo.commonGenerator(context.options.text),
+  commonGenerator: (text: string) => {
+    const textToZalgo = text.split('')
     let newMessage = ''
     textToZalgo.forEach(element => {
       newMessage += element
@@ -133,7 +125,7 @@ export const handleZalgo: Command = {
         newMessage += characters[Math.floor(Math.random() * characters.length)]
       }
     })
-    return newMessage.length >= 2000 ? args.join(' ') : newMessage
+    return newMessage.length >= 2000 ? text : newMessage
   }
 }
 
@@ -152,16 +144,11 @@ export const handleDezalgo: Command = {
       type: CommandOptionType.STRING
     }]
   },
-  slashGenerator: context => {
+  slashGenerator: context => handleDezalgo.commonGenerator(context.options.text),
+  generator: (message, args) => handleDezalgo.commonGenerator(args.join(' ')),
+  commonGenerator: (text: string) => {
     let newMessage = ''
-    context.options.text.split('').forEach((element: string) => {
-      if (!characters.includes(element)) newMessage += element
-    })
-    return newMessage
-  },
-  generator: (message, args) => {
-    let newMessage = ''
-    args.join(' ').split('').forEach(element => {
+    text.split('').forEach(element => {
       if (!characters.includes(element)) newMessage += element
     })
     return newMessage
@@ -191,6 +178,15 @@ export const handleRepeat: Command = {
   slashGenerator: context => {
     const number = context.options.number
     const text = context.options.text as string
+    return handleRepeat.commonGenerator(number, text)
+  },
+  generator: (message, args) => {
+    // All arguments.
+    const number = +args.shift()
+    if (isNaN(number)) return 'Correct usage: /repeat <number of times> <string to repeat>'
+    return handleRepeat.commonGenerator(number, args.join(' '))
+  },
+  commonGenerator: (number: number, text: string) => {
     if (number * text.length >= 2001) {
       return { content: 'To prevent spam, your excessive message has not been repeated.', error: true }
     } else if (text === '_' || text === '*' || text === '~') {
@@ -198,20 +194,6 @@ export const handleRepeat: Command = {
     }
     let generatedMessage = ''
     for (let x = 0; x < number; x++) { generatedMessage += text }
-    return generatedMessage
-  },
-  generator: (message, args) => {
-    // All arguments.
-    const number = +args.shift()
-    if (isNaN(number)) return 'Correct usage: /repeat <number of times> <string to repeat>'
-    else if (number * args.join(' ').length >= 2001) {
-      return { content: 'To prevent spam, your excessive message has not been repeated.', error: true }
-    } else if (
-      args.join(' ') === '_' || args.join(' ') === '*' || args.join(' ') === '~'
-    ) return { content: 'This is known to lag users and is disabled.', error: true }
-    // Generate the repeated string.
-    let generatedMessage = ''
-    for (let x = 0; x < number; x++) { generatedMessage += args.join(' ') }
     return generatedMessage
   }
 }
@@ -282,17 +264,11 @@ More info here: https://mathjs.org/docs/expressions/syntax.html`,
       type: CommandOptionType.STRING
     }]
   },
-  slashGenerator: context => {
+  slashGenerator: context => handleCalculate.commonGenerator(context.options.expression),
+  generator: (message, args) => handleCalculate.commonGenerator(args.join(' ')),
+  commonGenerator: (expression: string) => {
     try {
-      const expr = context.options.expression
-      return `${evaluate(expr.split(',').join('.').split('÷').join('/').toLowerCase())}`
-    } catch (e) {
-      return { content: 'Invalid expression >_<', error: true }
-    }
-  },
-  generator: (message, args) => {
-    try {
-      return `${evaluate(args.join(' ').split(',').join('.').split('÷').join('/').toLowerCase())}`
+      return `${evaluate(expression.split(',').join('.').split('÷').join('/').toLowerCase())}`
     } catch (e) {
       return { content: 'Invalid expression >_<', error: true }
     }
