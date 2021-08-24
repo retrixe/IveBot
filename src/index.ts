@@ -59,10 +59,12 @@ const commandToSlashCommand = (command: Command): SlashCommand => {
         // TODO: Does not support falsy permissions. Do we convert this to straightforward [] type?
         for (const permission in reqs.permissions) {
           if (reqs.permissions[permission]) {
-            const translatedName = permission.toLowerCase().split('_').map((value, index) => (
-              index === 0 ? value : value.substr(0, 1).toUpperCase() + value.substr(1)
-            ))
-            requiredPermissions.push(translatedName.join(''))
+            let translatedName = ''
+            permission.split('').forEach(letter => {
+              if (/^[A-Z]$/.test(letter)) translatedName += '_'
+              translatedName += letter
+            })
+            requiredPermissions.push(translatedName.toUpperCase())
           }
         }
       }
@@ -75,8 +77,13 @@ const commandToSlashCommand = (command: Command): SlashCommand => {
       })
     }
 
-    async run (ctx: CommandContext): Promise<string | MessageWebhookContent | void> {
-      if (command.opts.guildOnly && !ctx.guildID) return 'This command can only be executed from a Discord guild!'
+    async run (ctx: CommandContext): Promise<string | MessageWebhookContent | any | void> {
+      if (command.opts.guildOnly && !ctx.guildID) {
+        return {
+          content: 'This command can only be executed from a Discord guild.',
+          flags: InteractionResponseFlags.EPHEMERAL
+        }
+      }
       if (typeof command.generator !== 'function') return command.generator
       const func: IveBotSlashGeneratorFunction = command.slashGenerator === true
         ? command.generator as any

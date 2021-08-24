@@ -53,8 +53,6 @@ export const getChannel = (message: Message, arg: string): GuildChannel | undefi
   if (guild.channels.has(arg)) return guild.channels.get(arg)
   else if ((mentions.length > 0) && mentions[0] === getIdFromMention(arg)) {
     return guild.channels.get(mentions[0])
-  } else if (guild.channels.find(i => i.name === arg)) {
-    return guild.channels.find(i => i.name === arg)
   } else if (guild.channels.find(i => i.name.toLowerCase() === arg.toLowerCase())) {
     return guild.channels.find(i => i.name.toLowerCase() === arg.toLowerCase())
   }

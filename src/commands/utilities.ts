@@ -3,7 +3,7 @@ import Eris, { Message, GuildTextableChannel, Constants, Guild } from 'eris'
 import { CommandOptionType } from 'slash-create'
 import { Command } from '../imports/types.js'
 // All the needs!
-import { getIdFromMention, getInsult, getUser } from '../imports/tools.js'
+import { getIdFromMention, getInsult, getUser, getChannel } from '../imports/tools.js'
 import ms from 'ms'
 import { host, testPilots } from '../config.js'
 import moment from 'moment'
@@ -547,49 +547,70 @@ export const handleLeave: Command = {
   }
 }
 
-export const handleListserverregions: Command = ({
-  name: 'listserverregions',
-  aliases: ['lsr'],
+export const handleListvoiceregions: Command = ({
+  name: 'listvoiceregions',
+  aliases: ['lsr', 'lvr'],
   opts: {
     fullDescription: 'List available voice regions.',
     description: 'List available voice regions.',
-    usage: '/listserverregions',
-    example: '/listserverregions',
+    usage: '/listvoiceregions',
+    example: '/listvoiceregions',
     guildOnly: true,
     argsRequired: false
   },
-  generator: async (message, args, { client }) => 'Available server regions: `' + (
-    await client.getVoiceRegions(message.member.guild.id)
+  slashGenerator: (context, { client }) => handleListvoiceregions.commonGenerator(context.guildID, client),
+  generator: (message, args, { client }) => handleListvoiceregions.commonGenerator(message.guildID, client),
+  commonGenerator: async (guild: string, client: Eris.Client) => 'Available voice regions for this server: `' + (
+    await client.getVoiceRegions(guild)
   ).map((value) => value.id).join('`, `') + '`'
 })
 
-/* export const handleChangeserverregion: Command = {
-  name: 'changeserverregion',
-  aliases: ['csr'],
+export const handleChangevoiceregion: Command = {
+  name: 'changevoiceregion',
+  aliases: ['csr', 'cvr'],
   opts: {
-    fullDescription: 'Changes the voice region of the server.',
-    description: 'Changes the voice region of the server.',
-    usage: '/changeserverregion <server region>',
-    example: '/changeserverregion russia',
+    fullDescription: 'Changes the voice region of the voice channel.',
+    description: 'Changes the voice region of the voice channel.',
+    usage: '/changevoiceregion <voice channel name> <voice region or automatic>',
+    example: '/changevoiceregion General 1 russia',
     guildOnly: true,
     requirements: {
       permissions: { manageGuild: true }
     },
-    invalidUsageMessage: 'Correct usage: /changeserverregion <valid server region, /listserverregion>'
+    slashOptions: [{
+      name: 'channel',
+      description: 'The voice channel to edit the region of.',
+      type: CommandOptionType.CHANNEL,
+      required: true
+    }, {
+      name: 'region',
+      description: 'The voice region to switch the channel to.',
+      type: CommandOptionType.STRING // TODO: Maybe a choice?
+    }]
   },
-  generator: async (message, args, { client }) => {
+  slashGenerator: (context, { client }) => {
+    const ch = client.guilds.get(context.guildID).channels.get(context.options.channel)
+    if (!ch || ch.type !== 2) return { content: 'This voice channel does not exist!', error: true }
+    return handleChangevoiceregion.commonGenerator(ch, context.options.region || 'auto', client)
+  },
+  generator: (message, args, { client }) => {
     if (!message.member.guild.members.get(client.user.id).permissions.has('manageGuild')) {
       return 'I require the Manage Server permission to do that..'
     }
+    const rtcRegion = args.pop()
+    const ch = getChannel(message, args.join(' '))
+    if (!ch || ch.type !== 2) return { content: 'This voice channel does not exist!', error: true }
+    return handleChangevoiceregion.commonGenerator(ch, rtcRegion, client)
+  },
+  commonGenerator: async (channel: Eris.VoiceChannel, region: string, client: Eris.Client) => {
     try {
-      const guild = await client.editGuild(message.member.guild.id, {
-        region: args.join(' ').toLowerCase()
+      const { rtcRegion } = await channel.edit({
+        rtcRegion: region === 'automatic' || region === 'auto' ? null : region
       })
-      const name = (await guild.getVoiceRegions()).find(i => i.id === guild.region).name
-      return 'Voice region changed to ' + name + ' \\o/'
-    } catch (e) { return 'Invalid server voice region.' }
+      return 'Voice region changed to ' + (rtcRegion || 'auto') + ' \\o/'
+    } catch (e) { return 'Invalid voice region.' }
   }
-} */
+}
 
 export const handleEdit: Command = {
   name: 'edit',

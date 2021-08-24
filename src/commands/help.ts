@@ -58,7 +58,7 @@ TP \`/request\` - Request a specific feature.
 \`/addEmoji\`, \`/deleteEmoji\` and \`/editEmoji\`
 \`/deleteChannel\` and \`/editChannel\`
 \`/warn\`, \`/warnings\`, \`/clearwarns\` and \`/removewarn\`
-\`/changeserverregion\` and \`/listserverregions\`
+\`/changevoiceregion\` and \`/listvoiceregions\`
 \`/perms\` - Displays a particular member's permissions.
 \`/purge\` - Bulk delete a set of messages.
 \`/slowmode\` - When you must slow down chat.`
