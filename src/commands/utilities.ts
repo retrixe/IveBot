@@ -60,7 +60,7 @@ export const handleServerinfo: Command = {
           ...boost,
           { name: 'Owner', value: `${owner.username}#${owner.discriminator}`, inline: true },
           { name: 'Owner ID', value: guild.ownerID, inline: true },
-          { name: 'Region', value: guild.region, inline: true },
+          // { name: 'Region', value: guild.region, inline: true },
           {
             name: 'Created On',
             value: moment(guild.createdAt).format('DD/MM/YYYY, hh:mm:ss A'),
@@ -563,7 +563,7 @@ export const handleListserverregions: Command = ({
   ).map((value) => value.id).join('`, `') + '`'
 })
 
-export const handleChangeserverregion: Command = {
+/* export const handleChangeserverregion: Command = {
   name: 'changeserverregion',
   aliases: ['csr'],
   opts: {
@@ -589,7 +589,7 @@ export const handleChangeserverregion: Command = {
       return 'Voice region changed to ' + name + ' \\o/'
     } catch (e) { return 'Invalid server voice region.' }
   }
-}
+} */
 
 export const handleEdit: Command = {
   name: 'edit',

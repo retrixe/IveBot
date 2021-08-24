@@ -1,7 +1,9 @@
-import { Command as IveBotCommand } from '../imports/types.js'
 import { zeroWidthSpace, getInsult } from '../imports/tools.js'
+import { Command as IveBotCommand } from '../imports/types.js'
+import CommandParser, { Command } from '../client.js'
 import { rootURL } from '../config.js'
-import { Command } from '../client.js'
+import { Client } from 'eris'
+import { CommandOptionType } from 'slash-create'
 
 const generalHelp = {
   description: `**Jony Ive can do many commands 📡**
@@ -114,23 +116,35 @@ export const handleHelp: IveBotCommand = {
     fullDescription: 'The most innovative halp.',
     usage: '/help (command name)',
     example: '/help zalgo',
-    argsRequired: false
+    argsRequired: false,
+    slashOptions: [{ // TODO: Should this response be ephemeral?
+      name: 'command',
+      description: 'Name of the command to get help on.',
+      type: CommandOptionType.STRING,
+      required: false
+    }]
   },
-  generator: async (message, args, { commandParser }) => {
-    const commands = commandParser.commands
-    const command = args.join(' ').split('/').join('').toLowerCase()
+  slashGenerator: async ({ user, options }, { client, commandParser }) => (
+    await handleHelp.commonGenerator(user.id, options.command, client, commandParser)
+  ),
+  generator: async (message, args, { client, commandParser }) => (
+    await handleHelp.commonGenerator(message.author.id, args.join(' '), client, commandParser)
+  ),
+  commonGenerator: async (author: string, command: string, client: Client, parser: CommandParser) => {
+    const commands = parser.commands
+    const commandName = command.split('/').join('').toLowerCase()
     const check = (i: string): boolean => (
       // First checks for name, 2nd for aliases.
-      commands[i].name.toLowerCase() === command ||
-      (commands[i].aliases && commands[i].aliases.includes(command))
+      commands[i].name.toLowerCase() === commandName ||
+      (commands[i].aliases && commands[i].aliases.includes(commandName))
     )
     // Check if requested for a specific command.
     if (Object.keys(commands).find(check)) {
       return generateDocs(commands[Object.keys(commands).find(check)])
-    } else if (args.join(' ')) return { content: 'Incorrect parameters. Run /help for general help.', error: true }
+    } else if (command) return { content: 'Incorrect parameters. Run /help for general help.', error: true }
     // Default help.
     try {
-      const channel = await message.author.getDMChannel()
+      const channel = await client.getDMChannel(author)
       await channel.createMessage({
         content: `**IveBot's dashboard**: ${rootURL || 'https://ivebot.now.sh'}/
 (Manage Server required to manage a server)`,

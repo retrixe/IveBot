@@ -56,17 +56,17 @@ export const handleMute: Command = {
             client.editChannelPermission(
               a.id, role.id, 0,
               Constants.Permissions.sendMessages | Constants.Permissions.addReactions,
-              'role'
+              0
             ).catch(() => {}) // Ignore error.
           } else if (a.type === 2) {
-            client.editChannelPermission(a.id, role.id, 0, Constants.Permissions.voiceSpeak, 'role')
+            client.editChannelPermission(a.id, role.id, 0, Constants.Permissions.voiceSpeak, 0)
               .catch(() => {}) // Ignore error.
           } else if (a.type === 4) {
             client.editChannelPermission(
               a.id, role.id, 0,
               Constants.Permissions.sendMessages |
               Constants.Permissions.addReactions | Constants.Permissions.voiceSpeak,
-              'role'
+              0
             ).catch(() => {}) // Ignore error.
           }
         })

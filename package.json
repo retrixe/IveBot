@@ -20,7 +20,7 @@
     "node": ">=12.20.0"
   },
   "dependencies": {
-    "eris": "^0.15.1",
+    "eris": "DonovanDMC/eris#v9-interactions",
     "fuse.js": "^6.4.6",
     "json5": "^0.5.1",
     "mathjs": "^9.4.3",
