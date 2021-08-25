@@ -38,8 +38,8 @@ export const handleChoose: Command = {
       type: CommandOptionType.STRING
     }]
   },
-  slashGenerator: context => {
-    const choices = context.options.choices.split('|')
+  slashGenerator: interaction => {
+    const choices = interaction.data.options[0]?.value.split('|')
     return `I choose: ${choices[Math.floor(Math.random() * choices.length)]}`
   },
   generator: (message, args) => {
@@ -65,7 +65,7 @@ export const handleReverse: Command = {
       type: CommandOptionType.STRING
     }]
   },
-  slashGenerator: context => context.options.text.split('').reverse().join(''),
+  slashGenerator: interaction => interaction.data.options[0]?.value.split('').reverse().join(''),
   generator: (message, args) => args.join(' ').split('').reverse().join('')
 }
 
@@ -115,7 +115,7 @@ export const handleZalgo: Command = {
     }]
   },
   generator: (message, args) => handleZalgo.commonGenerator(args.join(' ')),
-  slashGenerator: context => handleZalgo.commonGenerator(context.options.text),
+  slashGenerator: interaction => handleZalgo.commonGenerator(interaction.data.options[0]?.value),
   commonGenerator: (text: string) => {
     const textToZalgo = text.split('')
     let newMessage = ''
@@ -144,7 +144,7 @@ export const handleDezalgo: Command = {
       type: CommandOptionType.STRING
     }]
   },
-  slashGenerator: context => handleDezalgo.commonGenerator(context.options.text),
+  slashGenerator: interaction => handleDezalgo.commonGenerator(interaction.data.options[0]?.value),
   generator: (message, args) => handleDezalgo.commonGenerator(args.join(' ')),
   commonGenerator: (text: string) => {
     let newMessage = ''
@@ -175,9 +175,9 @@ export const handleRepeat: Command = {
       type: CommandOptionType.STRING
     }]
   },
-  slashGenerator: context => {
-    const number = context.options.number
-    const text = context.options.text as string
+  slashGenerator: interaction => {
+    const number = interaction.data.options.find(opt => opt.name === 'number').value
+    const text = interaction.data.options.find(opt => opt.name === 'text').value
     return handleRepeat.commonGenerator(number, text)
   },
   generator: (message, args) => {
@@ -219,14 +219,14 @@ export const handleRandom: Command = {
       type: CommandOptionType.INTEGER
     }]
   },
-  slashGenerator: context => {
-    if (typeof context.options.start === 'number' && typeof context.options.end === 'number') {
-      const number1 = context.options.start
-      const number2 = context.options.end
-      return `The number.. is.. ${Math.floor(Math.random() * (number2 - number1)) + number1}`
-    } else if (typeof context.options.end === 'number') {
-      return `The number.. is.. ${Math.floor(Math.random() * context.options.end)}`
-    } else if (typeof context.options.start === 'number') {
+  slashGenerator: interaction => { // TODO: Workaround
+    const start = interaction.data.options.find(option => option.name === 'start')?.value as unknown as number
+    const end = interaction.data.options.find(option => option.name === 'end')?.value
+    if (typeof start === 'number' && typeof end === 'number') {
+      return `The number.. is.. ${Math.floor(Math.random() * (end - start)) + start}`
+    } else if (typeof end === 'number') {
+      return `The number.. is.. ${Math.floor(Math.random() * end)}`
+    } else if (typeof start === 'number') {
       return { content: 'You must provide an end number if providing a start number.', error: true }
     } else return `The number.. is.. ${Math.floor(Math.random() * 10)}`
   },
@@ -264,7 +264,7 @@ More info here: https://mathjs.org/docs/expressions/syntax.html`,
       type: CommandOptionType.STRING
     }]
   },
-  slashGenerator: context => handleCalculate.commonGenerator(context.options.expression),
+  slashGenerator: interaction => handleCalculate.commonGenerator(interaction.data.options[0]?.value),
   generator: (message, args) => handleCalculate.commonGenerator(args.join(' ')),
   commonGenerator: (expression: string) => {
     try {
@@ -289,7 +289,7 @@ export const handleDistort: Command = {
       type: CommandOptionType.STRING
     }]
   },
-  slashGenerator: context => context.options.text.split(' ').map((i: string) => (
+  slashGenerator: interaction => interaction.data.options[0]?.value.split(' ').map((i: string) => (
     i.split('').join('*') + (i.length % 2 === 0 ? '*' : '')
   )).join(' '),
   generator: (message, args) => args.map(i => (

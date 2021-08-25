@@ -1,7 +1,7 @@
 import 'json5/lib/require.js'
 // Tokens and stuff.
-import { Client, MessageWebhookContent } from 'eris'
-import { SlashCommand, SlashCreator, GatewayServer, CommandContext, InteractionResponseFlags } from 'slash-create'
+import { Client, CommandInteraction, Interaction } from 'eris'
+import { SlashCommand, SlashCreator, GatewayServer } from 'slash-create'
 // Get MongoDB.
 import { MongoClient } from 'mongodb'
 // Import fs.
@@ -10,8 +10,9 @@ import { inspect } from 'util'
 import http from 'http'
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto'
 // Import types.
-import { DB, Command, IveBotSlashGeneratorFunction } from './imports/types.js'
+import { DB, Command } from './imports/types.js'
 // Import the bot.
+import SlashParser from './slash.js'
 import CommandParser from './client.js'
 import { guildMemberAdd, guildMemberRemove, guildDelete, guildBanAdd } from './events.js'
 // Get the token needed.
@@ -43,19 +44,16 @@ const client = new Client(`Bot ${token === 'dotenv' ? process.env.IVEBOT_TOKEN :
 const creator = new SlashCreator({
   applicationID: Buffer.from(token.split('.')[0], 'base64').toString(), token
 })
-creator.withServer(new GatewayServer(
-  (handler) => client.on('rawWS', (event) => {
-    if (event.t === 'INTERACTION_CREATE') handler(event.d as any)
-  }))
-)
+creator.withServer(new GatewayServer((handler) => client.on('rawWS', (event) => {
+  // if (event.t === 'INTERACTION_CREATE') handler(event.d as any)
+})))
 
 const commandToSlashCommand = (command: Command): SlashCommand => {
   class IveBotSlashCommand extends SlashCommand {
     constructor (creator: SlashCreator) {
       const reqs = command.opts.requirements
-      const defaultPermission = !(reqs && (reqs.userIDs || reqs.custom))
       const requiredPermissions = []
-      if (reqs && reqs.permissions) {
+      if (reqs?.permissions) {
         // TODO: Does not support falsy permissions. Do we convert this to straightforward [] type?
         for (const permission in reqs.permissions) {
           if (reqs.permissions[permission]) {
@@ -71,32 +69,13 @@ const commandToSlashCommand = (command: Command): SlashCommand => {
       super(creator, {
         name: command.name,
         description: command.opts.description.replace(/</g, '').replace(/>/g, ''),
-        defaultPermission,
+        defaultPermission: true,
         requiredPermissions,
         options: command.opts.slashOptions || []
       })
     }
 
-    async run (ctx: CommandContext): Promise<string | MessageWebhookContent | any | void> {
-      if (command.opts.guildOnly && !ctx.guildID) {
-        return {
-          content: 'This command can only be executed from a Discord guild.',
-          flags: InteractionResponseFlags.EPHEMERAL
-        }
-      }
-      if (typeof command.generator !== 'function') return command.generator
-      const func: IveBotSlashGeneratorFunction = command.slashGenerator === true
-        ? command.generator as any
-        : command.slashGenerator
-      const response = await Promise.resolve(func(ctx, { client, db, tempDB, commandParser }))
-      const embedResponse = typeof response === 'object' && response.embed
-        ? { ...response, embeds: [response.embed] }
-        : response
-      if (typeof embedResponse === 'object' && embedResponse.error) {
-        embedResponse.flags = InteractionResponseFlags.EPHEMERAL
-      }
-      return embedResponse
-    }
+    async run (): Promise<void> {}
   }
   return new IveBotSlashCommand(creator)
 }
@@ -125,6 +104,13 @@ client.on('guildDelete', bubbleWrap(guildDelete(db)))
 const commandParser = new CommandParser(client, tempDB, db)
 client.on('messageCreate', bubbleWrap(commandParser.onMessage))
 client.on('messageUpdate', bubbleWrap(commandParser.onMessageUpdate))
+const slashParser = new SlashParser(client, tempDB, db, commandParser)
+client.on('interactionCreate', (interaction: Interaction) => { // TODO: Workaround
+  if (interaction.type === 2 && interaction instanceof CommandInteraction) {
+    if (!interaction.user) interaction.user = interaction.member?.user // TODO: Workaround
+    bubbleWrap(slashParser.handleCommandInteraction)(interaction)
+  }
+})
 // Register all commands in src/commands onto the CommandParser.
 const toRead = dev ? './src/commands/' : './lib/commands/'
 const commandFiles = await readdir(toRead)
@@ -143,11 +129,9 @@ for (const commandFile of commandFiles) {
       if (commandName === 'TriviaSession') return
       const command = commands[commandName]
       commandParser.registerCommand(command)
-      // TODO: Custom and user ID requirements not handled yet.
-      const reqs = command.opts.requirements
-      const hasCustomReqs = (reqs && (reqs.custom || reqs.userIDs))
-      if (!hasCustomReqs && (typeof command.generator !== 'function' || command.slashGenerator)) {
+      if (typeof command.generator !== 'function' || command.slashGenerator) {
         creator.registerCommand(commandToSlashCommand(command))
+        slashParser.registerCommand(command)
       }
     })
   }

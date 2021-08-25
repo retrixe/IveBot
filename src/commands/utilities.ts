@@ -25,9 +25,10 @@ export const handleServerinfo: Command = {
     }]
   },
 
-  slashGenerator: (context, { client }) => {
-    let guild = client.guilds.get(context.options.server || context.guildID)
-    if (context.options.server && guild && !guild.members.has(context.member.id)) guild = undefined
+  slashGenerator: (interaction, { client }) => {
+    const serverOpt = interaction.data.options.find(option => option.name === 'server')
+    let guild = client.guilds.get(serverOpt?.value || interaction.guildID)
+    if (serverOpt?.value && guild && !guild.members.has(interaction.user.id)) guild = undefined
     return handleServerinfo.commonGenerator(guild)
   },
   generator: (message, args, { client }) => {
@@ -558,7 +559,7 @@ export const handleListvoiceregions: Command = ({
     guildOnly: true,
     argsRequired: false
   },
-  slashGenerator: (context, { client }) => handleListvoiceregions.commonGenerator(context.guildID, client),
+  slashGenerator: ({ guildID }, { client }) => handleListvoiceregions.commonGenerator(guildID, client),
   generator: (message, args, { client }) => handleListvoiceregions.commonGenerator(message.guildID, client),
   commonGenerator: async (guild: string, client: Eris.Client) => 'Available voice regions for this server: `' + (
     await client.getVoiceRegions(guild)
@@ -588,10 +589,12 @@ export const handleChangevoiceregion: Command = {
       type: CommandOptionType.STRING // TODO: Maybe a choice?
     }]
   },
-  slashGenerator: (context, { client }) => {
-    const ch = client.guilds.get(context.guildID).channels.get(context.options.channel)
+  slashGenerator: (interaction, { client }) => {
+    const channelOpt = interaction.data.options.find(option => option.name === 'channel')
+    const regionOpt = interaction.data.options.find(option => option.name === 'region')
+    const ch = client.guilds.get(interaction.guildID).channels.get(channelOpt.value)
     if (!ch || ch.type !== 2) return { content: 'This voice channel does not exist!', error: true }
-    return handleChangevoiceregion.commonGenerator(ch, context.options.region || 'auto', client)
+    return handleChangevoiceregion.commonGenerator(ch, regionOpt.value || 'auto', client)
   },
   generator: (message, args, { client }) => {
     if (!message.member.guild.members.get(client.user.id).permissions.has('manageGuild')) {

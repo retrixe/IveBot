@@ -17,9 +17,11 @@
     "sourceMap": true,
     "outDir": "lib/",
     "pretty": true,
+    "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    "strictNullChecks": false,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true
   },

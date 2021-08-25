@@ -7,6 +7,7 @@ import { inspect } from 'util'
 import { getIdFromMention, getInsult } from '../imports/tools.js'
 import { Base } from 'eris'
 import { readFile } from 'fs/promises'
+import { CommandOptionType } from 'slash-create'
 const { version }: { version: string } = JSON.parse(await readFile('package.json', { encoding: 'utf8' }))
 
 export const handleVersion: Command = {
@@ -195,9 +196,18 @@ export const handleCreationtime: Command = {
     description: 'Finds out when a Snowflake (e.g. user ID) was created.',
     fullDescription: 'Finds out when a Snowflake (e.g. user ID) was created.',
     usage: '/creationtime <ID or mention>',
-    example: '/creationtime 383591525944262656'
+    example: '/creationtime 383591525944262656',
+    slashOptions: [{
+      name: 'entities',
+      description: 'The users, channels, roles and/or Discord IDs to get the creation time of.',
+      required: true,
+      type: CommandOptionType.STRING
+    }]
   },
-  generator: (message, args) => {
+  slashGenerator: ({ data: { options: [{ value }] } }) =>
+    handleCreationtime.commonGenerator(value.trim().split(' ').filter(arg => !!arg)),
+  generator: (message, args) => handleCreationtime.commonGenerator(args),
+  commonGenerator: (args: string[]) => {
     if (args.length === 1) {
       // Just parse it normally.
       let id = args[0]

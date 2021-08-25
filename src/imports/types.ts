@@ -1,9 +1,9 @@
 // Flow our types.
-import { AdvancedMessageContent, Client, Message } from 'eris'
+import { AdvancedMessageContent, Client, CommandInteraction, Message } from 'eris'
 import CommandParser from '../client.js'
 import { Db } from 'mongodb'
 import { TriviaSession } from '../commands/trivia.js'
-import { ApplicationCommandOption, CommandContext } from 'slash-create'
+import { ApplicationCommandOption } from 'slash-create'
 
 export interface DB {
   gunfight: {
@@ -34,7 +34,7 @@ export interface Context { tempDB: DB, db: Db, commandParser: CommandParser, cli
 export type CommandResponse = string | AdvancedMessageContent & { error?: boolean }
 export type IveBotCommandGeneratorFunction = (msg: Message, args: string[], ctx: Context) =>
 void | Promise<void> | CommandResponse | Promise<CommandResponse>
-export type IveBotSlashGeneratorFunction = (context: CommandContext, ctx: Context) =>
+export type IveBotSlashGeneratorFunction = (interaction: CommandInteraction, ctx: Context) =>
 void | Promise<void> | CommandResponse | Promise<CommandResponse>
 export type IveBotCommandGenerator = IveBotCommandGeneratorFunction|string|AdvancedMessageContent
 export interface Command {

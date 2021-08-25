@@ -124,8 +124,8 @@ export const handleHelp: IveBotCommand = {
       required: false
     }]
   },
-  slashGenerator: async ({ user, options }, { client, commandParser }) => (
-    await handleHelp.commonGenerator(user.id, options.command, client, commandParser)
+  slashGenerator: async ({ user, data: { options } }, { client, commandParser }) => (
+    await handleHelp.commonGenerator(user.id, options[0].value, client, commandParser)
   ),
   generator: async (message, args, { client, commandParser }) => (
     await handleHelp.commonGenerator(message.author.id, args.join(' '), client, commandParser)
