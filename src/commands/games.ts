@@ -268,7 +268,7 @@ More info here: https://mathjs.org/docs/expressions/syntax.html`,
   generator: (message, args) => handleCalculate.commonGenerator(args.join(' ')),
   commonGenerator: (expression: string) => {
     try {
-      return `${evaluate(expression.split(',').join('.').split('÷').join('/').toLowerCase())}`
+      return `${evaluate(expression.split(',').join('.').split('÷').join('/').toLowerCase())}`.trim()
     } catch (e) {
       return { content: 'Invalid expression >_<', error: true }
     }
