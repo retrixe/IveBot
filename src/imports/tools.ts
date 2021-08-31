@@ -79,7 +79,7 @@ export const fetchLimited = async (url: string, limit: number, opts = {}): Promi
     let size = 0
     const data: Buffer[] = []
     const parsedUrl = new URL(url)
-    const req = (parsedUrl.protocol === 'https:' ? https.get : get)({ ...parsedUrl, ...opts }, (res) => {
+    const req = (parsedUrl.protocol === 'https:' ? https.get : get)(parsedUrl, opts, (res) => {
       const contentLength = res.headers['content-length'] || '-1'
       if (!isNaN(+contentLength) && +contentLength > byteLimit) {
         req.abort()
