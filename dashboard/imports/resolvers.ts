@@ -16,6 +16,12 @@ const db = mongodb.db('ivebot')
 const botClient = new Client(`Bot ${botToken}`, { restMode: true, intents: 0 })
 
 // Helper functions.
+const defaultSettings = {
+  joinAutorole: '',
+  publicRoles: '',
+  ocrOnSend: false,
+  joinLeaveMessages: { channel: '', joinMessage: '', leaveMessage: '', banMessage: '' }
+}
 const getServerSettings = async (id: string): Promise<Document> => {
   await mongodb.connect()
   // Get serverSettings through query.
@@ -137,14 +143,13 @@ export default {
       if (hasPerm) {
         const serverSettings = await getServerSettings(id)
         // Insert default values for all properties.
-        const defaultJoinMsgs = { channel: '', joinMessage: '', leaveMessage: '', banMessage: '' }
         return {
           id,
-          joinAutorole: '',
-          publicRoles: '',
-          ocrOnSend: false,
+          ...defaultSettings,
           ...serverSettings,
-          joinLeaveMessages: { ...defaultJoinMsgs, ...(serverSettings.joinLeaveMessages || {}) }
+          joinLeaveMessages: {
+            ...defaultSettings.joinLeaveMessages, ...(serverSettings.joinLeaveMessages || {})
+          }
         }
       } else throw new ForbiddenError('You are not allowed to access this server\'s settings!')
     },
@@ -183,10 +188,15 @@ export default {
       { id, newSettings }: {
         id: string
         newSettings: {
-          publicRoles: string
-          joinAutorole: string
-          joinLeaveMessages: { channel: string, joinMessage: string, leaveMessage: string }
-          ocrOnSend: boolean
+          publicRoles?: string
+          joinAutorole?: string
+          joinLeaveMessages?: {
+            channel?: string
+            joinMessage?: string
+            leaveMessage?: string
+            banMessage?: string
+          }
+          ocrOnSend?: boolean
         }
       },
       context: ResolverContext
@@ -197,15 +207,16 @@ export default {
       const hasPerm = await checkUserGuildPerm(self.id, id, host === self.id)
       if (hasPerm) {
         const serverSettings = await getServerSettings(id)
-        // Insert default values for all properties.
-        const defaultJoinMsgs = { channel: '', joinMessage: '', leaveMessage: '', banMessage: '' }
         await db.collection('servers').updateOne({ id }, {
           $set: {
-            joinAutorole: '',
-            publicRoles: '',
-            ocrOnSend: false,
+            ...defaultSettings,
             ...serverSettings,
-            joinLeaveMessages: { ...defaultJoinMsgs, ...(serverSettings.joinLeaveMessages || {}) }
+            ...newSettings,
+            joinLeaveMessages: {
+              ...defaultSettings.joinLeaveMessages,
+              ...(serverSettings.joinLeaveMessages || {}),
+              ...(newSettings.joinLeaveMessages || {})
+            }
           }
         })
         return await getServerSettings(id)

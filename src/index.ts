@@ -211,7 +211,9 @@ if (jwtSecret) {
               return valid.push({
                 id,
                 perm: true,
-                textChannels: guild.channels.filter(c => c.type === 0).map(c => ({ id: c.id, name: c.name }))
+                textChannels: guild.channels
+                  .filter(c => c.type === 0 || c.type === 5)
+                  .map(c => ({ id: c.id, name: c.name }))
               })
             }
             let member = guild.members.get(parsed.id)
@@ -223,7 +225,7 @@ if (jwtSecret) {
             }
             if (member) {
               const perm = guild.permissionsOf(member).has('manageGuild')
-              const textChannels = perm ? guild.channels.filter(c => c.type === 0) : []
+              const textChannels = perm ? guild.channels.filter(c => c.type === 0 || c.type === 5) : []
               valid.push({ id, perm, textChannels: textChannels.map(c => ({ id: c.id, name: c.name })) })
             }
           }))

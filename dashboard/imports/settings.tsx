@@ -28,12 +28,13 @@ const EDIT_SERVER_SETTINGS = gql`
 const Settings = (props: { data: ServerSettings, server: ServerInfo }): JSX.Element => {
   const [editServerSettings, { loading, error }] = useMutation(EDIT_SERVER_SETTINGS)
   const [serverSettings, setServerSettings] = useState<ServerSettings>({ ...props.data })
+  const [originalServerSettings, setOriginalServerSettings] = useState<ServerSettings>({ ...props.data })
   // useEffect(() => setServerSettings({ ...props.data }), [props.data])?
 
   const setJoinLeaveMessages = (e: Partial<JoinLeaveMessages>): void => setServerSettings(s => ({
     ...s, joinLeaveMessages: { ...(s.joinLeaveMessages || {}), ...e }
   }))
-  const setpublicRoles = (e: string): void => setServerSettings(s => ({ ...s, publicRoles: e }))
+  const setPublicRoles = (e: string): void => setServerSettings(s => ({ ...s, publicRoles: e }))
   const setJoinAutorole = (e: string): void => setServerSettings(s => ({ ...s, joinAutorole: e }))
   const toggleOcrOnSend = (): void => setServerSettings(s => ({ ...s, ocrOnSend: !s.ocrOnSend }))
 
@@ -55,7 +56,7 @@ const Settings = (props: { data: ServerSettings, server: ServerInfo }): JSX.Elem
         <InputLabel>Role Names</InputLabel>
         <Input
           value={serverSettings.publicRoles || ''} fullWidth
-          onChange={e => setpublicRoles(e.target.value)} margin='dense'
+          onChange={e => setPublicRoles(e.target.value)} margin='dense'
         />
         <FormHelperText>Leave blank to disable public roles</FormHelperText>
       </FormControl>
@@ -148,7 +149,7 @@ const Settings = (props: { data: ServerSettings, server: ServerInfo }): JSX.Elem
           channel and posts the result using /ocr.'}
       </Typography>
       <div style={{ height: 10 }} />
-      <Button size='small'>Cancel</Button>
+      <Button size='small' onClick={() => setServerSettings(originalServerSettings)}>Cancel</Button>
       <Button
         size='small' onClick={async () => {
           const newSettings: Partial<ServerSettings> = {
@@ -158,6 +159,7 @@ const Settings = (props: { data: ServerSettings, server: ServerInfo }): JSX.Elem
           delete newSettings.__typename
           if (newSettings.joinLeaveMessages?.__typename) delete newSettings.joinLeaveMessages.__typename
           await editServerSettings({ variables: { id: props.server.id, newSettings } })
+          setOriginalServerSettings(serverSettings)
         }}
       >Save
       </Button>
