@@ -1,4 +1,4 @@
-import {
+import Eris, {
   Message,
   MessageContent,
   AdvancedMessageContent,
@@ -154,10 +154,6 @@ export default class SlashParser {
   }
 
   async executeCommand (command: SlashCommand, interaction: CommandInteraction): Promise<void> {
-    // We give our generators what they need.
-    const context: Context = {
-      tempDB: this.tempDB, db: this.db, commandParser: this.commandParser, client: this.client
-    }
     // Guild and DM only.
     if (command.guildOnly && !interaction.guildID) {
       await interaction.createMessage({
@@ -178,17 +174,42 @@ export default class SlashParser {
       )
       return
     }
-    // Delete the message if needed.
-    try {
-      if (command.deleteCommand) await interaction.deleteOriginalMessage() // TODO: Just make it ephemeral?
-    } catch (e) {}
+    // Validate that the arguments match schema to prevent further errors down the line.
+    const found: string[] = []
+    for (const option of interaction.data.options) {
+      found.push(option.name)
+      const optionInfo = command.options.find(arg => arg.name === option.name)
+      if (!optionInfo) continue // TODO: Ignore unused property. Or should we throw?
+      else if ((optionInfo.type === Constants.ApplicationCommandOptionTypes.STRING ||
+        optionInfo.type === Constants.ApplicationCommandOptionTypes.MENTIONABLE ||
+        optionInfo.type === Constants.ApplicationCommandOptionTypes.USER ||
+        optionInfo.type === Constants.ApplicationCommandOptionTypes.ROLE ||
+        optionInfo.type === Constants.ApplicationCommandOptionTypes.CHANNEL) &&
+        typeof (option as Eris.InteractionDataOptionsString).value !== 'string') {
+        throw new Error(`Discord did not correctly validate interaction! (${command.name})`)
+      } else if ((optionInfo.type === Constants.ApplicationCommandOptionTypes.INTEGER ||
+        optionInfo.type === Constants.ApplicationCommandOptionTypes.NUMBER) &&
+        typeof (option as Eris.InteractionDataOptionsNumber).value !== 'number') {
+        throw new Error(`Discord did not correctly validate interaction! (${command.name})`)
+      } else if (optionInfo.type === Constants.ApplicationCommandOptionTypes.BOOLEAN &&
+        typeof (option as Eris.InteractionDataOptionsBoolean).value !== 'boolean') {
+        throw new Error(`Discord did not correctly validate interaction! (${command.name})`)
+      } // TODO: No sub command validation, write when you add sub commands.
+    }
+    if (!command.options.filter(opt => opt.required).every(option => found.includes(option.name))) {
+      throw new Error(`Discord did not correctly validate interaction! (${command.name})`)
+    }
+    // We give our generators what they need.
+    const context: Context = {
+      tempDB: this.tempDB, db: this.db, commandParser: this.commandParser, client: this.client
+    }
     // We get the exact content to send.
     const messageToSend = await command.execute(context, interaction)
     // We define a sent variable to keep track.
     if (messageToSend) {
       await interaction.createMessage({
         ...this.disableEveryone(messageToSend),
-        flags: typeof messageToSend === 'object' && messageToSend.error
+        flags: (typeof messageToSend === 'object' && messageToSend.error) || command.deleteCommand
           ? Constants.MessageFlags.EPHEMERAL
           : 0
       })

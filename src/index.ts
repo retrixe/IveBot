@@ -1,6 +1,6 @@
 import 'json5/lib/require.js'
 // Tokens and stuff.
-import { Client, CommandInteraction, Interaction } from 'eris'
+import { Client, CommandInteraction } from 'eris'
 // Get MongoDB.
 import { MongoClient } from 'mongodb'
 // Import fs.
@@ -51,8 +51,9 @@ const mongoClient = new MongoClient(mongoURL === 'dotenv' ? process.env.MONGO_UR
 await mongoClient.connect()
 console.log('Bot connected successfully to MongoDB.')
 const db = mongoClient.db('ivebot')
-const bubbleWrap = <F extends (...args: any[]) => any>(func: F) =>
-  (...args: Parameters<F>) => { func(...args).catch(console.error) }
+const bubbleWrap = <F extends (...args: any[]) => any>(func: F) => (...args: Parameters<F>) => {
+  func(...args).catch((e: Error) => console.error('An error was bubbled!', e))
+}
 // When a server loses a member, it will callback.
 client.on('guildMemberAdd', bubbleWrap(guildMemberAdd(client, db, tempDB)))
 client.on('guildMemberRemove', bubbleWrap(guildMemberRemove(client, db)))
@@ -64,9 +65,10 @@ const commandParser = new CommandParser(client, tempDB, db)
 client.on('messageCreate', bubbleWrap(commandParser.onMessage))
 client.on('messageUpdate', bubbleWrap(commandParser.onMessageUpdate))
 const slashParser = new SlashParser(client, tempDB, db, commandParser)
-client.on('interactionCreate', (interaction: Interaction) => { // TODO: Workaround
+client.on('interactionCreate', interaction => {
   if (interaction.type === 2 && interaction instanceof CommandInteraction) {
-    if (!interaction.user) interaction.user = interaction.member?.user // TODO: Workaround
+    if (!interaction.user) interaction.user = interaction.member?.user
+    if (!Array.isArray(interaction.data.options)) interaction.data.options = []
     bubbleWrap(slashParser.handleCommandInteraction)(interaction)
   }
 })
