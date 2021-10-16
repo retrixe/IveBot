@@ -1,9 +1,8 @@
 // Flow our types.
-import { AdvancedMessageContent, Client, CommandInteraction, Message } from 'eris'
+import { AdvancedMessageContent, Client, CommandInteraction, ApplicationCommandOptions, Message } from 'eris'
 import CommandParser from '../client.js'
 import { Db } from 'mongodb'
 import { TriviaSession } from '../commands/trivia.js'
-import { ApplicationCommandOption } from 'slash-create'
 
 export interface DB {
   gunfight: {
@@ -47,6 +46,7 @@ export interface Command {
   commonGenerator?: (...args: any[]) => CommandResponse | Promise<CommandResponse>
 }
 export interface CommandOptions {
+  options?: ApplicationCommandOptions[]
   argsRequired?: boolean
   caseInsensitive?: boolean
   deleteCommand?: boolean
@@ -66,5 +66,4 @@ export interface CommandOptions {
     permissions?: { [permission: string]: boolean }
     roleIDs?: string[]
   }
-  slashOptions?: ApplicationCommandOption[]
 }

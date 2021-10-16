@@ -26,8 +26,7 @@
     "mathjs": "^9.4.3",
     "moment": "^2.24.0",
     "mongodb": "^4.0.1",
-    "node-fetch": "^2.6.1",
-    "slash-create": "^3.4.1"
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
     "@types/node": "^16.4.7",

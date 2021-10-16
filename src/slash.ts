@@ -1,5 +1,21 @@
-import { Message, MessageContent, AdvancedMessageContent, Client, CommandInteraction, Constants } from 'eris'
-import { DB, Command, IveBotCommandGenerator, Context, CommandResponse, IveBotSlashGeneratorFunction } from './imports/types.js'
+import {
+  Message,
+  MessageContent,
+  AdvancedMessageContent,
+  Client,
+  CommandInteraction,
+  Constants,
+  ApplicationCommandOptions,
+  ApplicationCommand
+} from 'eris'
+import {
+  DB,
+  Command,
+  IveBotCommandGenerator,
+  Context,
+  CommandResponse,
+  IveBotSlashGeneratorFunction
+} from './imports/types.js'
 import { getInsult } from './imports/tools.js'
 import CommandParser from './client.js'
 import { Db } from 'mongodb'
@@ -22,6 +38,7 @@ function isEquivalent (a: { [index: string]: boolean }, b: { [index: string]: bo
 export class SlashCommand {
   name: string
   aliases?: string[]
+  options: ApplicationCommandOptions[]
   generator: IveBotCommandGenerator
   slashGenerator: true | IveBotSlashGeneratorFunction
   postGenerator?: (message: Message, args: string[], sent?: Message, ctx?: Context) => void
@@ -53,6 +70,7 @@ export class SlashCommand {
     this.postGenerator = command.postGenerator
     this.slashGenerator = command.slashGenerator
     // Options.
+    this.options = command.opts.options
     this.argsRequired = command.opts.argsRequired === undefined || command.opts.argsRequired
     const defaultUsageMessage = 'Invalid usage, correct usage: ' + command.opts.usage
     this.invalidUsageMessage = command.opts.invalidUsageMessage || defaultUsageMessage
@@ -74,7 +92,15 @@ export class SlashCommand {
     // No reaction implementation.
   }
 
-  // TODO: checkAndRegisterSelf
+  async register (client: Client): Promise<ApplicationCommand> {
+    return await client.createCommand({
+      type: Constants.ApplicationCommandTypes.CHAT_INPUT,
+      name: this.name,
+      description: this.description.replace(/</g, '').replace(/>/g, ''),
+      defaultPermission: true,
+      options: this.options
+    })
+  }
 
   requirementsCheck (interaction: CommandInteraction): boolean {
     if (!this.requirements) return true
@@ -245,5 +271,11 @@ export default class SlashParser {
         return
       }
     }
+  }
+
+  async registerAllCommands (): Promise<ApplicationCommand[]> {
+    return await Promise.all(
+      Object.values(this.commands).map(async command => await command.register(this.client))
+    )
   }
 }

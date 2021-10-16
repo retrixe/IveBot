@@ -5,9 +5,8 @@ import { host, testPilots } from '../config.js'
 import { runInNewContext } from 'vm'
 import { inspect } from 'util'
 import { getIdFromMention, getInsult } from '../imports/tools.js'
-import { Base } from 'eris'
+import { Base, Constants, InteractionDataOptionsString } from 'eris'
 import { readFile } from 'fs/promises'
-import { CommandOptionType } from 'slash-create'
 const { version }: { version: string } = JSON.parse(await readFile('package.json', { encoding: 'utf8' }))
 
 export const handleVersion: Command = {
@@ -197,15 +196,16 @@ export const handleCreationtime: Command = {
     fullDescription: 'Finds out when a Snowflake (e.g. user ID) was created.',
     usage: '/creationtime <ID or mention>',
     example: '/creationtime 383591525944262656',
-    slashOptions: [{
+    options: [{
       name: 'entities',
       description: 'The users, channels, roles and/or Discord IDs to get the creation time of.',
       required: true,
-      type: CommandOptionType.STRING
+      type: Constants.ApplicationCommandOptionTypes.STRING
     }]
   },
-  slashGenerator: ({ data: { options: [{ value }] } }) =>
-    handleCreationtime.commonGenerator(value.trim().split(' ').filter(arg => !!arg)),
+  slashGenerator: ({ data: { options } }) => handleCreationtime.commonGenerator(
+    (options[0] as InteractionDataOptionsString).value.trim().split(' ').filter(arg => !!arg)
+  ),
   generator: (message, args) => handleCreationtime.commonGenerator(args),
   commonGenerator: (args: string[]) => {
     if (args.length === 1) {

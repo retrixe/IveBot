@@ -1,7 +1,6 @@
 import 'json5/lib/require.js'
 // Tokens and stuff.
 import { Client, CommandInteraction, Interaction } from 'eris'
-import { SlashCommand, SlashCreator, GatewayServer } from 'slash-create'
 // Get MongoDB.
 import { MongoClient } from 'mongodb'
 // Import fs.
@@ -39,46 +38,6 @@ const client = new Client(`Bot ${token === 'dotenv' ? process.env.IVEBOT_TOKEN :
   autoreconnect: true,
   restMode: true
 })
-
-// Create slash-create creator.
-const creator = new SlashCreator({
-  applicationID: Buffer.from(token.split('.')[0], 'base64').toString(), token
-})
-creator.withServer(new GatewayServer((handler) => client.on('rawWS', (event) => {
-  // if (event.t === 'INTERACTION_CREATE') handler(event.d as any)
-})))
-
-const commandToSlashCommand = (command: Command): SlashCommand => {
-  class IveBotSlashCommand extends SlashCommand {
-    constructor (creator: SlashCreator) {
-      const reqs = command.opts.requirements
-      const requiredPermissions = []
-      if (reqs?.permissions) {
-        // TODO: Does not support falsy permissions. Do we convert this to straightforward [] type?
-        for (const permission in reqs.permissions) {
-          if (reqs.permissions[permission]) {
-            let translatedName = ''
-            permission.split('').forEach(letter => {
-              if (/^[A-Z]$/.test(letter)) translatedName += '_'
-              translatedName += letter
-            })
-            requiredPermissions.push(translatedName.toUpperCase())
-          }
-        }
-      }
-      super(creator, {
-        name: command.name,
-        description: command.opts.description.replace(/</g, '').replace(/>/g, ''),
-        defaultPermission: true,
-        requiredPermissions,
-        options: command.opts.slashOptions || []
-      })
-    }
-
-    async run (): Promise<void> {}
-  }
-  return new IveBotSlashCommand(creator)
-}
 
 // Create a cache to handle certain stuff.
 const tempDB: DB = {
@@ -130,13 +89,12 @@ for (const commandFile of commandFiles) {
       const command = commands[commandName]
       commandParser.registerCommand(command)
       if (typeof command.generator !== 'function' || command.slashGenerator) {
-        creator.registerCommand(commandToSlashCommand(command))
         slashParser.registerCommand(command)
       }
     })
   }
 }
-creator.syncCommands()
+await slashParser.registerAllCommands()
 
 // Register setInterval to fulfill delayed tasks.
 setInterval(() => {

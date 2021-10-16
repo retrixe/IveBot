@@ -1,6 +1,5 @@
 // All the types!
-import Eris, { Message, GuildTextableChannel, Constants, Guild } from 'eris'
-import { CommandOptionType } from 'slash-create'
+import Eris, { Message, GuildTextableChannel, Constants, Guild, InteractionDataOptionsString } from 'eris'
 import { Command } from '../imports/types.js'
 // All the needs!
 import { getIdFromMention, getInsult, getUser, getChannel } from '../imports/tools.js'
@@ -17,18 +16,18 @@ export const handleServerinfo: Command = {
     example: '/serverinfo',
     usage: '/serverinfo (mutual server ID)',
     argsRequired: false,
-    slashOptions: [{
+    options: [{
       name: 'server',
       required: false,
       description: 'A server you share with IveBot.',
-      type: CommandOptionType.STRING
+      type: Constants.ApplicationCommandOptionTypes.STRING
     }]
   },
 
   slashGenerator: (interaction, { client }) => {
-    const serverOpt = interaction.data.options.find(option => option.name === 'server')
-    let guild = client.guilds.get(serverOpt?.value || interaction.guildID)
-    if (serverOpt?.value && guild && !guild.members.has(interaction.user.id)) guild = undefined
+    const serverOpt = (interaction.data.options[0] as InteractionDataOptionsString)?.value
+    let guild = client.guilds.get(serverOpt || interaction.guildID)
+    if (serverOpt && guild && !guild.members.has(interaction.user.id)) guild = undefined
     return handleServerinfo.commonGenerator(guild)
   },
   generator: (message, args, { client }) => {
@@ -252,10 +251,10 @@ export const handleRequest: Command = {
     fullDescription: 'Request a feature. 24 hour cooldown except for test pilots.',
     usage: '/request <suggestion>',
     example: '/request a /userinfo command.',
-    slashOptions: [{
+    options: [{
       name: 'suggestion',
       required: true,
-      type: CommandOptionType.STRING,
+      type: Constants.ApplicationCommandOptionTypes.STRING,
       description: 'The feature you want to suggest, or the bug you wish to report. Please be detailed.'
     }]
   },
@@ -578,20 +577,22 @@ export const handleChangevoiceregion: Command = {
     requirements: {
       permissions: { manageGuild: true }
     },
-    slashOptions: [{
+    options: [{
       name: 'channel',
       description: 'The voice channel to edit the region of.',
-      type: CommandOptionType.CHANNEL,
+      type: Constants.ApplicationCommandOptionTypes.CHANNEL,
       required: true
     }, {
       name: 'region',
       description: 'The voice region to switch the channel to.',
-      type: CommandOptionType.STRING // TODO: Maybe a choice?
+      type: Constants.ApplicationCommandOptionTypes.STRING // TODO: Maybe a choice?
     }]
   },
   slashGenerator: (interaction, { client }) => {
-    const channelOpt = interaction.data.options.find(option => option.name === 'channel')
-    const regionOpt = interaction.data.options.find(option => option.name === 'region')
+    const channelOpt = interaction.data.options.find(option => option.name === 'channel') as
+      Eris.InteractionDataOptionsChannel
+    const regionOpt = interaction.data.options.find(option => option.name === 'region') as
+      InteractionDataOptionsString
     const ch = client.guilds.get(interaction.guildID).channels.get(channelOpt.value)
     if (!ch || ch.type !== 2) return { content: 'This voice channel does not exist!', error: true }
     return handleChangevoiceregion.commonGenerator(ch, regionOpt.value || 'auto', client)

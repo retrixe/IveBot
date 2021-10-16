@@ -1,6 +1,6 @@
-import { CommandOptionType } from 'slash-create'
 import { Command } from '../imports/types.js'
 import { evaluate } from 'mathjs'
+import { Constants, InteractionDataOptionsInteger, InteractionDataOptionsString } from 'eris'
 
 // Zalgo characters.
 const characters = [
@@ -31,15 +31,15 @@ export const handleChoose: Command = {
     fullDescription: 'Choose between multiple options.',
     example: '/choose cake|ice cream|pasta',
     usage: '/choose <option 1>|(option 2)|(option 3)...',
-    slashOptions: [{
+    options: [{
       name: 'choices',
       description: 'The choices to choose from. Each option should be separated like: item1|item2',
       required: true,
-      type: CommandOptionType.STRING
+      type: Constants.ApplicationCommandOptionTypes.STRING
     }]
   },
   slashGenerator: interaction => {
-    const choices = interaction.data.options[0]?.value.split('|')
+    const choices = (interaction.data.options[0] as InteractionDataOptionsString).value.split('|')
     return `I choose: ${choices[Math.floor(Math.random() * choices.length)]}`
   },
   generator: (message, args) => {
@@ -58,14 +58,15 @@ export const handleReverse: Command = {
     fullDescription: 'Reverse a sentence.',
     example: '/reverse hello',
     usage: '/reverse <text>',
-    slashOptions: [{
+    options: [{
       name: 'text',
       description: 'The text to reverse.',
       required: true,
-      type: CommandOptionType.STRING
+      type: Constants.ApplicationCommandOptionTypes.STRING
     }]
   },
-  slashGenerator: interaction => interaction.data.options[0]?.value.split('').reverse().join(''),
+  slashGenerator: interaction => (interaction.data.options[0] as InteractionDataOptionsString).value
+    .split('').reverse().join(''),
   generator: (message, args) => args.join(' ').split('').reverse().join('')
 }
 
@@ -77,11 +78,11 @@ export const handle8ball: Command = {
     usage: '/8ball <question>',
     example: '/8ball Will I flunk my exam?',
     invalidUsageMessage: 'Please ask the 8ball a question.',
-    slashOptions: [{
+    options: [{
       name: 'question',
       description: 'The question you wish to ask the 8ball.',
       required: true,
-      type: CommandOptionType.STRING
+      type: Constants.ApplicationCommandOptionTypes.STRING
     }]
   },
   slashGenerator: true,
@@ -107,15 +108,17 @@ export const handleZalgo: Command = {
     fullDescription: 'The zalgo demon\'s handwriting.',
     usage: '/zalgo <text>',
     example: '/zalgo sup',
-    slashOptions: [{
+    options: [{
       name: 'text',
       description: 'The text to convert into the zalgo demon\'s handwriting.',
       required: true,
-      type: CommandOptionType.STRING
+      type: Constants.ApplicationCommandOptionTypes.STRING
     }]
   },
   generator: (message, args) => handleZalgo.commonGenerator(args.join(' ')),
-  slashGenerator: interaction => handleZalgo.commonGenerator(interaction.data.options[0]?.value),
+  slashGenerator: interaction => handleZalgo.commonGenerator(
+    (interaction.data.options[0] as InteractionDataOptionsString).value
+  ),
   commonGenerator: (text: string) => {
     const textToZalgo = text.split('')
     let newMessage = ''
@@ -137,14 +140,16 @@ export const handleDezalgo: Command = {
     fullDescription: 'Read the zalgo demon\'s writing.',
     usage: '/dezalgo <text>',
     example: '/dezalgo ḥ̛̓e̖l̽͞҉lͦͅoͥ',
-    slashOptions: [{
+    options: [{
       name: 'text',
       description: 'The zalgo demon\'s handwriting to be converted to regular text.',
       required: true,
-      type: CommandOptionType.STRING
+      type: Constants.ApplicationCommandOptionTypes.STRING
     }]
   },
-  slashGenerator: interaction => handleDezalgo.commonGenerator(interaction.data.options[0]?.value),
+  slashGenerator: interaction => handleDezalgo.commonGenerator(
+    (interaction.data.options[0] as InteractionDataOptionsString).value
+  ),
   generator: (message, args) => handleDezalgo.commonGenerator(args.join(' ')),
   commonGenerator: (text: string) => {
     let newMessage = ''
@@ -163,21 +168,23 @@ export const handleRepeat: Command = {
     fullDescription: 'Repeat a string.',
     usage: '/repeat <number of times> <string to repeat>',
     example: '/repeat 10 a',
-    slashOptions: [{
+    options: [{
       name: 'number',
       description: 'The number of times to repeat the text.',
       required: true,
-      type: CommandOptionType.INTEGER
+      type: Constants.ApplicationCommandOptionTypes.INTEGER
     }, {
       name: 'text',
       description: 'The text to repeat as many times as you want.',
       required: true,
-      type: CommandOptionType.STRING
+      type: Constants.ApplicationCommandOptionTypes.STRING
     }]
   },
   slashGenerator: interaction => {
-    const number = interaction.data.options.find(opt => opt.name === 'number').value
-    const text = interaction.data.options.find(opt => opt.name === 'text').value
+    const number = (interaction.data.options.find(opt => opt.name === 'number') as
+      InteractionDataOptionsInteger).value
+    const text = (interaction.data.options.find(opt => opt.name === 'text') as
+      InteractionDataOptionsString).value
     return handleRepeat.commonGenerator(number, text)
   },
   generator: (message, args) => {
@@ -207,21 +214,23 @@ export const handleRandom: Command = {
     usage: '/random (starting number) (ending number)',
     example: '/random 1 69',
     argsRequired: false,
-    slashOptions: [{
+    options: [{
       name: 'start',
       description: 'The number which the random number should be higher than or equal to.',
       required: false,
-      type: CommandOptionType.INTEGER
+      type: Constants.ApplicationCommandOptionTypes.INTEGER
     }, {
       name: 'end',
       description: 'The number which the random number should be lower than.',
       required: false,
-      type: CommandOptionType.INTEGER
+      type: Constants.ApplicationCommandOptionTypes.INTEGER
     }]
   },
-  slashGenerator: interaction => { // TODO: Workaround
-    const start = interaction.data.options.find(option => option.name === 'start')?.value as unknown as number
-    const end = interaction.data.options.find(option => option.name === 'end')?.value
+  slashGenerator: interaction => {
+    const start = (interaction.data.options.find(option => option.name === 'start') as
+      InteractionDataOptionsInteger)?.value
+    const end = (interaction.data.options.find(option => option.name === 'end') as
+      InteractionDataOptionsInteger)?.value
     if (typeof start === 'number' && typeof end === 'number') {
       return `The number.. is.. ${Math.floor(Math.random() * (end - start)) + start}`
     } else if (typeof end === 'number') {
@@ -257,14 +266,16 @@ More info here: https://mathjs.org/docs/expressions/syntax.html`,
     usage: '/calculate <expression>',
     example: '/calculate 2 + 2',
     invalidUsageMessage: 'Specify an expression >_<',
-    slashOptions: [{
+    options: [{
       name: 'expression',
       description: 'The math expression to be evaluated.',
       required: true,
-      type: CommandOptionType.STRING
+      type: Constants.ApplicationCommandOptionTypes.STRING
     }]
   },
-  slashGenerator: interaction => handleCalculate.commonGenerator(interaction.data.options[0]?.value),
+  slashGenerator: interaction => handleCalculate.commonGenerator(
+    (interaction.data.options[0] as InteractionDataOptionsString).value
+  ),
   generator: (message, args) => handleCalculate.commonGenerator(args.join(' ')),
   commonGenerator: (expression: string) => {
     try {
@@ -282,16 +293,17 @@ export const handleDistort: Command = {
     fullDescription: 'Pretty distorted text.',
     usage: '/distort <text>',
     example: '/distort lol',
-    slashOptions: [{
+    options: [{
       name: 'text',
       description: 'The text to be distorted.',
       required: true,
-      type: CommandOptionType.STRING
+      type: Constants.ApplicationCommandOptionTypes.STRING
     }]
   },
-  slashGenerator: interaction => interaction.data.options[0]?.value.split(' ').map((i: string) => (
-    i.split('').join('*') + (i.length % 2 === 0 ? '*' : '')
-  )).join(' '),
+  slashGenerator: interaction => (interaction.data.options[0] as InteractionDataOptionsString).value
+    .split(' ')
+    .map((i: string) => (i.split('').join('*') + (i.length % 2 === 0 ? '*' : '')))
+    .join(' '),
   generator: (message, args) => args.map(i => (
     i.split('').join('*') + (i.length % 2 === 0 ? '*' : '')
   )).join(' ')
