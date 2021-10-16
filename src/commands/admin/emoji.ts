@@ -154,12 +154,12 @@ export const handleEmojiimage: Command = {
     // Return emoji.
     return {
       content: '<:tom:402567029963489281> **| Emoji image:**',
-      embed: {
+      embeds: [{
         color: 0x696969,
         author: { name: found ? found.name : args[0].split(':')[1] },
         description: `**[Link](https://cdn.discordapp.com/emojis/${emoji}.${ext})**`,
         image: { url: `https://cdn.discordapp.com/emojis/${emoji}.${ext}` }
-      }
+      }]
     }
   }
 }

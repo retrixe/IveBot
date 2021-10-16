@@ -38,7 +38,7 @@ export class TriviaSession {
     this.client = client
   }
 
-  getScores (addMedals = false): { embed: EmbedOptions } {
+  getScores (addMedals = false): { embeds: EmbedOptions[] } {
     const currentScores = Object.entries(this.scores).sort(([, a], [, b]) => b - a)
     const medals: { [id: string]: string } = {}
     if (addMedals) {
@@ -71,7 +71,7 @@ export class TriviaSession {
         inline: true
       }))
     }
-    return { embed }
+    return { embeds: [embed] }
   }
 
   async endGame (): Promise<void> {
@@ -235,7 +235,7 @@ export const handleTrivia: Command = {
         : 0
       return {
         content: '❔ **Available trivia topics:**',
-        embed: { color, description: lists.map(name => `**${name.replace('.txt', '')}**`).join(', ') }
+        embeds: [{ color, description: lists.map(name => `**${name.replace('.txt', '')}**`).join(', ') }]
       }
     } else if (args.length === 1 && (args[0] === 'stop' || args[0] === 'end')) {
       const session = tempDB.trivia[message.channel.id]

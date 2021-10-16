@@ -75,7 +75,7 @@ export const handleOcr: Command = {
           ? `🤔 **Text recognition result uploaded to paste.gg${!useHastebin ? ' due to length' : ''}:**
 https://paste.gg/p/anonymous/${hastebin} (use this key to delete: \`${deletionKey}\`)`
           : `🤔 **Text recognition result:**\n${text}`,
-        embed: {
+        embeds: [{
           color: 0x666666,
           author: {
             name: `${message.author.username}#${message.author.discriminator}'s Image`,
@@ -88,7 +88,7 @@ https://paste.gg/p/anonymous/${hastebin} (use this key to delete: \`${deletionKe
             'favicons/onecloud/favicon.ico'
           },
           timestamp: new Date(message.timestamp).toISOString()
-        }
+        }]
       }
     } catch (e) { return `Invalid image URL, you ${getInsult()}.` }
   }
@@ -156,7 +156,7 @@ export const handleCat: Command = {
       // Fetch a cat and process it (this sounds funny to me idk why)
       const { file } = await (await fetch('http://aws.random.cat/meow')).json()
       // Send it.
-      return { embed: { image: { url: file }, color: 0x123456 }, content: '🐱' }
+      return { embeds: [{ image: { url: file }, color: 0x123456 }], content: '🐱' }
     } catch (e) {
       return `Something went wrong 👾 Error: ${e}`
     }
@@ -180,23 +180,23 @@ export const handleRobohash: Command = {
     const color = 0xcf1c1c
     if (target === 'robot') {
       return {
-        embed: { image: { url: `https://robohash.org/${text}.png` }, color }, content: '🤖'
+        embeds: [{ image: { url: `https://robohash.org/${text}.png` }, color }], content: '🤖'
       }
     } else if (target === 'monster') {
       return {
-        embed: { image: { url: `https://robohash.org/${text}.png?set=set2` }, color }, content: '👾'
+        embeds: [{ image: { url: `https://robohash.org/${text}.png?set=set2` }, color }], content: '👾'
       }
     } else if (target === 'head') {
       return {
-        embed: { image: { url: `https://robohash.org/${text}.png?set=set3` }, color }
+        embeds: [{ image: { url: `https://robohash.org/${text}.png?set=set3` }, color }]
       }
     } else if (target === 'cat') {
       return {
-        embed: { image: { url: `https://robohash.org/${text}.png?set=set4` }, color }
+        embeds: [{ image: { url: `https://robohash.org/${text}.png?set=set4` }, color }]
       }
     } else if (target === 'human') {
       return {
-        embed: { image: { url: `https://robohash.org/${text}.png?set=set5` }, color }, content: '🤔'
+        embeds: [{ image: { url: `https://robohash.org/${text}.png?set=set5` }, color }], content: '🤔'
       }
     } else {
       return { content: 'Correct usage: /robohash <robot, monster, head, cat, human> <text to robohash>', error: true }
@@ -239,7 +239,7 @@ export const handleApod: Command = {
           ? `**${title}**\n${explanation}\n${url.split('embed/').join('watch?v=')}`
           : {
               content: `**${title}**\n${explanation}`,
-              embed: { image: { url }, color: 0x2361BE }
+              embeds: [{ image: { url }, color: 0x2361BE }]
             }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
     } else if (args.length > 0) {
@@ -254,7 +254,7 @@ export const handleApod: Command = {
         ? `**${title}**\n${explanation}\n${url.split('embed/').join('watch?v=')}`
         : {
             content: `**${title}**\n${explanation}`,
-            embed: { image: { url: hdurl }, color: 0x2361BE }
+            embeds: [{ image: { url: hdurl }, color: 0x2361BE }]
           }
     } catch (err) { return `Something went wrong 👾 Error: ${err}` }
   }
@@ -294,7 +294,7 @@ export const handleDog: Command = {
         }
         if (!message || message.includes('Breed not found')) return { content: 'This breed/sub-breed does not exist!', error: true }
         return {
-          embed: { image: { url: message }, color: 0x654321 },
+          embeds: [{ image: { url: message }, color: 0x654321 }],
           content: `🐕 ${args[0]} ${args[1]}`
         }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
@@ -305,13 +305,13 @@ export const handleDog: Command = {
           `http://dog.ceo/api/breed/${args[0].toLowerCase()}/images/random`
         )).json()
         if (!message || message.includes('Breed not found')) return 'This breed does not exist!'
-        return { embed: { image: { url: message }, color: 0x654321 }, content: '🐕 ' + args[0] }
+        return { embeds: [{ image: { url: message }, color: 0x654321 }], content: '🐕 ' + args[0] }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
     }
     // Fetch a random picture.
     try {
       const { message } = await (await fetch('http://dog.ceo/api/breeds/image/random')).json()
-      return { embed: { image: { url: message }, color: 0x654321 }, content: '🐕' }
+      return { embeds: [{ image: { url: message }, color: 0x654321 }], content: '🐕' }
     } catch (err) { return `Something went wrong 👾 Error: ${err}` }
   }
 }
@@ -342,12 +342,12 @@ export const handleUrban: Command = {
         }
         return {
           content: `**🍸 Definition of ${args.join(' ')}:**`,
-          embed: {
+          embeds: [{
             color: 0x555555,
             description: response,
             footer: { text: 'Do not trust Urban Dictionary.' },
             title: args.join(' ')
-          }
+          }]
         }
         // Else, there will be an exception thrown.
       } catch (err) {
@@ -384,7 +384,7 @@ export const handleNamemc: Command = {
         )).json()
         return {
           content: `**Minecraft history and skin for ${name}:**`,
-          embed: {
+          embeds: [{
             color: 0x00AE86,
             title: 'Skin and Name History',
             fields: [...names.map(object => ({
@@ -396,7 +396,7 @@ export const handleNamemc: Command = {
             description: '**Name History**\n',
             image: { url: `https://mc-heads.net/body/${id}`, height: 216, width: 90 },
             footer: { text: 'Skin is recovered through https://mc-heads.net' }
-          }
+          }]
         }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
     } catch (e) { return { content: 'Enter a valid Minecraft username (account must be premium)', error: true } }
@@ -426,7 +426,7 @@ export const handleCurrency: Command = {
     if (args.length === 1 && args[0].toLowerCase() === 'list') {
       return {
         content: '**List of symbols:**',
-        embed: {
+        embeds: [{
           description: Object.keys(currency.rates).toString().split(',').join(', '),
           color: 0x666666,
           title: '💲 Currency symbols',
@@ -434,7 +434,7 @@ export const handleCurrency: Command = {
             name: 'Tip', value: 'Symbols are usually (but NOT ALWAYS) the country 2 \
 letter code + the first letter of the currency name.'
           }]
-        }
+        }]
       }
     }
     // Calculate the currencies to conver from and to, as well as the amount.
@@ -505,7 +505,7 @@ export const handleWeather: Command = {
     // We generate the entire embed.
     return {
       content: `**🌇🌃🌁🌆 The weather for ${args.join(', ')}:**`,
-      embed: {
+      embeds: [{
         title: 'Weather at ' + args.join(', '),
         color: 0x6D6BEA,
         description: `**Description:** ${weather.weather[0].main} - ${weather.weather[0].description}`,
@@ -548,7 +548,7 @@ ${weather.main.temp}${temp}/${weather.main.temp_max}${temp}/${weather.main.temp_
           value: weather.snow ? `${weather.snow['3h']}mm` : 'N/A',
           inline: true
         }]
-      }
+      }]
     }
   }
 }
@@ -630,13 +630,13 @@ export const handleDefine: Command = {
         }
         return {
           content: `📕 **|** Definition of **${args.join(' ')}**:`,
-          embed: {
+          embeds: [{
             color: 0x7289DA,
             type: 'rich',
             title: results[0].word,
             footer: { text: 'Powered by Oxford Dictionary \\o/' },
             fields
-          }
+          }]
         }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
     } catch (e) { return { content: 'Did you enter a valid word? 👾', error: true } }

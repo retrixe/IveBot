@@ -152,13 +152,13 @@ export const handleHelp: IveBotCommand = {
       await channel.createMessage({
         content: `**IveBot's dashboard**: ${rootURL || 'https://ivebot.now.sh'}/
 (Manage Server required to manage a server)`,
-        embed: {
+        embeds: [{
           color: 0x00AE86,
           // type: 'rich',
           title: 'Help',
           ...generalHelp,
           footer: { text: 'For help on a specific command or aliases, run /help <command>.' }
-        }
+        }]
       })
       return 'newbie, help has been direct messaged to you ✅'
     } catch {

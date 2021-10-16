@@ -50,7 +50,7 @@ export const handleServerinfo: Command = {
     // Display information.
     return {
       content: `⌨ **Server info on ${guild.name}:**`,
-      embed: {
+      embeds: [{
         author: { name: guild.name, icon_url: guild.iconURL },
         thumbnail: { url: guild.iconURL },
         color: Math.floor(Math.random() * 1000000 - 1),
@@ -94,7 +94,7 @@ export const handleServerinfo: Command = {
           },
           { name: 'Roles', inline: true, value: guild.roles.size.toString() }
         ]
-      }
+      }]
     }
   }
 }
@@ -127,7 +127,7 @@ export const handleUserinfo: Command = {
       : 0
     return {
       content: `👥 **Userinfo on ${user.username}:**`,
-      embed: {
+      embeds: [{
         author: { name: 'User info', icon_url: user.avatarURL },
         title: `${user.username}#${user.discriminator}` + (user.bot ? ' (Bot account)' : ''),
         description: user.mention + (member && member.pending ? ' (pending guild screening)' : ''),
@@ -160,7 +160,7 @@ export const handleUserinfo: Command = {
           { name: 'Permissions', value: member ? 'Run `/perms <user>` to get their permissions!' : 'N/A' }
         ],
         footer: { text: 'User ID: ' + user.id }
-      }
+      }]
     }
   }
 }
@@ -199,7 +199,7 @@ export const handlePermissions: Command = {
     const channelPerm = (message.channel as GuildTextableChannel).permissionsOf(user.id)
     return {
       content: `✅ **Permissions of ${user.username}:**`,
-      embed: {
+      embeds: [{
         author: {
           name: `${user.username}#${user.discriminator}'s permissions`,
           icon_url: user.avatarURL
@@ -238,7 +238,7 @@ export const handlePermissions: Command = {
             : { name: '', value: '' }
         ].filter(e => !!e.value),
         footer: { text: 'User ID: ' + user.id }
-      }
+      }]
     }
   }
 }
@@ -468,7 +468,7 @@ export const handleReminderlist: Command = {
     const format = 'dddd, MMMM Do YYYY, h:mm:ss A' // Date format.
     return {
       content: `⏰ **Reminders for ${user.username}#${user.discriminator}:**`,
-      embed: {
+      embeds: [{
         color: 0x00AE86,
         type: 'rich',
         title: 'Reminders',
@@ -479,7 +479,7 @@ export const handleReminderlist: Command = {
 **Channel:** <#${reminder.target}>
 **Message:** ${reminder.message.substring(1, reminder.message.lastIndexOf('\n')).trim()}`
         }))
-      }
+      }]
     }
   }
 }
@@ -501,14 +501,14 @@ export const handleAvatar: Command = {
     const format = user.avatar && user.avatar.startsWith('a_') ? 'gif' : 'png'
     return {
       content: '**Avatar:**',
-      embed: {
+      embeds: [{
         author: { name: `${user.username}#${user.discriminator}`, icon_url: user.avatarURL },
         image: { url: user.dynamicAvatarURL(format, 2048) },
         description: `**[Link](${user.dynamicAvatarURL(format, 2048)})**`,
         color: member.roles.map(i => member.guild.roles.get(i)).sort(
           (a, b) => a.position > b.position ? -1 : 1
         ).shift().color
-      }
+      }]
     }
   }
 }

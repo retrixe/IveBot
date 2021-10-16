@@ -44,14 +44,14 @@ export const handleWarn: Command = {
     if (message.member.guild.id === '402423671551164416') {
       client.createMessage('402435742925848578', {
         content: `**${user.username}#${user.discriminator}** has been warned:`,
-        embed: {
+        embeds: [{
           color: 0x00AE86,
           // type: 'rich',
           title: 'Information',
           description: `
   *| Moderator:** ${message.author.username}#${message.author.discriminator} **| Reason:** ${args.join(' ')}
   *| Date:** ${moment(new Date().toUTCString()).format('dddd, MMMM Do YYYY, h:mm:ss A')}`
-        }
+        }]
       }).catch(() => {}) // Ignore error.
     }
     return `**${user.username}#${user.discriminator}** has been warned. **lol.**`
@@ -93,7 +93,7 @@ export const handleWarnings: Command = {
     const format = 'dddd, MMMM Do YYYY, h:mm:ss A' // Date format.
     return {
       content: `🛃 **Warnings for ${user.username}#${user.discriminator}:**`,
-      embed: {
+      embeds: [{
         color: 0x00AE86,
         type: 'rich',
         title: 'Warnings',
@@ -108,7 +108,7 @@ export const handleWarnings: Command = {
 **| ID:** ${warning._id} **| Date:** ${moment(warning.date).format(format)}`
           }
         })
-      }
+      }]
     }
   }
 }

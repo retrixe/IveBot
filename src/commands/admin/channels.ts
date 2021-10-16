@@ -96,7 +96,7 @@ export const handleEditchannel: Command = {
     if (failedOps.length > 0) {
       return {
         content: 'Some operations failed to execute..',
-        embed: { color: 0x696969, fields: failedOps }
+        embeds: [{ color: 0x696969, fields: failedOps }]
       }
     }
     return '✅ All operations executed successfully \\o/'
