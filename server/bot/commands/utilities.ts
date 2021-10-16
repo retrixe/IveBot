@@ -473,7 +473,7 @@ export const handleAvatar: Command = {
     let user: Message['author'] = getUser(message, args.join(' ')) || message.author
     if (!user && message.mentions.length !== 0) user = message.mentions[0]
     const member = message.member.guild.members.get(user.id)
-    const format = user.avatar.startsWith('a_') ? 'gif' : 'png'
+    const format = user.avatar && user.avatar.startsWith('a_') ? 'gif' : 'png'
     return {
       content: '**Avatar:**',
       embed: {

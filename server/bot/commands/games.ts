@@ -179,7 +179,7 @@ More info here: https://mathjs.org/docs/expressions/syntax.html`,
   },
   generator: (message, args) => {
     try {
-      return `${evaluate(args.join(' ').split(',').join('.').split('÷').join('/').toLowerCase())}`
+      return `${evaluate(args.join(' ').split(',').join('.').split('÷').join('/').toLowerCase())}`.trim()
     } catch (e) {
       return { content: 'Invalid expression >_<', error: true }
     }
