@@ -172,10 +172,10 @@ export default class SlashParser {
 
   disableEveryone = (message: MessageContent): AdvancedMessageContent => {
     if (typeof message !== 'string' && !message.allowedMentions) {
-      message.allowedMentions = { everyone: false, roles: true, users: true }
+      message.allowedMentions = { everyone: false, roles: false, users: true }
       return message
     } else if (typeof message === 'string') {
-      return { content: message, allowedMentions: { everyone: false, roles: true, users: true } }
+      return { content: message, allowedMentions: { everyone: false, roles: false, users: true } }
     } else return message
   }
 

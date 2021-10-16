@@ -44,7 +44,7 @@ export class Command {
     userIDs?: string[]
     roleNames?: string[]
     custom?: (message: Message) => boolean
-    permissions?: {}
+    permissions?: { [key: string]: boolean }
     roleIDs?: string[]
   }
 
@@ -169,10 +169,10 @@ export default class CommandParser {
 
   disableEveryone = (message: MessageContent): MessageContent => {
     if (typeof message !== 'string' && !message.allowedMentions) {
-      message.allowedMentions = { everyone: false, roles: true, users: true }
+      message.allowedMentions = { everyone: false, roles: false, users: true }
       return message
     } else if (typeof message === 'string') {
-      return { content: message, allowedMentions: { everyone: false, roles: true, users: true } }
+      return { content: message, allowedMentions: { everyone: false, roles: false, users: true } }
     } else return message
   }
 
