@@ -70,7 +70,7 @@ export class SlashCommand {
     this.postGenerator = command.postGenerator
     this.slashGenerator = command.slashGenerator
     // Options.
-    this.options = command.opts.options
+    this.options = command.opts.options || []
     this.argsRequired = command.opts.argsRequired === undefined || command.opts.argsRequired
     const defaultUsageMessage = 'Invalid usage, correct usage: ' + command.opts.usage
     this.invalidUsageMessage = command.opts.invalidUsageMessage || defaultUsageMessage
