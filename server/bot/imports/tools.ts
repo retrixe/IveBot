@@ -1,6 +1,6 @@
 import https from 'https'
 import { get } from 'http'
-import { parse } from 'url'
+import { URL } from 'url'
 import { Db } from 'mongodb'
 import { Message } from 'eris'
 
@@ -78,8 +78,8 @@ export const fetchLimited = async (url: string, limit: number, opts = {}): Promi
   return new Promise((resolve, reject) => {
     let size = 0
     const data: Buffer[] = []
-    const parsedUrl = parse(url)
-    const req = (parsedUrl.protocol === 'https:' ? https.get : get)({ ...parse(url), ...opts }, (res) => {
+    const parsedUrl = new URL(url)
+    const req = (parsedUrl.protocol === 'https:' ? https.get : get)(parsedUrl, opts, (res) => {
       if (!isNaN(+res.headers['content-length']) && +res.headers['content-length'] > byteLimit) {
         req.abort()
         resolve(false)
