@@ -38,8 +38,6 @@ const client = new Client(`Bot ${token === 'dotenv' ? process.env.IVEBOT_TOKEN :
   autoreconnect: true,
   restMode: true
 })
-// TODO: Workaround for slash command registration.
-client.application = { id: Buffer.from(token.split('.')[0], 'base64').toString(), flags: 0 }
 
 // Create a cache to handle certain stuff.
 const tempDB: DB = {
@@ -98,9 +96,6 @@ for (const commandFile of commandFiles) {
     })
   }
 }
-slashParser.registerAllCommands() // Asynchronous registration for faster boot-up.
-  .then(() => console.log('Successfully registered all slash commands!'))
-  .catch(() => console.error('Looks like an error occurred during slash command registration.'))
 
 // Register setInterval to fulfill delayed tasks.
 setInterval(() => {
@@ -131,6 +126,9 @@ client.on('ready', () => {
     type: 1,
     url: 'https://twitch.tv/sorrybutyoudontdeservewatchingthisgameunlessyouhaveamacipadoriphone'
   })
+  slashParser.registerAllCommands()
+    .then(() => console.log('Successfully registered all Discord slash commands!'))
+    .catch(err => console.error('An error occurred when registering Discord slash commands.', err))
 })
 
 // Disconnection from Discord by error will trigger the following.

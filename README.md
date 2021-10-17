@@ -70,7 +70,7 @@ It's planned to have some nifty commands like /assistant which directly communic
 - `/addEmoji`, `/deleteEmoji` and `/editEmoji`
 - `/deleteChannel` and `/editChannel`
 - `/warn`, `/warnings`, `/clearwarns` and `/removewarn`
-- `/changeserverregion` and `/listserverregions`
+- `/changevoiceregion` and `/listvoiceregions`
 - `/perms`
 - `/purge`
 - `/slowmode`

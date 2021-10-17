@@ -584,8 +584,9 @@ export const handleChangevoiceregion: Command = {
       required: true
     }, {
       name: 'region',
-      description: 'The voice region to switch the channel to.',
-      type: Constants.ApplicationCommandOptionTypes.STRING // TODO: Maybe a choice?
+      description: 'The voice region to switch the channel to. Use /listvoiceregions.',
+      type: Constants.ApplicationCommandOptionTypes.STRING,
+      required: true
     }]
   },
   slashGenerator: (interaction, { client }) => {

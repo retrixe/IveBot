@@ -169,7 +169,7 @@ export default class SlashParser {
       return
       // Check for permissions.
     } else if (!command.requirementsCheck(interaction)) {
-      await interaction.createMessage(
+      await interaction.createMessage( // Publicly shaming them for missing permissions, ofc.
         `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
       )
       return
@@ -179,8 +179,9 @@ export default class SlashParser {
     for (const option of interaction.data.options) {
       found.push(option.name)
       const optionInfo = command.options.find(arg => arg.name === option.name)
-      if (!optionInfo) continue // TODO: Ignore unused property. Or should we throw?
-      else if ((optionInfo.type === Constants.ApplicationCommandOptionTypes.STRING ||
+      if (!optionInfo) {
+        throw new Error(`Discord did not correctly validate interaction! (${command.name})`)
+      } else if ((optionInfo.type === Constants.ApplicationCommandOptionTypes.STRING ||
         optionInfo.type === Constants.ApplicationCommandOptionTypes.MENTIONABLE ||
         optionInfo.type === Constants.ApplicationCommandOptionTypes.USER ||
         optionInfo.type === Constants.ApplicationCommandOptionTypes.ROLE ||
@@ -194,7 +195,7 @@ export default class SlashParser {
       } else if (optionInfo.type === Constants.ApplicationCommandOptionTypes.BOOLEAN &&
         typeof (option as Eris.InteractionDataOptionsBoolean).value !== 'boolean') {
         throw new Error(`Discord did not correctly validate interaction! (${command.name})`)
-      } // TODO: No sub command validation, write when you add sub commands.
+      } // No sub command validation, write when you add sub commands.
     }
     if (!command.options.filter(opt => opt.required).every(option => found.includes(option.name))) {
       throw new Error(`Discord did not correctly validate interaction! (${command.name})`)
