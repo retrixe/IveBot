@@ -5,8 +5,9 @@ import Eris, {
   Client,
   CommandInteraction,
   Constants,
+  ApplicationCommand,
   ApplicationCommandOptions,
-  ApplicationCommand
+  ApplicationCommandOptionsWithValue
 } from 'eris'
 import {
   DB,
@@ -197,7 +198,8 @@ export default class SlashParser {
         throw new Error(`Discord did not correctly validate interaction! (${command.name})`)
       } // No sub command validation, write when you add sub commands.
     }
-    if (!command.options.filter(opt => opt.required).every(option => found.includes(option.name))) {
+    const requiredOptions = command.options.filter(opt => (opt as ApplicationCommandOptionsWithValue).required)
+    if (!requiredOptions.every(option => found.includes(option.name))) {
       throw new Error(`Discord did not correctly validate interaction! (${command.name})`)
     }
     // We give our generators what they need.
