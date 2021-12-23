@@ -161,8 +161,9 @@ export default class CommandParser {
     if ( // No permission protection is here as well.
       messageToSend && ((message.member &&
       (message.channel as GuildTextableChannel)
-        .permissionsOf(this.client.user.id).has('sendMessages')) || message.channel.type === 1)
-    ) sent = await message.channel.createMessage(this.disableEveryone(messageToSend))
+        .permissionsOf(this.client.user.id).has('sendMessages')) || // Channel can be a partial now.
+        message.channel.type === 1 || message.channel.type === 3 || !message.channel.type)
+    ) sent = await this.client.createMessage(message.channel.id, this.disableEveryone(messageToSend))
     if (command.postGenerator) command.postGenerator(message, args, sent, context)
     return typeof messageToSend === 'object' ? messageToSend.error || false : false
   }
