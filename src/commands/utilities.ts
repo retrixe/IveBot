@@ -759,6 +759,11 @@ More info here: https://mathjs.org/docs/expressions/syntax.html`,
   }
 }
 
+const cToF = (c: number): number => +((c * 9 / 5) + 32).toFixed(2)
+const cToK = (c: number): number => +((c + 273.15).toFixed(2))
+const fToC = (f: number): number => +(((f - 32) * 5 / 9).toFixed(2))
+const kToC = (k: number): number => +((k - 273.15).toFixed(2))
+
 export const handleTemperature: Command = {
   name: 'temperature',
   aliases: ['temp'],
@@ -785,10 +790,6 @@ export const handleTemperature: Command = {
     if (!match) return { content: 'Specify a temperature ending in C, F or K.', error: true }
     const value = parseInt(match[1])
     const unit = match[2].toLowerCase()
-    const cToF = (c: number): number => +((c * 9 / 5) + 32).toFixed(2)
-    const cToK = (c: number): number => +((c + 273.15).toFixed(2))
-    const fToC = (f: number): number => +(((f - 32) * 5 / 9).toFixed(2))
-    const kToC = (k: number): number => +((k - 273.15).toFixed(2))
     const result = `**${value}°${unit.toUpperCase()}** is:`
     if (unit === 'c') {
       return result + `\n**${cToF(value)}°F** (Fahrenheit)` + `\n**${cToK(value)}K** (Kelvin)`
