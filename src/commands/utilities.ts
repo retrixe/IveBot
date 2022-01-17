@@ -780,7 +780,7 @@ export const handleTemperature: Command = {
   ),
   generator: (message, args) => handleTemperature.commonGenerator(args[0]),
   commonGenerator: (temp: string) => {
-    const regex = /^(\d+)°?([CFK])$/i
+    const regex = /^(\d+) ?°? ?([CFK])$/i
     const match = regex.exec(temp)
     if (!match) return { content: 'Specify a temperature ending in C, F or K.', error: true }
     const value = parseInt(match[1])
