@@ -1,5 +1,4 @@
 import { Command } from '../imports/types.js'
-import { evaluate } from 'mathjs'
 import { Constants, InteractionDataOptionsInteger, InteractionDataOptionsString } from 'eris'
 
 // Zalgo characters.
@@ -253,36 +252,6 @@ export const handleRandom: Command = {
       return { content: 'Correct usage: /random (optional start number) (optional end number)', error: true }
     }
     return `The number.. is.. ${Math.floor(Math.random() * 10)}`
-  }
-}
-
-export const handleCalculate: Command = {
-  name: 'calculate',
-  aliases: ['calc', 'cal'],
-  opts: {
-    description: 'Calculate an expression.',
-    fullDescription: `Calculate the value of an expression.
-More info here: https://mathjs.org/docs/expressions/syntax.html`,
-    usage: '/calculate <expression>',
-    example: '/calculate 2 + 2',
-    invalidUsageMessage: 'Specify an expression >_<',
-    options: [{
-      name: 'expression',
-      description: 'The math expression to be evaluated.',
-      required: true,
-      type: Constants.ApplicationCommandOptionTypes.STRING
-    }]
-  },
-  slashGenerator: interaction => handleCalculate.commonGenerator(
-    (interaction.data.options[0] as InteractionDataOptionsString).value
-  ),
-  generator: (message, args) => handleCalculate.commonGenerator(args.join(' ')),
-  commonGenerator: (expression: string) => {
-    try {
-      return `${evaluate(expression.split(',').join('.').split('÷').join('/').toLowerCase())}`.trim()
-    } catch (e) {
-      return { content: 'Invalid expression >_<', error: true }
-    }
   }
 }
 

@@ -18,7 +18,6 @@ const generalHelp = {
 \`/trivia\` - Start a trivia game on a topic of your choice.
 \`/8ball\` - Random answers to random questions.
 \`/repeat\` - Repeat a string.
-\`/calculate\` - Calculate an expression.
 \`/distort\` - Pretty distorted text.`
     }, {
       name: '**Random searches.**', value: `
@@ -50,7 +49,9 @@ TP \`/request\` - Request a specific feature.
 \`/giverole\` and \`/takerole\` - Edit roles.
 \`/notify\` - Ping a role that cannot be pinged.
 \`/hastebin\` - Upload a file to hasteb.in to view on phone.
-\`/suppress\` - Suppress or unsuppress embeds in a message.`
+\`/suppress\` - Suppress or unsuppress embeds in a message.
+\`/calculate\` - Calculate an expression.
+\`/temperature\` - Convert between temperature units.`
     }, {
       name: '**Administrative commands.**', value: `
 \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`

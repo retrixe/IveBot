@@ -6,6 +6,7 @@ import { getIdFromMention, getInsult, getUser, getChannel } from '../imports/too
 import ms from 'ms'
 import { host, testPilots } from '../config.js'
 import moment from 'moment'
+import { evaluate } from 'mathjs'
 
 export const handleServerinfo: Command = {
   name: 'serverinfo',
@@ -725,5 +726,77 @@ export const handleSuppress: Command = {
       await msg.edit({ flags: msg.flags ^ Eris.Constants.MessageFlags.SUPPRESS_EMBEDS })
       message.addReaction('✅').catch(() => {}) // Ignore error.
     } else return { content: `That's not a real message, you ${getInsult()}.`, error: true }
+  }
+}
+
+export const handleCalculate: Command = {
+  name: 'calculate',
+  aliases: ['calc', 'cal'],
+  opts: {
+    description: 'Calculate an expression.',
+    fullDescription: `Calculate the value of an expression.
+More info here: https://mathjs.org/docs/expressions/syntax.html`,
+    usage: '/calculate <expression>',
+    example: '/calculate 2 + 2',
+    invalidUsageMessage: 'Specify an expression >_<',
+    options: [{
+      name: 'expression',
+      description: 'The math expression to be evaluated.',
+      required: true,
+      type: Constants.ApplicationCommandOptionTypes.STRING
+    }]
+  },
+  slashGenerator: interaction => handleCalculate.commonGenerator(
+    (interaction.data.options[0] as InteractionDataOptionsString).value
+  ),
+  generator: (message, args) => handleCalculate.commonGenerator(args.join(' ')),
+  commonGenerator: (expression: string) => {
+    try {
+      return `${evaluate(expression.split(',').join('.').split('÷').join('/').toLowerCase())}`.trim()
+    } catch (e) {
+      return { content: 'Invalid expression >_<', error: true }
+    }
+  }
+}
+
+const cToF = (c: number): number => +((c * 9 / 5) + 32).toFixed(2)
+const cToK = (c: number): number => +((c + 273.15).toFixed(2))
+const fToC = (f: number): number => +(((f - 32) * 5 / 9).toFixed(2))
+const kToC = (k: number): number => +((k - 273.15).toFixed(2))
+
+export const handleTemperature: Command = {
+  name: 'temperature',
+  aliases: ['temp'],
+  opts: {
+    description: 'Convert between temperature units.',
+    fullDescription: 'Convert between temperature units.',
+    usage: '/temperature <temperature>',
+    example: '/temperature 100C',
+    invalidUsageMessage: 'Specify a temperature ending in C, F or K.',
+    options: [{
+      name: 'temperature',
+      description: 'The temperature to be converted, ending in C, F or K.',
+      required: true,
+      type: Constants.ApplicationCommandOptionTypes.STRING
+    }]
+  },
+  slashGenerator: interaction => handleTemperature.commonGenerator(
+    (interaction.data.options[0] as InteractionDataOptionsString).value
+  ),
+  generator: (message, args) => handleTemperature.commonGenerator(args[0]),
+  commonGenerator: (temp: string) => {
+    const regex = /^(\d+) ?°? ?([CFK])$/i
+    const match = regex.exec(temp)
+    if (!match) return { content: 'Specify a temperature ending in C, F or K.', error: true }
+    const value = parseInt(match[1])
+    const unit = match[2].toLowerCase()
+    const result = `**${value}°${unit.toUpperCase()}** is:`
+    if (unit === 'c') {
+      return result + `\n**${cToF(value)}°F** (Fahrenheit)` + `\n**${cToK(value)}K** (Kelvin)`
+    } else if (unit === 'f') {
+      return result + `\n**${fToC(value)}°C** (Celsius)` + `\n**${cToK(fToC(value))}K** (Kelvin)`
+    } else {
+      return result + `\n**${kToC(value)}°C** (Celsius)` + `\n**${cToF(kToC(value))}°F** (Fahrenheit)`
+    }
   }
 }
