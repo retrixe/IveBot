@@ -788,7 +788,7 @@ export const handleTemperature: Command = {
     const regex = /^(\d+.?\d*) ?°? ?([CFK])$/i
     const match = regex.exec(temp)
     if (!match) return { content: 'Specify a temperature ending in C, F or K.', error: true }
-    const value = parseInt(match[1])
+    const value = +match[1]
     const unit = match[2].toLowerCase()
     const result = `**${value}°${unit.toUpperCase()}** is:`
     if (unit === 'c') {
