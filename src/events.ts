@@ -150,7 +150,7 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db): Pro
         method: 'POST'
       })
       // Parse the response.
-      const result = (await res.json())
+      const result = await res.json() as { responses: Array<{ fullTextAnnotation: { text: string } }> }
       // If no text was found.
       if (!result.responses[0].fullTextAnnotation) return
       // Return our answer.

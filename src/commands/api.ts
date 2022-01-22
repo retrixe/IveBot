@@ -46,10 +46,9 @@ export const handleOcr: Command = {
         method: 'POST'
       })
       // Parse the response.
-      const result = (await res.json())
+      const result = await res.json() as { responses: Array<{ fullTextAnnotation: { text: string } }> }
       // If no text was found.
-      if (!result.responses[0].fullTextAnnotation
-      ) return 'I was unable to get any results for the image.'
+      if (!result.responses[0].fullTextAnnotation) return 'I was unable to get any results for the image.'
       // If the result is too long, upload it to paste.gg.
       const text = result.responses[0].fullTextAnnotation.text
       let hastebin = ''
@@ -62,7 +61,7 @@ export const handleOcr: Command = {
             body: JSON.stringify({
               name: 'IveBot /ocr result', files: [{ content: { format: 'text', value: text } }]
             })
-          }).then(async e => await e.json())
+          }).then(async e => (await e.json()) as { result: { id: string, deletion_key: string } })
           hastebin = result.id
           deletionKey = result.deletion_key
         }
@@ -132,8 +131,8 @@ export const handleHastebin: Command = {
       })
       if (!req.ok) return 'Failed to upload text to paste.gg!'
       // Parse the response.
-      const res = await req.json()
-      const { id, deletion_key: deletionKey }: { id: string, deletion_key: string } = res.result
+      const res = await req.json() as { result: { id: string, deletion_key: string } }
+      const { id, deletion_key: deletionKey } = res.result
       return id
         ? `**paste.gg URL:**\nhttps://paste.gg/p/anonymous/${id}\nDeletion key: ${deletionKey}`
         : 'Failed to upload text to paste.gg!'
@@ -154,7 +153,7 @@ export const handleCat: Command = {
   generator: async () => {
     try {
       // Fetch a cat and process it (this sounds funny to me idk why)
-      const { file } = await (await fetch('http://aws.random.cat/meow')).json()
+      const { file } = await (await fetch('http://aws.random.cat/meow')).json() as { file: string }
       // Send it.
       return { embeds: [{ image: { url: file }, color: 0x123456 }], content: '🐱' }
     } catch (e) {
@@ -232,9 +231,9 @@ export const handleApod: Command = {
       const dateStr = date.format('YYYY-MM-DD')
       // Fetch a picture or video.
       try {
-        const { media_type: mediaType, url, title, explanation }: ApodResponse = await (await fetch(
+        const { media_type: mediaType, url, title, explanation } = await (await fetch(
           `https://api.nasa.gov/planetary/apod?api_key=${NASAtoken}&date=${dateStr}`
-        )).json()
+        )).json() as ApodResponse
         return mediaType === 'video'
           ? `**${title}**\n${explanation}\n${url.split('embed/').join('watch?v=')}`
           : {
@@ -247,9 +246,9 @@ export const handleApod: Command = {
     }
     // Fetch a picture or video.
     try {
-      const { media_type: mediaType, url, hdurl, title, explanation }: ApodResponse = await (await fetch(
+      const { media_type: mediaType, url, hdurl, title, explanation } = await (await fetch(
         `https://api.nasa.gov/planetary/apod?api_key=${NASAtoken}`
-      )).json()
+      )).json() as ApodResponse
       return mediaType === 'video'
         ? `**${title}**\n${explanation}\n${url.split('embed/').join('watch?v=')}`
         : {
@@ -273,7 +272,9 @@ export const handleDog: Command = {
     // List of breeds.
     if (args[0] === 'list') {
       try {
-        const { message } = await (await fetch('https://dog.ceo/api/breeds/list/all')).json()
+        const { message } = await (await fetch('https://dog.ceo/api/breeds/list/all')).json() as {
+          message: { [index: string]: string[] }
+        }
         // If only list of breeds was asked.
         if (!args[1]) return `**List of breeds:** ${Object.keys(message).join(', ')}`
         // If list of sub-breeds was asked.
@@ -286,11 +287,11 @@ export const handleDog: Command = {
       try {
         let { message } = await (await fetch(
           `http://dog.ceo/api/breed/${args[0].toLowerCase()}/${args[1].toLowerCase()}/images/random`
-        )).json()
+        )).json() as { message: string }
         if (message.includes('Breed not found')) {
           ({ message } = await (await fetch(
             `http://dog.ceo/api/breed/${args.join('').toLowerCase()}/images/random`
-          )).json())
+          )).json() as { message: string })
         }
         if (!message || message.includes('Breed not found')) return { content: 'This breed/sub-breed does not exist!', error: true }
         return {
@@ -303,14 +304,14 @@ export const handleDog: Command = {
       try {
         const { message } = await (await fetch(
           `http://dog.ceo/api/breed/${args[0].toLowerCase()}/images/random`
-        )).json()
+        )).json() as { message: string }
         if (!message || message.includes('Breed not found')) return 'This breed does not exist!'
         return { embeds: [{ image: { url: message }, color: 0x654321 }], content: '🐕 ' + args[0] }
       } catch (err) { return `Something went wrong 👾 Error: ${err}` }
     }
     // Fetch a random picture.
     try {
-      const { message } = await (await fetch('http://dog.ceo/api/breeds/image/random')).json()
+      const { message } = await (await fetch('http://dog.ceo/api/breeds/image/random')).json() as { message: string }
       return { embeds: [{ image: { url: message }, color: 0x654321 }], content: '🐕' }
     } catch (err) { return `Something went wrong 👾 Error: ${err}` }
   }
@@ -331,7 +332,7 @@ export const handleUrban: Command = {
       // Fetch the definition and parse it to JSON.
       const { list } = await (await fetch(
         `http://api.urbandictionary.com/v0/define?term=${args.join(' ')}`
-      )).json()
+      )).json() as { list: Array<{ definition: string }> }
       try {
         let response: string = list[0].definition.trim()
         if (response.length > 1900) {
@@ -374,14 +375,14 @@ export const handleNamemc: Command = {
       // Fetch the UUID and name of the user and parse it to JSON.
       const member = message.member && message.member.guild.members.get(getIdFromMention(args[0]))
       const username = member ? (member.nick || member.username) : args[0]
-      const { id, name }: { id: string, name: string } = await (await fetch(
+      const { id, name } = await (await fetch(
         `https://api.mojang.com/users/profiles/minecraft/${username}`
-      )).json()
+      )).json() as { id: string, name: string }
       // Fetch the previous names as well.
       try {
-        const names: Array<{ name: string, changedToAt?: number }> = await (await fetch(
+        const names = await (await fetch(
           `https://api.mojang.com/user/profiles/${id}/names`
-        )).json()
+        )).json() as Array<{ name: string, changedToAt?: number }>
         return {
           content: `**Minecraft history and skin for ${name}:**`,
           embeds: [{
@@ -419,7 +420,7 @@ export const handleCurrency: Command = {
     if (!currency || Date.now() - currency.timestamp > 3600000) {
       currency = await ( // This just fetches the data and parses it to JSON.
         await fetch(`http://data.fixer.io/api/latest?access_key=${fixerAPIkey}`)
-      ).json()
+      ).json() as typeof currency
       currency.timestamp = Date.now() // To set the timestamp to the current time of the system.
     }
     // For /currency list
@@ -469,18 +470,7 @@ interface Weather {
   clouds: { all: number }
   rain: { '3h': number }
   snow: { '3h': number }
-}
-type Categories = Array<{
-  lexicalCategory: { id: string, text: string }
-  entries: Array<{
-    senses: Array<{
-      definitions: string[]
-      shortDefinitions?: string[]
-      examples: Array<{ text: string }>
-      registers: Array<{ id: string, text: string }>
-    }>
-  }>
-}> /* eslint-enable camelcase */
+} /* eslint-enable camelcase */
 export const handleWeather: Command = {
   name: 'weather',
   aliases: ['wt'],
@@ -494,11 +484,11 @@ export const handleWeather: Command = {
     const fahrenheit = args.includes('--fahrenheit') || args.includes('-f')
     if (fahrenheit) args.splice(args.includes('-f') ? args.indexOf('-f') : args.indexOf('--fahrenheit'), 1)
     // Get the response from our API.
-    const weather: Weather = await (await fetch(
+    const weather = await (await fetch(
       `http://api.openweathermap.org/data/2.5/weather?q=${args.join(',')}&appid=${weatherAPIkey}${
         fahrenheit ? '&units=imperial' : '&units=metric'
       }`
-    )).json()
+    )).json() as Weather
     const temp = fahrenheit ? '°F' : '°C'
     // If the place doesn't exist..
     if (weather.cod === '404') return { content: 'Enter a valid city >_<', error: true }
@@ -553,6 +543,21 @@ ${weather.main.temp}${temp}/${weather.main.temp_max}${temp}/${weather.main.temp_
   }
 }
 
+interface OxfordApiResponse {
+  error?: string
+  results: Array<{ lexicalEntries: Array<{ inflectionOf: Array<{ id: string }> }> }>
+}
+type Categories = Array<{
+  lexicalCategory: { id: string, text: string }
+  entries: Array<{
+    senses: Array<{
+      definitions: string[]
+      shortDefinitions?: string[]
+      examples: Array<{ text: string }>
+      registers: Array<{ id: string, text: string }>
+    }>
+  }>
+}>
 export const handleDefine: Command = {
   name: 'define',
   aliases: ['def'],
@@ -569,7 +574,7 @@ export const handleDefine: Command = {
     try {
       const r = await (await fetch(
         `https://od-api.oxforddictionaries.com/api/v2/lemmas/en/${args.join(' ')}`, { headers }
-      )).json()
+      )).json() as OxfordApiResponse
       // If the word doesn't exist in the Oxford Dictionary..
       if (r.error === 'No entries were found for a given inflected word' || (
         r.error && r.error.startsWith('No lemma was found')
@@ -583,7 +588,7 @@ export const handleDefine: Command = {
           `https://od-api.oxforddictionaries.com/api/v2/entries/en/${word}` +
             '?strictMatch=false&fields=definitions%2Cexamples',
           { headers }
-        )).json()
+        )).json() as { results: Array<{ lexicalEntries: Categories, word: string }> }
         // Now we create an embed based on the 1st entry.
         const fields: Array<{ name: string, value: string, inline?: boolean }> = []
         // Function to check for maximum number of fields in an embed, then push.
@@ -680,7 +685,7 @@ export const handleXkcd: Command = {
     ) return { content: 'Correct usage: /xkcd (latest|random|search) (search query if searching)', error: true }
     // Get the latest xkcd comic.
     try {
-      const { num } = await (await fetch('http://xkcd.com/info.0.json')).json()
+      const { num } = await (await fetch('http://xkcd.com/info.0.json')).json() as { num: number }
       if (args[0] === 'random') return `https://xkcd.com/${Math.floor(Math.random() * (num - 1)) + 1}`
       else return `https://xkcd.com/${num}`
     } catch (e) { return 'Failed to fetch an xkcd comic!\nhttps://xkcd.com/1348' }
