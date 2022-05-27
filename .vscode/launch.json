@@ -33,8 +33,7 @@
       "name": "Launch IveBot",
       "runtimeArgs": [
         "--inspect", "--loader", "ts-node/esm", "${workspaceFolder}/src/index.ts"
-      ],
-      "port": 9229
+      ]
     },
     {
       "type": "node",
@@ -43,7 +42,6 @@
       "runtimeArgs": [
         "--inspect", "--loader", "ts-node/esm", "${workspaceFolder}/src/index.ts"
       ],
-      "port": 9229,
       "console": "integratedTerminal"
     }
   ]

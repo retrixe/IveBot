@@ -56,20 +56,22 @@ export const handleBan: Command = {
       checkRolePosition(message.member.guild.members.get(client.user.id)) ||
       !message.member.guild.members.get(client.user.id).permissions.has('banMembers'))
     ) return { content: `I cannot ban this person, you ${getInsult()}.`, error: true }
-    try {
-      await client.banGuildMember(message.member.guild.id, user.id, 0, args.join(' '))
-    } catch (e) {
-      return 'That person could not be banned.'
-    }
+    let dm
     try {
       if (!f.silent) {
-        await (await client.getDMChannel(user.id)).createMessage(
+        dm = await (await client.getDMChannel(user.id)).createMessage(
           f.args.length !== 0
             ? `You have been banned from ${message.member.guild.name} for ${f.args.join(' ')}.`
             : `You have been banned from ${message.member.guild.name}.`
         )
       }
     } catch (e) {}
+    try {
+      await client.banGuildMember(message.member.guild.id, user.id, 0, args.join(' '))
+    } catch (e) {
+      if (dm) await dm.delete().catch(() => {})
+      return 'That person could not be banned.'
+    }
     // WeChill
     if (message.member.guild.id === '402423671551164416') {
       await client.createMessage('402437089557217290', f.args.length !== 0

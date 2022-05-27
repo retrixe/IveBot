@@ -94,19 +94,21 @@ export const handleKick: Command = {
         !message.member.guild.members.get(client.user.id).permissions.has('banMembers'))
     ) return { content: `I cannot kick this person, you ${getInsult()}.`, error: true }
     // Notify the user.
-    try {
-      await client.kickGuildMember(message.member.guild.id, user.id, args.join(' '))
-    } catch (e) {
-      return 'I am unable to kick that user.'
-    }
+    let dm: Message
     if (!f.silent) {
       try {
-        await (await client.getDMChannel(user.id)).createMessage(
+        dm = await (await client.getDMChannel(user.id)).createMessage(
           f.args.length !== 0
             ? `You have been kicked from ${message.member.guild.name} for ${f.args.join(' ')}.`
             : `You have been kicked from ${message.member.guild.name}.`
         )
-      } catch (e) { }
+      } catch (e) {}
+    }
+    try {
+      await client.kickGuildMember(message.member.guild.id, user.id, args.join(' '))
+    } catch (e) {
+      if (dm) await dm.delete().catch(() => {})
+      return 'I am unable to kick that user.'
     }
     // WeChill
     if (message.member.guild.id === '402423671551164416') {
