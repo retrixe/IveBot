@@ -68,7 +68,7 @@ const getMutualPermissionGuilds = async (id: string, guilds: string[], host = fa
           perm,
           textChannels: perm ? fullGuild.channels.filter(c => c.type === 0).map(c => ({ id: c.id, name: c.name })) : []
         })
-      } catch (e) {
+      } catch (e: any) {
         if (e.name === 'DiscordHTTPError') throw new ApolloError('Failed to make Discord request!')
       }
     }))
@@ -92,7 +92,7 @@ const authenticateRequest = async (req: NextApiRequest, res: NextApiResponse): P
     })
     if (!decoded?.accessToken) throw new AuthenticationError('Invalid JWT token in cookie!')
     return decoded.accessToken
-  } catch (e) {
+  } catch (e: any) {
     // If expired, try refresh token to create a new one, else throw AuthenticationError.
     if (e.name === 'TokenExpiredError') {
       const decoded: JwtPayload | undefined = await new Promise((resolve, reject) => {

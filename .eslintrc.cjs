@@ -28,6 +28,8 @@ module.exports = {
     '@typescript-eslint/no-invalid-void-type': 'off',
     '@typescript-eslint/no-dynamic-delete': 'off',
     '@typescript-eslint/no-var-requires': 'off',
+    '@typescript-eslint/no-base-to-string': 'off',
+    '@typescript-eslint/no-misused-promises': 'off',
     // Set strict rules regarding async/await.
     '@typescript-eslint/await-thenable': 'error',
     '@typescript-eslint/require-await': 'error',
