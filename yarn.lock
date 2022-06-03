@@ -1045,9 +1045,10 @@ enquirer@^2.3.5:
   dependencies:
     ansi-colors "^4.1.1"
 
-eris@bsian03/eris#timeout:
-  version "0.16.2-dev"
-  resolved "https://codeload.github.com/bsian03/eris/tar.gz/087ffda39316fcac77a9b474e888e43baaa5f152"
+eris@^0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/eris/-/eris-0.17.0.tgz#8d8caa9715eccf27951c9b16ce4249c559ccbb13"
+  integrity sha512-ba7fpe104uw86z8fbX7V1ORMblB7jMJoDsRpiy8BKDQo+kNCRuUXB5xfg/VKGtZ944QroBTEZDuyXCBhKOBplQ==
   dependencies:
     ws "^8.2.3"
   optionalDependencies:

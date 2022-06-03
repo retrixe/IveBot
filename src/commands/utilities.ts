@@ -1,5 +1,5 @@
 // All the types!
-import Eris, { Message, GuildTextableChannel, Constants, Guild, InteractionDataOptionsString } from 'eris'
+import Eris, { Message, GuildTextableChannel, Constants, Guild, InteractionDataOptionsString, ChannelTypes } from 'eris'
 import { Command } from '../imports/types.js'
 // All the needs!
 import { getIdFromMention, getInsult, getUser, getChannel } from '../imports/tools.js'
@@ -476,6 +476,7 @@ export const handleReminderlist: Command = {
         // This function generates the fields.
         fields: reminders.map((reminder, index) => ({
           name: `Reminder ${index + 1}`,
+          // TODO: Switch to Discord timestamps for reminders.
           value: `**Due time:** ${moment(reminder.time).format(format)}
 **Channel:** <#${reminder.target}>
 **Message:** ${reminder.message.substring(1, reminder.message.lastIndexOf('\n')).trim()}`
@@ -582,6 +583,8 @@ export const handleChangevoiceregion: Command = {
       name: 'channel',
       description: 'The voice channel to edit the region of.',
       type: Constants.ApplicationCommandOptionTypes.CHANNEL,
+      // TODO: Fix this in Eris.
+      channel_types: [Constants.ChannelTypes.GUILD_VOICE, Constants.ChannelTypes.GUILD_STAGE_VOICE] as unknown as ChannelTypes,
       required: true
     }, {
       name: 'region',
