@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import {
-  Typography, Button, LinearProgress, Divider, Input, InputLabel, FormGroup, FormControlLabel,
-  FormControl, FormHelperText, Switch, Select, MenuItem
+  Typography, Button, LinearProgress, Divider, InputLabel, FormGroup, FormControlLabel,
+  FormControl, FormHelperText, MenuItem, Switch, Select, TextField
 } from '@mui/material'
 import { gql, useMutation } from '@apollo/client'
 import { JoinLeaveMessages, ServerInfo, ServerSettings } from './graphqlTypes'
@@ -52,15 +52,15 @@ const Settings = (props: { data: ServerSettings, server: ServerInfo }): JSX.Elem
       <Typography gutterBottom>
         Use | to separate roles. If a role contains |, it will not be added to the list.
       </Typography>
-      <FormControl fullWidth>
-        <InputLabel>Role Names</InputLabel>
-        <Input
-          value={serverSettings.publicRoles || ''} fullWidth
-          onChange={e => setPublicRoles(e.target.value)} margin='dense'
-        />
-        <FormHelperText>Leave blank to disable public roles</FormHelperText>
-      </FormControl>
-      <br /><br />
+      <TextField
+        fullWidth
+        margin='dense'
+        label='Role Names'
+        value={serverSettings.publicRoles || ''}
+        onChange={e => setPublicRoles(e.target.value)}
+        helperText='Leave blank to disable public roles'
+      />
+      <br />
       <Typography variant='h6' gutterBottom>Join/Leave Actions</Typography>
       <Divider />
       <br />
@@ -74,14 +74,14 @@ const Settings = (props: { data: ServerSettings, server: ServerInfo }): JSX.Elem
         {'Use | to separate roles. If a role contains |, it will not be added. \
           Prefix role names with bot- for adding roles to bots automatically.'}
       </Typography>
-      <FormControl fullWidth>
-        <InputLabel>Role Names</InputLabel>
-        <Input
-          value={serverSettings.joinAutorole || ''} fullWidth
-          onChange={e => setJoinAutorole(e.target.value)} margin='dense'
-        />
-        <FormHelperText>Leave blank to disable autorole</FormHelperText>
-      </FormControl>
+      <TextField
+        fullWidth
+        margin='dense'
+        label='Role Names'
+        value={serverSettings.joinAutorole || ''}
+        onChange={e => setJoinAutorole(e.target.value)}
+        helperText='Leave blank to disable autorole'
+      />
       <br /><br /><Divider /><br />
       <Typography variant='subtitle1' gutterBottom>Join/Leave Messages</Typography>
       <Typography gutterBottom>
@@ -107,29 +107,29 @@ const Settings = (props: { data: ServerSettings, server: ServerInfo }): JSX.Elem
         {'Use {un} for the username of the \
           joining/leaving user, {m} for mentioning them and {d} for their discriminator.'}
       </Typography>
-      <FormControl fullWidth>
-        <InputLabel>Join Message</InputLabel>
-        <Input
-          value={serverSettings.joinLeaveMessages.joinMessage || ''} fullWidth
-          onChange={e => setJoinLeaveMessages({ joinMessage: e.target.value })} margin='dense'
-        />
-      </FormControl>
+      <TextField
+        fullWidth
+        margin='dense'
+        label='Join Message'
+        value={serverSettings.joinLeaveMessages.joinMessage || ''}
+        onChange={e => setJoinLeaveMessages({ joinMessage: e.target.value })}
+      />
       <div style={{ height: 10 }} />
-      <FormControl fullWidth>
-        <InputLabel>Leave Message</InputLabel>
-        <Input
-          value={serverSettings.joinLeaveMessages.leaveMessage || ''} fullWidth
-          onChange={e => setJoinLeaveMessages({ leaveMessage: e.target.value })} margin='dense'
-        />
-      </FormControl>
+      <TextField
+        fullWidth
+        margin='dense'
+        label='Leave Message'
+        value={serverSettings.joinLeaveMessages.leaveMessage || ''}
+        onChange={e => setJoinLeaveMessages({ leaveMessage: e.target.value })}
+      />
       <div style={{ height: 10 }} />
-      <FormControl fullWidth>
-        <InputLabel>Ban Message</InputLabel>
-        <Input
-          value={serverSettings.joinLeaveMessages.banMessage || ''} fullWidth
-          onChange={e => setJoinLeaveMessages({ banMessage: e.target.value })} margin='dense'
-        />
-      </FormControl>
+      <TextField
+        fullWidth
+        margin='dense'
+        label='Ban Message'
+        value={serverSettings.joinLeaveMessages.banMessage || ''}
+        onChange={e => setJoinLeaveMessages({ banMessage: e.target.value })}
+      />
       <br /><br />
       <Typography variant='h6' gutterBottom>Text Recognition on Image Send</Typography>
       <Divider />
