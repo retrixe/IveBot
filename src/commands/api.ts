@@ -15,7 +15,7 @@ export const handleOcr: Command = {
     description: 'Get text from an image.',
     fullDescription: 'Get text from an image. Powered by Google Cloud Vision.',
     example: '/ocr <with uploaded image>',
-    usage: '/ocr (--hastebin) <link to image/uploaded image>',
+    usage: '/ocr (--hastebin) <link to image/uploaded image/reply to an image>',
     argsRequired: false
   },
   generator: async (message, args, { client }) => {
@@ -24,14 +24,29 @@ export const handleOcr: Command = {
     if (useHastebin) args.shift()
     // Get the image and convert it to Base64.
     try {
-      // Check if a message link was passed.
-      const regex = /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
-      let url = (args.length > 0) ? args.join('%20') : message.attachments[0].url
-      if (regex.test(url)) {
-        const split = url.split('/')
-        const mess = await client.getMessage(split[split.length - 2], split.pop())
-        url = /^https?:\/\/\S+$/.test(mess.content) ? mess.content : mess.attachments[0].url
+      let url = (args.length > 0)
+        ? args.join('%20')
+        : message.attachments && message.attachments[0] && message.attachments[0].url
+      if (message.messageReference) {
+        const mess = message.referencedMessage || await client.getMessage(
+          message.messageReference.channelID,
+          message.messageReference.messageID
+        )
+        url = /^https?:\/\/\S+$/.test(mess.content)
+          ? mess.content
+          : mess.attachments && mess.attachments[0] && mess.attachments[0].url
+      } else {
+        // Check if a message link was passed.
+        const regex = /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
+        if (regex.test(url)) {
+          const split = url.split('/')
+          const mess = await client.getMessage(split[split.length - 2], split.pop())
+          url = /^https?:\/\/\S+$/.test(mess.content)
+            ? mess.content
+            : mess.attachments && mess.attachments[0] && mess.attachments[0].url
+        }
       }
+      if (!url) return `Invalid image URL, you ${getInsult()}.`
       // const image = Buffer.from(await (await fetch(url)).arrayBuffer()).toString('base64')
       const fetchedImage = await fetchLimited(url, 16)
       if (fetchedImage === false) return 'The file provided is larger than 16 MB!'
@@ -89,7 +104,7 @@ https://paste.gg/p/anonymous/${hastebin} (use this key to delete: \`${deletionKe
           timestamp: new Date(message.timestamp).toISOString()
         }]
       }
-    } catch (e) { return `Invalid image URL, you ${getInsult()}.` }
+    } catch (e) { console.error(e); return `Invalid image URL, you ${getInsult()}.` }
   }
 }
 
