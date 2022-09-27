@@ -10,13 +10,13 @@ const getToken = async (req: NextApiRequest): Promise<string | undefined> => {
   if (!token) return
   // Check if it's a JWT token issued by us.
   try {
-    const decoded: JwtPayload | undefined = await new Promise((resolve, reject) => {
+    const decoded: string | JwtPayload | undefined = await new Promise((resolve, reject) => {
       verify(
         token, jwtSecret, { ignoreExpiration: true },
         (err, decoded) => (err ? reject(err) : resolve(decoded))
       )
     })
-    return decoded?.refreshToken
+    return typeof decoded === 'string' ? undefined : decoded?.refreshToken
   } catch (e) {}
 }
 

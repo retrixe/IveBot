@@ -1,5 +1,5 @@
 import React from 'react'
-import { AppBar, Toolbar, Button, Typography, LinearProgress } from '@material-ui/core'
+import { AppBar, Toolbar, Button, Typography, LinearProgress } from '@mui/material'
 import { useQuery, gql } from '@apollo/client'
 import Head from 'next/head'
 import Link from 'next/link'

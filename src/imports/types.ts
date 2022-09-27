@@ -35,7 +35,7 @@ export type IveBotCommandGeneratorFunction = (msg: Message, args: string[], ctx:
 void | Promise<void> | CommandResponse | Promise<CommandResponse>
 export type IveBotSlashGeneratorFunction = (interaction: CommandInteraction, ctx: Context) =>
 void | Promise<void> | CommandResponse | Promise<CommandResponse>
-export type IveBotCommandGenerator = IveBotCommandGeneratorFunction|string|AdvancedMessageContent
+export type IveBotCommandGenerator = IveBotCommandGeneratorFunction | string | AdvancedMessageContent
 export interface Command {
   opts: CommandOptions
   aliases?: string[]

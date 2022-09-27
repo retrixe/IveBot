@@ -87,20 +87,22 @@ const authenticateRequest = async (req: NextApiRequest, res: NextApiResponse): P
   if (!token) throw new AuthenticationError('No auth cookie received!')
   // Check if it's a JWT token issued by us.
   try {
-    const decoded: JwtPayload | undefined = await new Promise((resolve, reject) => {
+    const decoded: string | JwtPayload | undefined = await new Promise((resolve, reject) => {
       verify(token, jwtSecret, {}, (err, decoded) => (err ? reject(err) : resolve(decoded)))
     })
-    if (!decoded?.accessToken) throw new AuthenticationError('Invalid JWT token in cookie!')
+    if (typeof decoded === 'string' || !decoded?.accessToken) {
+      throw new AuthenticationError('Invalid JWT token in cookie!')
+    }
     return decoded.accessToken
   } catch (e: any) {
     // If expired, try refresh token to create a new one, else throw AuthenticationError.
     if (e.name === 'TokenExpiredError') {
-      const decoded: JwtPayload | undefined = await new Promise((resolve, reject) => {
+      const decoded: string | JwtPayload | undefined = await new Promise((resolve, reject) => {
         verify(token, jwtSecret, { ignoreExpiration: true }, (err, decoded) => (
           err ? reject(err) : resolve(decoded)
         ))
       })
-      if (!decoded?.refreshToken || !decoded.scope) {
+      if (typeof decoded === 'string' || !decoded?.refreshToken || !decoded.scope) {
         throw new AuthenticationError('Invalid JWT token in cookie!')
       }
       try {

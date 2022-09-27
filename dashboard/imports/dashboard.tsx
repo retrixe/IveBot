@@ -1,32 +1,37 @@
 import React, { useState } from 'react'
 import {
   Typography, Paper, List, ListItem, ListItemAvatar, ListItemText, Avatar, Hidden, Divider,
-  IconButton, LinearProgress, makeStyles, useMediaQuery, useTheme
-} from '@material-ui/core'
-import ArrowBack from '@material-ui/icons/ArrowBack'
+  IconButton, LinearProgress, styled, useMediaQuery, useTheme
+} from '@mui/material'
+import ArrowBack from '@mui/icons-material/ArrowBack'
 import { useLazyQuery, gql } from '@apollo/client'
 import { ServerInfo, DiscordUser } from './graphqlTypes'
 import Settings from './settings'
 
-const useStyles = makeStyles(theme => ({
-  root: { [theme.breakpoints.down('sm')]: { flexDirection: 'column' } },
-  banner: {
-    display: 'flex',
-    alignItems: 'center',
-    flexDirection: 'column',
-    // [theme.breakpoints.down('xs')]: { alignItems: 'center' },
-    [theme.breakpoints.down('sm')]: { width: '100%' },
-    [theme.breakpoints.only('md')]: { width: '30%' },
-    [theme.breakpoints.only('lg')]: { width: '25%' },
-    [theme.breakpoints.only('xl')]: { width: '20%' }
-  },
-  image: {
-    borderRadius: '50%',
-    marginBottom: '1em',
-    [theme.breakpoints.down('sm')]: { maxWidth: 256 },
-    [theme.breakpoints.up('md')]: { width: '100%' }
-  },
-  bannerText: { [theme.breakpoints.up('md')]: { textAlign: 'center' }, wordWrap: 'break-word' }
+const Root = styled('div')(({ theme }) => ({
+  display: 'flex',
+  [theme.breakpoints.down('sm')]: {
+    flexDirection: 'column'
+  }
+}))
+
+const Banner = styled('div')(({ theme }) => ({
+  padding: 8,
+  display: 'flex',
+  alignItems: 'center',
+  flexDirection: 'column',
+  // [theme.breakpoints.down('xs')]: { alignItems: 'center' },
+  [theme.breakpoints.down('sm')]: { width: '100%' },
+  [theme.breakpoints.only('md')]: { width: '30%' },
+  [theme.breakpoints.only('lg')]: { width: '25%' },
+  [theme.breakpoints.only('xl')]: { width: '20%' }
+}))
+
+const AvatarImage = styled('img')(({ theme }) => ({
+  borderRadius: '50%',
+  marginBottom: '1em',
+  [theme.breakpoints.down('sm')]: { maxWidth: 256 },
+  [theme.breakpoints.up('md')]: { width: '100%' }
 }))
 
 const GET_SERVER_SETTINGS = gql`
@@ -49,7 +54,6 @@ const GET_SERVER_SETTINGS = gql`
 const Dashboard = (props: {
   data: { servers: ServerInfo[], user: Omit<DiscordUser, 'id'> }
 }): JSX.Element => {
-  const classes = useStyles()
   const largeDisplay = useMediaQuery(useTheme().breakpoints.up('lg'))
   const mobileDisplay = useMediaQuery(useTheme().breakpoints.down('xs'))
   const [selectedServer, setSelectedServer] = useState<ServerInfo | null>(null)
@@ -87,12 +91,12 @@ const Dashboard = (props: {
       <List>
         {props.data.servers.map(element => {
           let nameOfServer = element.name ? element.name : ''
-          if (nameOfServer.length >= 32) nameOfServer = element.name.substr(0, 29) + '...'
+          if (nameOfServer.length >= 32) nameOfServer = element.name.substring(0, 29) + '...'
           return (
             <ListItem
               disabled={!element.perms} divider button key={element.id}
               onClick={() => {
-                getServerSettings({ variables: { id: element.id } })
+                getServerSettings({ variables: { id: element.id } }).catch(console.error)
                 setSelectedServer(element)
               }}
             >
@@ -109,22 +113,27 @@ const Dashboard = (props: {
   const textVariant = (largeDisplay || mobileDisplay) && username.length > 9
     ? username.length > 14 ? 'h6' : 'h5'
     : 'h4'
+
   return (
-    <div style={{ display: 'flex' }} className={classes.root}>
-      <div style={{ padding: 8 }} className={classes.banner}>
-        <img
-          src={props.data.user.avatar.replace('?size=128', '?size=4096')} alt='Avatar'
-          className={classes.image}
+    <Root>
+      <Banner>
+        <AvatarImage
+          src={props.data.user.avatar.replace('?size=128', '?size=4096')}
+          alt='Avatar'
         />
         <Typography
-          variant={textVariant} style={{ wordWrap: username.length > 17 ? 'break-word' : 'normal' }}
-          className={classes.bannerText} gutterBottom
+          sx={{
+            wordWrap: username.length > 17 ? 'break-word' : 'normal',
+            textAlign: { md: 'center' }
+          }}
+          variant={textVariant}
+          gutterBottom
         >
           {username}<span style={{ color: '#666' }}>#{props.data.user.identifier.split('#').pop()}</span>
         </Typography>
-      </div>
+      </Banner>
       <Paper style={{ marginLeft: '1%', marginRight: '1%', padding: 10, flex: 1 }}>{settings}</Paper>
-    </div>
+    </Root>
   )
 }
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import {
   AppBar, Toolbar, Button, Typography, SvgIcon, IconButton
-} from '@material-ui/core'
+} from '@mui/material'
 import Head from 'next/head'
 import Link from 'next/link'
 import { readFile } from 'fs/promises'

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import {
   Typography, Button, LinearProgress, Divider, Input, InputLabel, FormGroup, FormControlLabel,
   FormControl, FormHelperText, Switch, Select, MenuItem
-} from '@material-ui/core'
+} from '@mui/material'
 import { gql, useMutation } from '@apollo/client'
 import { JoinLeaveMessages, ServerInfo, ServerSettings } from './graphqlTypes'
 
@@ -93,7 +93,7 @@ const Settings = (props: { data: ServerSettings, server: ServerInfo }): JSX.Elem
         <InputLabel>Channel Name</InputLabel>
         <Select
           value={serverSettings.joinLeaveMessages.channel || ''} fullWidth margin='dense'
-          onChange={e => setJoinLeaveMessages({ channel: e.target.value as string })}
+          onChange={e => setJoinLeaveMessages({ channel: e.target.value })}
         >
           <MenuItem value=''><em>None</em></MenuItem>
           {props.server.channels.map(i => (

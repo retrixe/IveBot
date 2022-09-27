@@ -51,7 +51,7 @@ export const guildMemberAdd = (client: Client, db: Db, tempDB: DB) => async (
 
 // When a server loses a member, this function will be called.
 export const guildMemberRemove = (client: Client, db: Db) => async (
-  guild: Guild, member: Member|{ id: string, user: User }
+  guild: Guild, member: Member | { id: string, user: User }
 ) => {
   // Get server settings.
   const serverSettings = await getServerSettings(db, guild.id)

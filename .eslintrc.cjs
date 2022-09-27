@@ -5,19 +5,19 @@ module.exports = {
     node: true
   },
   extends: ['plugin:react/recommended', 'plugin:react-hooks/recommended', 'standard-with-typescript', 'standard-react', 'standard-jsx'],
-  plugins: ['react', 'graphql', 'react-hooks', '@typescript-eslint'],
+  plugins: ['react', 'react-hooks', '@typescript-eslint'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: './tsconfig.json'
   },
   rules: {
-    'graphql/template-strings': ['error', {
+    /* 'graphql/template-strings': ['error', {
       env: 'apollo',
       schemaString: require('fs').readFileSync(
         require('path').resolve(__dirname, 'dashboard/schema.graphql'),
         { encoding: 'utf8' }
       )
-    }],
+    }], */
     // Make TypeScript ESLint less strict.
     '@typescript-eslint/strict-boolean-expressions': 'off',
     '@typescript-eslint/restrict-template-expressions': 'off',
@@ -30,6 +30,7 @@ module.exports = {
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/no-base-to-string': 'off',
     '@typescript-eslint/no-misused-promises': 'off',
+    '@typescript-eslint/restrict-plus-operands': 'off',
     // Set strict rules regarding async/await.
     '@typescript-eslint/await-thenable': 'error',
     '@typescript-eslint/require-await': 'error',

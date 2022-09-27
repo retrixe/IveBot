@@ -33,7 +33,7 @@ export class TriviaSession {
     this.author = message.author
     this.message = message
     this.questionList = triviaList
-    this.settings = { maxScore: maxScore, timeout: 120000, timeLimit, botPlays, revealAnswer }
+    this.settings = { maxScore, timeout: 120000, timeLimit, botPlays, revealAnswer }
     this.tempDB = tempDB
     this.client = client
   }

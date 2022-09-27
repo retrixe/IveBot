@@ -1,5 +1,5 @@
 import React from 'react'
-import { AppBar, Toolbar, Button, Typography } from '@material-ui/core'
+import { AppBar, Toolbar, Button, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Link from 'next/link'

@@ -1,27 +1,37 @@
 import React from 'react'
 import Head from 'next/head'
-import CssBaseline from '@material-ui/core/CssBaseline'
-import { ThemeProvider } from '@material-ui/core/styles'
-import { useApollo } from '../imports/apolloClient'
+import { AppProps } from 'next/app'
 import { ApolloProvider } from '@apollo/client'
+import { ThemeProvider } from '@mui/material/styles'
+import CssBaseline from '@mui/material/CssBaseline'
+import { CacheProvider, EmotionCache } from '@emotion/react'
+import createCache from '@emotion/cache'
+import { useApollo } from '../imports/apolloClient'
 import theme from '../imports/theme'
 
-export default function MyApp (props: { Component: React.ElementType, pageProps: {} }): JSX.Element {
-  const { Component, pageProps } = props
+// Client-side cache, shared for the whole session of the user in the browser.
+const clientSideEmotionCache = createCache({ key: 'css' })
+
+interface MyAppProps extends AppProps {
+  emotionCache?: EmotionCache
+}
+
+export default function MyApp (props: MyAppProps): JSX.Element {
+  const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
 
   React.useEffect(() => {
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector('#jss-server-side')
-    if ((jssStyles != null) && (jssStyles.parentElement != null)) {
-      jssStyles.parentElement.removeChild(jssStyles)
+    if (jssStyles) {
+      jssStyles?.parentElement?.removeChild(jssStyles)
     }
   }, [])
 
   return (
-    <>
+    <CacheProvider value={emotionCache}>
       <Head>
         <title>IveBot</title>
-        <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
+        <meta name='viewport' content='initial-scale=1, width=device-width' />
       </Head>
       <ThemeProvider theme={theme}>
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
@@ -30,6 +40,6 @@ export default function MyApp (props: { Component: React.ElementType, pageProps:
           <Component {...pageProps} />
         </ApolloProvider>
       </ThemeProvider>
-    </>
+    </CacheProvider>
   )
 }

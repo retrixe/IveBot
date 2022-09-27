@@ -1,4 +1,3 @@
-import 'json5/lib/require.js'
 // Tokens and stuff.
 import { Client, CommandInteraction } from 'eris'
 // Get MongoDB.
