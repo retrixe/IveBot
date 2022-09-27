@@ -410,11 +410,20 @@ export const handleRemindme: Command = {
     example: '/remindme 1h do your homework'
   },
   generator: async (message, args, { db }) => {
-    if (args.length < 2 || !ms(args[0])) {
-      return { content: 'Correct usage: /remindme <time in 1d|1h|1m|1s> <description>', error: true }
-    }
     let channel = false
-    if (args[1] === '-c' || args[1] === '--channel') channel = true
+    if (args[0] === '-c' || args[0] === '--channel') {
+      args.splice(0, 1)
+      channel = true
+    } else if (args[1] === '-c' || args[1] === '--channel') {
+      args.splice(1, 1)
+      channel = true
+    } else if (args[args.length - 1] === '-c' || args[args.length - 1] === '--channel') {
+      args.splice(args.length - 1, 1)
+      channel = true
+    }
+    if (args.length < 2 || !ms(args[0])) {
+      return { content: 'Correct usage: /remindme <time in 1d|1h|1m|1s> (--channel|-c) <description>', error: true }
+    }
     if (ms(args[0]) > 61 * 1000) { // Greater than 61 seconds and it's relegated to the database.
       try {
         const res = await db.collection('tasks').insertOne({
@@ -424,7 +433,7 @@ export const handleRemindme: Command = {
           target: channel ? message.channel.id : (await message.author.getDMChannel()).id,
           message: `⏰${
             channel ? message.author.mention + ' ' : ''
-          } ${args.slice(channel ? 2 : 1).join(' ')}\nReminder set ${args[0]} ago.`
+          } ${args.slice(1).join(' ')}\nReminder set ${args[0]} ago.`
         })
         if (!res.acknowledged) return 'Failed to add a reminder to the database!'
       } catch (e) { return 'Failed to add a reminder to the database!' + (channel ? '' : ' Can I DM you?') }
@@ -433,7 +442,7 @@ export const handleRemindme: Command = {
         (async () => {
           const textChannel = channel ? message.channel : await message.author.getDMChannel()
           const firstLine = channel
-            ? `${message.author.mention} ${args.slice(2).join(' ')}`
+            ? `${message.author.mention} ${args.slice(1).join(' ')}`
             : args.slice(1).join(' ')
           await textChannel.createMessage(`⏰ ${firstLine}\nReminder set ${args[0]} ago.`)
         })().catch(() => {})
@@ -689,8 +698,9 @@ export const handleEditLastSay: Command = {
   }
 }
 
-export const handleSuppress: Command = {
-  name: 'suppress',
+export const handleSuppressEmbed: Command = {
+  name: 'suppressEmbed',
+  aliases: ['suppressEmbeds', 'suppress'],
   opts: {
     requirements: {
       permissions: { manageMessages: true },
@@ -701,32 +711,36 @@ export const handleSuppress: Command = {
     },
     description: 'Suppress or unsuppress embeds in a message.',
     fullDescription: 'Suppress or unsuppress embeds in a message.',
-    usage: '/suppress (channel) <message ID or link>',
-    example: '/suppress #general 123456789012345678'
+    usage: '/suppress (channel) <message ID/link/reply to a message>',
+    example: '/suppress #general 123456789012345678',
+    argsRequired: false
   },
-  generator: async (message, args) => {
+  generator: async (message, args, { client }) => {
     let msg
-    let channel
-    if (args.length === 1) {
+    console.log(args)
+    console.log(message.messageReference)
+    if (args.length === 0 && message.messageReference) {
+      const { channelID, messageID } = message.messageReference
+      msg = message.referencedMessage || await client.getMessage(channelID, messageID)
+    } else if (args.length === 1) {
       const regex = /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
       if (regex.test(args[0])) {
         const split = args[0].split('/')
-        channel = message.member.guild.channels.get(split[5]) as GuildTextableChannel
+        const channel = message.member.guild.channels.get(split[5]) as GuildTextableChannel
         if (!channel || channel.type !== 0) return { content: `That's not a real channel, you ${getInsult()}.`, error: true }
         msg = channel.messages.get(split[6]) || await channel.getMessage(split[6])
       } else {
         msg = message.channel.messages.get(args[0]) || await message.channel.getMessage(args[0])
-        channel = message.channel
       }
     } else if (args.length === 2) {
-      channel = message.member.guild.channels.get(getIdFromMention(args[0])) as GuildTextableChannel
+      const channel = message.member.guild.channels.get(getIdFromMention(args[0])) as GuildTextableChannel
       if (channel && channel.type === 0) {
         msg = channel.messages.get(args[1]) || await channel.getMessage(args[1])
       } else return { content: `That's not a real channel, you ${getInsult()}.`, error: true }
-    } else return { content: 'Correct usage: /suppress (channel) <message ID or link>', error: true }
+    } else return { content: 'Correct usage: /suppress (channel) <message ID/link/reply to a message>', error: true }
 
     if (msg) {
-      await msg.edit({ flags: msg.flags ^ Eris.Constants.MessageFlags.SUPPRESS_EMBEDS })
+      await msg.edit({ flags: msg.flags ^ Constants.MessageFlags.SUPPRESS_EMBEDS })
       message.addReaction('✅').catch(() => {}) // Ignore error.
     } else return { content: `That's not a real message, you ${getInsult()}.`, error: true }
   }

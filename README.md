@@ -62,7 +62,7 @@ It's planned to have some nifty commands like /assistant which directly communic
 - `/giverole` and `/takerole`
 - `/notify`
 - `/hastebin`
-- `/suppress`
+- `/suppressEmbed`
 
 **Administrative commands.**
 

@@ -49,9 +49,9 @@ TP \`/request\` - Request a specific feature.
 \`/giverole\` and \`/takerole\` - Edit roles.
 \`/notify\` - Ping a role that cannot be pinged.
 \`/hastebin\` - Upload a file to hasteb.in to view on phone.
-\`/suppress\` - Suppress or unsuppress embeds in a message.
 \`/calculate\` - Calculate an expression.
-\`/temperature\` - Convert between temperature units.`
+\`/temperature\` - Convert between temperature units.
+\`/suppressEmbed\` - Suppress or unsuppress embeds in a message.`
     }, {
       name: '**Administrative commands.**', value: `
 \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
