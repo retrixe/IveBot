@@ -380,9 +380,13 @@ export const handleNamemc: Command = {
       )).json() as { id: string, name: string }
       // Fetch the previous names as well.
       try {
-        const names = await (await fetch(
+        const names: Array<{ name: string, changedToAt?: number }> = [{
+          name: 'Currently, username history is not available. ' +
+            'See: https://help.minecraft.net/hc/en-us/articles/8969841895693-Username-History-API-Removal-FAQ-'
+        }]
+        /* await (await fetch(
           `https://api.mojang.com/user/profiles/${id}/names`
-        )).json() as Array<{ name: string, changedToAt?: number }>
+        )).json() as Array<{ name: string, changedToAt?: number }> */
         return {
           content: `**Minecraft history and skin for ${name}:**`,
           embeds: [{

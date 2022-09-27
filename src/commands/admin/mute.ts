@@ -38,7 +38,11 @@ export const handleMute: Command = {
         else if ( // Or if a permission overwrite grants perms, then user has permissions.
           a.permissionOverwrites.get(role.id).has('sendMessages') ||
           a.permissionOverwrites.get(role.id).has('addReactions') ||
-          a.permissionOverwrites.get(role.id).has('voiceSpeak')
+          a.permissionOverwrites.get(role.id).has('voiceSpeak') ||
+          a.permissionOverwrites.get(role.id).has('useApplicationCommands') ||
+          a.permissionOverwrites.get(role.id).has('sendMessagesInThreads') ||
+          a.permissionOverwrites.get(role.id).has('createPrivateThreads') ||
+          a.permissionOverwrites.get(role.id).has('createPublicThreads')
         ) hasPerms = true
       })
     // If the role doesn't exist, we create one.
@@ -51,25 +55,19 @@ export const handleMute: Command = {
     // Set permissions as required.
     if (hasPerms && role) {
       try {
-        message.member.guild.channels.forEach((a) => {
-          if (a.type === 0) {
-            client.editChannelPermission(
-              a.id, role.id, 0,
-              Constants.Permissions.sendMessages | Constants.Permissions.addReactions,
-              0
-            ).catch(() => {}) // Ignore error.
-          } else if (a.type === 2) {
-            client.editChannelPermission(a.id, role.id, 0, Constants.Permissions.voiceSpeak, 0)
-              .catch(() => {}) // Ignore error.
-          } else if (a.type === 4) {
-            client.editChannelPermission(
-              a.id, role.id, 0,
-              Constants.Permissions.sendMessages |
-              Constants.Permissions.addReactions | Constants.Permissions.voiceSpeak,
-              0
-            ).catch(() => {}) // Ignore error.
-          }
-        })
+        await Promise.all(message.member.guild.channels.map(async channel => {
+          return await client.editChannelPermission(
+            channel.id, role.id, 0,
+            Constants.Permissions.sendMessages |
+            Constants.Permissions.addReactions |
+            Constants.Permissions.voiceSpeak |
+            Constants.Permissions.useApplicationCommands |
+            Constants.Permissions.sendMessagesInThreads |
+            Constants.Permissions.createPrivateThreads |
+            Constants.Permissions.createPublicThreads,
+            0
+          )
+        }))
       } catch (e) { return 'I cannot set permissions for the Muted role.' }
     }
     // Can the bot manage this role?
