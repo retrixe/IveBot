@@ -1,9 +1,8 @@
-import { Constants, InteractionDataOptionsString } from 'eris'
+import { Constants, InteractionDataOptionsString, TextChannel } from 'eris'
 import { Command } from '../imports/types.js'
 import { openaiAPIkey } from '../config.js'
 import fetch from 'node-fetch'
 
-// TODO: Support switching between models: ada/babbage/davinci/curie
 export const handleAi: Command = {
   name: 'ai',
   aliases: ['openai'],
@@ -21,13 +20,38 @@ export const handleAi: Command = {
       }
     ]
   },
-  generator: (message, args) => handleAi.commonGenerator(args.join(' '), message.id),
+  generator: (message, args) => handleAi.commonGenerator(
+    args.join(' '), message.author.id, (message.channel as TextChannel).guild?.id, message.id),
   slashGenerator: async interaction => {
     await interaction.defer()
     return await handleAi.commonGenerator(
-      (interaction.data.options[0] as InteractionDataOptionsString).value)
+      (interaction.data.options[0] as InteractionDataOptionsString).value,
+      interaction.user?.id,
+      (interaction.channel as TextChannel).guild?.id)
   },
-  commonGenerator: async (query: string, reply?: string) => {
+  commonGenerator: async (query: string, userID: string, guildID?: string, reply?: string) => {
+    // TODO: This should be configurable.
+    let model = 'text-davinci-003'
+    if (guildID !== '411829766178734081') model = 'text-ada-001'
+    else if (query.includes('--ada')) {
+      query = query.replace('--ada', '')
+      model = 'text-ada-001'
+    } else if (query.includes('--babbage')) {
+      query = query.replace('--babbage', '')
+      model = 'text-babbage-001'
+    } else if (query.includes('--curie')) {
+      query = query.replace('--curie', '')
+      model = 'text-curie-001'
+    }
+    let temperature = model === 'text-davinci-003' ? 0.9 : 0
+    if (query.includes('--temp')) {
+      const temp = query.match(/--temp ([0-9.]+)/)
+      if (temp) {
+        temperature = parseFloat(temp[1])
+        query = query.replace(temp[0], '')
+      }
+    }
+
     const request = await fetch('https://api.openai.com/v1/completions', {
       method: 'POST',
       headers: {
@@ -35,13 +59,17 @@ export const handleAi: Command = {
         Authorization: `Bearer ${openaiAPIkey}`
       },
       body: JSON.stringify({
-        model: 'text-davinci-003',
+        model,
         prompt: query,
         max_tokens: 400,
-        temperature: 0
+        temperature,
+        user: userID
       })
     })
     const response = await request.json() as { choices: Array<{ text: string }> }
+    if (response.choices.length === 0) {
+      return 'OpenAI servers returned no response (likely rate-limited). Try again later?'
+    }
     return {
       content: response.choices[0].text.trim(),
       messageReference: reply ? { messageID: reply } : undefined
