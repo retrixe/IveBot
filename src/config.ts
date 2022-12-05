@@ -3,6 +3,7 @@ import { readFile } from 'fs/promises'
 
 interface Config {
   weatherAPIkey: string
+  openaiAPIkey: string
   fixerAPIkey: string
   cvAPIkey: string
   host: string
@@ -19,6 +20,7 @@ const config: Config = json5.parse(await readFile('config.json5', { encoding: 'u
 
 export const {
   weatherAPIkey,
+  openaiAPIkey,
   fixerAPIkey,
   cvAPIkey,
   host,
