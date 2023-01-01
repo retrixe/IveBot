@@ -22,7 +22,7 @@
   "dependencies": {
     "eris": "^0.17.1",
     "fuse.js": "^6.6.2",
-    "json5": "^2.2.1",
+    "json5": "^2.2.2",
     "mathjs": "^11.2.1",
     "moment": "^2.29.4",
     "mongodb": "^4.10.0",
