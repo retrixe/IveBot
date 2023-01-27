@@ -1,10 +1,10 @@
 import { Client } from 'eris'
 import { promisify } from 'util'
+import { GraphQLError } from 'graphql'
 import { MongoClient, Document } from 'mongodb'
 import { JwtPayload, verify, sign } from 'jsonwebtoken'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { randomBytes, createCipheriv, createDecipheriv, createHash } from 'crypto'
-import { ApolloError, AuthenticationError, ForbiddenError } from 'apollo-server-micro'
 import config from '../config.json'
 const { host, rootUrl, mongoUrl, jwtSecret, clientId, clientSecret, botToken, botApiUrl } = config
 
@@ -50,12 +50,24 @@ const getMutualPermissionGuilds = async (id: string, guilds: string[], host = fa
     let body: Buffer
     try {
       body = await encrypt(Buffer.from(JSON.stringify({ id, guilds, host })))
-    } catch (e) { throw new ApolloError('Failed to encrypt IveBot request!') }
+    } catch (e) {
+      throw new GraphQLError('Failed to encrypt IveBot request!', {
+        extensions: { code: 'INTERNAL_SERVER_ERROR' }
+      })
+    }
     try {
       const request = await fetch(`${botApiUrl}/private`, { method: 'POST', body })
-      if (!request.ok) throw new ApolloError('Failed to make request to IveBot private API!')
+      if (!request.ok) {
+        throw new GraphQLError('Failed to make request to IveBot private API!', {
+          extensions: { code: 'INTERNAL_SERVER_ERROR' }
+        })
+      }
       return JSON.parse(decrypt(Buffer.from(await request.arrayBuffer())).toString('utf8'))
-    } catch (e) { throw new ApolloError('Failed to make request to IveBot private API!') }
+    } catch (e) {
+      throw new GraphQLError('Failed to make request to IveBot private API!', {
+        extensions: { code: 'INTERNAL_SERVER_ERROR' }
+      })
+    }
   } else {
     const mutualGuildsWithPerm: Array<{ id: string, perm: boolean, textChannels: TextChannel[] }> = []
     await Promise.all(guilds.map(async guild => {
@@ -69,7 +81,11 @@ const getMutualPermissionGuilds = async (id: string, guilds: string[], host = fa
           textChannels: perm ? fullGuild.channels.filter(c => c.type === 0).map(c => ({ id: c.id, name: c.name })) : []
         })
       } catch (e: any) {
-        if (e.name === 'DiscordHTTPError') throw new ApolloError('Failed to make Discord request!')
+        if (e.name === 'DiscordHTTPError') {
+          throw new GraphQLError('Failed to make Discord request!', {
+            extensions: { code: 'INTERNAL_SERVER_ERROR' }
+          })
+        }
       }
     }))
     return mutualGuildsWithPerm
@@ -84,14 +100,20 @@ const checkUserGuildPerm = async (id: string, guild: string, host = false): Prom
 const secure = rootUrl.startsWith('https') && process.env.NODE_ENV !== 'development' ? '; Secure' : ''
 const authenticateRequest = async (req: NextApiRequest, res: NextApiResponse): Promise<string> => {
   const token = req.cookies['Discord-OAuth']
-  if (!token) throw new AuthenticationError('No auth cookie received!')
+  if (!token) {
+    throw new GraphQLError('No auth cookie received!', {
+      extensions: { code: 'UNAUTHENTICATED' }
+    })
+  }
   // Check if it's a JWT token issued by us.
   try {
     const decoded: string | JwtPayload | undefined = await new Promise((resolve, reject) => {
       verify(token, jwtSecret, {}, (err, decoded) => (err ? reject(err) : resolve(decoded)))
     })
     if (typeof decoded === 'string' || !decoded?.accessToken) {
-      throw new AuthenticationError('Invalid JWT token in cookie!')
+      throw new GraphQLError('Invalid JWT token in cookie!', {
+        extensions: { code: 'UNAUTHENTICATED' }
+      })
     }
     return decoded.accessToken
   } catch (e: any) {
@@ -103,7 +125,9 @@ const authenticateRequest = async (req: NextApiRequest, res: NextApiResponse): P
         ))
       })
       if (typeof decoded === 'string' || !decoded?.refreshToken || !decoded.scope) {
-        throw new AuthenticationError('Invalid JWT token in cookie!')
+        throw new GraphQLError('Invalid JWT token in cookie!', {
+          extensions: { code: 'UNAUTHENTICATED' }
+        })
       }
       try {
         const body = new URLSearchParams({
@@ -123,9 +147,15 @@ const authenticateRequest = async (req: NextApiRequest, res: NextApiResponse): P
         const token = sign({ accessToken, refreshToken, scope: decoded.scope }, jwtSecret, { expiresIn })
         res.setHeader('Set-Cookie', `Discord-OAuth="${token}"; Max-Age=2678400; HttpOnly; SameSite=Lax${secure}`)
         return accessToken
-      } catch (e) { throw new AuthenticationError('The provided auth token has expired!') }
+      } catch (e) {
+        throw new GraphQLError('The provided auth token has expired!', {
+          extensions: { code: 'UNAUTHENTICATED' }
+        })
+      }
     }
-    throw new AuthenticationError('Invalid JWT token in cookie!')
+    throw new GraphQLError('Invalid JWT token in cookie!', {
+      extensions: { code: 'UNAUTHENTICATED' }
+    })
   }
 }
 
@@ -153,7 +183,11 @@ export default {
             ...defaultSettings.joinLeaveMessages, ...(serverSettings.joinLeaveMessages || {})
           }
         }
-      } else throw new ForbiddenError('You are not allowed to access this server\'s settings!')
+      } else {
+        throw new GraphQLError('You are not allowed to access this server\'s settings!', {
+          extensions: { code: 'FORBIDDEN' }
+        })
+      }
     },
     getUserInfo: async (parent: string, args: {}, context: ResolverContext) => {
       const accessToken = await authenticateRequest(context.req, context.res)
@@ -222,7 +256,11 @@ export default {
           }
         })
         return await getServerSettings(id)
-      } else throw new ForbiddenError('You are not allowed to access this server\'s settings!')
+      } else {
+        throw new GraphQLError('You are not allowed to access this server\'s settings!', {
+          extensions: { code: 'FORBIDDEN' }
+        })
+      }
     }
   }
 }
