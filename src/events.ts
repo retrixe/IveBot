@@ -128,8 +128,8 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db): Pro
     if (!key) return
     const gunfight = tempDB.gunfight[key]
     if (!gunfight || !gunfight.wordSaid || gunfight.randomWord !== command) return
-    await message.channel.createMessage(`${message.author.mention} won!`)
     delete tempDB.gunfight[key]
+    await message.channel.createMessage(`${message.author.mention} won!`)
   }
 
   // Get settings, server specific from now on.
