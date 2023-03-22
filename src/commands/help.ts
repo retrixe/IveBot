@@ -29,7 +29,8 @@ const generalHelp = {
 \`/astronomy-picture-of-the-day\` or \`/apod\`
 \`/currency\` - Currency conversion (\`/help currency\`)
 \`/xkcd\` - Get the latest or a random xkcd comic.
-\`/httpcat\` - Cats for HTTP status codes.`
+\`/httpcat\` - Cats for HTTP status codes.
+\`/google\` - Let me Google that for you.`
     }, {
       name: '**Utilities.**', value: `
 TP \`/request\` - Request a specific feature.
