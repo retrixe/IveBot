@@ -211,8 +211,8 @@ export const handleCreationtime: Command = {
     if (args.length === 1) {
       // Just parse it normally.
       let id = args[0]
-      id = (id.length === 17 || id.length === 18) && !isNaN(+id) ? id : getIdFromMention(args[0])
-      if ((id.length !== 17 && id.length !== 18) || isNaN(+id)) {
+      id = id.length < 17 && !isNaN(+id) ? id : getIdFromMention(args[0])
+      if ((id.length < 17) || isNaN(+id)) {
         return { content: `Provide an valid ID or mention, you ${getInsult()}.`, error: true }
       }
       return moment((new Base(id)).createdAt).format('YYYY/MM/DD, hh:mm:ss A')

@@ -1,6 +1,7 @@
 # Configuration
 config.json
 config.json5
+.vercel
 
 # We don't use npm.
 package-lock.json

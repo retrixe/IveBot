@@ -99,7 +99,7 @@ export const handleDeleteemoji: Command = {
 
 export const handleEditemoji: Command = {
   name: 'editEmoji',
-  aliases: ['ee'],
+  aliases: ['ee', 'renameEmoji', 're'],
   opts: {
     description: 'Edit an emoji name in the server.',
     fullDescription: 'Edit an emoji name in the server.',

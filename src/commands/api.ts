@@ -4,6 +4,7 @@ import { Command } from '../imports/types.js'
 import fetch from 'node-fetch'
 import moment from 'moment'
 import Fuse from 'fuse.js'
+import { Constants, InteractionDataOptionsString } from 'eris'
 import { zeroWidthSpace, getInsult, fetchLimited, getIdFromMention } from '../imports/tools.js'
 // Get the NASA API token.
 import { NASAtoken, fixerAPIkey, weatherAPIkey, oxfordAPI, cvAPIkey } from '../config.js'
@@ -373,6 +374,29 @@ export const handleUrban: Command = {
       return `Something went wrong 👾 Error: ${e}`
     }
   }
+}
+
+export const handleGoogle: Command = {
+  name: 'google',
+  aliases: ['g', 'lmgtfy'],
+  opts: {
+    description: 'Let me Google that for you.',
+    fullDescription: 'Let me Google that for you.',
+    usage: '/google <query>',
+    example: '/google what is the meaning of life',
+    options: [
+      {
+        name: 'query',
+        description: 'The query to search for.',
+        type: Constants.ApplicationCommandOptionTypes.STRING,
+        required: true
+      }
+    ]
+  },
+  generator: (message, args) => `https://lmgtfy.com/?q=${encodeURIComponent(
+    args.join(' ')).replace(/%20/g, '+')}`,
+  slashGenerator: (interaction) => `https://lmgtfy.com/?q=${encodeURIComponent(
+    (interaction.data.options[0] as InteractionDataOptionsString).value).replace(/%20/g, '+')}`
 }
 
 export const handleNamemc: Command = {

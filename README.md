@@ -39,6 +39,7 @@ It includes many different and useful commands, from games to tools, utilities, 
 - `/currency`
 - `/xkcd`
 - `/httpcat`
+- `/google`
 
 **Utilities.**
 
