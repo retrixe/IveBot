@@ -422,7 +422,6 @@ export const handleNamemc: Command = {
     } catch (e) { return { content: 'Enter a valid Minecraft username (account must be premium)', error: true } }
   }
 }
-
 // Initialize cache.
 let currency: { timestamp: number, rates: { [index: string]: number } }
 export const handleCurrency: Command = {
@@ -467,13 +466,19 @@ letter code + the first letter of the currency name.'
     else if (!args[2]) args[2] = '1' // If no amount was provided, the amount should be one.
     else if (args.length > 3) return { content: 'Enter a single number for currency conversion.', error: true }
     else if (isNaN(+args[2])) return { content: 'Enter a proper number to convert.', error: true }
+    // to change syp value to blackmarket value
+    if (from === 'SYP' || to === 'SYP') {
+      const response = await fetch('https://sp-today.com/en/currency/us_dollar/city/damascus')
+      const data = await response.text()
+      const value = data.toString().search('<span class="value">')
+      currency.rates.SYP = Number(data.substring(value + 20, value + 24))
+    }
     // Now we convert the amount.
     const convertedAmount = ((currency.rates[to] / currency.rates[from]) * +args[2])
     const roundedOffAmount = Math.ceil(convertedAmount * Math.pow(10, 4)) / Math.pow(10, 4)
     return `**${from}** ${args[2]} = **${to}** ${roundedOffAmount}`
   }
 }
-
 // Our weather and define types.
 interface Weather {
   cod: string
