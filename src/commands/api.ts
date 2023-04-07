@@ -446,6 +446,7 @@ export const handleNamemc: Command = {
     } catch (e) { return { content: 'Enter a valid Minecraft username (account must be premium)', error: true } }
   }
 }
+
 // Initialize cache.
 let currency: { timestamp: number, rates: { [index: string]: number } }
 export const handleCurrency: Command = {
@@ -503,6 +504,7 @@ letter code + the first letter of the currency name.'
     return `**${from}** ${args[2]} = **${to}** ${roundedOffAmount}`
   }
 }
+
 // Our weather and define types.
 interface Weather {
   cod: string
