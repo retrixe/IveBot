@@ -4,6 +4,7 @@ import { Command } from '../imports/types.js'
 import fetch from 'node-fetch'
 import moment from 'moment'
 import Fuse from 'fuse.js'
+import fs from 'fs'
 import { Constants, InteractionDataOptionsString } from 'eris'
 import { zeroWidthSpace, getInsult, fetchLimited, getIdFromMention } from '../imports/tools.js'
 // Get the NASA API token.
@@ -465,6 +466,14 @@ export const handleCurrency: Command = {
         await fetch(`http://data.fixer.io/api/latest?access_key=${fixerAPIkey}`)
       ).json() as typeof currency
       currency.timestamp = Date.now() // To set the timestamp to the current time of the system.
+      // to change syp value to blackmarket value
+      if (args[0].toUpperCase() === 'SYP' || args[1].toUpperCase() === 'SYP') {
+        const response = await fetch('https://sp-today.com/en/currency/us_dollar/city/damascus')
+        const data = await response.text()
+        const index = data.toString().search('<span class="name">usd damas </span>\n<div class="line-data">\n<span class="value">')
+        const value = (index + 81)
+        currency.rates.SYP = Number(data[value] + data[value + 1] + data[value + 2] + data[value + 3])
+      }
     }
     // For /currency list
     if (args.length === 1 && args[0].toLowerCase() === 'list') {
@@ -491,13 +500,6 @@ letter code + the first letter of the currency name.'
     else if (!args[2]) args[2] = '1' // If no amount was provided, the amount should be one.
     else if (args.length > 3) return { content: 'Enter a single number for currency conversion.', error: true }
     else if (isNaN(+args[2])) return { content: 'Enter a proper number to convert.', error: true }
-    // to change syp value to blackmarket value
-    if (from === 'SYP' || to === 'SYP') {
-      const response = await fetch('https://sp-today.com/en/currency/us_dollar/city/damascus')
-      const data = await response.text()
-      const value = data.toString().search('<span class="value">')
-      currency.rates.SYP = Number(data.substring(value + 20, value + 24))
-    }
     // Now we convert the amount.
     const convertedAmount = ((currency.rates[to] / currency.rates[from]) * +args[2])
     const roundedOffAmount = Math.ceil(convertedAmount * Math.pow(10, 4)) / Math.pow(10, 4)
