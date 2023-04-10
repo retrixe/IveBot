@@ -4,7 +4,6 @@ import { Command } from '../imports/types.js'
 import fetch from 'node-fetch'
 import moment from 'moment'
 import Fuse from 'fuse.js'
-import fs from 'fs'
 import { Constants, InteractionDataOptionsString } from 'eris'
 import { zeroWidthSpace, getInsult, fetchLimited, getIdFromMention } from '../imports/tools.js'
 // Get the NASA API token.
@@ -466,7 +465,6 @@ export const handleCurrency: Command = {
         await fetch(`http://data.fixer.io/api/latest?access_key=${fixerAPIkey}`)
       ).json() as typeof currency
       currency.timestamp = Date.now() // To set the timestamp to the current time of the system.
-
       // to change syp value to blackmarket value
       const response = await fetch('https://sp-today.com/en/currency/us_dollar/city/damascus')
       const data = await response.text()
