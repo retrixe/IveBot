@@ -466,14 +466,13 @@ export const handleCurrency: Command = {
         await fetch(`http://data.fixer.io/api/latest?access_key=${fixerAPIkey}`)
       ).json() as typeof currency
       currency.timestamp = Date.now() // To set the timestamp to the current time of the system.
+
       // to change syp value to blackmarket value
-      if (args[0].toUpperCase() === 'SYP' || args[1].toUpperCase() === 'SYP') {
-        const response = await fetch('https://sp-today.com/en/currency/us_dollar/city/damascus')
-        const data = await response.text()
-        const index = data.toString().search('<span class="name">usd damas </span>\n<div class="line-data">\n<span class="value">')
-        const value = (index + 81)
-        currency.rates.SYP = Number(data[value] + data[value + 1] + data[value + 2] + data[value + 3])
-      }
+      const response = await fetch('https://sp-today.com/en/currency/us_dollar/city/damascus')
+      const data = await response.text()
+      const index = data.toString().search('<span class="name">usd damas </span>\n<div class="line-data">\n<span class="value">')
+      const value = data.substring(index + 81, index + 85)
+      currency.rates.SYP = Number(value)
     }
     // For /currency list
     if (args.length === 1 && args[0].toLowerCase() === 'list') {
