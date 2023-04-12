@@ -468,9 +468,8 @@ export const handleCurrency: Command = {
       // to change syp value to blackmarket value
       const response = await fetch('https://sp-today.com/en/currency/us_dollar/city/damascus')
       const data = await response.text()
-      const index = data.toString().search('<span class="name">usd damas </span>\n<div class="line-data">\n<span class="value">')
-      const value = data.substring(index + 81, index + 85)
-      currency.rates.SYP = Number(value)
+      const value = data.toString().search('<span class="value">')
+      currency.rates.SYP = Number(data.substring(value + 20, value + 24)) * currency.rates.USD
     }
     // For /currency list
     if (args.length === 1 && args[0].toLowerCase() === 'list') {
