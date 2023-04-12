@@ -416,7 +416,10 @@ export const handleNamemc: Command = {
       const username = member ? (member.nick || member.username) : args[0]
       const { id, name } = await (await fetch(
         `https://api.mojang.com/users/profiles/minecraft/${username}`
-      )).json() as { id: string, name: string }
+      )).json() as { id?: string, name?: string }
+      if (!id || !name) {
+        return { content: 'Enter a valid Minecraft username (account must be premium)', error: true }
+      }
       // Fetch the previous names as well.
       try {
         const names: Array<{ name: string, changedToAt?: number }> = [{
