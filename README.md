@@ -6,8 +6,6 @@ The bot that created the iPhone X. It's strictly private. You may run it locally
 
 It includes many different and useful commands, from games to tools, utilities, fun commands, moderation and even a `/ai` command which generates text responses to inputs. It also uses Next.js to provide a web dashboard as part of the bot itself.
 
-1.0/2.0 used discord.io while 3.0 uses Eris and is much more refined and full-featured. It is highly recommended to use 3.0 as older versions are unsupported and may not connect to Discord's API gateway anymore. 4.0 is in development to separate the dashboard from the bot and make use of many new Discord features.
-
 <hr />
 <details><summary>Commands</summary>
 

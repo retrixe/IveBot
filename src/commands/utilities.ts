@@ -1,5 +1,11 @@
 // All the types!
-import Eris, { Message, GuildTextableChannel, Constants, Guild, InteractionDataOptionsString, ChannelTypes } from 'eris'
+import Dysnomia, {
+  Message,
+  GuildTextableChannel,
+  Constants,
+  Guild,
+  InteractionDataOptionsString
+} from '@projectdysnomia/dysnomia'
 import { Command } from '../imports/types.js'
 // All the needs!
 import { getIdFromMention, getInsult, getUser, getChannel } from '../imports/tools.js'
@@ -571,7 +577,7 @@ export const handleListvoiceregions: Command = ({
   },
   slashGenerator: ({ guildID }, { client }) => handleListvoiceregions.commonGenerator(guildID, client),
   generator: (message, args, { client }) => handleListvoiceregions.commonGenerator(message.guildID, client),
-  commonGenerator: async (guild: string, client: Eris.Client) => 'Available voice regions for this server: `' + (
+  commonGenerator: async (guild: string, client: Dysnomia.Client) => 'Available voice regions for this server: `' + (
     await client.getVoiceRegions(guild)
   ).map((value) => value.id).join('`, `') + '`'
 })
@@ -592,8 +598,7 @@ export const handleChangevoiceregion: Command = {
       name: 'channel',
       description: 'The voice channel to edit the region of.',
       type: Constants.ApplicationCommandOptionTypes.CHANNEL,
-      // TODO: Fix this in Eris.
-      channel_types: [Constants.ChannelTypes.GUILD_VOICE, Constants.ChannelTypes.GUILD_STAGE_VOICE] as unknown as ChannelTypes,
+      channel_types: [Constants.ChannelTypes.GUILD_VOICE, Constants.ChannelTypes.GUILD_STAGE_VOICE],
       required: true
     }, {
       name: 'region',
@@ -604,7 +609,7 @@ export const handleChangevoiceregion: Command = {
   },
   slashGenerator: (interaction, { client }) => {
     const channelOpt = interaction.data.options.find(option => option.name === 'channel') as
-      Eris.InteractionDataOptionsChannel
+      Dysnomia.InteractionDataOptionsChannel
     const regionOpt = interaction.data.options.find(option => option.name === 'region') as
       InteractionDataOptionsString
     const ch = client.guilds.get(interaction.guildID).channels.get(channelOpt.value)
@@ -620,7 +625,7 @@ export const handleChangevoiceregion: Command = {
     if (!ch || ch.type !== 2) return { content: 'This voice channel does not exist!', error: true }
     return handleChangevoiceregion.commonGenerator(ch, rtcRegion, client)
   },
-  commonGenerator: async (channel: Eris.VoiceChannel, region: string, client: Eris.Client) => {
+  commonGenerator: async (channel: Dysnomia.VoiceChannel, region: string, client: Dysnomia.Client) => {
     try {
       const { rtcRegion } = await channel.edit({
         rtcRegion: region === 'automatic' || region === 'auto' ? null : region

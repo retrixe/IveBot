@@ -2,7 +2,7 @@ import { zeroWidthSpace, getInsult } from '../imports/tools.js'
 import { Command as IveBotCommand } from '../imports/types.js'
 import CommandParser, { Command } from '../client.js'
 import { rootURL } from '../config.js'
-import { Client, Constants, InteractionDataOptionsString } from 'eris'
+import { Client, Constants, InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
 
 const generalHelp = {
   description: `**Jony Ive can do many commands 📡**

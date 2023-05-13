@@ -8,4 +8,3 @@ declare module 'ms' {
 declare module 'mathjs' {
   export const evaluate: (expression: string) => number
 }
-declare module 'eris/lib/rest/RequestHandler'

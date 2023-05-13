@@ -5,7 +5,7 @@ import { host, testPilots } from '../config.js'
 import { runInNewContext } from 'vm'
 import { inspect } from 'util'
 import { getIdFromMention, getInsult } from '../imports/tools.js'
-import { Base, Constants, InteractionDataOptionsString } from 'eris'
+import { Base, Constants, InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
 import { readFile } from 'fs/promises'
 const { version }: { version: string } = JSON.parse(await readFile('package.json', { encoding: 'utf8' }))
 
@@ -32,7 +32,7 @@ export const handleAbout: Command = {
     argsRequired: false
   },
   generator: `**IveBot ${version}**
-IveBot is a Discord bot written with Eris and care.
+IveBot is a Discord bot written with Dysnomia (Eris continuation) and care.
 Unlike most other dumb bots, IveBot was not written with discord.js and has 0% copied code.
 Built with community feedback mainly, IveBot does a lot of random stuff and fun.
 IveBot 4.0 is planned to revamp the dashboard, make the code a lot more maintainable and use intents.

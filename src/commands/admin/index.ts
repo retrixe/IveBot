@@ -1,7 +1,7 @@
 import { Command } from '../../imports/types.js'
 import { getInsult, getUser } from '../../imports/tools.js'
 import { checkRolePosition } from '../../imports/permissions.js'
-import { Message, GuildTextableChannel } from 'eris'
+import { Message, GuildTextableChannel } from '@projectdysnomia/dysnomia'
 export { handleAddemoji, handleDeleteemoji, handleEditemoji, handleEmojiimage } from './emoji.js'
 export { handleWarn, handleWarnings, handleClearwarns, handleRemovewarn } from './warn.js'
 export { handleGiverole, handleTakerole, handleNotify } from './roles.js'
@@ -53,7 +53,7 @@ export const handlePurge: Command = {
     let messages: Message[]
     // Get the list of messages.
     try {
-      messages = await client.getMessages(message.channel.id, +args.shift(), message.id)
+      messages = await client.getMessages(message.channel.id, { limit: +args.shift(), before: message.id })
     } catch (e) { return 'Could not retrieve messages.' }
     // Delete the messages.
     try {

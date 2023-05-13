@@ -1,4 +1,4 @@
-import { User } from 'eris'
+import { User } from '@projectdysnomia/dysnomia'
 import { Command } from '../../imports/types.js'
 import { checkRolePosition } from '../../imports/permissions.js'
 import { getInsult, getUser } from '../../imports/tools.js'
@@ -67,7 +67,10 @@ export const handleBan: Command = {
       }
     } catch (e) {}
     try {
-      await client.banGuildMember(message.member.guild.id, user.id, 0, args.join(' '))
+      await client.banGuildMember(message.member.guild.id, user.id, {
+        deleteMessageSeconds: 0,
+        reason: args.join(' ')
+      })
     } catch (e) {
       if (dm) await dm.delete().catch(() => {})
       return 'That person could not be banned.'

@@ -1,4 +1,4 @@
-import Eris, {
+import Dysnomia, {
   Message,
   MessageContent,
   AdvancedMessageContent,
@@ -8,7 +8,7 @@ import Eris, {
   ApplicationCommand,
   ApplicationCommandOptions,
   ApplicationCommandOptionsWithValue
-} from 'eris'
+} from '@projectdysnomia/dysnomia'
 import {
   DB,
   Command,
@@ -187,14 +187,14 @@ export default class SlashParser {
         optionInfo.type === Constants.ApplicationCommandOptionTypes.USER ||
         optionInfo.type === Constants.ApplicationCommandOptionTypes.ROLE ||
         optionInfo.type === Constants.ApplicationCommandOptionTypes.CHANNEL) &&
-        typeof (option as Eris.InteractionDataOptionsString).value !== 'string') {
+        typeof (option as Dysnomia.InteractionDataOptionsString).value !== 'string') {
         throw new Error(`Discord did not correctly validate interaction! (${command.name})`)
       } else if ((optionInfo.type === Constants.ApplicationCommandOptionTypes.INTEGER ||
         optionInfo.type === Constants.ApplicationCommandOptionTypes.NUMBER) &&
-        typeof (option as Eris.InteractionDataOptionsNumber).value !== 'number') {
+        typeof (option as Dysnomia.InteractionDataOptionsNumber).value !== 'number') {
         throw new Error(`Discord did not correctly validate interaction! (${command.name})`)
       } else if (optionInfo.type === Constants.ApplicationCommandOptionTypes.BOOLEAN &&
-        typeof (option as Eris.InteractionDataOptionsBoolean).value !== 'boolean') {
+        typeof (option as Dysnomia.InteractionDataOptionsBoolean).value !== 'boolean') {
         throw new Error(`Discord did not correctly validate interaction! (${command.name})`)
       } // No sub command validation, write when you add sub commands.
     }

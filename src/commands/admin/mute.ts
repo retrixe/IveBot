@@ -1,7 +1,7 @@
 import { Command } from '../../imports/types.js'
 import { checkRolePosition } from '../../imports/permissions.js'
 import { getInsult, getUser } from '../../imports/tools.js'
-import { Constants } from 'eris'
+import { Constants } from '@projectdysnomia/dysnomia'
 import ms from 'ms'
 
 export const handleMute: Command = {

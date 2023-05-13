@@ -1,5 +1,5 @@
 import { Command } from '../imports/types.js'
-import { Constants, InteractionDataOptionsInteger, InteractionDataOptionsString } from 'eris'
+import { Constants, InteractionDataOptionsInteger, InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
 
 // Zalgo characters.
 const characters = [

@@ -1,4 +1,4 @@
-import { Message, MessageContent, Client, GuildTextableChannel } from 'eris'
+import { Message, MessageContent, Client, GuildTextableChannel } from '@projectdysnomia/dysnomia'
 import { DB, Command as IveBotCommand, IveBotCommandGenerator, Context, CommandResponse } from './imports/types.js'
 import { Db } from 'mongodb'
 import { getInsult } from './imports/tools.js'

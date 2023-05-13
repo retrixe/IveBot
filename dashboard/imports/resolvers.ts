@@ -1,4 +1,4 @@
-import { Client } from 'eris'
+import { Client } from '@projectdysnomia/dysnomia'
 import { promisify } from 'util'
 import { GraphQLError } from 'graphql'
 import { MongoClient, Document } from 'mongodb'
@@ -13,7 +13,7 @@ const mongodb = new MongoClient(mongoUrl === 'dotenv' ? process.env.MONGO_URL ||
 mongodb.once('open', () => console.log('GraphQL server connected successfully to MongoDB.'))
 const db = mongodb.db('ivebot')
 
-const botClient = new Client(`Bot ${botToken}`, { restMode: true, intents: 0 })
+const botClient = new Client(`Bot ${botToken}`, { restMode: true })
 
 // Helper functions.
 const defaultSettings = {
@@ -169,7 +169,7 @@ export default {
   Query: {
     getServerSettings: async (parent: string, { id }: { id: string }, context: ResolverContext) => {
       const accessToken = await authenticateRequest(context.req, context.res)
-      const client = new Client(`Bearer ${accessToken}`, { restMode: true, intents: 0 })
+      const client = new Client(`Bearer ${accessToken}`, { restMode: true })
       const self = await client.getSelf()
       const hasPerm = await checkUserGuildPerm(self.id, id, host === self.id)
       if (hasPerm) {
@@ -191,7 +191,7 @@ export default {
     },
     getUserInfo: async (parent: string, args: {}, context: ResolverContext) => {
       const accessToken = await authenticateRequest(context.req, context.res)
-      const client = new Client(`Bearer ${accessToken}`, { restMode: true, intents: 0 })
+      const client = new Client(`Bearer ${accessToken}`, { restMode: true })
       const self = await client.getSelf()
       return {
         identifier: `${self.username}#${self.discriminator}`,
@@ -201,7 +201,7 @@ export default {
     },
     getUserServers: async (parent: string, args: {}, context: ResolverContext) => {
       const accessToken = await authenticateRequest(context.req, context.res)
-      const client = new Client(`Bearer ${accessToken}`, { restMode: true, intents: 0 })
+      const client = new Client(`Bearer ${accessToken}`, { restMode: true })
       const guilds = await client.getRESTGuilds()
       const self = await client.getSelf()
       const mutuals = await getMutualPermissionGuilds(self.id, guilds.map(guild => guild.id), host === self.id)
@@ -238,7 +238,7 @@ export default {
       context: ResolverContext
     ) => {
       const accessToken = await authenticateRequest(context.req, context.res)
-      const client = new Client(`Bearer ${accessToken}`, { restMode: true, intents: 0 })
+      const client = new Client(`Bearer ${accessToken}`, { restMode: true })
       const self = await client.getSelf()
       const hasPerm = await checkUserGuildPerm(self.id, id, host === self.id)
       if (hasPerm) {

@@ -1,5 +1,5 @@
 // Get types.
-import { Member } from 'eris'
+import { Member } from '@projectdysnomia/dysnomia'
 
 // Export function.
 export function checkRolePosition (

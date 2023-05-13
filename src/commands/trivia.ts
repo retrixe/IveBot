@@ -1,4 +1,4 @@
-import { Message, GuildTextableChannel, TextableChannel, User, EmbedOptions, Client } from 'eris'
+import { Message, GuildTextableChannel, TextableChannel, User, EmbedOptions, Client } from '@projectdysnomia/dysnomia'
 import { Command, DB } from '../imports/types.js'
 import { getInsult } from '../imports/tools.js'
 import fs from 'fs'

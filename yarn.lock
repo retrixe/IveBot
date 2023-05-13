@@ -824,6 +824,16 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@projectdysnomia/dysnomia@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@projectdysnomia/dysnomia/-/dysnomia-0.1.1.tgz#25950ee00537fc0df84bab2889445888c876997c"
+  integrity sha512-6865gwvTNMNrL5xOUMgJ9Uf8i+S1lx+7nHYYd6rstTd2WayUBJFSkxdYTHu9hTqbLdDvmdFzaY6sNJbrcK01Iw==
+  dependencies:
+    ws "^8.2.3"
+  optionalDependencies:
+    opusscript "^0.0.8"
+    tweetnacl "^1.0.3"
+
 "@tsconfig/node10@^1.0.7":
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/@tsconfig/node10/-/node10-1.0.9.tgz#df4907fc07a886922637b15e02d4cebc4c0021b2"
@@ -1377,16 +1387,6 @@ doctrine@^3.0.0:
   integrity sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==
   dependencies:
     esutils "^2.0.2"
-
-eris@^0.17.1:
-  version "0.17.1"
-  resolved "https://registry.yarnpkg.com/eris/-/eris-0.17.1.tgz#c2ddc44ae5bc876ea20d251ae7fafcae0fbecd86"
-  integrity sha512-PexpHusPxViuzcsSM0GQEAgZRJbziFfeeLifc8+ZrvS88UusPieQlUD7pRm28E7m7rN+p+Rt6bf9jGLwD725Zg==
-  dependencies:
-    ws "^8.2.3"
-  optionalDependencies:
-    opusscript "^0.0.8"
-    tweetnacl "^1.0.3"
 
 error-ex@^1.3.1:
   version "1.3.2"
@@ -3106,9 +3106,9 @@ wrappy@1:
   integrity sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==
 
 ws@^8.2.3:
-  version "8.12.0"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-8.12.0.tgz#485074cc392689da78e1828a9ff23585e06cddd8"
-  integrity sha512-kU62emKIdKVeEIOIKVegvqpXMSTAMLJozpHZaJNDYqBjzlSYXQGviYwN1osDLJ9av68qHd4a2oSjd7yD4pacig==
+  version "8.13.0"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.13.0.tgz#9a9fb92f93cf41512a0735c8f4dd09b8a1211cd0"
+  integrity sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==
 
 yallist@^4.0.0:
   version "4.0.0"

@@ -1,5 +1,5 @@
 // Flow our types.
-import { AdvancedMessageContent, Client, CommandInteraction, ApplicationCommandOptions, Message } from 'eris'
+import { AdvancedMessageContent, Client, CommandInteraction, ApplicationCommandOptions, Message } from '@projectdysnomia/dysnomia'
 import CommandParser from '../client.js'
 import { Db } from 'mongodb'
 import { TriviaSession } from '../commands/trivia.js'

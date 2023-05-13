@@ -1,5 +1,5 @@
 // Tokens and stuff.
-import { Client, CommandInteraction } from 'eris'
+import { Client, CommandInteraction } from '@projectdysnomia/dysnomia'
 // Get MongoDB.
 import { MongoClient } from 'mongodb'
 // Import fs.
@@ -23,18 +23,20 @@ const dev = process.env.NODE_ENV !== 'production'
 
 // Create a client to connect to Discord API Gateway.
 const client = new Client(`Bot ${token === 'dotenv' ? process.env.IVEBOT_TOKEN : token}`, {
-  // Full list: guildBans, guildIntegrations, guildWebhooks, guildInvites, guildVoiceStates,
-  // guildMessageReactions, guildMessageTyping, directMessageReactions, directMessageTyping
-  intents: [
-    // guilds - IveBot code and dashboard require that all guilds are cached.
-    // guildEmojis - Do away with and rely on Discord REST API?
-    // guildMembers - IveBot code relies on the assumption that all members are cached. Reduce need?
-    // guildPresences - Required for /userinfo to provide presence info.
-    // guildMessages and directMessages - Naturally required.
-    'guilds', 'guildEmojis', 'guildMembers', 'guildPresences', 'guildMessages', 'directMessages'
-  ],
+  gateway: {
+    // Full list: guildBans, guildIntegrations, guildWebhooks, guildInvites, guildVoiceStates,
+    // guildMessageReactions, guildMessageTyping, directMessageReactions, directMessageTyping
+    intents: [
+      // guilds - IveBot code and dashboard require that all guilds are cached.
+      // guildEmojisAndSticker - Do away with and rely on Discord REST API?
+      // guildMembers - IveBot code relies on the assumption that all members are cached. Reduce need?
+      // guildPresences - Required for /userinfo to provide presence info.
+      // guildMessages and directMessages - Naturally required.
+      'guilds', 'guildEmojisAndStickers', 'guildMembers', 'guildPresences', 'guildMessages', 'directMessages', 'messageContent'
+    ],
+    autoreconnect: true
+  },
   allowedMentions: { everyone: false, roles: true, users: true },
-  autoreconnect: true,
   restMode: true
 })
 

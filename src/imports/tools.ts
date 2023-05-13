@@ -3,7 +3,7 @@ import { URL } from 'url'
 import { get } from 'http'
 import fetch from 'node-fetch'
 import { Db, Document } from 'mongodb'
-import { GuildChannel, Message, User } from 'eris'
+import { GuildChannel, Message, User } from '@projectdysnomia/dysnomia'
 
 export const getIdFromMention = (mention: string): string => {
   const f = mention.substring(2, mention.length - 1).replace('!', '').replace('&', '').split(':')

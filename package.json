@@ -20,7 +20,7 @@
     "node": ">=12.20.0"
   },
   "dependencies": {
-    "eris": "^0.17.1",
+    "@projectdysnomia/dysnomia": "^0.1.1",
     "fuse.js": "^6.6.2",
     "json5": "^2.2.1",
     "mathjs": "^11.2.1",
