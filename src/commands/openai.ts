@@ -32,8 +32,7 @@ export const handleAi: Command = {
   commonGenerator: async (query: string, userID: string, guildID?: string, reply?: string) => {
     // TODO: This should be configurable.
     let model = 'text-davinci-003'
-    if (guildID !== '411829766178734081') model = 'text-ada-001'
-    else if (query.includes('--ada')) {
+    if (query.includes('--ada')) {
       query = query.replace('--ada', '')
       model = 'text-ada-001'
     } else if (query.includes('--babbage')) {
