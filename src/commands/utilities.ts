@@ -524,7 +524,7 @@ export const handleAvatar: Command = {
         description: `**[Link](${user.dynamicAvatarURL(format, 2048)})**`,
         color: member.roles.map(i => member.guild.roles.get(i)).sort(
           (a, b) => a.position > b.position ? -1 : 1
-        ).shift().color
+        ).shift()?.color
       }]
     }
   }
