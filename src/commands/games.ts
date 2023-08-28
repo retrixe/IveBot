@@ -114,8 +114,8 @@ export const handleZalgo: Command = {
       type: Constants.ApplicationCommandOptionTypes.STRING
     }]
   },
-  generator: (message, args) => handleZalgo.commonGenerator(args.join(' ')),
-  slashGenerator: interaction => handleZalgo.commonGenerator(
+  generator: async (message, args) => await handleZalgo.commonGenerator(args.join(' ')),
+  slashGenerator: async interaction => await handleZalgo.commonGenerator(
     (interaction.data.options[0] as InteractionDataOptionsString).value
   ),
   commonGenerator: (text: string) => {
@@ -146,10 +146,10 @@ export const handleDezalgo: Command = {
       type: Constants.ApplicationCommandOptionTypes.STRING
     }]
   },
-  slashGenerator: interaction => handleDezalgo.commonGenerator(
+  slashGenerator: async interaction => await handleDezalgo.commonGenerator(
     (interaction.data.options[0] as InteractionDataOptionsString).value
   ),
-  generator: (message, args) => handleDezalgo.commonGenerator(args.join(' ')),
+  generator: async (message, args) => await handleDezalgo.commonGenerator(args.join(' ')),
   commonGenerator: (text: string) => {
     let newMessage = ''
     text.split('').forEach(element => {
@@ -179,18 +179,18 @@ export const handleRepeat: Command = {
       type: Constants.ApplicationCommandOptionTypes.STRING
     }]
   },
-  slashGenerator: interaction => {
+  slashGenerator: async interaction => {
     const number = (interaction.data.options.find(opt => opt.name === 'number') as
       InteractionDataOptionsInteger).value
     const text = (interaction.data.options.find(opt => opt.name === 'text') as
       InteractionDataOptionsString).value
-    return handleRepeat.commonGenerator(number, text)
+    return await handleRepeat.commonGenerator(number, text)
   },
-  generator: (message, args) => {
+  generator: async (message, args) => {
     // All arguments.
     const number = +args.shift()
     if (isNaN(number)) return 'Correct usage: /repeat <number of times> <string to repeat>'
-    return handleRepeat.commonGenerator(number, args.join(' '))
+    return await handleRepeat.commonGenerator(number, args.join(' '))
   },
   commonGenerator: (number: number, text: string) => {
     if (number * text.length >= 2001) {

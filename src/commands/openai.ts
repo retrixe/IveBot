@@ -20,7 +20,7 @@ export const handleAi: Command = {
       }
     ]
   },
-  generator: (message, args) => handleAi.commonGenerator(
+  generator: async (message, args) => await handleAi.commonGenerator(
     args.join(' '), message.author.id, (message.channel as TextChannel).guild?.id, message.id),
   slashGenerator: async interaction => {
     await interaction.defer()

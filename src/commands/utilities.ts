@@ -31,16 +31,16 @@ export const handleServerinfo: Command = {
     }]
   },
 
-  slashGenerator: (interaction, { client }) => {
+  slashGenerator: async (interaction, { client }) => {
     const serverOpt = (interaction.data.options[0] as InteractionDataOptionsString)?.value
     let guild = client.guilds.get(serverOpt || interaction.guildID)
     if (serverOpt && guild && !guild.members.has(interaction.user.id)) guild = undefined
-    return handleServerinfo.commonGenerator(guild)
+    return await handleServerinfo.commonGenerator(guild)
   },
-  generator: (message, args, { client }) => {
+  generator: async (message, args, { client }) => {
     let guild = args.length > 0 ? client.guilds.get(args[0]) : message.member.guild
     if (args.length > 0 && guild && !guild.members.has(message.author.id)) guild = undefined
-    return handleServerinfo.commonGenerator(guild)
+    return await handleServerinfo.commonGenerator(guild)
   },
   commonGenerator: (guild: Guild) => {
     if (!guild) return { content: `Specify a valid mutual guild, ${getInsult()}.`, error: true }
@@ -575,8 +575,8 @@ export const handleListvoiceregions: Command = ({
     guildOnly: true,
     argsRequired: false
   },
-  slashGenerator: ({ guildID }, { client }) => handleListvoiceregions.commonGenerator(guildID, client),
-  generator: (message, args, { client }) => handleListvoiceregions.commonGenerator(message.guildID, client),
+  slashGenerator: async ({ guildID }, { client }) => await handleListvoiceregions.commonGenerator(guildID, client),
+  generator: async (message, args, { client }) => await handleListvoiceregions.commonGenerator(message.guildID, client),
   commonGenerator: async (guild: string, client: Dysnomia.Client) => 'Available voice regions for this server: `' + (
     await client.getVoiceRegions(guild)
   ).map((value) => value.id).join('`, `') + '`'
@@ -607,23 +607,23 @@ export const handleChangevoiceregion: Command = {
       required: true
     }]
   },
-  slashGenerator: (interaction, { client }) => {
+  slashGenerator: async (interaction, { client }) => {
     const channelOpt = interaction.data.options.find(option => option.name === 'channel') as
       Dysnomia.InteractionDataOptionsChannel
     const regionOpt = interaction.data.options.find(option => option.name === 'region') as
       InteractionDataOptionsString
     const ch = client.guilds.get(interaction.guildID).channels.get(channelOpt.value)
     if (!ch || ch.type !== 2) return { content: 'This voice channel does not exist!', error: true }
-    return handleChangevoiceregion.commonGenerator(ch, regionOpt.value || 'auto', client)
+    return await handleChangevoiceregion.commonGenerator(ch, regionOpt.value || 'auto', client)
   },
-  generator: (message, args, { client }) => {
+  generator: async (message, args, { client }) => {
     if (!message.member.guild.members.get(client.user.id).permissions.has('manageGuild')) {
       return 'I require the Manage Server permission to do that..'
     }
     const rtcRegion = args.pop()
     const ch = getChannel(message, args.join(' '))
     if (!ch || ch.type !== 2) return { content: 'This voice channel does not exist!', error: true }
-    return handleChangevoiceregion.commonGenerator(ch, rtcRegion, client)
+    return await handleChangevoiceregion.commonGenerator(ch, rtcRegion, client)
   },
   commonGenerator: async (channel: Dysnomia.VoiceChannel, region: string, client: Dysnomia.Client) => {
     try {
@@ -768,10 +768,10 @@ More info here: https://mathjs.org/docs/expressions/syntax.html`,
       type: Constants.ApplicationCommandOptionTypes.STRING
     }]
   },
-  slashGenerator: interaction => handleCalculate.commonGenerator(
+  slashGenerator: async interaction => await handleCalculate.commonGenerator(
     (interaction.data.options[0] as InteractionDataOptionsString).value
   ),
-  generator: (message, args) => handleCalculate.commonGenerator(args.join(' ')),
+  generator: async (message, args) => await handleCalculate.commonGenerator(args.join(' ')),
   commonGenerator: (expression: string) => {
     try {
       return `${evaluate(expression.split(',').join('.').split('÷').join('/').toLowerCase())}`.trim()
@@ -802,10 +802,10 @@ export const handleTemperature: Command = {
       type: Constants.ApplicationCommandOptionTypes.STRING
     }]
   },
-  slashGenerator: interaction => handleTemperature.commonGenerator(
+  slashGenerator: async interaction => await handleTemperature.commonGenerator(
     (interaction.data.options[0] as InteractionDataOptionsString).value
   ),
-  generator: (message, args) => handleTemperature.commonGenerator(args[0]),
+  generator: async (message, args) => await handleTemperature.commonGenerator(args[0]),
   commonGenerator: (temp: string) => {
     const regex = /^(-?\d+.?\d*) ?°? ?([CFK])$/i
     const match = regex.exec(temp)

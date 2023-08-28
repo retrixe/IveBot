@@ -203,10 +203,10 @@ export const handleCreationtime: Command = {
       type: Constants.ApplicationCommandOptionTypes.STRING
     }]
   },
-  slashGenerator: ({ data: { options } }) => handleCreationtime.commonGenerator(
+  slashGenerator: async ({ data: { options } }) => await handleCreationtime.commonGenerator(
     (options[0] as InteractionDataOptionsString).value.trim().split(' ').filter(arg => !!arg)
   ),
-  generator: (message, args) => handleCreationtime.commonGenerator(args),
+  generator: async (message, args) => await handleCreationtime.commonGenerator(args),
   commonGenerator: (args: string[]) => {
     if (args.length === 1) {
       // Just parse it normally.
