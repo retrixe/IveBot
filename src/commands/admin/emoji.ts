@@ -14,7 +14,7 @@ export const handleAddemoji: Command = {
   },
   generator: async (message, args, { client }) => {
     // Get the URL.
-    const url = args.length > 1 ? args.splice(1).join('%20') : message.attachments.get(0)?.url
+    const url = args.length > 1 ? args.splice(1).join('%20') : message.attachments?.find(attachment => !!attachment)?.url
     // This can check the first bits of the Buffer.
     const check = (header: number[], buf: Buffer): boolean => {
       for (let i = 0; i < header.length; i++) { if (header[i] !== buf[i]) return false }

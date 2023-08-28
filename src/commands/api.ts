@@ -27,7 +27,7 @@ export const handleOcr: Command = {
     try {
       let url = (args.length > 0)
         ? args.join('%20')
-        : message.attachments?.get(0)?.url
+        : message.attachments?.find(attachment => !!attachment)?.url
       if (message.messageReference) {
         const mess = message.referencedMessage || await client.getMessage(
           message.messageReference.channelID,
@@ -35,7 +35,7 @@ export const handleOcr: Command = {
         )
         url = /^https?:\/\/\S+$/.test(mess.content)
           ? mess.content
-          : mess.attachments?.get(0)?.url
+          : mess.attachments?.find(attachment => !!attachment)?.url
       } else {
         // Check if a message link was passed.
         const regex = /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
@@ -44,7 +44,7 @@ export const handleOcr: Command = {
           const mess = await client.getMessage(split[split.length - 2], split.pop())
           url = /^https?:\/\/\S+$/.test(mess.content)
             ? mess.content
-            : mess.attachments?.get(0)?.url
+            : mess.attachments?.find(attachment => !!attachment)?.url
         }
       }
       if (!url) return `Invalid image URL, you ${getInsult()}.`
@@ -123,11 +123,11 @@ export const handleHastebin: Command = {
     try {
       // Check if a message link was passed.
       const regex = /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
-      let url = (args.length > 0) ? args.join('%20') : message.attachments.get(0)?.url
+      let url = (args.length > 0) ? args.join('%20') : message.attachments?.find(attachment => !!attachment)?.url
       if (regex.test(url)) {
         const split = url.split('/')
         const mess = await client.getMessage(split[split.length - 2], split.pop())
-        url = /^https?:\/\/\S+$/.test(mess.content) ? mess.content : mess.attachments.get(0)?.url
+        url = /^https?:\/\/\S+$/.test(mess.content) ? mess.content : mess.attachments?.find(attachment => !!attachment)?.url
       }
       // Fetch text file.
       // TODO: Outdated..
@@ -140,7 +140,7 @@ export const handleHastebin: Command = {
         body: JSON.stringify({
           name: 'IveBot paste.gg upload',
           files: [{
-            name: (message.attachments.size > 0) ? message.attachments.get(0).filename : 'pastefile1',
+            name: message.attachments?.find(attachment => !!attachment)?.filename ?? 'pastefile1',
             content: { format: 'text', value: text.toString('utf8') }
           }]
         })
