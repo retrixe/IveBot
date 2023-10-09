@@ -10,7 +10,7 @@ export const handleAddemoji: Command = {
     usage: '/addemoji <name> <link or attached image>',
     example: '/addemoji whateverURLmeh',
     guildOnly: true,
-    requirements: { permissions: { manageEmojis: true } }
+    requirements: { permissions: { manageEmojisAndStickers: true } }
   },
   generator: async (message, args, { client }) => {
     // Get the URL.
@@ -75,7 +75,7 @@ export const handleDeleteemoji: Command = {
     usage: '/deleteEmoji <custom emoji by ID/mention/name>',
     example: '/deleteEmoji <:tom:402567029963489281>',
     guildOnly: true,
-    requirements: { permissions: { manageEmojis: true } }
+    requirements: { permissions: { manageEmojisAndStickers: true } }
   },
   generator: async (message, args, { client }) => {
     // Check bot permissions.
@@ -106,7 +106,7 @@ export const handleEditemoji: Command = {
     usage: '/editEmoji <custom emoji by ID/mention/name> <new name>',
     example: '/editEmoji tim tim2',
     guildOnly: true,
-    requirements: { permissions: { manageEmojis: true } }
+    requirements: { permissions: { manageEmojisAndStickers: true } }
   },
   generator: async (message, args, { client }) => {
     // Check if enough arguments were provided.
