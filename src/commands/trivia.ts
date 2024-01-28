@@ -178,10 +178,10 @@ export const handleTrivia: Command = {
     description: 'Start a trivia game on a topic of your choice.',
     fullDescription: `Start a trivia game on a topic of your choice.
 **Default settings:** IveBot plays: no, seconds to answer: 15, points to win: 30, reveal answer: yes`,
-    usage: `/trivia <topic> (botplays) (revealanswer) (timelimit=<5 seconds or more>) (pointstowin=<1 point or more>)
-**During a trivia game:** /trivia (scoreboard/score/scores/stop/end)
+    usage: `/trivia <topic> (botplays(=true/false)) (revealanswer(=true/false)) (timelimit=<5 seconds or more>) (pointstowin=<1 point or more>)
+**During a trivia game:** /trivia (scoreboard/score/scores or stop/end)
 **To view available topics:** /trivia list`,
-    example: '/trivia greekmyth --bot-plays',
+    example: '/trivia greekmyth botplays revealanswer=false timelimit=5 pointstowin=10',
     guildOnly: true,
     argsRequired: true
   },
