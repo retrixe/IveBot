@@ -81,8 +81,6 @@ It includes many different and useful commands, from games to tools, utilities, 
 
 Set up a MongoDB instance and note its URL. You can set it to store its data in `database` within this folder (you must first make the folder before starting MongoDB)
 
-Get the trivia lists zip from [here](https://siasky.net/nAHYx0Qe7NFag-RuMZTSGizq5ral6Q6m6BZrSHKzzx7r_g) and extract it so that the triviaLists folder is in the top-level directory.
-
 Make a file named `config.json5` in the top-level directory. It should be something like this:
 
 ```json

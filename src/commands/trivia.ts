@@ -4,7 +4,7 @@ import { getInsult } from '../imports/tools.js'
 import fs from 'fs'
 
 async function parseTriviaList (fileName: string): Promise<Map<string, string[]>> {
-  const data = await fs.promises.readFile(`./triviaLists/${fileName}.txt`, 'utf8')
+  const data = await fs.promises.readFile(`./src/commands/triviaLists/${fileName}.txt`, 'utf8')
   const triviaList = new Map<string, string[]>()
   data.split('\n').forEach(el => {
     const splitEl = el.split('`').map(ans => ans.trim()).filter(ans => !!ans)
@@ -226,7 +226,7 @@ export const handleTrivia: Command = {
         return 'There is no trivia session ongoing in this channel.'
       }
     } else if (args.length === 1 && args[0] === 'list') {
-      const lists = await fs.promises.readdir('./triviaLists/')
+      const lists = await fs.promises.readdir('./src/commands/triviaLists/')
       const member = message.member.guild.members.get(client.user.id)
       const color = member
         ? (member.roles.map(i => member.guild.roles.get(i)).sort(
