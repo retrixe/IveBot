@@ -6,6 +6,9 @@ import moment from 'moment'
 import Fuse from 'fuse.js'
 import { Constants, InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
 import { zeroWidthSpace, getInsult, fetchLimited, getIdFromMention } from '../imports/tools.js'
+import currencies from '../currencies.json' assert {type: 'json'}
+import countries from '../countries.json' assert {type: 'json'}
+
 // Get the NASA API token.
 import { NASAtoken, fixerAPIkey, weatherAPIkey, oxfordAPI, cvAPIkey } from '../config.js'
 
@@ -99,8 +102,8 @@ https://paste.gg/p/anonymous/${hastebin} (use this key to delete: \`${deletionKe
           footer: {
             text: 'Powered by Google Cloud Vision API',
             icon_url: 'https://www.gstatic.com/devrel-devsite/prod/' +
-            'v2210deb8920cd4a55bd580441aa58e7853afc04b39a9d9ac4198e1cd7fbe04ef/cloud/images/' +
-            'favicons/onecloud/favicon.ico'
+              'v2210deb8920cd4a55bd580441aa58e7853afc04b39a9d9ac4198e1cd7fbe04ef/cloud/images/' +
+              'favicons/onecloud/favicon.ico'
           },
           timestamp: new Date(message.timestamp).toISOString()
         }]
@@ -492,12 +495,30 @@ letter code + the first letter of the currency name.'
     }
     // Calculate the currencies to conver from and to, as well as the amount.
     if (args.length < 2) return { content: 'Invalid usage, use /help currency for proper usage.', error: true }
-    const from = args[0].toUpperCase()
-    const to = args[1].toUpperCase()
+    let from = args[0].toUpperCase()
+    let to = args[1].toUpperCase()
+    // If country name provided as currency, we convert to its currency ISO code
+    function convertToSym (input: string): string {
+      // For countries alpha codes
+      if (input.length === 3) {
+        const info = countries.find(elem => elem['alpha-3'] === input)
+        input = info ? info.name.toUpperCase().split(' ').join('') : input
+      } else if (input.length === 2) {
+        const info = countries.find(elem => elem['alpha-2'] === input)
+        input = info ? info.name.toUpperCase().split(' ').join('') : input
+      }
+      const country = currencies.find(elem => elem.Entity.toUpperCase().split(' ').join('') === input)
+      return country ? country.AlphabeticCode : input
+    }
+    // If input does not exist as currency, we check if user meant a country name instead
+    if (!currency.rates[from]) from = convertToSym(from)
+    if (!currency.rates[to]) to = convertToSym(to)
     // Check if everything is in order.
     if (from.length !== 3 || !currency.rates[from]) return { content: 'Invalid currency to convert from.', error: true }
     else if (to.length !== 3 || !currency.rates[to]) return { content: 'Invalid currency to convert to.', error: true }
     else if (!args[2]) args[2] = '1' // If no amount was provided, the amount should be one.
+    // A way to include commas for input.
+    else if (args[2].search(',') !== -1) args[2] = args[2].split(',').join('')
     else if (args.length > 3) return { content: 'Enter a single number for currency conversion.', error: true }
     else if (isNaN(+args[2])) return { content: 'Enter a proper number to convert.', error: true }
     // Now we convert the amount.
@@ -537,8 +558,7 @@ export const handleWeather: Command = {
     if (fahrenheit) args.splice(args.includes('-f') ? args.indexOf('-f') : args.indexOf('--fahrenheit'), 1)
     // Get the response from our API.
     const weather = await (await fetch(
-      `http://api.openweathermap.org/data/2.5/weather?q=${args.join(',')}&appid=${weatherAPIkey}${
-        fahrenheit ? '&units=imperial' : '&units=metric'
+      `http://api.openweathermap.org/data/2.5/weather?q=${args.join(',')}&appid=${weatherAPIkey}${fahrenheit ? '&units=imperial' : '&units=metric'
       }`
     )).json() as Weather
     const temp = fahrenheit ? '°F' : '°C'
@@ -638,7 +658,7 @@ export const handleDefine: Command = {
         const word = r.results[0].lexicalEntries[0].inflectionOf[0].id
         const { results } = await (await fetch(
           `https://od-api.oxforddictionaries.com/api/v2/entries/en/${word}` +
-            '?strictMatch=false&fields=definitions%2Cexamples',
+          '?strictMatch=false&fields=definitions%2Cexamples',
           { headers }
         )).json() as { results: Array<{ lexicalEntries: Categories, word: string }> }
         // Now we create an embed based on the 1st entry.
