@@ -63,14 +63,14 @@ client.on('guildBanAdd', bubbleWrap(guildBanAdd(client, db)))
 client.on('guildDelete', bubbleWrap(guildDelete(db)))
 // Register the commandParser.
 const commandParser = new CommandParser(client, tempDB, db)
-client.on('messageCreate', bubbleWrap(commandParser.onMessage))
-client.on('messageUpdate', bubbleWrap(commandParser.onMessageUpdate))
+client.on('messageCreate', bubbleWrap(async m => await commandParser.onMessage(m)))
+client.on('messageUpdate', bubbleWrap(async m => await commandParser.onMessageUpdate(m)))
 const slashParser = new SlashParser(client, tempDB, db, commandParser)
 client.on('interactionCreate', interaction => {
   if (interaction.type === 2 && interaction instanceof CommandInteraction) {
     if (!interaction.user) interaction.user = interaction.member?.user
     if (!Array.isArray(interaction.data.options)) interaction.data.options = []
-    bubbleWrap(slashParser.handleCommandInteraction)(interaction)
+    bubbleWrap(async () => await slashParser.handleCommandInteraction(interaction))()
   }
 })
 // Register all commands in src/commands onto the CommandParser.

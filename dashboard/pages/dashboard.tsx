@@ -53,17 +53,15 @@ const DashboardPage = (props: { rootUrl: string }): JSX.Element => {
       <AppBar>
         <Toolbar>
           <Typography variant='h6' color='inherit' style={{ flex: 1 }}>IveBot</Typography>
-          <Link passHref href='/'>
-            <a style={{ textDecoration: 'none', color: 'inherit' }}>
-              <Button color='inherit'>Home</Button>
-            </a>
+          <Link style={{ textDecoration: 'none', color: 'inherit' }} href='/'>
+            <Button color='inherit'>Home</Button>
           </Link>
           {loggedOut
             ? <Button color='inherit' onClick={loginWithOauth}>Login</Button>
             : <Button color='inherit' onClick={logout}>Logout</Button>}
         </Toolbar>
       </AppBar>
-      <br /><br /><br /><br />
+      <br /><br /><br />
       <div style={{ padding: 10 }}>
         {loggedOut
           ? (

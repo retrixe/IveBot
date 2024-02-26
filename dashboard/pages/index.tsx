@@ -29,14 +29,12 @@ class Index extends React.Component<{ rootUrl: string, clientId: string }, {}> {
             <a href='https://github.com/retrixe/IveBot' target='_blank' rel='noopener noreferrer'>
               <IconButton color='default'><GitHubLogo /></IconButton>
             </a>
-            <Link passHref href='/dashboard'>
-              <a style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Button color='inherit'>Dashboard</Button>
-              </a>
+            <Link style={{ textDecoration: 'none', color: 'inherit' }} href='/dashboard'>
+              <Button color='inherit'>Dashboard</Button>
             </Link>
           </Toolbar>
         </AppBar>
-        <br /><br /><br /><br />
+        <br /><br /><br />
         <Button
           href={
           `https://discordapp.com/oauth2/authorize?client_id=${this.props.clientId}&scope=bot&permissions=8`

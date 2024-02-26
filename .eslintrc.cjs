@@ -29,6 +29,7 @@ module.exports = {
     '@typescript-eslint/triple-slash-reference': 'off',
     '@typescript-eslint/prefer-optional-chain': 'off',
     '@typescript-eslint/no-invalid-void-type': 'off',
+    '@typescript-eslint/no-unsafe-argument': 'off',
     '@typescript-eslint/no-dynamic-delete': 'off',
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/ban-types': 'off',
@@ -36,7 +37,6 @@ module.exports = {
     '@typescript-eslint/no-misused-promises': 'off',
     '@typescript-eslint/restrict-plus-operands': 'off',
     // Set strict rules regarding async/await.
-    '@typescript-eslint/await-thenable': 'error',
     '@typescript-eslint/require-await': 'error',
     // Allow no-multi-str.
     'no-multi-str': 'off'
