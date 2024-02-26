@@ -1,30 +1,19 @@
-// Flow our types.
-import { AdvancedMessageContent, Client, CommandInteraction, ApplicationCommandOptions, Message } from '@projectdysnomia/dysnomia'
-import CommandParser from '../client.js'
-import { Db } from 'mongodb'
-import { TriviaSession } from '../commands/trivia.js'
+import type { AdvancedMessageContent, Client, CommandInteraction, ApplicationCommandOptions, Message } from '@projectdysnomia/dysnomia'
+import type CommandParser from '../client.js'
+import type { Db } from 'mongodb'
+import type { TriviaSession } from '../commands/trivia.js'
 
 export interface DB {
-  gunfight: {
-    [key: string]: {
-      randomWord: string
-      timestamp: number
-      channelID: string
-      accepted: boolean
-      wordSaid: boolean
-    }
-  }
-  say: {
-    // Channels.
-    [index: string]: string
-  }
-  trivia: {
-    [index: string]: TriviaSession
-  }
-  mute: {
-    // Servers with userIDs contained.
-    [index: string]: string[]
-  }
+  gunfight: Record<string, {
+    randomWord: string
+    timestamp: number
+    channelID: string
+    accepted: boolean
+    wordSaid: boolean
+  }>
+  say: Record<string, string> // Channels.
+  trivia: Record<string, TriviaSession>
+  mute: Record<string, string[]> // Servers with userIDs contained.
   cooldowns: { request: Set<string> }
   leave: Set<string>
 }
@@ -32,9 +21,9 @@ export interface DB {
 export interface Context { tempDB: DB, db: Db, commandParser: CommandParser, client: Client }
 export type CommandResponse = string | AdvancedMessageContent & { error?: boolean }
 export type IveBotCommandGeneratorFunction = (msg: Message, args: string[], ctx: Context) =>
-void | Promise<void> | CommandResponse | Promise<CommandResponse>
+undefined | Promise<undefined> | CommandResponse | Promise<CommandResponse>
 export type IveBotSlashGeneratorFunction = (interaction: CommandInteraction, ctx: Context) =>
-void | Promise<void> | CommandResponse | Promise<CommandResponse>
+undefined | Promise<undefined> | CommandResponse | Promise<CommandResponse>
 export type IveBotCommandGenerator = IveBotCommandGeneratorFunction | string | AdvancedMessageContent
 export interface Command {
   opts: CommandOptions
@@ -63,7 +52,7 @@ export interface CommandOptions {
     userIDs?: string[]
     roleNames?: string[]
     custom?: (message: Message) => boolean
-    permissions?: { [permission: string]: boolean }
+    permissions?: Record<string, boolean>
     roleIDs?: string[]
   }
 }

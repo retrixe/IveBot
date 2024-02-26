@@ -1,10 +1,10 @@
-import { Message, MessageContent, Client, GuildTextableChannel } from '@projectdysnomia/dysnomia'
-import { DB, Command as IveBotCommand, IveBotCommandGenerator, Context, CommandResponse } from './imports/types.js'
-import { Db } from 'mongodb'
+import type { Message, MessageContent, Client, GuildTextableChannel } from '@projectdysnomia/dysnomia'
+import type { DB, Command as IveBotCommand, IveBotCommandGenerator, Context, CommandResponse } from './imports/types.js'
+import type { Db } from 'mongodb'
 import { getInsult } from './imports/tools.js'
 import botCallback from './events.js'
 
-function isEquivalent (a: { [index: string]: boolean }, b: { [index: string]: boolean }): boolean {
+function isEquivalent (a: Record<string, boolean>, b: Record<string, boolean>): boolean {
   // Create arrays of property names
   const aProps = Object.getOwnPropertyNames(a)
   const bProps = Object.getOwnPropertyNames(b)
@@ -44,7 +44,7 @@ export class Command {
     userIDs?: string[]
     roleNames?: string[]
     custom?: (message: Message) => boolean
-    permissions?: { [key: string]: boolean }
+    permissions?: Record<string, boolean>
     roleIDs?: string[]
   }
 
@@ -94,9 +94,9 @@ export class Command {
     return userIDs || custom || permissions
   }
 
-  async execute (context: Context, message: Message, args: string[]): Promise<CommandResponse | void> {
+  async execute (context: Context, message: Message, args: string[]): Promise<CommandResponse | undefined> {
     // Define 2 vars.
-    let messageToSend: CommandResponse | void | Promise<CommandResponse> | Promise<void>
+    let messageToSend: CommandResponse | undefined | Promise<CommandResponse> | Promise<undefined>
     // If it's a function, we call it first.
     if (typeof this.generator === 'function') messageToSend = this.generator(message, args, context)
     else messageToSend = this.generator
@@ -107,12 +107,12 @@ export class Command {
 }
 
 export default class CommandParser {
-  commands: { [name: string]: Command }
+  commands: Record<string, Command>
   client: Client
   tempDB: DB
   db: Db
   evaluatedMessages: string[]
-  analytics: { [name: string]: { totalUse: number, averageExecTime: number[] } }
+  analytics: Record<string, { totalUse: number, averageExecTime: number[] }>
 
   constructor (client: Client, tempDB: DB, db: Db) {
     this.commands = {}

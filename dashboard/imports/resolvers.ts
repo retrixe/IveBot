@@ -1,9 +1,9 @@
 import { Client } from '@projectdysnomia/dysnomia'
 import { promisify } from 'util'
 import { GraphQLError } from 'graphql'
-import { MongoClient, Document } from 'mongodb'
-import { JwtPayload, verify, sign } from 'jsonwebtoken'
-import { NextApiRequest, NextApiResponse } from 'next'
+import { MongoClient, type Document } from 'mongodb'
+import { type JwtPayload, verify, sign } from 'jsonwebtoken'
+import { type NextApiRequest, type NextApiResponse } from 'next'
 import { randomBytes, createCipheriv, createDecipheriv, createHash } from 'crypto'
 import config from '../config.json'
 const { host, rootUrl, mongoUrl, jwtSecret, clientId, clientSecret, botToken, botApiUrl } = config
@@ -189,7 +189,7 @@ export default {
         })
       }
     },
-    getUserInfo: async (parent: string, args: {}, context: ResolverContext) => {
+    getUserInfo: async (parent: string, args: unknown, context: ResolverContext) => {
       const accessToken = await authenticateRequest(context.req, context.res)
       const client = new Client(`Bearer ${accessToken}`, { restMode: true })
       const self = await client.getSelf()
@@ -199,7 +199,7 @@ export default {
         id: self.id
       }
     },
-    getUserServers: async (parent: string, args: {}, context: ResolverContext) => {
+    getUserServers: async (parent: string, args: unknown, context: ResolverContext) => {
       const accessToken = await authenticateRequest(context.req, context.res)
       const client = new Client(`Bearer ${accessToken}`, { restMode: true })
       const guilds = await client.getRESTGuilds()

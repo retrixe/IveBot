@@ -1,4 +1,4 @@
-import { Command } from '../../imports/types.js'
+import { type Command } from '../../imports/types.js'
 import { getInsult, getIdFromMention, fetchLimited } from '../../imports/tools.js'
 
 export const handleAddemoji: Command = {

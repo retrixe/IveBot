@@ -19,25 +19,17 @@ module.exports = {
       )
     }], */
     // Make TypeScript ESLint less strict.
-    '@typescript-eslint/strict-boolean-expressions': 'off',
-    '@typescript-eslint/restrict-template-expressions': 'off',
-    // Disable some interfering rules.
-    '@typescript-eslint/consistent-indexed-object-style': 'off',
     '@typescript-eslint/no-confusing-void-expression': 'off',
-    '@typescript-eslint/prefer-nullish-coalescing': 'off',
-    '@typescript-eslint/consistent-type-imports': 'off',
+    '@typescript-eslint/strict-boolean-expressions': 'off',
+    '@typescript-eslint/restrict-plus-operands': 'off',
     '@typescript-eslint/triple-slash-reference': 'off',
-    '@typescript-eslint/prefer-optional-chain': 'off',
-    '@typescript-eslint/no-invalid-void-type': 'off',
-    '@typescript-eslint/no-unsafe-argument': 'off',
     '@typescript-eslint/no-dynamic-delete': 'off',
-    '@typescript-eslint/no-var-requires': 'off',
-    '@typescript-eslint/ban-types': 'off',
+    // Disable some interfering rules. TODO: Re-enable these!
+    '@typescript-eslint/restrict-template-expressions': 'off',
+    '@typescript-eslint/prefer-nullish-coalescing': 'off',
+    '@typescript-eslint/no-unsafe-argument': 'off',
     '@typescript-eslint/no-base-to-string': 'off',
     '@typescript-eslint/no-misused-promises': 'off',
-    '@typescript-eslint/restrict-plus-operands': 'off',
-    // Set strict rules regarding async/await.
-    '@typescript-eslint/require-await': 'error',
     // Allow no-multi-str.
     'no-multi-str': 'off'
   }

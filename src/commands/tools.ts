@@ -1,11 +1,11 @@
-import { Command } from '../imports/types.js'
+import { type Command } from '../imports/types.js'
 import { execSync } from 'child_process'
 import moment from 'moment'
 import { host, testPilots } from '../config.js'
 import { runInNewContext } from 'vm'
 import { inspect } from 'util'
 import { getIdFromMention, getInsult } from '../imports/tools.js'
-import { Base, Constants, InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
+import { Base, Constants, type InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
 import { readFile } from 'fs/promises'
 const { version }: { version: string } = JSON.parse(await readFile('package.json', { encoding: 'utf8' }))
 

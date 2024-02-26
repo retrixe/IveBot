@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Link from 'next/link'
 import { readFile } from 'fs/promises'
-import { GetStaticProps } from 'next'
+import type { GetStaticProps } from 'next'
 
 const ErrorPage = (props: { rootUrl: string }): JSX.Element => {
   const router = useRouter()

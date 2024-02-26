@@ -4,9 +4,9 @@ import { useQuery, gql } from '@apollo/client'
 import Head from 'next/head'
 import Link from 'next/link'
 import Dashboard from '../imports/dashboard'
-import { DiscordUser, ServerInfo } from '../imports/graphqlTypes'
+import type { DiscordUser, ServerInfo } from '../imports/graphqlTypes'
 import { readFile } from 'fs/promises'
-import { GetStaticProps } from 'next'
+import type { GetStaticProps } from 'next'
 
 const GET_USER_DATA = gql`
   query GetUserData {

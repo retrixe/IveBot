@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from '@apollo/client'
+import { ApolloClient, HttpLink, InMemoryCache, type NormalizedCacheObject } from '@apollo/client'
 import isEqual from 'lodash/isEqual'
 import merge from 'deepmerge'
 import config from '../config.json'
@@ -31,7 +31,7 @@ export function initializeApollo (
     const existingCache = _apolloClient.extract()
 
     // Merge the existing cache into data passed from getStaticProps/getServerSideProps
-    const data = merge(initialState, existingCache as {}, {
+    const data = merge(initialState, existingCache as any, {
       // combine arrays using object equality (like in sets)
       arrayMerge: (destinationArray, sourceArray) => [
         ...sourceArray,
@@ -53,15 +53,15 @@ export function initializeApollo (
 }
 
 export function addApolloState (
-  client: ApolloClient<InMemoryCache>, pageProps: { [key: string]: any }
-): { [key: string]: any } {
+  client: ApolloClient<InMemoryCache>, pageProps: Record<string, any>
+): Record<string, any> {
   if (pageProps?.props) {
     pageProps.props[APOLLO_STATE_PROP_NAME] = client.cache.extract()
   }
   return pageProps
 }
 
-export function useApollo (pageProps: { [key: string]: any }): ApolloClient<InMemoryCache> {
+export function useApollo (pageProps: Record<string, any>): ApolloClient<InMemoryCache> {
   const state = pageProps[APOLLO_STATE_PROP_NAME]
   const store = useMemo(() => initializeApollo(state), [state])
   return store

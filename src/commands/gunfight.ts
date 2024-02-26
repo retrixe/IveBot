@@ -1,5 +1,5 @@
 // All the types!
-import { Command } from '../imports/types.js'
+import type { Command } from '../imports/types.js'
 // All the tools!
 import { getUser } from '../imports/tools.js'
 

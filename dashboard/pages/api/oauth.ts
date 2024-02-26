@@ -1,5 +1,5 @@
 import { sign } from 'jsonwebtoken'
-import { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import config from '../../config.json'
 const { rootUrl, clientId, clientSecret, jwtSecret } = config
 

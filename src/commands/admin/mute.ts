@@ -1,4 +1,4 @@
-import { Command } from '../../imports/types.js'
+import { type Command } from '../../imports/types.js'
 import { checkRolePosition } from '../../imports/permissions.js'
 import { getInsult, getUser } from '../../imports/tools.js'
 import { Constants } from '@projectdysnomia/dysnomia'

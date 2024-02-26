@@ -1,6 +1,6 @@
 import { ApolloServer } from '@apollo/server'
 import { startServerAndCreateNextHandler } from '@as-integrations/next'
-import { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import gql from 'graphql-tag'
 import resolvers from '../../imports/resolvers'
 

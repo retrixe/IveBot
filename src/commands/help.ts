@@ -1,8 +1,9 @@
 import { zeroWidthSpace, getInsult } from '../imports/tools.js'
-import { Command as IveBotCommand } from '../imports/types.js'
-import CommandParser, { Command } from '../client.js'
+import type { Command as IveBotCommand } from '../imports/types.js'
+import type { Command } from '../client.js'
+import type CommandParser from '../client.js'
 import { rootURL } from '../config.js'
-import { Client, Constants, InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
+import { type Client, Constants, type InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
 
 const generalHelp = {
   description: `**Jony Ive can do many commands 📡**
@@ -138,16 +139,19 @@ export const handleHelp: IveBotCommand = {
   ),
   commonGenerator: async (author: string, command: string, client: Client, parser: CommandParser) => {
     const commands = parser.commands
-    const commandName = command.split('/').join('').toLowerCase()
-    const check = (i: string): boolean => (
+    command = command.replace(/\//g, '').toLowerCase()
+    const check = (name: string): boolean => !!(
       // First checks for name, 2nd for aliases.
-      commands[i].name.toLowerCase() === commandName ||
-      (commands[i].aliases && commands[i].aliases.includes(commandName))
+      commands[name].name.toLowerCase() === command ||
+      commands[name].aliases?.includes(command)
     )
     // Check if requested for a specific command.
-    if (Object.keys(commands).find(check)) {
-      return generateDocs(commands[Object.keys(commands).find(check)])
-    } else if (command) return { content: 'Incorrect parameters. Run /help for general help.', error: true }
+    const commandName = Object.keys(commands).find(check)
+    if (commandName) {
+      return generateDocs(commands[commandName])
+    } else if (command) {
+      return { content: 'Incorrect parameters. Run /help for general help.', error: true }
+    }
     // Default help.
     try {
       const channel = await client.getDMChannel(author)

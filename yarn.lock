@@ -138,6 +138,11 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node12/-/node12-1.0.11.tgz#ee3def1f27d9ed66dac6e46a295cffb0152e058d"
   integrity sha512-cqefuRsh12pWyGsIoBKJA9luFu3mRxCA+ORZvA4ktLSzIuCUtWVxGIuXigEwO5/ywWFMZ2QEGKWvkZG1zDMTag==
 
+"@tsconfig/node12@^12.1.1":
+  version "12.1.1"
+  resolved "https://registry.yarnpkg.com/@tsconfig/node12/-/node12-12.1.1.tgz#7b7e0aac9be749f2c2b84147b40254ba66b7c987"
+  integrity sha512-8hi81NzF66PWaA05SZkUCV4XxbHEF/W1nIDOM5Iit/yp+MAT5Na0U91xr9UlFkuCQUUwJfpUNlwVMYrRMrEFig==
+
 "@tsconfig/node14@^1.0.0":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@tsconfig/node14/-/node14-1.0.3.tgz#e4386316284f00b98435bf40f72f75a09dabf6c1"

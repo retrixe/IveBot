@@ -1,5 +1,5 @@
-import { Constants, InteractionDataOptionsString, TextChannel } from '@projectdysnomia/dysnomia'
-import { Command } from '../imports/types.js'
+import { Constants, type InteractionDataOptionsString, type TextChannel } from '@projectdysnomia/dysnomia'
+import { type Command } from '../imports/types.js'
 import { openaiAPIkey } from '../config.js'
 import fetch from 'node-fetch'
 

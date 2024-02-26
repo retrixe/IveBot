@@ -29,6 +29,7 @@
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
+    "@tsconfig/node12": "^12.1.1",
     "@types/node": "^20.5.7",
     "@types/node-fetch": "^2.6.4",
     "@typescript-eslint/eslint-plugin": "^7.0.2",

@@ -5,7 +5,7 @@ import {
 import Head from 'next/head'
 import Link from 'next/link'
 import { readFile } from 'fs/promises'
-import { GetStaticProps } from 'next'
+import type { GetStaticProps } from 'next'
 
 const GitHubLogo = (): JSX.Element => (
   <SvgIcon>
@@ -13,7 +13,7 @@ const GitHubLogo = (): JSX.Element => (
   </SvgIcon>
 )
 
-class Index extends React.Component<{ rootUrl: string, clientId: string }, {}> {
+class Index extends React.Component<{ rootUrl: string, clientId: string }, unknown> {
   render (): JSX.Element {
     return (
       <div style={{ marginRight: 16, marginLeft: 16 }}>

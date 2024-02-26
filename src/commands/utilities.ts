@@ -1,12 +1,13 @@
 // All the types!
-import Dysnomia, {
-  Message,
-  GuildTextableChannel,
-  Constants,
-  Guild,
-  InteractionDataOptionsString
+import { Constants } from '@projectdysnomia/dysnomia'
+import type Dysnomia from '@projectdysnomia/dysnomia'
+import {
+  type Message,
+  type GuildTextableChannel,
+  type Guild,
+  type InteractionDataOptionsString
 } from '@projectdysnomia/dysnomia'
-import { Command } from '../imports/types.js'
+import { type Command } from '../imports/types.js'
 // All the needs!
 import { getIdFromMention, getInsult, getUser, getChannel } from '../imports/tools.js'
 import ms from 'ms'
@@ -141,7 +142,7 @@ export const handleUserinfo: Command = {
         thumbnail: { url: user.dynamicAvatarURL('png', 2048) },
         color,
         fields: [
-          { name: 'Status', value: member && member.status ? member.status : 'N/A', inline: true },
+          { name: 'Status', value: member?.status ?? 'N/A', inline: true },
           // { name: 'Join Position }
           {
             name: 'Joined server at',

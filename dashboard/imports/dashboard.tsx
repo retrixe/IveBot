@@ -5,7 +5,7 @@ import {
 } from '@mui/material'
 import ArrowBack from '@mui/icons-material/ArrowBack'
 import { useLazyQuery, gql } from '@apollo/client'
-import { ServerInfo, DiscordUser } from './graphqlTypes'
+import type { ServerInfo, DiscordUser } from './graphqlTypes'
 import Settings from './settings'
 
 const Root = styled('div')(({ theme }) => ({
