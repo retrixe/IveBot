@@ -4,9 +4,9 @@ import { useQuery, gql } from '@apollo/client'
 import Head from 'next/head'
 import Link from 'next/link'
 import Dashboard from '../imports/dashboard'
-import { DiscordUser, ServerInfo } from '../imports/graphqlTypes'
+import type { DiscordUser, ServerInfo } from '../imports/graphqlTypes'
 import { readFile } from 'fs/promises'
-import { GetStaticProps } from 'next'
+import type { GetStaticProps } from 'next'
 
 const GET_USER_DATA = gql`
   query GetUserData {
@@ -53,17 +53,15 @@ const DashboardPage = (props: { rootUrl: string }): JSX.Element => {
       <AppBar>
         <Toolbar>
           <Typography variant='h6' color='inherit' style={{ flex: 1 }}>IveBot</Typography>
-          <Link passHref href='/'>
-            <a style={{ textDecoration: 'none', color: 'inherit' }}>
-              <Button color='inherit'>Home</Button>
-            </a>
+          <Link style={{ textDecoration: 'none', color: 'inherit' }} href='/'>
+            <Button color='inherit'>Home</Button>
           </Link>
           {loggedOut
             ? <Button color='inherit' onClick={loginWithOauth}>Login</Button>
             : <Button color='inherit' onClick={logout}>Logout</Button>}
         </Toolbar>
       </AppBar>
-      <br /><br /><br /><br />
+      <br /><br /><br />
       <div style={{ padding: 10 }}>
         {loggedOut
           ? (

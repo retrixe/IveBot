@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Link from 'next/link'
 import { readFile } from 'fs/promises'
-import { GetStaticProps } from 'next'
+import type { GetStaticProps } from 'next'
 
 const ErrorPage = (props: { rootUrl: string }): JSX.Element => {
   const router = useRouter()
@@ -20,10 +20,8 @@ const ErrorPage = (props: { rootUrl: string }): JSX.Element => {
       <AppBar>
         <Toolbar>
           <Typography variant='h6' color='inherit' style={{ flex: 1 }}>IveBot</Typography>
-          <Link passHref href='/'>
-            <a style={{ textDecoration: 'none', color: 'inherit' }}>
-              <Button color='inherit'>Home</Button>
-            </a>
+          <Link style={{ textDecoration: 'none', color: 'inherit' }} href='/'>
+            <Button color='inherit'>Home</Button>
           </Link>
         </Toolbar>
       </AppBar>
@@ -34,7 +32,7 @@ const ErrorPage = (props: { rootUrl: string }): JSX.Element => {
           <br />
           {router.query.error}
           <br /><br />
-          <Link passHref href='/'><a>Click here to go back to the home page.</a></Link>
+          <Link href='/'>Click here to go back to the home page.</Link>
         </Typography>
       </div>
     </>

@@ -1,10 +1,10 @@
-import { Message, GuildTextableChannel, TextableChannel, User, EmbedOptions, Client } from '@projectdysnomia/dysnomia'
-import { Command, DB } from '../imports/types.js'
+import type { Message, GuildTextableChannel, TextableChannel, User, EmbedOptions, Client } from '@projectdysnomia/dysnomia'
+import type { Command, DB } from '../imports/types.js'
 import { getInsult } from '../imports/tools.js'
 import fs from 'fs'
 
 async function parseTriviaList (fileName: string): Promise<Map<string, string[]>> {
-  const data = await fs.promises.readFile(`./src/commands/triviaLists/${fileName}.txt`, 'utf8')
+  const data = await fs.promises.readFile(`./src/data/triviaLists/${fileName}.txt`, 'utf8')
   const triviaList = new Map<string, string[]>()
   data.split('\n').forEach(el => {
     const splitEl = el.split('`').map(ans => ans.trim()).filter(ans => !!ans)
@@ -20,7 +20,7 @@ export class TriviaSession {
   author: User
   message: Message
   questionList: Map<string, string[]>
-  scores: { [id: string]: number } = {}
+  scores: Record<string, number> = {}
   stopped = false
   timer: number | null = null
   timeout = Date.now()
@@ -40,7 +40,7 @@ export class TriviaSession {
 
   getScores (addMedals = false): { embeds: EmbedOptions[] } {
     const currentScores = Object.entries(this.scores).sort(([, a], [, b]) => b - a)
-    const medals: { [id: string]: string } = {}
+    const medals: Record<string, string> = {}
     if (addMedals) {
       const maxReduce = (a: number, b: number): number => Math.max(a || 0, b || 0)
       const values = Object.values(this.scores)
@@ -226,7 +226,7 @@ export const handleTrivia: Command = {
         return 'There is no trivia session ongoing in this channel.'
       }
     } else if (args.length === 1 && args[0] === 'list') {
-      const lists = await fs.promises.readdir('./src/commands/triviaLists/')
+      const lists = await fs.promises.readdir('./src/data/triviaLists/')
       const member = message.member.guild.members.get(client.user.id)
       const color = member
         ? (member.roles.map(i => member.guild.roles.get(i)).sort(

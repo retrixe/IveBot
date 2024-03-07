@@ -8,7 +8,7 @@ import { inspect } from 'util'
 import http from 'http'
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto'
 // Import types.
-import { DB, Command } from './imports/types.js'
+import type { DB, Command } from './imports/types.js'
 // Import the bot.
 import SlashParser from './slash.js'
 import CommandParser from './client.js'
@@ -63,14 +63,14 @@ client.on('guildBanAdd', bubbleWrap(guildBanAdd(client, db)))
 client.on('guildDelete', bubbleWrap(guildDelete(db)))
 // Register the commandParser.
 const commandParser = new CommandParser(client, tempDB, db)
-client.on('messageCreate', bubbleWrap(commandParser.onMessage))
-client.on('messageUpdate', bubbleWrap(commandParser.onMessageUpdate))
+client.on('messageCreate', bubbleWrap(async m => await commandParser.onMessage(m)))
+client.on('messageUpdate', bubbleWrap(async m => await commandParser.onMessageUpdate(m)))
 const slashParser = new SlashParser(client, tempDB, db, commandParser)
 client.on('interactionCreate', interaction => {
   if (interaction.type === 2 && interaction instanceof CommandInteraction) {
     if (!interaction.user) interaction.user = interaction.member?.user
     if (!Array.isArray(interaction.data.options)) interaction.data.options = []
-    bubbleWrap(slashParser.handleCommandInteraction)(interaction)
+    bubbleWrap(async () => await slashParser.handleCommandInteraction(interaction))()
   }
 })
 // Register all commands in src/commands onto the CommandParser.
@@ -82,7 +82,7 @@ commandFiles.push(dev ? 'admin/index.ts' : 'admin/index.js')
 for (const commandFile of commandFiles) {
   // If it's a file..
   if ((await stat(toRead + commandFile)).isFile() && (commandFile.endsWith('.ts') || commandFile.endsWith('.js'))) {
-    const commands: { [index: string]: Command } = await import('./commands/' + commandFile.replace('.ts', '.js'))
+    const commands: Record<string, Command> = await import('./commands/' + commandFile.replace('.ts', '.js'))
     // ..and there are commands..
     if (Object.keys(commands).length === 0) continue
     // ..register the commands.
@@ -101,7 +101,7 @@ for (const commandFile of commandFiles) {
 // Register setInterval to fulfill delayed tasks.
 setInterval(() => {
   db.collection('tasks').find({ time: { $lte: Date.now() + 60000 } }).toArray().then(tasks => {
-    if (tasks && tasks.length) {
+    if (tasks?.length) {
       tasks.forEach(task => setTimeout(() => {
         // TODO: What if no perms?
         if (task.type === 'unmute') {
@@ -148,9 +148,13 @@ if (jwtSecret) {
     textChannels: Array<{ id: string, name: string }>
   }
   const key = createHash('sha256').update(jwtSecret).digest()
-  const headers = (body: NodeJS.ArrayBufferView | string): {} => ({
-    'Content-Length': Buffer.byteLength(body), 'Content-Type': 'application/json'
-  })
+  const headers = (body: NodeJS.ArrayBufferView | string): {
+    'Content-Length': number
+    'Content-Type': string
+  } => ({ 'Content-Length': Buffer.byteLength(body), 'Content-Type': 'application/json' })
+  const port = process.env.IVEBOT_API_PORT && !isNaN(+process.env.IVEBOT_API_PORT)
+    ? +process.env.IVEBOT_API_PORT
+    : 7331
   const server = http.createServer((req, res) => {
     if (req.method !== 'POST' || req.url !== '/private') return
     let buffer = Buffer.from([])
@@ -208,7 +212,5 @@ if (jwtSecret) {
         }
       })().catch(console.error)
     })
-  }).listen(isNaN(+process.env.IVEBOT_API_PORT) ? 7331 : +process.env.IVEBOT_API_PORT, () => {
-    console.log('Listening for IveBot dashboard requests on', server.address())
-  })
+  }).listen(port, () => console.log('Listening for IveBot dashboard requests on', server.address()))
 }

@@ -1,7 +1,7 @@
 // We need types.
-import { DB } from './imports/types.js'
-import { Member, Message, Client, User, Guild, GuildTextableChannel } from '@projectdysnomia/dysnomia'
-import { Db } from 'mongodb'
+import { type DB } from './imports/types.js'
+import type { Member, Message, Client, User, Guild, GuildTextableChannel } from '@projectdysnomia/dysnomia'
+import { type Db } from 'mongodb'
 import fetch from 'node-fetch'
 
 // Database reading function.
@@ -136,12 +136,11 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db): Pro
   if (!message.member) return
   const serverSettings = await getServerSettings(db, message.member.guild.id)
   // Text recognition on image send \o/
-  if ((message.attachments.size > 0) && serverSettings.ocrOnSend) {
+  const attachment = message.attachments.get(0)
+  if (attachment && serverSettings.ocrOnSend) {
     // Get the image and convert it to Base64.
     try {
-      const image = Buffer.from(await (await fetch(
-        message.attachments.get(0).url
-      )).arrayBuffer()).toString('base64')
+      const image = Buffer.from(await (await fetch(attachment.url)).arrayBuffer()).toString('base64')
       // Now send the request.
       const res = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${cvAPIkey}`, {
         body: JSON.stringify({

@@ -1,10 +1,10 @@
 // All the types!
-import { Command } from '../imports/types.js'
+import type { Command } from '../imports/types.js'
 // All the tools!
 import fetch from 'node-fetch'
 import moment from 'moment'
 import Fuse from 'fuse.js'
-import { Constants, InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
+import { Constants, type InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
 import { zeroWidthSpace, getInsult, fetchLimited, getIdFromMention } from '../imports/tools.js'
 import currencies from '../currencies.json' assert {type: 'json'}
 import countries from '../countries.json' assert {type: 'json'}
@@ -292,7 +292,7 @@ export const handleDog: Command = {
     if (args[0] === 'list') {
       try {
         const { message } = await (await fetch('https://dog.ceo/api/breeds/list/all')).json() as {
-          message: { [index: string]: string[] }
+          message: Record<string, string[]>
         }
         // If only list of breeds was asked.
         if (!args[1]) return `**List of breeds:** ${Object.keys(message).join(', ')}`
@@ -415,7 +415,7 @@ export const handleNamemc: Command = {
     if (args.length > 1) return 'Minecraft users cannot have spaces in their name.'
     try {
       // Fetch the UUID and name of the user and parse it to JSON.
-      const member = message.member && message.member.guild.members.get(getIdFromMention(args[0]))
+      const member = message.member?.guild.members.get(getIdFromMention(args[0]))
       const username = member ? (member.nick || member.username) : args[0]
       const { id, name } = await (await fetch(
         `https://api.mojang.com/users/profiles/minecraft/${username}`
@@ -454,7 +454,7 @@ export const handleNamemc: Command = {
 }
 
 // Initialize cache.
-let currency: { timestamp: number, rates: { [index: string]: number } }
+let currency: { timestamp: number, rates: Record<string, number> }
 export const handleCurrency: Command = {
   name: 'currency',
   aliases: ['cur'],
@@ -694,7 +694,7 @@ export const handleDefine: Command = {
                     name: `**${a}.** ` + (sense.registers ? `(${sense.registers[0].text}) ` : '') + (
                       (sense.shortDefinitions || sense.definitions)[0]
                     ),
-                    value: sense.examples && sense.examples[0].text
+                    value: sense.examples?.[0].text
                       ? `e.g. ${sense.examples[0].text}`
                       : 'No example is available.'
                   })

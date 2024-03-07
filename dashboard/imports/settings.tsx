@@ -4,7 +4,7 @@ import {
   FormControl, FormHelperText, MenuItem, Switch, Select, TextField
 } from '@mui/material'
 import { gql, useMutation } from '@apollo/client'
-import { JoinLeaveMessages, ServerInfo, ServerSettings } from './graphqlTypes'
+import type { JoinLeaveMessages, ServerInfo, ServerSettings } from './graphqlTypes'
 
 const EDIT_SERVER_SETTINGS = gql`
   mutation EditServerSettings(
