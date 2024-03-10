@@ -8,6 +8,46 @@ import { Constants, type InteractionDataOptionsString } from '@projectdysnomia/d
 import { zeroWidthSpace, getInsult, fetchLimited, getIdFromMention } from '../imports/tools.js'
 // Get the NASA API token.
 import { NASAtoken, fixerAPIkey, weatherAPIkey, oxfordAPI, cvAPIkey } from '../config.js'
+import fs from 'fs'
+
+interface countriesInfo {
+  'name': string
+  'alpha-2': string
+  'alpha-3': string
+  'country-code': number
+  'iso_3166-2': string
+  'region': string
+  'sub-region': string
+  'intermediate-region': string
+  'region-code': number
+  'sub-region-code': number
+  'intermediate-region-code': number
+}
+interface currenciesInfo {
+  'AlphabeticCode': string
+  'Currency': string
+  'Entity': string
+  'MinorUnit': number
+  'NumericCode': number
+  'WithdrawalDate': null
+}
+
+const countries = JSON.parse((await fs.promises.readFile('./src/data/countries.json', 'utf-8'))) as countriesInfo[]
+const currencies = JSON.parse((await fs.promises.readFile('./src/data/currencies.json', 'utf-8'))) as currenciesInfo[]
+
+function convertToSym(input: string): string {
+  // For countries alpha codes.
+  if (input.length === 3) {
+    const info = countries.find(elem => elem['alpha-3'] === input)
+    input = info ? info.name.toUpperCase().split(' ').join('') : input
+  } else if (input.length === 2) {
+    const info = countries.find(elem => elem['alpha-2'] === input)
+    input = info ? info.name.toUpperCase().split(' ').join('') : input
+  }
+  // Find the matching Entity and return the currency code.
+  const country = currencies.find(elem => elem.Entity.toUpperCase().split(' ').join('') === input)
+  return country ? country.AlphabeticCode : input
+}
 
 export const handleOcr: Command = {
   name: 'ocr',
@@ -492,12 +532,16 @@ letter code + the first letter of the currency name.'
     }
     // Calculate the currencies to conver from and to, as well as the amount.
     if (args.length < 2) return { content: 'Invalid usage, use /help currency for proper usage.', error: true }
-    const from = args[0].toUpperCase()
-    const to = args[1].toUpperCase()
+    let from = args[0].toUpperCase()
+    let to = args[1].toUpperCase()
+    // If input does not exist as currency, we check if user meant a country name or code instead.
+    if (!currency.rates[from]) from = convertToSym(from)
+    if (!currency.rates[to]) to = convertToSym(to)
     // Check if everything is in order.
     if (from.length !== 3 || !currency.rates[from]) return { content: 'Invalid currency to convert from.', error: true }
     else if (to.length !== 3 || !currency.rates[to]) return { content: 'Invalid currency to convert to.', error: true }
     else if (!args[2]) args[2] = '1' // If no amount was provided, the amount should be one.
+    else if (args[2].search(',') !== -1) args[2] = args[2].split(',').join('') // If user used commas, they should be removed.
     else if (args.length > 3) return { content: 'Enter a single number for currency conversion.', error: true }
     else if (isNaN(+args[2])) return { content: 'Enter a proper number to convert.', error: true }
     // Now we convert the amount.
