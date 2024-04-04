@@ -265,7 +265,7 @@ export default class CommandParser {
     if (message.content && !message.content.startsWith('/')) return
     else if (!message.editedTimestamp) return
     else if (this.evaluatedMessages.includes(message.id)) return
-    else if (!oldMessage || Date.now() - message.timestamp > 30000) return
+    else if (Date.now() - message.timestamp > 30000) return
     else if (message.editedTimestamp - message.timestamp > 30000) return
     // Proceed to evaluate.
     const commandExec = message.content.split(' ')[0].substr(1).toLowerCase()

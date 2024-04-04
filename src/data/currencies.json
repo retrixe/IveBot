@@ -1325,13 +1325,6 @@
   {
     "AlphabeticCode": "EUR",
     "Currency": "Euro",
-    "Entity": "LOLPORTUGAL",
-    "MinorUnit": "2",
-    "NumericCode": 978
-  },
-  {
-    "AlphabeticCode": "EUR",
-    "Currency": "Euro",
     "Entity": "PORTUGAL",
     "MinorUnit": "2",
     "NumericCode": 978
