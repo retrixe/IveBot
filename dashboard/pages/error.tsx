@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { readFile } from 'fs/promises'
 import type { GetStaticProps } from 'next'
 
-const ErrorPage = (props: { rootUrl: string }): JSX.Element => {
+const ErrorPage = (props: { rootUrl: string }): React.JSX.Element => {
   const router = useRouter()
   return (
     <>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import {
-  Typography, Paper, List, ListItem, ListItemAvatar, ListItemText, Avatar, Hidden, Divider,
-  IconButton, LinearProgress, styled, useMediaQuery, useTheme
+  Typography, Paper, List, ListItemButton, ListItemAvatar, ListItemText, Avatar, Divider,
+  IconButton, LinearProgress, styled, useMediaQuery, useTheme,
+  Box
 } from '@mui/material'
 import ArrowBack from '@mui/icons-material/ArrowBack'
 import { useLazyQuery, gql } from '@apollo/client'
@@ -53,7 +54,7 @@ const GET_SERVER_SETTINGS = gql`
 
 const Dashboard = (props: {
   data: { servers: ServerInfo[], user: Omit<DiscordUser, 'id'> }
-}): JSX.Element => {
+}): React.JSX.Element => {
   const largeDisplay = useMediaQuery(useTheme().breakpoints.up('lg'))
   const mobileDisplay = useMediaQuery(useTheme().breakpoints.down('xs'))
   const [selectedServer, setSelectedServer] = useState<ServerInfo | null>(null)
@@ -75,7 +76,7 @@ const Dashboard = (props: {
           </IconButton>
           {selectedServer.icon === 'no icon' ? '' : <Avatar src={selectedServer.icon} />}
           <Typography style={{ marginLeft: 10 }} variant='h6' component='h1'>
-            {nameOfServer} <Hidden mdDown>({selectedServer.id})</Hidden>
+            {nameOfServer} <Box sx={{ display: { xs: 'none', lg: 'block' } }}>({selectedServer.id})</Box>
           </Typography>
         </div>
         <Divider />
@@ -93,8 +94,8 @@ const Dashboard = (props: {
           let nameOfServer = element.name ? element.name : ''
           if (nameOfServer.length >= 32) nameOfServer = element.name.substring(0, 29) + '...'
           return (
-            <ListItem
-              disabled={!element.perms} divider button key={element.id}
+            <ListItemButton
+              disabled={!element.perms} divider key={element.id}
               onClick={() => {
                 getServerSettings({ variables: { id: element.id } }).catch(console.error)
                 setSelectedServer(element)
@@ -104,7 +105,7 @@ const Dashboard = (props: {
                 <ListItemAvatar><Avatar src={element.icon} /></ListItemAvatar>
               )}
               <ListItemText primary={nameOfServer} secondary={element.id} />
-            </ListItem>
+            </ListItemButton>
           )
         })}
       </List>

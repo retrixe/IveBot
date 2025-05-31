@@ -27,7 +27,7 @@ const GET_USER_DATA = gql`
   }
 `
 
-const DashboardPage = (props: { rootUrl: string }): JSX.Element => {
+const DashboardPage = (props: { rootUrl: string }): React.JSX.Element => {
   const { loading, error, data } = useQuery<{
     servers: ServerInfo[]
     user: Omit<DiscordUser, 'id'>

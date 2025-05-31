@@ -7,7 +7,7 @@ import theme from '../imports/theme'
 const ico = 'https://cdn.discordapp.com/avatars/383591525944262656/7b826edf3e6dcb47dbbb1131aaf72710.jpg'
 
 class MyDocument extends Document {
-  render (): JSX.Element {
+  render (): React.JSX.Element {
     return (
       <Html lang='en' dir='ltr'>
         <Head>
@@ -61,12 +61,12 @@ MyDocument.getInitialProps = async ctx => {
   // You can consider sharing the same emotion cache between all the SSR requests to speed up performance.
   // However, be aware that it can have global side effects.
   const cache = createCache({ key: 'css' })
-  const emotionServer = createEmotionServer(cache)
+  const emotionServer = createEmotionServer(cache as any)
 
   ctx.renderPage = async () =>
     await originalRenderPage({
       enhanceApp: (App: any) => {
-        const EnhancedApp = (props: any): JSX.Element => <App emotionCache={cache} {...props} />
+        const EnhancedApp = (props: any): React.JSX.Element => <App emotionCache={cache} {...props} />
         return EnhancedApp
       }
     })

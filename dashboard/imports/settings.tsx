@@ -25,7 +25,7 @@ const EDIT_SERVER_SETTINGS = gql`
   }
 `
 
-const Settings = (props: { data: ServerSettings, server: ServerInfo }): JSX.Element => {
+const Settings = (props: { data: ServerSettings, server: ServerInfo }): React.JSX.Element => {
   const [editServerSettings, { loading, error }] = useMutation(EDIT_SERVER_SETTINGS)
   const [serverSettings, setServerSettings] = useState<ServerSettings>({ ...props.data })
   const [originalServerSettings, setOriginalServerSettings] = useState<ServerSettings>({ ...props.data })

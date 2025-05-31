@@ -168,7 +168,7 @@ export default class CommandParser {
     return typeof messageToSend === 'object' ? messageToSend.error || false : false
   }
 
-  disableEveryone = (message: MessageContent): MessageContent => {
+  disableEveryone = (message: MessageContent<'hasNonce'>): MessageContent<'hasNonce'> => {
     if (typeof message !== 'string' && !message.allowedMentions) {
       message.allowedMentions = { everyone: false, roles: false, users: true }
       return message
