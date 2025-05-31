@@ -4,10 +4,11 @@ import createEmotionServer from '@emotion/server/create-instance'
 import createCache from '@emotion/cache'
 import theme from '../imports/theme'
 
-const ico = 'https://cdn.discordapp.com/avatars/383591525944262656/7b826edf3e6dcb47dbbb1131aaf72710.jpg'
+const ico =
+  'https://cdn.discordapp.com/avatars/383591525944262656/7b826edf3e6dcb47dbbb1131aaf72710.jpg'
 
 class MyDocument extends Document {
-  render (): React.JSX.Element {
+  render(): React.JSX.Element {
     return (
       <Html lang='en' dir='ltr'>
         <Head>
@@ -21,7 +22,7 @@ class MyDocument extends Document {
           <meta property='og:image' content={ico} />
           <link
             rel='stylesheet'
-            href='https://fonts.googleapis.com/css?family=Roboto:300,400,500'
+            href='https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=optional'
           />
         </Head>
         <body>
@@ -66,9 +67,11 @@ MyDocument.getInitialProps = async ctx => {
   ctx.renderPage = async () =>
     await originalRenderPage({
       enhanceApp: (App: any) => {
-        const EnhancedApp = (props: any): React.JSX.Element => <App emotionCache={cache} {...props} />
+        const EnhancedApp = (props: any): React.JSX.Element => (
+          <App emotionCache={cache} {...props} />
+        )
         return EnhancedApp
-      }
+      },
     })
 
   const initialProps = await Document.getInitialProps(ctx)
@@ -79,7 +82,6 @@ MyDocument.getInitialProps = async ctx => {
     <style
       data-emotion={`${style.key} ${style.ids.join(' ')}`}
       key={style.key}
-      // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: style.css }}
     />
   ))
@@ -87,7 +89,7 @@ MyDocument.getInitialProps = async ctx => {
   return {
     ...initialProps,
     // Styles fragment is rendered after the app and page rendering finish.
-    styles: [...React.Children.toArray(initialProps.styles), ...emotionStyleTags]
+    styles: [...React.Children.toArray(initialProps.styles), ...emotionStyleTags],
   }
 }
 

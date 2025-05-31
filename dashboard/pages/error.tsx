@@ -19,19 +19,25 @@ const ErrorPage = (props: { rootUrl: string }): React.JSX.Element => {
       </Head>
       <AppBar>
         <Toolbar>
-          <Typography variant='h6' color='inherit' style={{ flex: 1 }}>IveBot</Typography>
+          <Typography variant='h6' color='inherit' style={{ flex: 1 }}>
+            IveBot
+          </Typography>
           <Link style={{ textDecoration: 'none', color: 'inherit' }} href='/'>
             <Button color='inherit'>Home</Button>
           </Link>
         </Toolbar>
       </AppBar>
-      <br /><br /><br /><br />
+      <br />
+      <br />
+      <br />
+      <br />
       <div style={{ padding: 10 }}>
         <Typography color='error'>
           An error occurred while logging in:
           <br />
           {router.query.error}
-          <br /><br />
+          <br />
+          <br />
           <Link href='/'>Click here to go back to the home page.</Link>
         </Typography>
       </div>

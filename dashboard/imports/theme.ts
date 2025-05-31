@@ -6,8 +6,8 @@ const theme = createTheme({
   palette: {
     primary: blue,
     secondary: yellow,
-    mode: 'light'
-  }
+    mode: 'light',
+  },
 })
 
 export default theme

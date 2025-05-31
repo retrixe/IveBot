@@ -8,19 +8,19 @@ export const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__'
 
 let apolloClient: ApolloClient<InMemoryCache>
 
-function createApolloClient (): ApolloClient<NormalizedCacheObject> {
+function createApolloClient(): ApolloClient<NormalizedCacheObject> {
   return new ApolloClient({
     ssrMode: typeof window === 'undefined',
     link: new HttpLink({
       uri: config.rootUrl + '/api/graphql', // Server URL (must be absolute)
-      credentials: 'same-origin' // Additional fetch() options like `credentials` or `headers`
+      credentials: 'same-origin', // Additional fetch() options like `credentials` or `headers`
     }),
-    cache: new InMemoryCache()
+    cache: new InMemoryCache(),
   })
 }
 
-export function initializeApollo (
-  initialState: NormalizedCacheObject | null = null
+export function initializeApollo(
+  initialState: NormalizedCacheObject | null = null,
 ): ApolloClient<InMemoryCache> {
   const _apolloClient = apolloClient ?? createApolloClient()
 
@@ -35,10 +35,8 @@ export function initializeApollo (
       // combine arrays using object equality (like in sets)
       arrayMerge: (destinationArray, sourceArray) => [
         ...sourceArray,
-        ...destinationArray.filter((d) =>
-          sourceArray.every((s) => !isEqual(d, s))
-        )
-      ]
+        ...destinationArray.filter(d => sourceArray.every(s => !isEqual(d, s))),
+      ],
     })
 
     // Restore the cache with the merged data
@@ -52,8 +50,9 @@ export function initializeApollo (
   return _apolloClient
 }
 
-export function addApolloState (
-  client: ApolloClient<InMemoryCache>, pageProps: Record<string, any>
+export function addApolloState(
+  client: ApolloClient<InMemoryCache>,
+  pageProps: Record<string, any>,
 ): Record<string, any> {
   if (pageProps?.props) {
     pageProps.props[APOLLO_STATE_PROP_NAME] = client.cache.extract()
@@ -61,7 +60,7 @@ export function addApolloState (
   return pageProps
 }
 
-export function useApollo (pageProps: Record<string, any>): ApolloClient<InMemoryCache> {
+export function useApollo(pageProps: Record<string, any>): ApolloClient<InMemoryCache> {
   const state = pageProps[APOLLO_STATE_PROP_NAME]
   const store = useMemo(() => initializeApollo(state), [state])
   return store

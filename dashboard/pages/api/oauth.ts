@@ -4,13 +4,14 @@ import config from '../../config.json'
 const { rootUrl, clientId, clientSecret, jwtSecret } = config
 
 const scope = ['identify', 'guilds'].join(' ')
-const secure = rootUrl.startsWith('https') && process.env.NODE_ENV !== 'development' ? '; Secure' : ''
+const secure =
+  rootUrl.startsWith('https') && process.env.NODE_ENV !== 'development' ? '; Secure' : ''
 const REDIRECT_URI = `${rootUrl}/api/oauth`
 const OAUTH_QS = new URLSearchParams({
   client_id: clientId,
   redirect_uri: REDIRECT_URI,
   response_type: 'code',
-  scope
+  scope,
 }).toString()
 const OAUTH_URI = `https://discord.com/api/oauth2/authorize?${OAUTH_QS}`
 
@@ -19,7 +20,9 @@ export default async (req: NextApiRequest, res: NextApiResponse): Promise<NextAp
   const { code, error } = req.query
 
   if (error) {
-    return res.redirect(`/error?error=${req.query.error}`)
+    return res.redirect(
+      `/error?error=${encodeURIComponent(req.query.error?.toString() ?? 'Unknown error')}`,
+    )
   } else if (!code || typeof code !== 'string') {
     return res.redirect(OAUTH_URI)
   }
@@ -30,22 +33,27 @@ export default async (req: NextApiRequest, res: NextApiResponse): Promise<NextAp
     grant_type: 'authorization_code',
     redirect_uri: REDIRECT_URI,
     code,
-    scope
+    scope,
   }).toString()
 
   const {
     access_token: accessToken,
     refresh_token: refreshToken,
-    expires_in: expiresIn
+    expires_in: expiresIn,
   } = await fetch('https://discord.com/api/oauth2/token', {
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, method: 'POST', body
-  }).then(async (res) => await res.json())
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    method: 'POST',
+    body,
+  }).then(async res => await res.json())
 
   if (!accessToken || typeof accessToken !== 'string') {
     return res.redirect(OAUTH_URI)
   }
 
   const token = sign({ accessToken, refreshToken, scope }, jwtSecret, { expiresIn })
-  res.setHeader('Set-Cookie', `Discord-OAuth="${token}"; HttpOnly; Max-Age=2678400; SameSite=Lax${secure}`)
+  res.setHeader(
+    'Set-Cookie',
+    `Discord-OAuth="${token}"; HttpOnly; Max-Age=2678400; SameSite=Lax${secure}`,
+  )
   return res.redirect('/dashboard')
 }

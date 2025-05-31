@@ -1,6 +1,6 @@
 import React from 'react'
 import Head from 'next/head'
-import { type AppProps } from 'next/app'
+import type { AppProps } from 'next/app'
 import { ApolloProvider } from '@apollo/client'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
@@ -16,15 +16,13 @@ interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache
 }
 
-export default function MyApp (props: MyAppProps): React.JSX.Element {
+export default function MyApp(props: MyAppProps): React.JSX.Element {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
 
   React.useEffect(() => {
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector('#jss-server-side')
-    if (jssStyles) {
-      jssStyles?.parentElement?.removeChild(jssStyles)
-    }
+    jssStyles?.parentElement?.removeChild(jssStyles)
   }, [])
 
   return (

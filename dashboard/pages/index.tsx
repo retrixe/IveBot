@@ -1,7 +1,5 @@
 import React from 'react'
-import {
-  AppBar, Toolbar, Button, Typography, SvgIcon, IconButton
-} from '@mui/material'
+import { AppBar, Toolbar, Button, Typography, SvgIcon, IconButton } from '@mui/material'
 import Head from 'next/head'
 import Link from 'next/link'
 import { readFile } from 'fs/promises'
@@ -13,8 +11,8 @@ const GitHubLogo = (): React.JSX.Element => (
   </SvgIcon>
 )
 
-class Index extends React.Component<{ rootUrl: string, clientId: string }, unknown> {
-  render (): React.JSX.Element {
+class Index extends React.Component<{ rootUrl: string; clientId: string }, unknown> {
+  render(): React.JSX.Element {
     return (
       <div style={{ marginRight: 16, marginLeft: 16 }}>
         <Head>
@@ -25,21 +23,27 @@ class Index extends React.Component<{ rootUrl: string, clientId: string }, unkno
         </Head>
         <AppBar>
           <Toolbar>
-            <Typography variant='h6' color='inherit' style={{ flex: 1 }}>IveBot</Typography>
+            <Typography variant='h6' color='inherit' style={{ flex: 1 }}>
+              IveBot
+            </Typography>
             <a href='https://github.com/retrixe/IveBot' target='_blank' rel='noopener noreferrer'>
-              <IconButton color='default'><GitHubLogo /></IconButton>
+              <IconButton color='default'>
+                <GitHubLogo />
+              </IconButton>
             </a>
             <Link style={{ textDecoration: 'none', color: 'inherit' }} href='/dashboard'>
               <Button color='inherit'>Dashboard</Button>
             </Link>
           </Toolbar>
         </AppBar>
-        <br /><br /><br />
+        <br />
+        <br />
+        <br />
         <Button
-          href={
-          `https://discordapp.com/oauth2/authorize?client_id=${this.props.clientId}&scope=bot&permissions=8`
-        } fullWidth
-        >Add IveBot to your server
+          href={`https://discordapp.com/oauth2/authorize?client_id=${this.props.clientId}&scope=bot&permissions=8`}
+          fullWidth
+        >
+          Add IveBot to your server
         </Button>
         <hr />
         <Typography align='center' variant='h4'>
@@ -49,15 +53,16 @@ class Index extends React.Component<{ rootUrl: string, clientId: string }, unkno
           It is THE multipurpose Discord bot.
         </Typography>
         <hr />
-        <Typography>Intended as a Discord bot driven by the community,
-          IveBot is 100% open source and always will be.
+        <Typography>
+          Intended as a Discord bot driven by the community, IveBot is 100% open source and always
+          will be.
         </Typography>
-        <Typography>IveBot also provides an API for other bots to authenticate
-          and communicate with.
+        <Typography>
+          IveBot also provides an API for other bots to authenticate and communicate with.
         </Typography>
         <hr />
         <Typography>IveBot boasts fast ping and is highly scalable.</Typography>
-        <Typography>Also, {'it\'s'} just a pretty good bot that does everything you want.</Typography>
+        <Typography>Also, it's just a pretty good bot that does everything you want.</Typography>
       </div>
     )
   }

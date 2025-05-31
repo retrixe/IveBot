@@ -7,7 +7,7 @@ export interface ServerInfo extends ApolloBase {
   icon: string
   id: string
   name: string
-  channels: Array<{ name: string, id: string }>
+  channels: { name: string; id: string }[]
 }
 
 export interface DiscordUser extends ApolloBase {

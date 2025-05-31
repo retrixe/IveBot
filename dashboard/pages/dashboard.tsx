@@ -47,43 +47,47 @@ const DashboardPage = (props: { rootUrl: string }): React.JSX.Element => {
       <Head>
         <title>IveBot</title>
         <meta property='og:url' content={`${props.rootUrl}/dashboard`} />
-        <meta property='og:description' content={'IveBot\'s dashboard for managing settings.'} />
-        <meta name='Description' content={'IveBot\'s dashboard for managing settings.'} />
+        <meta property='og:description' content="IveBot's dashboard for managing settings." />
+        <meta name='Description' content="IveBot's dashboard for managing settings." />
       </Head>
       <AppBar>
         <Toolbar>
-          <Typography variant='h6' color='inherit' style={{ flex: 1 }}>IveBot</Typography>
+          <Typography variant='h6' color='inherit' style={{ flex: 1 }}>
+            IveBot
+          </Typography>
           <Link style={{ textDecoration: 'none', color: 'inherit' }} href='/'>
             <Button color='inherit'>Home</Button>
           </Link>
-          {loggedOut
-            ? <Button color='inherit' onClick={loginWithOauth}>Login</Button>
-            : <Button color='inherit' onClick={logout}>Logout</Button>}
+          {loggedOut ? (
+            <Button color='inherit' onClick={loginWithOauth}>
+              Login
+            </Button>
+          ) : (
+            <Button color='inherit' onClick={logout}>
+              Logout
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
-      <br /><br /><br />
+      <br />
+      <br />
+      <br />
       <div style={{ padding: 10 }}>
-        {loggedOut
-          ? (
-            <Typography align='center'>
-              Click the button in the top-right corner to login via Discord.
-            </Typography>
-            )
-          : (
-              error
-                ? (
-                  <Typography color='error'>
-                    Could not fetch data from the server! Refresh the page and try again.
-                    <br />
-                    {error.message}
-                  </Typography>
-                  )
-                : (
-                    loading || !data
-                      ? <LinearProgress color='secondary' variant='query' />
-                      : <Dashboard data={data} />
-                  )
-            )}
+        {loggedOut ? (
+          <Typography align='center'>
+            Click the button in the top-right corner to login via Discord.
+          </Typography>
+        ) : error ? (
+          <Typography color='error'>
+            Could not fetch data from the server! Refresh the page and try again.
+            <br />
+            {error.message}
+          </Typography>
+        ) : loading || !data ? (
+          <LinearProgress color='secondary' variant='query' />
+        ) : (
+          <Dashboard data={data} />
+        )}
       </div>
     </>
   )

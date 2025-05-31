@@ -11,7 +11,7 @@
   },
   "scripts": {
     "dev": "NODE_OPTIONS='--inspect' next",
-    "lint": "graphql-schema-linter && tsc",
+    "lint": "graphql-schema-linter && tsc && eslint .",
     "build": "next build",
     "start": "next start"
   },
@@ -35,12 +35,26 @@
   },
   "devDependencies": {
     "@babel/core": "^7.27.4",
+    "@eslint/js": "^9.28.0",
+    "@next/eslint-plugin-next": "^15.3.3",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/lodash": "^4.17.17",
     "@types/node": "^22.15.29",
     "@types/react": "^19.1.6",
+    "eslint": "^9.28.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-config-standard-jsx": "^11.0.0",
+    "eslint-config-standard-react": "^13.0.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-n": "^17.18.0",
+    "eslint-plugin-prettier": "^5.4.1",
+    "eslint-plugin-promise": "^7.2.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "graphql-schema-linter": "^3.0.1",
-    "typescript": "^5.8.3"
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.33.0"
   },
   "graphql-schema-linter": {
     "rules": [
