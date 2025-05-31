@@ -35,7 +35,7 @@ interface currenciesInfo {
 const countries = JSON.parse((await fs.promises.readFile('./src/data/countries.json', 'utf-8'))) as countriesInfo[]
 const currencies = JSON.parse((await fs.promises.readFile('./src/data/currencies.json', 'utf-8'))) as currenciesInfo[]
 
-function convertToSym(input: string): string {
+function convertToSym (input: string): string {
   // For countries alpha codes.
   if (input.length === 3) {
     const info = countries.find(elem => elem['alpha-3'] === input)

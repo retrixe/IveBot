@@ -11,7 +11,7 @@
   },
   "scripts": {
     "dev": "NODE_OPTIONS='--inspect' next",
-    "lint": "tsc",
+    "lint": "graphql-schema-linter && tsc",
     "build": "next build",
     "start": "next start"
   },
@@ -38,6 +38,32 @@
     "@types/jsonwebtoken": "^9.0.5",
     "@types/lodash": "^4.14.202",
     "@types/react": "^18.2.58",
+    "graphql-schema-linter": "^3.0.1",
     "typescript": "^5.3.3"
+  },
+  "graphql-schema-linter": {
+    "rules": [
+      "arguments-have-descriptions",
+      "defined-types-are-used",
+      "deprecations-have-a-reason",
+      "descriptions-are-capitalized",
+      "enum-values-all-caps",
+      "enum-values-have-descriptions",
+      "enum-values-sorted-alphabetically",
+      "fields-are-camel-cased",
+      "fields-have-descriptions",
+      "input-object-fields-sorted-alphabetically",
+      "input-object-values-are-camel-cased",
+      "input-object-values-have-descriptions",
+      "interface-fields-sorted-alphabetically",
+      "types-are-capitalized",
+      "types-have-descriptions"
+    ],
+    "disabledRules": [
+      "type-fields-sorted-alphabetically"
+    ],
+    "schemaPaths": [
+      "schema.graphql"
+    ]
   }
 }
