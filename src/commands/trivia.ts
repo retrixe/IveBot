@@ -1,20 +1,36 @@
-import type { Message, GuildTextableChannel, TextableChannel, User, EmbedOptions, Client } from '@projectdysnomia/dysnomia'
+import type {
+  Message,
+  GuildTextableChannel,
+  TextableChannel,
+  User,
+  EmbedOptions,
+  Client,
+} from '@projectdysnomia/dysnomia'
 import type { Command, DB } from '../imports/types.ts'
 import { getInsult } from '../imports/tools.ts'
 import fs from 'fs'
 
-async function parseTriviaList (fileName: string): Promise<Map<string, string[]>> {
+async function parseTriviaList(fileName: string): Promise<Map<string, string[]>> {
   const data = await fs.promises.readFile(`./src/data/triviaLists/${fileName}.txt`, 'utf8')
   const triviaList = new Map<string, string[]>()
   data.split('\n').forEach(el => {
-    const splitEl = el.split('`').map(ans => ans.trim()).filter(ans => !!ans)
+    const splitEl = el
+      .split('`')
+      .map(ans => ans.trim())
+      .filter(ans => !!ans)
     if (splitEl.length >= 2) triviaList.set(splitEl[0], splitEl.slice(1))
   })
   return triviaList
 }
 
 export class TriviaSession {
-  settings: { maxScore: number, timeout: number, timeLimit: number, botPlays: boolean, revealAnswer: boolean }
+  settings: {
+    maxScore: number
+    timeout: number
+    timeLimit: number
+    botPlays: boolean
+    revealAnswer: boolean
+  }
   currentQuestion: [string, string[]]
   channel: TextableChannel
   author: User
@@ -28,7 +44,16 @@ export class TriviaSession {
   tempDB: DB
   client: Client
 
-  constructor (triviaList: Map<string, string[]>, message: Message, botPlays: boolean, timeLimit: number, maxScore: number, revealAnswer: boolean, tempDB: DB, client: Client) {
+  constructor(
+    triviaList: Map<string, string[]>,
+    message: Message,
+    botPlays: boolean,
+    timeLimit: number,
+    maxScore: number,
+    revealAnswer: boolean,
+    tempDB: DB,
+    client: Client,
+  ) {
     this.channel = message.channel
     this.author = message.author
     this.message = message
@@ -38,7 +63,7 @@ export class TriviaSession {
     this.client = client
   }
 
-  getScores (addMedals = false): { embeds: EmbedOptions[] } {
+  getScores(addMedals = false): { embeds: EmbedOptions[] } {
     const currentScores = Object.entries(this.scores).sort(([, a], [, b]) => b - a)
     const medals: Record<string, string> = {}
     if (addMedals) {
@@ -48,11 +73,14 @@ export class TriviaSession {
       const second = values.filter(num => num !== first).reduce(maxReduce, 0)
       const third = values.filter(num => num !== first && num !== second).reduce(maxReduce, 0)
       currentScores.forEach(([id, b]) => {
-        medals[id] = first && b === first
-          ? '🥇 '
-          : second && b === second
-            ? '🥈 '
-            : third && b === third ? '🥉 ' : ''
+        medals[id] =
+          first && b === first
+            ? '🥇 '
+            : second && b === second
+              ? '🥈 '
+              : third && b === third
+                ? '🥉 '
+                : ''
       })
     }
     const member = this.message.member.guild.members.get(this.client.user.id)
@@ -68,19 +96,19 @@ export class TriviaSession {
       fields: currentScores.map(player => ({
         name: (medals[player[0]] || '') + this.message.member.guild.members.get(player[0]).username,
         value: player[1].toString(),
-        inline: true
-      }))
+        inline: true,
+      })),
     }
     return { embeds: [embed] }
   }
 
-  async endGame (): Promise<void> {
+  async endGame(): Promise<void> {
     this.stopped = true
     delete this.tempDB.trivia[this.channel.id]
     if (Object.keys(this.scores).length > 0) await this.channel.createMessage(this.getScores(true))
   }
 
-  async newQuestion (): Promise<boolean> {
+  async newQuestion(): Promise<boolean> {
     for (const i of Object.values(this.scores)) {
       if (i === this.settings.maxScore) {
         await this.endGame()
@@ -97,7 +125,7 @@ export class TriviaSession {
     this.timer = Date.now()
     await this.channel.createMessage(`**Question number ${this.count}!**\n\n${this.currentQuestion[0]}`)
 
-    while (this.currentQuestion !== null && (Date.now() - this.timer) <= this.settings.timeLimit) {
+    while (this.currentQuestion !== null && Date.now() - this.timer <= this.settings.timeLimit) {
       if (Date.now() - this.timeout >= this.settings.timeout) {
         await this.channel.createMessage(`If you ${getInsult(true)} aren't going to play then I might as well stop.`)
         await this.endGame()
@@ -106,7 +134,7 @@ export class TriviaSession {
       await new Promise(resolve => setTimeout(resolve, 1000)) // Wait for answer or timeout
     }
 
-    const revealMessages = ['I know this: ', 'Easy: ', 'Of course, it\'s: ']
+    const revealMessages = ['I know this: ', 'Easy: ', "Of course, it's: "]
     const failMessages = ['You suck at this', 'That was trivial, really', 'Moving on...']
 
     if (this.currentQuestion === null) {
@@ -117,7 +145,9 @@ export class TriviaSession {
     } else {
       let message: string
       if (this.settings.revealAnswer) {
-        message = revealMessages[Math.floor(Math.random() * revealMessages.length)] + this.currentQuestion[1][0]
+        message =
+          revealMessages[Math.floor(Math.random() * revealMessages.length)] +
+          this.currentQuestion[1][0]
       } else {
         message = failMessages[Math.floor(Math.random() * failMessages.length)]
       }
@@ -137,7 +167,7 @@ export class TriviaSession {
     }
   }
 
-  async checkAnswer (message: Message): Promise<boolean> {
+  async checkAnswer(message: Message): Promise<boolean> {
     if (message.author.bot || this.currentQuestion === null) {
       return false
     }
@@ -148,14 +178,16 @@ export class TriviaSession {
     for (const rawAnswer of this.currentQuestion[1]) {
       const answer = rawAnswer.toLowerCase()
       const guess = message.content.toLowerCase()
-      if (!answer.includes(' ')) { // Strict answer checking for one word answers
+      if (!answer.includes(' ')) {
+        // Strict answer checking for one word answers
         const guessWords = guess.split(' ')
         for (const guessWord of guessWords) {
           if (guessWord === answer) {
             hasGuessed = true
           }
         }
-      } else if (guess.includes(answer)) { // The answer has spaces, checking isn't as strict
+      } else if (guess.includes(answer)) {
+        // The answer has spaces, checking isn't as strict
         hasGuessed = true
       }
     }
@@ -183,7 +215,7 @@ export const handleTrivia: Command = {
 **To view available topics:** /trivia list`,
     example: '/trivia greekmyth botplays revealanswer=false timelimit=5 pointstowin=10',
     guildOnly: true,
-    argsRequired: true
+    argsRequired: true,
   },
   generator: async (message, args, { tempDB, client }) => {
     let botPlays = false
@@ -191,7 +223,9 @@ export const handleTrivia: Command = {
     let maxScore = 30
     let revealAnswer = true
 
-    const botPlaysFlag = args.find(element => element.startsWith('botplays=') || element === 'botplays')
+    const botPlaysFlag = args.find(
+      element => element.startsWith('botplays=') || element === 'botplays',
+    )
     if (botPlaysFlag) {
       if (botPlaysFlag.split('=')[1] === 'true' || botPlaysFlag === 'botplays') {
         botPlays = true
@@ -209,7 +243,9 @@ export const handleTrivia: Command = {
       if (+maxScoreFlag[1] > 0) maxScore = +maxScoreFlag[1]
       else return 'Invalid usage. `pointstowin` must be a number greater than 0.'
     }
-    const revealAnswerFlag = args.find(element => element.startsWith('revealanswer=') || element === 'revealanswer')
+    const revealAnswerFlag = args.find(
+      element => element.startsWith('revealanswer=') || element === 'revealanswer',
+    )
     if (revealAnswerFlag) {
       if (revealAnswerFlag.split('=')[1] === 'false') {
         revealAnswer = false
@@ -235,13 +271,18 @@ export const handleTrivia: Command = {
         : 0
       return {
         content: '❔ **Available trivia topics:**',
-        embeds: [{ color, description: lists.map(name => `**${name.replace('.txt', '')}**`).join(', ') }]
+        embeds: [
+          { color, description: lists.map(name => `**${name.replace('.txt', '')}**`).join(', ') },
+        ],
       }
     } else if (args.length === 1 && (args[0] === 'stop' || args[0] === 'end')) {
       const session = tempDB.trivia[message.channel.id]
       const channel = message.channel as GuildTextableChannel
       if (session) {
-        if (message.author === session.author || channel.permissionsOf(message.author.id).has('manageMessages')) {
+        if (
+          message.author === session.author ||
+          channel.permissionsOf(message.author.id).has('manageMessages')
+        ) {
           await session.endGame()
           return 'Trivia stopped.'
         } else {
@@ -257,14 +298,23 @@ export const handleTrivia: Command = {
         try {
           triviaList = await parseTriviaList(args[0])
         } catch (err) {
-          return 'That trivia list doesn\'t exist.'
+          return "That trivia list doesn't exist."
         }
-        const t = new TriviaSession(triviaList, message, botPlays, timeLimit, maxScore, revealAnswer, tempDB, client)
+        const t = new TriviaSession(
+          triviaList,
+          message,
+          botPlays,
+          timeLimit,
+          maxScore,
+          revealAnswer,
+          tempDB,
+          client,
+        )
         tempDB.trivia[message.channel.id] = t
         await t.newQuestion()
       } else {
         return 'A trivia session is already ongoing in this channel.'
       }
     }
-  }
+  },
 }

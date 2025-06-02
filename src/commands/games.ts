@@ -1,8 +1,12 @@
 import { Constants } from '@projectdysnomia/dysnomia'
-import type { InteractionDataOptionsInteger, InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
+import type {
+  InteractionDataOptionsInteger,
+  InteractionDataOptionsString,
+} from '@projectdysnomia/dysnomia'
 import type { Command } from '../imports/types.ts'
 
 // Zalgo characters.
+// prettier-ignore
 const characters = [
   // upper characters
   '\u030d', '\u030e', '\u0304', '\u0305', '\u033f', '\u0311', '\u0306', '\u0310', '\u0352',
@@ -31,12 +35,15 @@ export const handleChoose: Command = {
     fullDescription: 'Choose between multiple options.',
     example: '/choose cake|ice cream|pasta',
     usage: '/choose <option 1>|(option 2)|(option 3)...',
-    options: [{
-      name: 'choices',
-      description: 'The choices to choose from. Each option should be separated like: item1|item2',
-      required: true,
-      type: Constants.ApplicationCommandOptionTypes.STRING
-    }]
+    options: [
+      {
+        name: 'choices',
+        description:
+          'The choices to choose from. Each option should be separated like: item1|item2',
+        required: true,
+        type: Constants.ApplicationCommandOptionTypes.STRING,
+      },
+    ],
   },
   slashGenerator: interaction => {
     const choices = (interaction.data.options[0] as InteractionDataOptionsString).value.split('|')
@@ -44,10 +51,11 @@ export const handleChoose: Command = {
   },
   generator: (message, args) => {
     // Is it used correctly?
-    if (message.content.split('|').length === 1) return { content: 'Correct usage: /choose item1|item2|...', error: true }
+    if (message.content.split('|').length === 1)
+      return { content: 'Correct usage: /choose item1|item2|...', error: true }
     const choices = args.join(' ').split('|')
     return `I choose: ${choices[Math.floor(Math.random() * choices.length)]}`
-  }
+  },
 }
 
 export const handleReverse: Command = {
@@ -58,16 +66,21 @@ export const handleReverse: Command = {
     fullDescription: 'Reverse a sentence.',
     example: '/reverse hello',
     usage: '/reverse <text>',
-    options: [{
-      name: 'text',
-      description: 'The text to reverse.',
-      required: true,
-      type: Constants.ApplicationCommandOptionTypes.STRING
-    }]
+    options: [
+      {
+        name: 'text',
+        description: 'The text to reverse.',
+        required: true,
+        type: Constants.ApplicationCommandOptionTypes.STRING,
+      },
+    ],
   },
-  slashGenerator: interaction => (interaction.data.options[0] as InteractionDataOptionsString).value
-    .split('').reverse().join(''),
-  generator: (message, args) => args.join(' ').split('').reverse().join('')
+  slashGenerator: interaction =>
+    (interaction.data.options[0] as InteractionDataOptionsString).value
+      .split('')
+      .reverse()
+      .join(''),
+  generator: (message, args) => args.join(' ').split('').reverse().join(''),
 }
 
 export const handle8ball: Command = {
@@ -78,47 +91,59 @@ export const handle8ball: Command = {
     usage: '/8ball <question>',
     example: '/8ball Will I flunk my exam?',
     invalidUsageMessage: 'Please ask the 8ball a question.',
-    options: [{
-      name: 'question',
-      description: 'The question you wish to ask the 8ball.',
-      required: true,
-      type: Constants.ApplicationCommandOptionTypes.STRING
-    }]
+    options: [
+      {
+        name: 'question',
+        description: 'The question you wish to ask the 8ball.',
+        required: true,
+        type: Constants.ApplicationCommandOptionTypes.STRING,
+      },
+    ],
   },
   slashGenerator: true,
   generator: () => {
     // Possible responses, taken from Diary Of A Wimpy Kid: Hard Luck.
     const responses = [
-      'It is certain.', 'It is decidedly so.', 'Better not tell you now.',
-      'My sources say no.', 'Without a doubt.', 'Concentrate and ask again.',
-      'My reply is no.', 'No.', 'Yes, definitely.',
-      'Ask again later.', 'Reply hazy, try again later.'
+      'It is certain.',
+      'It is decidedly so.',
+      'Better not tell you now.',
+      'My sources say no.',
+      'Without a doubt.',
+      'Concentrate and ask again.',
+      'My reply is no.',
+      'No.',
+      'Yes, definitely.',
+      'Ask again later.',
+      'Reply hazy, try again later.',
     ]
     // Respond.
     return `The 🎱 has spoken.
 8ball: ${responses[Math.floor(Math.random() * responses.length)]}`
-  }
+  },
 }
 
 export const handleZalgo: Command = {
   name: 'zalgo',
   aliases: ['zgo'],
   opts: {
-    description: 'The zalgo demon\'s writing.',
-    fullDescription: 'The zalgo demon\'s handwriting.',
+    description: "The zalgo demon's writing.",
+    fullDescription: "The zalgo demon's handwriting.",
     usage: '/zalgo <text>',
     example: '/zalgo sup',
-    options: [{
-      name: 'text',
-      description: 'The text to convert into the zalgo demon\'s handwriting.',
-      required: true,
-      type: Constants.ApplicationCommandOptionTypes.STRING
-    }]
+    options: [
+      {
+        name: 'text',
+        description: "The text to convert into the zalgo demon's handwriting.",
+        required: true,
+        type: Constants.ApplicationCommandOptionTypes.STRING,
+      },
+    ],
   },
   generator: async (message, args) => await handleZalgo.commonGenerator(args.join(' ')),
-  slashGenerator: async interaction => await handleZalgo.commonGenerator(
-    (interaction.data.options[0] as InteractionDataOptionsString).value
-  ),
+  slashGenerator: async interaction =>
+    await handleZalgo.commonGenerator(
+      (interaction.data.options[0] as InteractionDataOptionsString).value,
+    ),
   commonGenerator: (text: string) => {
     const textToZalgo = text.split('')
     let newMessage = ''
@@ -129,27 +154,30 @@ export const handleZalgo: Command = {
       }
     })
     return newMessage.length >= 2000 ? text : newMessage
-  }
+  },
 }
 
 export const handleDezalgo: Command = {
   name: 'dezalgo',
   aliases: ['dzgo'],
   opts: {
-    description: 'The zalgo demon\'s writing.',
-    fullDescription: 'Read the zalgo demon\'s writing.',
+    description: "The zalgo demon's writing.",
+    fullDescription: "Read the zalgo demon's writing.",
     usage: '/dezalgo <text>',
     example: '/dezalgo ḥ̛̓e̖l̽͞҉lͦͅoͥ',
-    options: [{
-      name: 'text',
-      description: 'The zalgo demon\'s handwriting to be converted to regular text.',
-      required: true,
-      type: Constants.ApplicationCommandOptionTypes.STRING
-    }]
+    options: [
+      {
+        name: 'text',
+        description: "The zalgo demon's handwriting to be converted to regular text.",
+        required: true,
+        type: Constants.ApplicationCommandOptionTypes.STRING,
+      },
+    ],
   },
-  slashGenerator: async interaction => await handleDezalgo.commonGenerator(
-    (interaction.data.options[0] as InteractionDataOptionsString).value
-  ),
+  slashGenerator: async interaction =>
+    await handleDezalgo.commonGenerator(
+      (interaction.data.options[0] as InteractionDataOptionsString).value,
+    ),
   generator: async (message, args) => await handleDezalgo.commonGenerator(args.join(' ')),
   commonGenerator: (text: string) => {
     let newMessage = ''
@@ -157,7 +185,7 @@ export const handleDezalgo: Command = {
       if (!characters.includes(element)) newMessage += element
     })
     return newMessage
-  }
+  },
 }
 
 export const handleRepeat: Command = {
@@ -168,17 +196,20 @@ export const handleRepeat: Command = {
     fullDescription: 'Repeat a string.',
     usage: '/repeat <number of times> <string to repeat>',
     example: '/repeat 10 a',
-    options: [{
-      name: 'number',
-      description: 'The number of times to repeat the text.',
-      required: true,
-      type: Constants.ApplicationCommandOptionTypes.INTEGER
-    }, {
-      name: 'text',
-      description: 'The text to repeat as many times as you want.',
-      required: true,
-      type: Constants.ApplicationCommandOptionTypes.STRING
-    }]
+    options: [
+      {
+        name: 'number',
+        description: 'The number of times to repeat the text.',
+        required: true,
+        type: Constants.ApplicationCommandOptionTypes.INTEGER,
+      },
+      {
+        name: 'text',
+        description: 'The text to repeat as many times as you want.',
+        required: true,
+        type: Constants.ApplicationCommandOptionTypes.STRING,
+      },
+    ],
   },
   slashGenerator: async interaction => {
     const number = (interaction.data.options.find(opt => opt.name === 'number') as
@@ -200,9 +231,11 @@ export const handleRepeat: Command = {
       return { content: 'This is known to lag users and is disabled.', error: true }
     }
     let generatedMessage = ''
-    for (let x = 0; x < number; x++) { generatedMessage += text }
+    for (let x = 0; x < number; x++) {
+      generatedMessage += text
+    }
     return generatedMessage
-  }
+  },
 }
 
 export const handleRandom: Command = {
@@ -214,17 +247,20 @@ export const handleRandom: Command = {
     usage: '/random (starting number) (ending number)',
     example: '/random 1 69',
     argsRequired: false,
-    options: [{
-      name: 'start',
-      description: 'The number which the random number should be higher than or equal to.',
-      required: false,
-      type: Constants.ApplicationCommandOptionTypes.INTEGER
-    }, {
-      name: 'end',
-      description: 'The number which the random number should be lower than.',
-      required: false,
-      type: Constants.ApplicationCommandOptionTypes.INTEGER
-    }]
+    options: [
+      {
+        name: 'start',
+        description: 'The number which the random number should be higher than or equal to.',
+        required: false,
+        type: Constants.ApplicationCommandOptionTypes.INTEGER,
+      },
+      {
+        name: 'end',
+        description: 'The number which the random number should be lower than.',
+        required: false,
+        type: Constants.ApplicationCommandOptionTypes.INTEGER,
+      },
+    ],
   },
   slashGenerator: interaction => {
     const start = (interaction.data.options.find(option => option.name === 'start') as
@@ -253,7 +289,7 @@ export const handleRandom: Command = {
       return { content: 'Correct usage: /random (optional start number) (optional end number)', error: true }
     }
     return `The number.. is.. ${Math.floor(Math.random() * 10)}`
-  }
+  },
 }
 
 export const handleDistort: Command = {
@@ -263,18 +299,20 @@ export const handleDistort: Command = {
     fullDescription: 'Pretty distorted text.',
     usage: '/distort <text>',
     example: '/distort lol',
-    options: [{
-      name: 'text',
-      description: 'The text to be distorted.',
-      required: true,
-      type: Constants.ApplicationCommandOptionTypes.STRING
-    }]
+    options: [
+      {
+        name: 'text',
+        description: 'The text to be distorted.',
+        required: true,
+        type: Constants.ApplicationCommandOptionTypes.STRING,
+      },
+    ],
   },
-  slashGenerator: interaction => (interaction.data.options[0] as InteractionDataOptionsString).value
-    .split(' ')
-    .map((i: string) => (i.split('').join('*') + (i.length % 2 === 0 ? '*' : '')))
-    .join(' '),
-  generator: (message, args) => args.map(i => (
-    i.split('').join('*') + (i.length % 2 === 0 ? '*' : '')
-  )).join(' ')
+  slashGenerator: interaction =>
+    (interaction.data.options[0] as InteractionDataOptionsString).value
+      .split(' ')
+      .map((i: string) => i.split('').join('*') + (i.length % 2 === 0 ? '*' : ''))
+      .join(' '),
+  generator: (message, args) =>
+    args.map(i => i.split('').join('*') + (i.length % 2 === 0 ? '*' : '')).join(' '),
 }

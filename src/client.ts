@@ -1,10 +1,21 @@
-import type { Message, MessageContent, Client, GuildTextableChannel } from '@projectdysnomia/dysnomia'
-import type { DB, Command as IveBotCommand, IveBotCommandGenerator, Context, CommandResponse } from './imports/types.ts'
+import type {
+  Message,
+  MessageContent,
+  Client,
+  GuildTextableChannel,
+} from '@projectdysnomia/dysnomia'
+import type {
+  DB,
+  Command as IveBotCommand,
+  IveBotCommandGenerator,
+  Context,
+  CommandResponse,
+} from './imports/types.ts'
 import type { Db } from 'mongodb'
 import { getInsult } from './imports/tools.ts'
 import botCallback from './events.ts'
 
-function isEquivalent (a: Record<string, boolean>, b: Record<string, boolean>): boolean {
+function isEquivalent(a: Record<string, boolean>, b: Record<string, boolean>): boolean {
   // Create arrays of property names
   const aProps = Object.getOwnPropertyNames(a)
   const bProps = Object.getOwnPropertyNames(b)
@@ -46,7 +57,7 @@ export class Command {
     roleIDs?: string[]
   }
 
-  constructor (command: IveBotCommand) {
+  constructor(command: IveBotCommand) {
     // Key functions.
     this.name = command.name
     this.aliases = command.aliases
@@ -58,7 +69,8 @@ export class Command {
     this.invalidUsageMessage = command.opts.invalidUsageMessage || defaultUsageMessage
     this.errorMessage = command.opts.errorMessage || 'IveBot has experienced an internal error.'
     // No impl for next.
-    this.caseInsensitive = command.opts.caseInsensitive === undefined || command.opts.caseInsensitive
+    this.caseInsensitive =
+      command.opts.caseInsensitive === undefined || command.opts.caseInsensitive
     this.deleteCommand = command.opts.deleteCommand || false
     this.guildOnly = command.opts.guildOnly || false
     this.dmOnly = command.opts.dmOnly || false
@@ -74,7 +86,7 @@ export class Command {
     // No reaction implementation.
   }
 
-  requirementsCheck (message: Message): boolean {
+  requirementsCheck(message: Message): boolean {
     if (!this.requirements) return true
     // No role name or ID impl.
     const userIDs = this.requirements.userIDs // If it doesn't exist it's a pass.
@@ -110,9 +122,9 @@ export default class CommandParser {
   tempDB: DB
   db: Db
   evaluatedMessages: string[]
-  analytics: Record<string, { totalUse: number, averageExecTime: number[] }>
+  analytics: Record<string, { totalUse: number; averageExecTime: number[] }>
 
-  constructor (client: Client, tempDB: DB, db: Db) {
+  constructor(client: Client, tempDB: DB, db: Db) {
     this.commands = {}
     this.client = client
     this.tempDB = tempDB
@@ -121,26 +133,35 @@ export default class CommandParser {
     this.evaluatedMessages = []
     this.onMessage = this.onMessage.bind(this)
     this.onMessageUpdate = this.onMessageUpdate.bind(this)
-    setInterval(() => { this.sendAnalytics().catch(console.error) }, 30000)
+    setInterval(() => {
+      this.sendAnalytics().catch(console.error)
+    }, 30000)
   }
 
   registerCommand = (command: IveBotCommand): void => {
     this.commands[command.name] = new Command(command)
   }
 
-  async executeCommand (command: Command, message: Message): Promise<boolean> {
+  async executeCommand(command: Command, message: Message): Promise<boolean> {
     // We give our generators what they need.
     const context: Context = {
-      tempDB: this.tempDB, db: this.db, commandParser: this, client: this.client
+      tempDB: this.tempDB,
+      db: this.db,
+      commandParser: this,
+      client: this.client,
     }
-    const args = message.content.trim().split(' ').filter(i => i).slice(1)
+    const args = message.content
+      .trim()
+      .split(' ')
+      .filter(i => i)
+      .slice(1)
     // Guild and DM only.
     if (command.guildOnly && message.channel.type !== 0) return false
     else if (command.dmOnly && message.channel.type !== 1) return false
     // Check for permissions.
     else if (!command.requirementsCheck(message)) {
       await message.channel.createMessage(
-        `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
+        `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`,
       )
       return false
       // We check for arguments.
@@ -175,7 +196,7 @@ export default class CommandParser {
     } else return message
   }
 
-  saveAnalytics (timeTaken: [number, number], name: string): void {
+  saveAnalytics(timeTaken: [number, number], name: string): void {
     // Get the local command info.
     let commandInfo = this.analytics[name]
     // If there is no info for the command then insert an object for it.
@@ -192,7 +213,7 @@ export default class CommandParser {
     this.analytics[name].averageExecTime = averageExecTime
   }
 
-  async sendAnalytics (): Promise<void> {
+  async sendAnalytics(): Promise<void> {
     const analytics = this.db.collection('analytics')
     // Iterate over every command we have information stored locally.
     for (const commandName in this.analytics) {
@@ -220,19 +241,22 @@ export default class CommandParser {
     }
   }
 
-  async onMessage (message: Message): Promise<void> {
+  async onMessage(message: Message): Promise<void> {
     if (message.content && !message.content.startsWith('/')) {
       await botCallback(message, this.client, this.tempDB, this.db)
       return // Don't process it if it's not a command.
     }
     const commandExec = message.content.split(' ')[0].substr(1).toLowerCase()
     // Webhook and bot protection.
-    try { if (message.author.bot) return } catch (e) { return }
+    try {
+      if (message.author.bot) return
+    } catch (e) {
+      return
+    }
     // Check for the command in this.commands.
     const keys = Object.keys(this.commands)
     for (const key of keys) {
-      if (commandExec === key.toLowerCase() ||
-        this.commands[key].aliases?.includes(commandExec)) {
+      if (commandExec === key.toLowerCase() || this.commands[key].aliases?.includes(commandExec)) {
         // Execute command.
         try {
           const executeFirst = process.hrtime() // Initial high-precision time.
@@ -258,7 +282,7 @@ export default class CommandParser {
   }
 
   // For evaluating messages which weren't evaluated.
-  async onMessageUpdate (message: Message, oldMessage?: Message): Promise<void> {
+  async onMessageUpdate(message: Message, oldMessage?: Message): Promise<void> {
     // We won't bother with a lot of messages..
     if (message.content && !message.content.startsWith('/')) return
     else if (!message.editedTimestamp) return
@@ -268,12 +292,15 @@ export default class CommandParser {
     // Proceed to evaluate.
     const commandExec = message.content.split(' ')[0].substr(1).toLowerCase()
     // Webhook and bot protection.
-    try { if (message.author.bot) return } catch (e) { return }
+    try {
+      if (message.author.bot) return
+    } catch (e) {
+      return
+    }
     // Check for the command in this.commands.
     const keys = Object.keys(this.commands)
     for (const key of keys) {
-      if (commandExec === key.toLowerCase() ||
-        this.commands[key].aliases?.includes(commandExec)) {
+      if (commandExec === key.toLowerCase() || this.commands[key].aliases?.includes(commandExec)) {
         // Execute command.
         try {
           const executeFirst = process.hrtime() // Initial high precision time.

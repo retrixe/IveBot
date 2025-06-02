@@ -1,4 +1,8 @@
-import { Constants, type InteractionDataOptionsString, type TextChannel } from '@projectdysnomia/dysnomia'
+import {
+  Constants,
+  type InteractionDataOptionsString,
+  type TextChannel,
+} from '@projectdysnomia/dysnomia'
 import type { Command } from '../imports/types.ts'
 import { openaiAPIkey } from '../config.ts'
 
@@ -15,18 +19,24 @@ export const handleAi: Command = {
         name: 'query',
         description: 'The query to ask the AI.',
         type: Constants.ApplicationCommandOptionTypes.STRING,
-        required: true
-      }
-    ]
+        required: true,
+      },
+    ],
   },
-  generator: async (message, args) => await handleAi.commonGenerator(
-    args.join(' '), message.author.id, (message.channel as TextChannel).guild?.id, message.id),
+  generator: async (message, args) =>
+    await handleAi.commonGenerator(
+      args.join(' '),
+      message.author.id,
+      (message.channel as TextChannel).guild?.id,
+      message.id,
+    ),
   slashGenerator: async interaction => {
     await interaction.defer()
     return await handleAi.commonGenerator(
       (interaction.data.options[0] as InteractionDataOptionsString).value,
       interaction.user?.id,
-      (interaction.channel as TextChannel).guild?.id)
+      (interaction.channel as TextChannel).guild?.id,
+    )
   },
   commonGenerator: async (query: string, userID: string, guildID?: string, reply?: string) => {
     // TODO: This should be configurable.
@@ -54,23 +64,23 @@ export const handleAi: Command = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${openaiAPIkey}`
+        Authorization: `Bearer ${openaiAPIkey}`,
       },
       body: JSON.stringify({
         model,
         prompt: query,
         max_tokens: 400,
         temperature,
-        user: userID
-      })
+        user: userID,
+      }),
     })
-    const response = await request.json() as { choices: Array<{ text: string }> }
+    const response = (await request.json()) as { choices: Array<{ text: string }> }
     if (response.choices.length === 0) {
       return 'OpenAI servers returned no response (likely rate-limited). Try again later?'
     }
     return {
       content: response.choices[0].text.trim(),
-      messageReference: reply ? { messageID: reply } : undefined
+      messageReference: reply ? { messageID: reply } : undefined,
     }
-  }
+  },
 }

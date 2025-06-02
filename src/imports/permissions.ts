@@ -2,8 +2,10 @@
 import type { Member } from '@projectdysnomia/dysnomia'
 
 // Export function.
-export function checkRolePosition (
-  member: Member, considerOwnership = true, considerMutedRole = true
+export function checkRolePosition(
+  member: Member,
+  considerOwnership = true,
+  considerMutedRole = true,
 ): number {
   // If owner, return.
   if (member.guild.ownerID === member.id && considerOwnership) return 9999
@@ -16,9 +18,7 @@ export function checkRolePosition (
   for (const roleId of rolesOfUser) {
     const role = rolesInServer.get(roleId)
     if (role && role.position > highestRolePosition) {
-      if (
-        !considerMutedRole && role.name === 'Muted'
-      ) continue
+      if (!considerMutedRole && role.name === 'Muted') continue
       highestRolePosition = role.position
     }
   }

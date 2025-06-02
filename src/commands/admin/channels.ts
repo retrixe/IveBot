@@ -10,7 +10,7 @@ export const handleDeletechannel: Command = {
     usage: '/deletechannel <channel by ID/mention/name> (reason)',
     example: '/deletechannel ok Accidentally made.',
     guildOnly: true,
-    requirements: { permissions: { manageChannels: true } }
+    requirements: { permissions: { manageChannels: true } },
   },
   generator: async (message, args, { client }) => {
     // Get the channel ID.
@@ -18,29 +18,32 @@ export const handleDeletechannel: Command = {
     if (!channel) return { content: `Specify a valid channel, you ${getInsult()}!`, error: true }
     // If no permission to manage channels, say it.
     if (!message.member.guild.members.get(client.user.id).permissions.has('manageChannels')) {
-      return { content: 'I can\'t even delete that channel, you ' + getInsult() + '.', error: true }
+      return { content: "I can't even delete that channel, you " + getInsult() + '.', error: true }
     }
     // Delete it.
     try {
       await channel.delete(args.join(' '))
-    } catch (e) { return 'I was unable to delete that channel >_<' }
+    } catch (e) {
+      return 'I was unable to delete that channel >_<'
+    }
     // Confirm the delete.
     return `Channel \`${channel.name}\` deleted.`
-  }
+  },
 }
 
 export const handleEditchannel: Command = {
   name: 'editChannel',
   aliases: ['ec'],
   opts: {
-    description: 'Edit a channel\'s settings.',
-    fullDescription: 'Edit a channel\'s settings with ease.',
-    usage: '/editchannel <channel by ID/mention/name> (name-<channel name>) ' +
-    '(topic-<channel topic>) (nsfw-<true/false>) (bitrate-<8 to 96 kbps>) ' +
-    '(userLimit-<0 to 99>) (rateLimitPerUser-<0 to 120>)',
+    description: "Edit a channel's settings.",
+    fullDescription: "Edit a channel's settings with ease.",
+    usage:
+      '/editchannel <channel by ID/mention/name> (name-<channel name>) ' +
+      '(topic-<channel topic>) (nsfw-<true/false>) (bitrate-<8 to 96 kbps>) ' +
+      '(userLimit-<0 to 99>) (rateLimitPerUser-<0 to 120>)',
     example: '/ec general topic-All topics allowed here.',
     guildOnly: true,
-    requirements: { permissions: { manageChannels: true } }
+    requirements: { permissions: { manageChannels: true } },
   },
   generator: async (message, args, { client }) => {
     // Get the channel ID.
@@ -48,15 +51,13 @@ export const handleEditchannel: Command = {
     if (!channel) return { content: `Specify a valid channel, you ${getInsult()}!`, error: true }
     // If no permission to manage channel, say it.
     if (!channel.permissionsOf(client.user.id).has('manageChannels')) {
-      return { content: 'I can\'t edit that channel, you ' + getInsult() + '.', error: true }
+      return { content: "I can't edit that channel, you " + getInsult() + '.', error: true }
     }
     // Get the operations.
     const ops: string[] = args.join(' ').split('|')
     // Now iterate over each operation and execute them.
-    const operationTypes = [
-      'name', 'topic', 'rateLimitPerUser', 'nsfw', 'bitrate', 'userLimit'
-    ]
-    const failedOps: Array<{ name: string, value: string }> = []
+    const operationTypes = ['name', 'topic', 'rateLimitPerUser', 'nsfw', 'bitrate', 'userLimit']
+    const failedOps: Array<{ name: string; value: string }> = []
     for (const operation of ops) {
       const opArr = operation.split('-')
       const name = opArr.shift()
@@ -90,15 +91,17 @@ export const handleEditchannel: Command = {
           else if (name === 'nsfw') await channel.edit({ nsfw: value === 'true' })
           else if (name === 'bitrate') await channel.edit({ bitrate: +value * 1000 })
           else if (name === 'userLimit') await channel.edit({ userLimit: +value })
-        } catch (e) { failedOps.push({ name: `❌ ${operation}`, value: e.toString() }) }
+        } catch (e) {
+          failedOps.push({ name: `❌ ${operation}`, value: e.toString() })
+        }
       }
     }
     if (failedOps.length > 0) {
       return {
         content: 'Some operations failed to execute..',
-        embeds: [{ color: 0x696969, fields: failedOps }]
+        embeds: [{ color: 0x696969, fields: failedOps }],
       }
     }
     return '✅ All operations executed successfully \\o/'
-  }
+  },
 }

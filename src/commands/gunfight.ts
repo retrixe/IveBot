@@ -7,11 +7,11 @@ export const handleGunfight: Command = {
   name: 'gunfight',
   aliases: ['gfi'],
   opts: {
-    description: 'For that good ol\' fight bro.',
+    description: "For that good ol' fight bro.",
     fullDescription: 'Challenge someone to a gunfight showdown.',
     usage: '/gunfight <user>',
     example: '/gunfight @voldemort#6931',
-    guildOnly: true
+    guildOnly: true,
   },
   generator: (message, args, { client, tempDB }) => {
     // Get challenged user.
@@ -20,10 +20,14 @@ export const handleGunfight: Command = {
     if (!user) {
       return { content: 'Specify a valid user to challenge >_>', error: true }
       // It should not be a challenge to self.
-    } else if (user.id === message.author.id) return { content: 'You cannot challenge yourself :P', error: true }
+    } else if (user.id === message.author.id)
+      return { content: 'You cannot challenge yourself :P', error: true }
     // It should not be a challenge to bot itself.
     else if (user.id === client.user.id) {
-      return { content: 'Aw, how sweet. But I don\'t play with pathetic fools who try to fool me :>', error: true }
+      return {
+        content: "Aw, how sweet. But I don't play with pathetic fools who try to fool me :>",
+        error: true,
+      }
       // It should not be a challenge to a bot.
     } else if (user.bot) return { content: 'Noob, that person is a bot.', error: true }
 

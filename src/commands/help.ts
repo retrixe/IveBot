@@ -3,14 +3,19 @@ import type { Command as IveBotCommand } from '../imports/types.ts'
 import type { Command } from '../client.ts'
 import type CommandParser from '../client.ts'
 import { rootURL } from '../config.ts'
-import { type Client, Constants, type InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
+import {
+  type Client,
+  Constants,
+  type InteractionDataOptionsString,
+} from '@projectdysnomia/dysnomia'
 
 const generalHelp = {
   description: `**Jony Ive can do many commands 📡**
 \`/halp\` and \`/help\` - The most innovative help.`,
   fields: [
     {
-      name: '**Games.**', value: `
+      name: '**Games.**',
+      value: `
 \`/gunfight\` - For that good ol' fight bro.
 \`/random\` - Return a random number.
 \`/randomword\` - Returns a random word.
@@ -19,9 +24,11 @@ const generalHelp = {
 \`/trivia\` - Start a trivia game on a topic of your choice.
 \`/8ball\` - Random answers to random questions.
 \`/repeat\` - Repeat a string.
-\`/distort\` - Pretty distorted text.`
-    }, {
-      name: '**Random searches.**', value: `
+\`/distort\` - Pretty distorted text.`.trimStart(),
+    },
+    {
+      name: '**Random searches.**',
+      value: `
 \`/urban\` - Get an Urban Dictionary definition ;)
 \`/cat\` and \`/dog\` - Random cats and dogs from <https://random.cat> and <https://dog.ceo>
 \`/robohash\` - Take some text, make it a robot/monster/head/cat.
@@ -31,9 +38,11 @@ const generalHelp = {
 \`/currency\` - Currency conversion (\`/help currency\`)
 \`/xkcd\` - Get the latest or a random xkcd comic.
 \`/httpcat\` - Cats for HTTP status codes.
-\`/google\` - Let me Google that for you.`
-    }, {
-      name: '**Utilities.**', value: `
+\`/google\` - Let me Google that for you.`.trimStart(),
+    },
+    {
+      name: '**Utilities.**',
+      value: `
 TP \`/request\` - Request a specific feature.
 \`/token\` - Links your Discord to IveBot Web (use in DM only)
 \`/weather\` - It's really cloudy here..
@@ -53,9 +62,11 @@ TP \`/request\` - Request a specific feature.
 \`/hastebin\` - Upload a file to hasteb.in to view on phone.
 \`/calculate\` - Calculate an expression.
 \`/temperature\` - Convert between temperature units.
-\`/suppressEmbed\` - Suppress or unsuppress embeds in a message.`
-    }, {
-      name: '**Administrative commands.**', value: `
+\`/suppressEmbed\` - Suppress or unsuppress embeds in a message.`.trimStart(),
+    },
+    {
+      name: '**Administrative commands.**',
+      value: `
 \`/ban\`, \`/unban\`, \`/kick\`, \`/mute\` and \`/unmute\`
 \`/addEmoji\`, \`/deleteEmoji\` and \`/editEmoji\`
 \`/deleteChannel\` and \`/editChannel\`
@@ -63,22 +74,28 @@ TP \`/request\` - Request a specific feature.
 \`/changevoiceregion\` and \`/listvoiceregions\`
 \`/perms\` - Displays a particular member's permissions.
 \`/purge\` - Bulk delete a set of messages.
-\`/slowmode\` - When you must slow down chat.`
-    }, {
+\`/slowmode\` - When you must slow down chat.`.trimStart(),
+    },
+    {
       name: zeroWidthSpace,
       value: `**There are some easter egg auto responses.**
-**Commands with TP are test pilot only.**`
-    }
-  ]
+**Commands with TP are test pilot only.**`,
+    },
+  ],
 }
 
 const generateDocs = (command: Command): string => {
   let requirements = ''
   if (command.requirements) {
     const permissions = command.requirements.permissions
-      ? `Needs the permissions: ${Object.keys(command.requirements.permissions).map(perm => (
-        perm.substr(0, 1).toUpperCase() + perm.substr(1)
-      ).replace(/[A-Z]+/g, s => ' ' + s).trim()).join(', ').replace('TTSMessages', 'TTS Messages')} | `
+      ? `Needs the permissions: ${Object.keys(command.requirements.permissions)
+          .map(perm =>
+            (perm.substr(0, 1).toUpperCase() + perm.substr(1))
+              .replace(/[A-Z]+/g, s => ' ' + s)
+              .trim(),
+          )
+          .join(', ')
+          .replace('TTSMessages', 'TTS Messages')} | `
       : ''
     const roleNames = command.requirements.roleNames
       ? `Needs the roles: ${command.requirements.roleNames.join(', ')} | `
@@ -88,12 +105,14 @@ const generateDocs = (command: Command): string => {
     const custom = command.requirements.custom
       ? '\n**Requirements:** Has some unknown permission checks | '
       : ''
-    requirements = custom || (permissions || roleIDs || roleNames || userIDs
-      ? `\n**Requirements:** ${custom}${permissions}${roleIDs}${roleNames}${userIDs}`
-      : '')
+    requirements =
+      custom ||
+      (permissions || roleIDs || roleNames || userIDs
+        ? `\n**Requirements:** ${custom}${permissions}${roleIDs}${roleNames}${userIDs}`
+        : '')
   }
 
-  if (command.aliases && (command.aliases.length > 0)) {
+  if (command.aliases && command.aliases.length > 0) {
     return `
 **Usage:** ${command.usage}
 **Aliases:** ${command.aliases.map(i => '/' + i).join(', ')}
@@ -119,32 +138,36 @@ export const handleHelp: IveBotCommand = {
     usage: '/help (command name)',
     example: '/help zalgo',
     argsRequired: false,
-    options: [{ // TODO: Should this response be ephemeral?
-      name: 'command',
-      description: 'Name of the command to get help on.',
-      type: Constants.ApplicationCommandOptionTypes.STRING,
-      required: false
-    }]
+    options: [
+      {
+        // TODO: Should this response be ephemeral?
+        name: 'command',
+        description: 'Name of the command to get help on.',
+        type: Constants.ApplicationCommandOptionTypes.STRING,
+        required: false,
+      },
+    ],
   },
-  slashGenerator: async ({ user, data: { options } }, { client, commandParser }) => (
+  slashGenerator: async ({ user, data: { options } }, { client, commandParser }) =>
     await handleHelp.commonGenerator(
       user.id,
       (options[0] as InteractionDataOptionsString)?.value ?? '',
       client,
-      commandParser
-    )
-  ),
-  generator: async (message, args, { client, commandParser }) => (
-    await handleHelp.commonGenerator(message.author.id, args.join(' '), client, commandParser)
-  ),
-  commonGenerator: async (author: string, command: string, client: Client, parser: CommandParser) => {
+      commandParser,
+    ),
+  generator: async (message, args, { client, commandParser }) =>
+    await handleHelp.commonGenerator(message.author.id, args.join(' '), client, commandParser),
+  commonGenerator: async (
+    author: string,
+    command: string,
+    client: Client,
+    parser: CommandParser,
+  ) => {
     const commands = parser.commands
     command = command.replace(/\//g, '').toLowerCase()
-    const check = (name: string): boolean => !!(
+    const check = (name: string): boolean =>
       // First checks for name, 2nd for aliases.
-      commands[name].name.toLowerCase() === command ||
-      commands[name].aliases?.includes(command)
-    )
+      commands[name].name.toLowerCase() === command || commands[name].aliases?.includes(command)
     // Check if requested for a specific command.
     const commandName = Object.keys(commands).find(check)
     if (commandName) {
@@ -158,17 +181,19 @@ export const handleHelp: IveBotCommand = {
       await channel.createMessage({
         content: `**IveBot's dashboard**: ${rootURL || 'https://ivebot.now.sh'}/
 (Manage Server required to manage a server)`,
-        embeds: [{
-          color: 0x00AE86,
-          // type: 'rich',
-          title: 'Help',
-          ...generalHelp,
-          footer: { text: 'For help on a specific command or aliases, run /help <command>.' }
-        }]
+        embeds: [
+          {
+            color: 0x00ae86,
+            // type: 'rich',
+            title: 'Help',
+            ...generalHelp,
+            footer: { text: 'For help on a specific command or aliases, run /help <command>.' },
+          },
+        ],
       })
       return 'newbie, help has been direct messaged to you ✅'
     } catch {
       return { content: `I cannot DM you the help for newbies, you ${getInsult()} ❌`, error: true }
     }
-  }
+  },
 }

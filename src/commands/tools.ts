@@ -7,7 +7,10 @@ import { inspect } from 'util'
 import { getIdFromMention, getInsult } from '../imports/tools.ts'
 import { Base, Constants, type InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
 import { readFile } from 'fs/promises'
-const { version }: { version: string } = JSON.parse(await readFile('package.json', { encoding: 'utf8' }))
+
+const { version }: { version: string } = JSON.parse(
+  await readFile('package.json', { encoding: 'utf8' }),
+)
 
 export const handleVersion: Command = {
   name: 'version',
@@ -17,9 +20,9 @@ export const handleVersion: Command = {
     fullDescription: 'Current running version of IveBot.',
     usage: '/version',
     example: '/version',
-    argsRequired: false
+    argsRequired: false,
   },
-  generator: `**IveBot ${version}**`
+  generator: `**IveBot ${version}**`,
 }
 
 export const handleAbout: Command = {
@@ -29,16 +32,16 @@ export const handleAbout: Command = {
     fullDescription: 'About IveBot.',
     usage: '/about',
     example: '/about',
-    argsRequired: false
+    argsRequired: false,
   },
   generator: `**IveBot ${version}**
 IveBot is a Discord bot written with Dysnomia (Eris continuation) and care.
 Unlike most other dumb bots, IveBot was not written with discord.js and has 0% copied code.
 Built with community feedback mainly, IveBot does a lot of random stuff and fun.
-IveBot 4.0 is planned to revamp the dashboard, make the code a lot more maintainable and use intents.
+IveBot 4.0 made a lot of changes under the hood and added support for new Discord features.
 For information on what IveBot can do, type **/help** or **/halp**.
 The source code can be found here: <https://github.com/retrixe/IveBot>
-For noobs, this bot is licensed and protected by law. Copy code and I will sue you for a KitKat.`
+For noobs, this bot is licensed and protected by law. Copy code and I will sue you for a KitKat.`,
 }
 
 export const handleUptime: Command = {
@@ -48,7 +51,7 @@ export const handleUptime: Command = {
     fullDescription: 'How long was IveBot on?',
     usage: '/uptime',
     example: '/uptime',
-    argsRequired: false
+    argsRequired: false,
   },
   slashGenerator: true,
   generator: () => {
@@ -59,7 +62,7 @@ export const handleUptime: Command = {
     } else if (d.hours()) return `${d.hours()} hours ${d.minutes()} minutes ${d.seconds()} seconds`
     else if (d.minutes()) return `${d.minutes()} minutes ${d.seconds()} seconds`
     return `${d.seconds()} seconds`
-  }
+  },
 }
 
 export const handleRemoteexec: Command = {
@@ -70,8 +73,8 @@ export const handleRemoteexec: Command = {
     usage: '/remoteexec <command>',
     example: '/remoteexec killall node',
     requirements: {
-      userIDs: [host]
-    }
+      userIDs: [host],
+    },
   },
   generator: (message, args) => {
     try {
@@ -79,24 +82,26 @@ export const handleRemoteexec: Command = {
     } catch (e) {
       return e.toString()
     }
-  }
+  },
 }
 
 export const handlePing: Command = {
   name: 'ping',
   opts: {
-    description: 'IveBot\'s latency.',
-    fullDescription: 'Latency of IveBot\'s connection to your server.',
+    description: "IveBot's latency.",
+    fullDescription: "Latency of IveBot's connection to your server.",
     usage: '/ping',
     example: '/ping',
-    argsRequired: false
+    argsRequired: false,
   },
   generator: async (message, args) => {
     // Special stuff.
     if (args.length === 1 && testPilots.includes(message.author.id)) {
       try {
         return execSync('ping -c 1 ' + args[0], { encoding: 'utf8' }).split('\n')[1]
-      } catch (e) { return { content: 'Looks like pinging the website failed.', error: true } }
+      } catch (e) {
+        return { content: 'Looks like pinging the website failed.', error: true }
+      }
     }
     // Get the time before sending the message.
     const startTime = Date.now()
@@ -110,7 +115,7 @@ export const handlePing: Command = {
     const e = l < 200 ? `latency of **${l}ms** 🚅🔃` : `latency of **${l}ms** 🔃`
     // Edit the message with the latency.
     await sent.edit(`Aha! IveBot ${version} is connected to your server with a ${e}`)
-  }
+  },
 }
 
 export const handleEval: Command = {
@@ -119,8 +124,8 @@ export const handleEval: Command = {
     description: 'Runs JavaScript. Owner only.',
     fullDescription: 'Runs JavaScript. Owner only.',
     usage: '/eval <code in codeblock or not>',
-    example: '/eval ```js\nconsole.log(\'ji\')\n```',
-    requirements: { userIDs: [host] }
+    example: "/eval ```js\nconsole.log('ji')\n```",
+    requirements: { userIDs: [host] },
   },
   generator: async (message, args, { client, tempDB, db, commandParser }) => {
     try {
@@ -142,7 +147,7 @@ export const handleEval: Command = {
       message.addReaction('❌').catch(() => {}) // Ignore error.
       await channel.createMessage(`**Error:**\n${e}`)
     }
-  }
+  },
 }
 
 export const handleSafeeval: Command = {
@@ -155,8 +160,8 @@ Available variables: content
 Available functions:
 getContent/getCleanContent(messageID), createMessage(content), getReactions(messageID)`,
     usage: '/safeEval <code in codeblock or not>',
-    example: '/safeEval ```js\ncreateMessage(\'You sent: \' + content)\n```',
-    requirements: { userIDs: testPilots }
+    example: "/safeEval ```js\ncreateMessage('You sent: ' + content)\n```",
+    requirements: { userIDs: testPilots },
   },
   generator: async (message, args, context) => {
     try {
@@ -174,7 +179,7 @@ getContent/getCleanContent(messageID), createMessage(content), getReactions(mess
         content: message.content,
         getContent: async (id: string) => (await message.channel.getMessage(id)).content,
         getCleanContent: async (id: string) => (await message.channel.getMessage(id)).cleanContent,
-        getReactions: async (id: string) => (await message.channel.getMessage(id)).reactions
+        getReactions: async (id: string) => (await message.channel.getMessage(id)).reactions,
       })
       const res = inspect(await Promise.resolve(result), false, 0)
       message.addReaction('✅').catch(() => {}) // Ignore error.
@@ -184,7 +189,7 @@ getContent/getCleanContent(messageID), createMessage(content), getReactions(mess
       message.addReaction('❌').catch(() => {}) // Ignore error.
       return { content: `**Error:**\n${e}`, error: true }
     }
-  }
+  },
 }
 
 export const handleCreationtime: Command = {
@@ -195,16 +200,22 @@ export const handleCreationtime: Command = {
     fullDescription: 'Finds out when a Snowflake (e.g. user ID) was created.',
     usage: '/creationtime <ID or mention>',
     example: '/creationtime 383591525944262656',
-    options: [{
-      name: 'entities',
-      description: 'The users, channels, roles and/or Discord IDs to get the creation time of.',
-      required: true,
-      type: Constants.ApplicationCommandOptionTypes.STRING
-    }]
+    options: [
+      {
+        name: 'entities',
+        description: 'The users, channels, roles and/or Discord IDs to get the creation time of.',
+        required: true,
+        type: Constants.ApplicationCommandOptionTypes.STRING,
+      },
+    ],
   },
-  slashGenerator: async ({ data: { options } }) => await handleCreationtime.commonGenerator(
-    (options[0] as InteractionDataOptionsString).value.trim().split(' ').filter(arg => !!arg)
-  ),
+  slashGenerator: async ({ data: { options } }) =>
+    await handleCreationtime.commonGenerator(
+      (options[0] as InteractionDataOptionsString).value
+        .trim()
+        .split(' ')
+        .filter(arg => !!arg),
+    ),
   generator: async (message, args) => await handleCreationtime.commonGenerator(args),
   commonGenerator: (args: string[]) => {
     if (args.length === 1) {
@@ -230,5 +241,5 @@ export const handleCreationtime: Command = {
         allowedMentions: { users: false, roles: false, everyone: false }
       }
     }
-  }
+  },
 }

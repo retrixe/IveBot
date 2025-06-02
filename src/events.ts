@@ -1,6 +1,13 @@
 // We need types.
 import type { DB } from './imports/types.ts'
-import type { Member, Message, Client, User, Guild, GuildTextableChannel } from '@projectdysnomia/dysnomia'
+import type {
+  Member,
+  Message,
+  Client,
+  User,
+  Guild,
+  GuildTextableChannel,
+} from '@projectdysnomia/dysnomia'
 import type { Db } from 'mongodb'
 
 // Database reading function.
@@ -81,11 +88,11 @@ export const guildBanAdd = (client: Client, db: Db) => async (guild: Guild, user
   // We send a message.
   try {
     const toSend = banMessage
-      .split('{un}').join(user.username) // Replace the username.
-      .split('{m}').join(user.mention) // Replace the mention.
-      .split('{d}').join(user.discriminator) // Replace the discriminator.
+      .replaceAll('{un}', user.username) // Replace the username.
+      .replaceAll('{m}', user.mention) // Replace the mention.
+      .replaceAll('{d}', user.discriminator) // Replace the discriminator.
     await client.createMessage(channel, toSend)
-  } catch (e) { }
+  } catch (e) {}
 }
 
 // When the bot leaves a server, this function will be called.
@@ -97,13 +104,13 @@ export const guildDelete = (db: Db) => async (guild: Guild) => {
 // When client recieves a message, it will callback.
 export default async (message: Message, client: Client, tempDB: DB, db: Db): Promise<void> => {
   try {
-    if ( // If there are no permissions do not do anything.
-      !(message.channel as GuildTextableChannel)
-        .permissionsOf(client.user.id).has('sendMessages')
-    ) return
+    // If there are no permissions do not do anything.
+    const selfChannelPerms = (message.channel as GuildTextableChannel).permissionsOf(client.user.id)
+    if (!selfChannelPerms.has('sendMessages')) return
   } catch (e) {}
   // Content of message and sendResponse.
-  const sendResponse = async (content: string): Promise<Message> => await message.channel.createMessage(content)
+  const sendResponse = async (content: string): Promise<Message> =>
+    await message.channel.createMessage(content)
   const command = message.content.toLowerCase()
   // Handle answers to trivia
   const session = tempDB.trivia[message.channel.id]
@@ -111,19 +118,19 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db): Pro
     await session.checkAnswer(message)
   }
   // Auto responses and easter eggs.
-  if (command.startsWith('is dot a good boy')) await sendResponse('Shame on you. He\'s undefined.')
-  else if (command.startsWith('iphone x')) await sendResponse('You don\'t deserve it. 😎')
-  else if (command.startsWith('iphone 11')) await sendResponse('You don\'t deserve it. 😎')
-  else if (command.startsWith('iphone 12')) await sendResponse('You don\'t deserve it. 😎')
-  else if (command.startsWith('iphone 13')) await sendResponse('You don\'t deserve it. 😎')
+  if (command.startsWith('is dot a good boy')) await sendResponse("Shame on you. He's undefined.")
+  else if (command.startsWith('iphone x')) await sendResponse("You don't deserve it. 😎")
+  else if (command.startsWith('iphone 11')) await sendResponse("You don't deserve it. 😎")
+  else if (command.startsWith('iphone 12')) await sendResponse("You don't deserve it. 😎")
+  else if (command.startsWith('iphone 13')) await sendResponse("You don't deserve it. 😎")
   else if (command.startsWith('iphone se')) await sendResponse('lol peasant')
   else if (command.startsWith('triggered')) await sendResponse('Ah, pathetic people again.')
   else if (command.startsWith('ayy')) await sendResponse('lmao')
   // Handle answers to gunfight.
   else if (['fire', 'water', 'gun', 'dot'].includes(command)) {
-    const key = Object.keys(tempDB.gunfight).find(i => (
-      i.split('-')[0] === message.author.id || i.split('-')[1] === message.author.id
-    ))
+    const key = Object.keys(tempDB.gunfight).find(
+      i => i.split('-')[0] === message.author.id || i.split('-')[1] === message.author.id,
+    )
     if (!key) return
     const gunfight = tempDB.gunfight[key]
     if (!gunfight || !gunfight.wordSaid || gunfight.randomWord !== command) return
@@ -139,21 +146,24 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db): Pro
   if (attachment && serverSettings.ocrOnSend) {
     // Get the image and convert it to Base64.
     try {
-      const image = Buffer.from(await (await fetch(attachment.url)).arrayBuffer()).toString('base64')
+      const req = await fetch(attachment.url)
+      const image = Buffer.from(await req.arrayBuffer()).toString('base64')
       // Now send the request.
       const res = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${cvAPIkey}`, {
         body: JSON.stringify({
-          requests: [{ image: { content: image }, features: [{ type: 'TEXT_DETECTION' }] }]
+          requests: [{ image: { content: image }, features: [{ type: 'TEXT_DETECTION' }] }],
         }),
-        method: 'POST'
+        method: 'POST',
       })
       // Parse the response.
-      const result = await res.json() as { responses: Array<{ fullTextAnnotation: { text: string } }> }
+      const result = (await res.json()) as {
+        responses: Array<{ fullTextAnnotation: { text: string } }>
+      }
       // If no text was found.
       if (!result.responses[0].fullTextAnnotation) return
       // Return our answer.
       await message.channel.createMessage({
-        content: `**Text recognition result:**\n${result.responses[0].fullTextAnnotation.text}`
+        content: `**Text recognition result:**\n${result.responses[0].fullTextAnnotation.text}`,
       })
     } catch (e) {}
   }

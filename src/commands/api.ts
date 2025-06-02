@@ -10,12 +10,12 @@ import { NASAtoken, fixerAPIkey, weatherAPIkey, oxfordAPI, cvAPIkey } from '../c
 import fs from 'fs'
 
 interface countriesInfo {
-  'name': string
+  name: string
   'alpha-2': string
   'alpha-3': string
   'country-code': number
   'iso_3166-2': string
-  'region': string
+  region: string
   'sub-region': string
   'intermediate-region': string
   'region-code': number
@@ -23,18 +23,22 @@ interface countriesInfo {
   'intermediate-region-code': number
 }
 interface currenciesInfo {
-  'AlphabeticCode': string
-  'Currency': string
-  'Entity': string
-  'MinorUnit': number
-  'NumericCode': number
-  'WithdrawalDate': null
+  AlphabeticCode: string
+  Currency: string
+  Entity: string
+  MinorUnit: number
+  NumericCode: number
+  WithdrawalDate: null
 }
 
-const countries = JSON.parse((await fs.promises.readFile('./src/data/countries.json', 'utf-8'))) as countriesInfo[]
-const currencies = JSON.parse((await fs.promises.readFile('./src/data/currencies.json', 'utf-8'))) as currenciesInfo[]
+const countries = JSON.parse(
+  await fs.promises.readFile('./src/data/countries.json', 'utf-8'),
+) as countriesInfo[]
+const currencies = JSON.parse(
+  await fs.promises.readFile('./src/data/currencies.json', 'utf-8'),
+) as currenciesInfo[]
 
-function convertToSym (input: string): string {
+function convertToSym(input: string): string {
   // For countries alpha codes.
   if (input.length === 3) {
     const info = countries.find(elem => elem['alpha-3'] === input)
@@ -56,7 +60,7 @@ export const handleOcr: Command = {
     fullDescription: 'Get text from an image. Powered by Google Cloud Vision.',
     example: '/ocr <with uploaded image>',
     usage: '/ocr (--hastebin) <link to image/uploaded image/reply to an image>',
-    argsRequired: false
+    argsRequired: false,
   },
   generator: async (message, args, { client }) => {
     // To hasteb.in or not to hasteb.in.
@@ -77,7 +81,8 @@ export const handleOcr: Command = {
           : mess.attachments?.find(attachment => !!attachment)?.url
       } else {
         // Check if a message link was passed.
-        const regex = /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
+        const regex =
+          /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
         if (regex.test(url)) {
           const split = url.split('/')
           const mess = await client.getMessage(split[split.length - 2], split.pop())
@@ -103,7 +108,8 @@ export const handleOcr: Command = {
       // Parse the response.
       const result = await res.json() as { responses: Array<{ fullTextAnnotation: { text: string } }> }
       // If no text was found.
-      if (!result.responses[0].fullTextAnnotation) return 'I was unable to get any results for the image.'
+      if (!result.responses[0].fullTextAnnotation)
+        return 'I was unable to get any results for the image.'
       // If the result is too long, upload it to paste.gg.
       const text = result.responses[0].fullTextAnnotation.text
       let hastebin = ''
@@ -156,7 +162,7 @@ export const handleHastebin: Command = {
     fullDescription: 'Upload a file to paste.gg to view on phone',
     example: '/hastebin <with uploaded text file>',
     usage: '/hastebin <link to text file/uploaded text file>',
-    argsRequired: false
+    argsRequired: false,
   },
   generator: async (message, args, { client }) => {
     try {
@@ -178,21 +184,25 @@ export const handleHastebin: Command = {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           name: 'IveBot paste.gg upload',
-          files: [{
-            name: message.attachments?.find(attachment => !!attachment)?.filename ?? 'pastefile1',
-            content: { format: 'text', value: text.toString('utf8') }
-          }]
-        })
+          files: [
+            {
+              name: message.attachments?.find(attachment => !!attachment)?.filename ?? 'pastefile1',
+              content: { format: 'text', value: text.toString('utf8') },
+            },
+          ],
+        }),
       })
       if (!req.ok) return 'Failed to upload text to paste.gg!'
       // Parse the response.
-      const res = await req.json() as { result: { id: string, deletion_key: string } }
+      const res = (await req.json()) as { result: { id: string; deletion_key: string } }
       const { id, deletion_key: deletionKey } = res.result
       return id
         ? `**paste.gg URL:**\nhttps://paste.gg/p/anonymous/${id}\nDeletion key: ${deletionKey}`
         : 'Failed to upload text to paste.gg!'
-    } catch (e) { return `Invalid text file, you ${getInsult()}.` }
-  }
+    } catch (e) {
+      return `Invalid text file, you ${getInsult()}.`
+    }
+  },
 }
 
 export const handleCat: Command = {
@@ -202,7 +212,7 @@ export const handleCat: Command = {
     fullDescription: 'Random cat from <https://random.cat>',
     usage: '/cat',
     example: '/cat',
-    argsRequired: false
+    argsRequired: false,
   },
   slashGenerator: true,
   generator: async () => {
@@ -214,7 +224,7 @@ export const handleCat: Command = {
     } catch (e) {
       return `Something went wrong 👾 Error: ${e}`
     }
-  }
+  },
 }
 
 export const handleRobohash: Command = {
@@ -224,7 +234,7 @@ export const handleRobohash: Command = {
     description: 'Take some text, make it a robot/monster/head/cat/human.',
     fullDescription: 'Takes some text and hashes it in the form of an image :P',
     usage: '/robohash <cat/robot/monster/head/human> <text to hash>',
-    example: '/robohash cat voldemort#6931'
+    example: '/robohash cat voldemort#6931',
   },
   generator: (message, args) => {
     // Get text to hash.
@@ -234,28 +244,34 @@ export const handleRobohash: Command = {
     const color = 0xcf1c1c
     if (target === 'robot') {
       return {
-        embeds: [{ image: { url: `https://robohash.org/${text}.png` }, color }], content: '🤖'
+        embeds: [{ image: { url: `https://robohash.org/${text}.png` }, color }],
+        content: '🤖',
       }
     } else if (target === 'monster') {
       return {
-        embeds: [{ image: { url: `https://robohash.org/${text}.png?set=set2` }, color }], content: '👾'
+        embeds: [{ image: { url: `https://robohash.org/${text}.png?set=set2` }, color }],
+        content: '👾',
       }
     } else if (target === 'head') {
       return {
-        embeds: [{ image: { url: `https://robohash.org/${text}.png?set=set3` }, color }]
+        embeds: [{ image: { url: `https://robohash.org/${text}.png?set=set3` }, color }],
       }
     } else if (target === 'cat') {
       return {
-        embeds: [{ image: { url: `https://robohash.org/${text}.png?set=set4` }, color }]
+        embeds: [{ image: { url: `https://robohash.org/${text}.png?set=set4` }, color }],
       }
     } else if (target === 'human') {
       return {
-        embeds: [{ image: { url: `https://robohash.org/${text}.png?set=set5` }, color }], content: '🤔'
+        embeds: [{ image: { url: `https://robohash.org/${text}.png?set=set5` }, color }],
+        content: '🤔',
       }
     } else {
-      return { content: 'Correct usage: /robohash <robot, monster, head, cat, human> <text to robohash>', error: true }
+      return {
+        content: 'Correct usage: /robohash <robot, monster, head, cat, human> <text to robohash>',
+        error: true,
+      }
     }
-  }
+  },
 }
 
 interface ApodResponse {
@@ -274,7 +290,7 @@ export const handleApod: Command = {
     fullDescription: 'The astronomy picture of the day. Truly beautiful. Usually.',
     usage: '/astronomy-picture-of-the-day (date)',
     example: '/astronomy-picture-of-the-day 2nd March 2017',
-    argsRequired: false
+    argsRequired: false,
   },
   generator: async (message, args) => {
     // Check for date.
@@ -293,9 +309,11 @@ export const handleApod: Command = {
           ? `**${title}**\n${explanation}\n${url.split('embed/').join('watch?v=')}`
           : {
               content: `**${title}**\n${explanation}`,
-              embeds: [{ image: { url }, color: 0x2361BE }]
+              embeds: [{ image: { url }, color: 0x2361be }],
             }
-      } catch (err) { return `Something went wrong 👾 Error: ${err}` }
+      } catch (err) {
+        return `Something went wrong 👾 Error: ${err}`
+      }
     } else if (args.length > 0) {
       return { content: 'Invalid date.', error: true }
     }
@@ -308,10 +326,12 @@ export const handleApod: Command = {
         ? `**${title}**\n${explanation}\n${url.split('embed/').join('watch?v=')}`
         : {
             content: `**${title}**\n${explanation}`,
-            embeds: [{ image: { url: hdurl }, color: 0x2361BE }]
+            embeds: [{ image: { url: hdurl }, color: 0x2361be }],
           }
-    } catch (err) { return `Something went wrong 👾 Error: ${err}` }
-  }
+    } catch (err) {
+      return `Something went wrong 👾 Error: ${err}`
+    }
+  },
 }
 
 export const handleDog: Command = {
@@ -321,22 +341,28 @@ export const handleDog: Command = {
     fullDescription: 'Random dog from <https://dog.ceo>',
     usage: '/dog (list) (breed, works with random image AND list) (sub-breed ONLY without list)',
     example: '/dog list | /dog labrador | /dog',
-    argsRequired: false
+    argsRequired: false,
   },
   generator: async (message, args) => {
     // List of breeds.
     if (args[0] === 'list') {
       try {
-        const { message } = await (await fetch('https://dog.ceo/api/breeds/list/all')).json() as {
+        const { message } = (await (await fetch('https://dog.ceo/api/breeds/list/all')).json()) as {
           message: Record<string, string[]>
         }
         // If only list of breeds was asked.
         if (!args[1]) return `**List of breeds:** ${Object.keys(message).join(', ')}`
         // If list of sub-breeds was asked.
-        if (!message[args[1]]) return { content: 'This breed does not exist!', error: true }
-        else if (message[args[1]].length === 0) return { content: 'This breed has no sub-breeds!', error: true }
-        return `**List of sub-breeds:** ${message[args[1]].join(', ')}`
-      } catch (err) { return `Something went wrong 👾 Error: ${err}` }
+        if (!message[args[1]]) {
+          return { content: 'This breed does not exist!', error: true }
+        } else if (message[args[1]].length === 0) {
+          return { content: 'This breed has no sub-breeds!', error: true }
+        } else {
+          return `**List of sub-breeds:** ${message[args[1]].join(', ')}`
+        }
+      } catch (err) {
+        return `Something went wrong 👾 Error: ${err}`
+      }
       // Fetch a random picture for a sub-breed.
     } else if (args[0] && args[1]) {
       try {
@@ -348,12 +374,15 @@ export const handleDog: Command = {
             `http://dog.ceo/api/breed/${args.join('').toLowerCase()}/images/random`
           )).json() as { message: string })
         }
-        if (!message || message.includes('Breed not found')) return { content: 'This breed/sub-breed does not exist!', error: true }
+        if (!message || message.includes('Breed not found'))
+          return { content: 'This breed/sub-breed does not exist!', error: true }
         return {
           embeds: [{ image: { url: message }, color: 0x654321 }],
-          content: `🐕 ${args[0]} ${args[1]}`
+          content: `🐕 ${args[0]} ${args[1]}`,
         }
-      } catch (err) { return `Something went wrong 👾 Error: ${err}` }
+      } catch (err) {
+        return `Something went wrong 👾 Error: ${err}`
+      }
     } else if (args[0]) {
       // Fetch a random picture for a breed.
       try {
@@ -362,14 +391,18 @@ export const handleDog: Command = {
         )).json() as { message: string }
         if (!message || message.includes('Breed not found')) return 'This breed does not exist!'
         return { embeds: [{ image: { url: message }, color: 0x654321 }], content: '🐕 ' + args[0] }
-      } catch (err) { return `Something went wrong 👾 Error: ${err}` }
+      } catch (err) {
+        return `Something went wrong 👾 Error: ${err}`
+      }
     }
     // Fetch a random picture.
     try {
       const { message } = await (await fetch('http://dog.ceo/api/breeds/image/random')).json() as { message: string }
       return { embeds: [{ image: { url: message }, color: 0x654321 }], content: '🐕' }
-    } catch (err) { return `Something went wrong 👾 Error: ${err}` }
-  }
+    } catch (err) {
+      return `Something went wrong 👾 Error: ${err}`
+    }
+  },
 }
 
 export const handleUrban: Command = {
@@ -380,14 +413,14 @@ export const handleUrban: Command = {
     fullDescription: 'Get an Urban Dictionary definition ;)',
     usage: '/urban <term>',
     example: '/urban nub',
-    argsRequired: false // this is fun.
+    argsRequired: false, // this is fun.
   },
   generator: async (message, args) => {
     try {
       // Fetch the definition and parse it to JSON.
-      const { list } = await (await fetch(
-        `http://api.urbandictionary.com/v0/define?term=${args.join(' ')}`
-      )).json() as { list: Array<{ definition: string }> }
+      const { list } = (await (
+        await fetch(`http://api.urbandictionary.com/v0/define?term=${args.join(' ')}`)
+      ).json()) as { list: Array<{ definition: string }> }
       try {
         let response: string = list[0].definition.trim()
         if (response.length > 1900) {
@@ -412,7 +445,7 @@ export const handleUrban: Command = {
     } catch (e) {
       return `Something went wrong 👾 Error: ${e}`
     }
-  }
+  },
 }
 
 export const handleGoogle: Command = {
@@ -428,24 +461,26 @@ export const handleGoogle: Command = {
         name: 'query',
         description: 'The query to search for.',
         type: Constants.ApplicationCommandOptionTypes.STRING,
-        required: true
-      }
-    ]
+        required: true,
+      },
+    ],
   },
-  generator: (message, args) => `https://lmgtfy.com/?q=${encodeURIComponent(
-    args.join(' ')).replace(/%20/g, '+')}`,
-  slashGenerator: (interaction) => `https://lmgtfy.com/?q=${encodeURIComponent(
-    (interaction.data.options[0] as InteractionDataOptionsString).value).replace(/%20/g, '+')}`
+  generator: (message, args) =>
+    `https://lmgtfy.com/?q=${encodeURIComponent(args.join(' ')).replace(/%20/g, '+')}`,
+  slashGenerator: interaction =>
+    `https://lmgtfy.com/?q=${encodeURIComponent(
+      (interaction.data.options[0] as InteractionDataOptionsString).value,
+    ).replace(/%20/g, '+')}`,
 }
 
 export const handleNamemc: Command = {
   name: 'namemc',
   aliases: ['nmc'],
   opts: {
-    description: 'A Minecraft user\'s previous usernames and skin.',
+    description: "A Minecraft user's previous usernames and skin.",
     fullDescription: 'Displays previous usernames and skins of a Minecraft player.',
     usage: '/namemc <premium Minecraft username>',
-    example: '/namemc voldemort'
+    example: '/namemc voldemort',
   },
   generator: async (message, args) => {
     if (args.length > 1) return 'Minecraft users cannot have spaces in their name.'
@@ -490,15 +525,16 @@ export const handleNamemc: Command = {
 }
 
 // Initialize cache.
-let currency: { timestamp: number, rates: Record<string, number> }
+let currency: { timestamp: number; rates: Record<string, number> }
 export const handleCurrency: Command = {
   name: 'currency',
   aliases: ['cur'],
   opts: {
     description: 'Convert a currency from one currency to another.',
     fullDescription: 'Convert a currency from one currency to another.',
-    usage: '/currency (list) <currency symbol to convert from> <currency symbol to convert to> (amount, default: 1)',
-    example: '/currency EUR USD 40'
+    usage:
+      '/currency (list) <currency symbol to convert from> <currency symbol to convert to> (amount, default: 1)',
+    example: '/currency EUR USD 40',
   },
   generator: async (message, args) => {
     // Check cache if old, and refresh accordingly.
@@ -530,38 +566,44 @@ letter code + the first letter of the currency name.'
       }
     }
     // Calculate the currencies to conver from and to, as well as the amount.
-    if (args.length < 2) return { content: 'Invalid usage, use /help currency for proper usage.', error: true }
+    if (args.length < 2)
+      return { content: 'Invalid usage, use /help currency for proper usage.', error: true }
     let from = args[0].toUpperCase()
     let to = args[1].toUpperCase()
     // If input does not exist as currency, we check if user meant a country name or code instead.
     if (!currency.rates[from]) from = convertToSym(from)
     if (!currency.rates[to]) to = convertToSym(to)
     // Check if everything is in order.
-    if (from.length !== 3 || !currency.rates[from]) return { content: 'Invalid currency to convert from.', error: true }
-    else if (to.length !== 3 || !currency.rates[to]) return { content: 'Invalid currency to convert to.', error: true }
-    else if (!args[2]) args[2] = '1' // If no amount was provided, the amount should be one.
-    else if (args[2].search(',') !== -1) args[2] = args[2].split(',').join('') // If user used commas, they should be removed.
-    else if (args.length > 3) return { content: 'Enter a single number for currency conversion.', error: true }
+    if (from.length !== 3 || !currency.rates[from])
+      return { content: 'Invalid currency to convert from.', error: true }
+    else if (to.length !== 3 || !currency.rates[to])
+      return { content: 'Invalid currency to convert to.', error: true }
+    else if (!args[2])
+      args[2] = '1' // If no amount was provided, the amount should be one.
+    else if (args[2].search(',') !== -1)
+      args[2] = args[2].split(',').join('') // If user used commas, they should be removed.
+    else if (args.length > 3)
+      return { content: 'Enter a single number for currency conversion.', error: true }
     else if (isNaN(+args[2])) return { content: 'Enter a proper number to convert.', error: true }
     // Now we convert the amount.
-    const convertedAmount = ((currency.rates[to] / currency.rates[from]) * +args[2])
+    const convertedAmount = (currency.rates[to] / currency.rates[from]) * +args[2]
     const roundedOffAmount = Math.ceil(convertedAmount * Math.pow(10, 4)) / Math.pow(10, 4)
     return `**${from}** ${args[2]} = **${to}** ${roundedOffAmount}`
-  }
+  },
 }
 
 // Our weather and define types.
 interface Weather {
   cod: string
-  coord: { lon: number, lat: number }
+  coord: { lon: number; lat: number }
   weather: Array<{
     main: string
     description: string
     icon: string
   }>
-  main: { temp: number, temp_min: number, temp_max: number, humidity: number, pressure: number }
+  main: { temp: number; temp_min: number; temp_max: number; humidity: number; pressure: number }
   visibility: number
-  wind: { speed: number, deg: number }
+  wind: { speed: number; deg: number }
   clouds: { all: number }
   rain: { '3h': number }
   snow: { '3h': number }
@@ -570,14 +612,15 @@ export const handleWeather: Command = {
   name: 'weather',
   aliases: ['wt'],
   opts: {
-    description: 'It\'s really cloudy here..',
-    fullDescription: 'What\'s the weather like at your place?',
+    description: "It's really cloudy here..",
+    fullDescription: "What's the weather like at your place?",
     usage: '/weather <city name> (country code) (--fahrenheit or -f)',
-    example: '/weather Shanghai CN'
+    example: '/weather Shanghai CN',
   },
   generator: async (message, args) => {
     const fahrenheit = args.includes('--fahrenheit') || args.includes('-f')
-    if (fahrenheit) args.splice(args.includes('-f') ? args.indexOf('-f') : args.indexOf('--fahrenheit'), 1)
+    if (fahrenheit)
+      args.splice(args.includes('-f') ? args.indexOf('-f') : args.indexOf('--fahrenheit'), 1)
     // Get the response from our API.
     const weather = await (await fetch(
       `http://api.openweathermap.org/data/2.5/weather?q=${args.join(',')}&appid=${weatherAPIkey}${
@@ -660,11 +703,15 @@ export const handleDefine: Command = {
     description: 'Define a word in the Oxford Dictionary.',
     fullDescription: 'Define a word in the Oxford Dictionary.',
     usage: '/define <term>',
-    example: '/define cyclone'
+    example: '/define cyclone',
   },
   generator: async (message, args) => {
     // Setup request to find word.
-    const headers = { app_id: oxfordAPI.appId, app_key: oxfordAPI.appKey, Accept: 'application/json' }
+    const headers = {
+      app_id: oxfordAPI.appId,
+      app_key: oxfordAPI.appKey,
+      Accept: 'application/json',
+    }
     // Search for the word, destructure for results, and then pass them on to our second request.
     try {
       const r = await (await fetch(
@@ -752,7 +799,7 @@ export const handleXkcd: Command = {
     fullDescription: 'Get the latest, random or search for an xkcd comic.',
     usage: '/xkcd (latest (default)|random|search) (search query, if searching)',
     example: '/xkcd random',
-    argsRequired: false
+    argsRequired: false,
   },
   generator: async (message, args) => {
     if (args.length >= 2 && args[0] === 'search') {
@@ -796,14 +843,15 @@ export const handleHttpCat: Command = {
     fullDescription: 'Get an HTTP cat from https://http.cat',
     example: '/httpcat <HTTP error code>',
     usage: '/httpcat 200',
-    argsRequired: false
+    argsRequired: false,
   },
   generator: async (message, args) => {
     if (isNaN(+args[0]) || args.length > 1) return 'Enter a valid HTTP status code!'
 
     const req = await fetch('https://http.cat/' + args[0], { method: 'HEAD' })
-    if (req.status === 404) return { content: 'Enter a valid HTTP status code!\nhttps://http.cat/404', error: true }
+    if (req.status === 404)
+      return { content: 'Enter a valid HTTP status code!\nhttps://http.cat/404', error: true }
 
     return 'https://http.cat/' + args[0]
-  }
+  },
 }

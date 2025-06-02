@@ -1,11 +1,15 @@
+import http, { type RequestOptions } from 'http'
 import https from 'https'
 import { URL } from 'url'
-import { get } from 'http'
 import type { Db, Document } from 'mongodb'
 import type { GuildChannel, Message, User } from '@projectdysnomia/dysnomia'
 
 export const getIdFromMention = (mention: string): string => {
-  const f = mention.substring(2, mention.length - 1).replace('!', '').replace('&', '').split(':')
+  const f = mention
+    .substring(2, mention.length - 1)
+    .replace('!', '')
+    .replace('&', '')
+    .split(':')
   return f[f.length - 1]
 }
 
@@ -28,13 +32,15 @@ export const getUser = (message: Message, arg: string): User | undefined => {
   const guild = message.member.guild
   const member = guild.members.get(arg)
   if (member) return member.user
-  else if ((mentions.length > 0) && mentions[0].id === getIdFromMention(arg)) return mentions[0]
+  else if (mentions.length > 0 && mentions[0].id === getIdFromMention(arg)) return mentions[0]
   // Filter members then use .find for order of precedence.
   const lower = arg.toLowerCase()
-  const users = guild.members.filter(i => (
-    (i.nick && i.nick.toLowerCase() === lower) || i.username.toLowerCase() === lower ||
-    i.username.toLowerCase() + '#' + i.discriminator === lower
-  ))
+  const users = guild.members.filter(
+    i =>
+      i.nick?.toLowerCase() === lower ||
+      i.username.toLowerCase() === lower ||
+      i.username.toLowerCase() + '#' + i.discriminator === lower,
+  )
   if (users.length === 0) return
   else if (users.length === 1) return users[0].user
   const userDiscrim = users.find(i => i.username.toLowerCase() + '#' + i.discriminator === lower)
@@ -50,7 +56,7 @@ export const getChannel = (message: Message, arg: string): GuildChannel | undefi
   const mentions = message.channelMentions
   const guild = message.member.guild
   if (guild.channels.has(arg)) return guild.channels.get(arg)
-  else if ((mentions.length > 0) && mentions[0] === getIdFromMention(arg)) {
+  else if (mentions.length > 0 && mentions[0] === getIdFromMention(arg)) {
     return guild.channels.get(mentions[0])
   } else if (guild.channels.find(i => i.name.toLowerCase() === arg.toLowerCase())) {
     return guild.channels.find(i => i.name.toLowerCase() === arg.toLowerCase())
@@ -60,17 +66,29 @@ export const getChannel = (message: Message, arg: string): GuildChannel | undefi
 // Fresh insults. They come and go, I suppose.
 export const getInsult = (plural = false): string => {
   const insults = [
-    'pathetic lifeform', 'ungrateful bastard', 'idiotic slimeball', 'worthless ass', 'dumb dolt',
-    'one pronged fork', 'withered oak', 'two pump chump', 'oompa loompa'
+    'pathetic lifeform',
+    'ungrateful bastard',
+    'idiotic slimeball',
+    'worthless ass',
+    'dumb dolt',
+    'one pronged fork',
+    'withered oak',
+    'two pump chump',
+    'oompa loompa',
   ]
   const insult = insults[Math.floor(Math.random() * insults.length)]
   return plural ? insult.replace('ass', 'asse') + 's' : insult
 }
 
-export const fetchLimited = async (url: string, limit: number, opts = {}): Promise<false | Buffer> => {
+export const fetchLimited = async (
+  url: string,
+  limit: number,
+  opts: RequestOptions = {},
+): Promise<false | Buffer> => {
   const byteLimit = limit * 1024 * 1024
   try {
-    const contentLength = (await fetch(url, { method: 'HEAD' })).headers.get('content-length') || '-1'
+    const contentLength =
+      (await fetch(url, { method: 'HEAD' })).headers.get('content-length') || '-1'
     if (!isNaN(+contentLength) && +contentLength > byteLimit) return false
   } catch (e) {} // Understandable that this may fail.
   // Create a Promise which resolves on stream finish.
@@ -78,13 +96,14 @@ export const fetchLimited = async (url: string, limit: number, opts = {}): Promi
     let size = 0
     const data: Buffer[] = []
     const parsedUrl = new URL(url)
-    const req = (parsedUrl.protocol === 'https:' ? https.get : get)(parsedUrl, opts, (res) => {
+    const get = parsedUrl.protocol === 'https:' ? https.get : http.get
+    const req = get(parsedUrl, opts, res => {
       const contentLength = res.headers['content-length'] || '-1'
       if (!isNaN(+contentLength) && +contentLength > byteLimit) {
         req.abort()
         resolve(false)
       }
-      res.on('data', (chunk) => {
+      res.on('data', chunk => {
         if (!Buffer.isBuffer(chunk)) chunk = Buffer.from(chunk)
         data.push(chunk)
         size += (chunk as Buffer).length

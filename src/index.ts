@@ -33,22 +33,28 @@ const client = new Client(`Bot ${token === 'dotenv' ? process.env.IVEBOT_TOKEN :
     // Full list: guildBans, guildIntegrations, guildWebhooks, guildInvites, guildVoiceStates,
     // guildMessageReactions, guildMessageTyping, directMessageReactions, directMessageTyping
     intents: [
-      // guilds - IveBot code and dashboard require that all guilds are cached.
-      // guildEmojisAndSticker - Do away with and rely on Discord REST API?
-      // guildMembers - IveBot code relies on the assumption that all members are cached. Reduce need?
-      // guildPresences - Required for /userinfo to provide presence info.
-      // guildMessages and directMessages - Naturally required.
-      'guilds', 'guildEmojisAndStickers', 'guildMembers', 'guildPresences', 'guildMessages', 'directMessages', 'messageContent'
+      'guilds', // IveBot code and dashboard require that all guilds are cached.
+      'guildEmojisAndStickers', // Do away with and rely on Discord REST API?
+      'guildMembers', // IveBot code relies on the assumption that all members are cached. Reduce need?
+      'guildPresences', // Required for /userinfo to provide presence info.
+      'guildMessages', // Naturally required.
+      'directMessages', // Naturally required.
+      'messageContent', // Required for command parsing.
     ],
-    autoreconnect: true
+    autoreconnect: true,
   },
   allowedMentions: { everyone: false, roles: true, users: true },
-  restMode: true
+  restMode: true,
 })
 
 // Create a cache to handle certain stuff.
 const tempDB: DB = {
-  gunfight: {}, say: {}, trivia: {}, leave: new Set(), mute: {}, cooldowns: { request: new Set() }
+  gunfight: {},
+  say: {},
+  trivia: {},
+  leave: new Set(),
+  mute: {},
+  cooldowns: { request: new Set() },
 }
 
 // Create a MongoDB instance.
@@ -58,9 +64,11 @@ const mongoClient = new MongoClient(mongoURL === 'dotenv' ? process.env.MONGO_UR
 await mongoClient.connect()
 console.log('Bot connected successfully to MongoDB.')
 const db = mongoClient.db('ivebot')
-const bubbleWrap = <F extends (...args: any[]) => any>(func: F) => (...args: Parameters<F>) => {
-  func(...args).catch((e: Error) => console.error('An error was bubbled!', e))
-}
+const bubbleWrap =
+  <F extends (...args: any[]) => any>(func: F) =>
+  (...args: Parameters<F>) => {
+    func(...args).catch((e: Error) => console.error('An error was bubbled!', e))
+  }
 // When a server loses a member, it will callback.
 client.on('guildMemberAdd', bubbleWrap(guildMemberAdd(client, db, tempDB)))
 client.on('guildMemberRemove', bubbleWrap(guildMemberRemove(client, db)))
@@ -69,8 +77,8 @@ client.on('guildBanAdd', bubbleWrap(guildBanAdd(client, db)))
 client.on('guildDelete', bubbleWrap(guildDelete(db)))
 // Register the commandParser.
 const commandParser = new CommandParser(client, tempDB, db)
-client.on('messageCreate', bubbleWrap(async m => await commandParser.onMessage(m)))
-client.on('messageUpdate', bubbleWrap(async m => await commandParser.onMessageUpdate(m)))
+client.on('messageCreate', bubbleWrap(commandParser.onMessage.bind(commandParser)))
+client.on('messageUpdate', bubbleWrap(commandParser.onMessageUpdate.bind(commandParser)))
 const slashParser = new SlashParser(client, tempDB, db, commandParser)
 client.on('interactionCreate', interaction => {
   if (interaction.type === 2 && interaction instanceof CommandInteraction) {
@@ -144,7 +152,7 @@ client.on('ready', () => {
   client.editStatus('online', {
     name: 'DXMD (5k) on iMac Pro.',
     type: 1,
-    url: 'https://twitch.tv/sorrybutyoudontdeservewatchingthisgameunlessyouhaveamacipadoriphone'
+    url: 'https://twitch.tv/sorrybutyoudontdeservewatchingthisgameunlessyouhaveamacipadoriphone',
   })
   slashParser
     .registerAllCommands()
@@ -167,7 +175,7 @@ if (jwtSecret) {
   interface DiscordServerResponse {
     id: string
     perm: boolean
-    textChannels: Array<{ id: string, name: string }>
+    textChannels: Array<{ id: string; name: string }>
   }
   const key = createHash('sha256').update(jwtSecret).digest()
   const headers = (body: NodeJS.ArrayBufferView | string): {

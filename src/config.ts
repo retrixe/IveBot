@@ -8,7 +8,7 @@ interface Config {
   cvAPIkey: string
   host: string
   NASAtoken: string
-  oxfordAPI: { appKey: string, appId: string }
+  oxfordAPI: { appKey: string; appId: string }
   testPilots: string[]
   jwtSecret: string
   mongoURL: string
@@ -30,7 +30,7 @@ export const {
   jwtSecret,
   mongoURL,
   rootURL,
-  token
+  token,
 } = config
 
 export default config

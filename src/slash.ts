@@ -8,7 +8,7 @@ import type {
   CommandInteraction,
   ApplicationCommand,
   ApplicationCommandOptions,
-  ApplicationCommandOptionsWithValue
+  ApplicationCommandOptionsWithValue,
 } from '@projectdysnomia/dysnomia'
 import type {
   DB,
@@ -16,13 +16,13 @@ import type {
   IveBotCommandGenerator,
   Context,
   CommandResponse,
-  IveBotSlashGeneratorFunction
+  IveBotSlashGeneratorFunction,
 } from './imports/types.ts'
 import { getInsult } from './imports/tools.ts'
 import type CommandParser from './client.ts'
 import type { Db } from 'mongodb'
 
-function isEquivalent (a: Record<string, boolean>, b: Record<string, boolean>): boolean {
+function isEquivalent(a: Record<string, boolean>, b: Record<string, boolean>): boolean {
   // Create arrays of property names
   const aProps = Object.getOwnPropertyNames(a)
   const bProps = Object.getOwnPropertyNames(b)
@@ -63,7 +63,7 @@ export class SlashCommand {
     roleIDs?: string[]
   }
 
-  constructor (command: Command) {
+  constructor(command: Command) {
     // Key functions.
     this.name = command.name
     this.aliases = command.aliases
@@ -77,7 +77,8 @@ export class SlashCommand {
     this.invalidUsageMessage = command.opts.invalidUsageMessage || defaultUsageMessage
     this.errorMessage = command.opts.errorMessage || 'IveBot has experienced an internal error.'
     // No impl for next.
-    this.caseInsensitive = command.opts.caseInsensitive === undefined || command.opts.caseInsensitive
+    this.caseInsensitive =
+      command.opts.caseInsensitive === undefined || command.opts.caseInsensitive
     this.deleteCommand = command.opts.deleteCommand || false
     this.guildOnly = command.opts.guildOnly || false
     this.dmOnly = command.opts.dmOnly || false
@@ -93,17 +94,17 @@ export class SlashCommand {
     // No reaction implementation.
   }
 
-  async register (client: Client): Promise<ApplicationCommand> {
+  async register(client: Client): Promise<ApplicationCommand> {
     return await client.createCommand({
       type: Constants.ApplicationCommandTypes.CHAT_INPUT,
       name: this.name,
       description: this.description.replace(/</g, '').replace(/>/g, ''),
       defaultPermission: true,
-      options: this.options
+      options: this.options,
     })
   }
 
-  requirementsCheck (interaction: CommandInteraction): boolean {
+  requirementsCheck(interaction: CommandInteraction): boolean {
     if (!this.requirements) return true
     // No role name or ID impl.
     const userIDs = this.requirements.userIDs // If it doesn't exist it's a pass.
@@ -137,9 +138,9 @@ export default class SlashParser {
   tempDB: DB
   db: Db
   evaluatedMessages: string[]
-  analytics: Record<string, { totalUse: number, averageExecTime: number[] }>
+  analytics: Record<string, { totalUse: number; averageExecTime: number[] }>
 
-  constructor (client: Client, tempDB: DB, db: Db, commandParser: CommandParser) {
+  constructor(client: Client, tempDB: DB, db: Db, commandParser: CommandParser) {
     this.commands = {}
     this.commandParser = commandParser
     this.client = client
@@ -147,31 +148,34 @@ export default class SlashParser {
     this.db = db
     this.analytics = {}
     this.handleCommandInteraction = this.handleCommandInteraction.bind(this)
-    setInterval(() => { this.sendAnalytics().catch(console.error) }, 30000)
+    setInterval(() => {
+      this.sendAnalytics().catch(console.error)
+    }, 30000)
   }
 
   registerCommand = (command: Command): void => {
     this.commands[command.name] = new SlashCommand(command)
   }
 
-  async executeCommand (command: SlashCommand, interaction: CommandInteraction): Promise<void> {
+  async executeCommand(command: SlashCommand, interaction: CommandInteraction): Promise<void> {
     // Guild and DM only.
     if (command.guildOnly && !interaction.guildID) {
       await interaction.createMessage({
         content: 'This command can only be executed from a Discord guild.',
-        flags: Constants.MessageFlags.EPHEMERAL
+        flags: Constants.MessageFlags.EPHEMERAL,
       })
       return
     } else if (command.dmOnly && interaction.guildID) {
       await interaction.createMessage({
         content: 'This command can only be executed in direct messages.',
-        flags: Constants.MessageFlags.EPHEMERAL
+        flags: Constants.MessageFlags.EPHEMERAL,
       })
       return
       // Check for permissions.
     } else if (!command.requirementsCheck(interaction)) {
-      await interaction.createMessage( // Publicly shaming them for missing permissions, ofc.
-        `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`
+      await interaction.createMessage(
+        // Publicly shaming them for missing permissions, ofc.
+        `**Thankfully, you don't have enough permissions for that, you ${getInsult()}.**`,
       )
       return
     }
@@ -182,19 +186,25 @@ export default class SlashParser {
       const optionInfo = command.options.find(arg => arg.name === option.name)
       if (!optionInfo) {
         throw new Error(`Discord did not correctly validate interaction! (${command.name})`)
-      } else if ((optionInfo.type === Constants.ApplicationCommandOptionTypes.STRING ||
-        optionInfo.type === Constants.ApplicationCommandOptionTypes.MENTIONABLE ||
-        optionInfo.type === Constants.ApplicationCommandOptionTypes.USER ||
-        optionInfo.type === Constants.ApplicationCommandOptionTypes.ROLE ||
-        optionInfo.type === Constants.ApplicationCommandOptionTypes.CHANNEL) &&
-        typeof (option as Dysnomia.InteractionDataOptionsString).value !== 'string') {
+      } else if (
+        (optionInfo.type === Constants.ApplicationCommandOptionTypes.STRING ||
+          optionInfo.type === Constants.ApplicationCommandOptionTypes.MENTIONABLE ||
+          optionInfo.type === Constants.ApplicationCommandOptionTypes.USER ||
+          optionInfo.type === Constants.ApplicationCommandOptionTypes.ROLE ||
+          optionInfo.type === Constants.ApplicationCommandOptionTypes.CHANNEL) &&
+        typeof (option as Dysnomia.InteractionDataOptionsString).value !== 'string'
+      ) {
         throw new Error(`Discord did not correctly validate interaction! (${command.name})`)
-      } else if ((optionInfo.type === Constants.ApplicationCommandOptionTypes.INTEGER ||
-        optionInfo.type === Constants.ApplicationCommandOptionTypes.NUMBER) &&
-        typeof (option as Dysnomia.InteractionDataOptionsNumber).value !== 'number') {
+      } else if (
+        (optionInfo.type === Constants.ApplicationCommandOptionTypes.INTEGER ||
+          optionInfo.type === Constants.ApplicationCommandOptionTypes.NUMBER) &&
+        typeof (option as Dysnomia.InteractionDataOptionsNumber).value !== 'number'
+      ) {
         throw new Error(`Discord did not correctly validate interaction! (${command.name})`)
-      } else if (optionInfo.type === Constants.ApplicationCommandOptionTypes.BOOLEAN &&
-        typeof (option as Dysnomia.InteractionDataOptionsBoolean).value !== 'boolean') {
+      } else if (
+        optionInfo.type === Constants.ApplicationCommandOptionTypes.BOOLEAN &&
+        typeof (option as Dysnomia.InteractionDataOptionsBoolean).value !== 'boolean'
+      ) {
         throw new Error(`Discord did not correctly validate interaction! (${command.name})`)
       } // No sub command validation, write when you add sub commands.
     }
@@ -204,7 +214,10 @@ export default class SlashParser {
     }
     // We give our generators what they need.
     const context: Context = {
-      tempDB: this.tempDB, db: this.db, commandParser: this.commandParser, client: this.client
+      tempDB: this.tempDB,
+      db: this.db,
+      commandParser: this.commandParser,
+      client: this.client,
     }
     // We get the exact content to send.
     const messageToSend = await command.execute(context, interaction)
@@ -229,7 +242,7 @@ export default class SlashParser {
     } else return message
   }
 
-  saveAnalytics (timeTaken: [number, number], name: string): void {
+  saveAnalytics(timeTaken: [number, number], name: string): void {
     // Get the local command info.
     let commandInfo = this.analytics[name]
     // If there is no info for the command then insert an object for it.
@@ -246,7 +259,7 @@ export default class SlashParser {
     this.analytics[name].averageExecTime = averageExecTime
   }
 
-  async sendAnalytics (): Promise<void> {
+  async sendAnalytics(): Promise<void> {
     const analytics = this.db.collection('analytics')
     // Iterate over every command we have information stored locally.
     for (const commandName in this.analytics) {
@@ -274,7 +287,7 @@ export default class SlashParser {
     }
   }
 
-  async handleCommandInteraction (interaction: CommandInteraction): Promise<void> {
+  async handleCommandInteraction(interaction: CommandInteraction): Promise<void> {
     if (!interaction.user) return
 
     const keys = Object.keys(this.commands)
@@ -297,9 +310,9 @@ export default class SlashParser {
     }
   }
 
-  async registerAllCommands (): Promise<ApplicationCommand[]> {
+  async registerAllCommands(): Promise<ApplicationCommand[]> {
     return await Promise.all(
-      Object.values(this.commands).map(async command => await command.register(this.client))
+      Object.values(this.commands).map(async command => await command.register(this.client)),
     )
   }
 }
