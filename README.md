@@ -4,7 +4,7 @@ The bot that created the iPhone X. It's strictly private. You may run it locally
 
 **Requires Node.js 24.x or higher.**
 
-It includes many different and useful commands, from games to tools, utilities, fun commands, moderation and even a `/ai` command which generates text responses to inputs. It also uses Next.js to provide a web dashboard as part of the bot itself.
+It includes many different and useful commands, from games to tools, utilities, fun commands, moderation and even a `/ai` command which generates text responses to inputs. It also has a web dashboard with various features like auto role, public roles and join/leave messages.
 
 <hr />
 <details><summary>Commands</summary>
@@ -23,7 +23,6 @@ It includes many different and useful commands, from games to tools, utilities, 
 - `/trivia`
 - `/8ball`
 - `/repeat`
-- `/calculate`
 - `/distort`
 
 **Random searches.**
@@ -59,6 +58,8 @@ It includes many different and useful commands, from games to tools, utilities, 
 - `/giverole` and `/takerole`
 - `/notify`
 - `/hastebin`
+- `/calculate`
+- `/temperature`
 - `/suppressEmbed`
 
 **Administrative commands.**

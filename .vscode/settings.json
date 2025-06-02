@@ -5,20 +5,11 @@
       "typescript",
       "typescriptreact"
     ],
-    "eslint.options": {
-      "extensions": [
-        ".js",
-        ".ts",
-        ".jsx",
-        ".tsx"
-      ]
-    },
     "eslint.enable": true,
     "eslint.autoFixOnSave": true,
     "eslint.packageManager": "yarn",
     "typescript.tsdk": "node_modules/typescript/lib",
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": "explicit"
-    },
-    "typescript.preferences.importModuleSpecifierEnding": "js"
+    }
   }
