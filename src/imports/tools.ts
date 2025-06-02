@@ -1,7 +1,6 @@
 import https from 'https'
 import { URL } from 'url'
 import { get } from 'http'
-import fetch from 'node-fetch'
 import type { Db, Document } from 'mongodb'
 import type { GuildChannel, Message, User } from '@projectdysnomia/dysnomia'
 

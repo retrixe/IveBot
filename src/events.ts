@@ -2,7 +2,6 @@
 import { type DB } from './imports/types.ts'
 import type { Member, Message, Client, User, Guild, GuildTextableChannel } from '@projectdysnomia/dysnomia'
 import { type Db } from 'mongodb'
-import fetch from 'node-fetch'
 
 // Database reading function.
 import { getServerSettings } from './imports/tools.ts'

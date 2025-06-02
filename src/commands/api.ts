@@ -1,7 +1,6 @@
 // All the types!
 import type { Command } from '../imports/types.ts'
 // All the tools!
-import fetch from 'node-fetch'
 import moment from 'moment'
 import Fuse from 'fuse.js'
 import { Constants, type InteractionDataOptionsString } from '@projectdysnomia/dysnomia'

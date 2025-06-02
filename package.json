@@ -26,13 +26,11 @@
     "json5": "^2.2.1",
     "mathjs": "^14.5.2",
     "moment": "^2.29.4",
-    "mongodb": "^6.16.0",
-    "node-fetch": "^3.3.2"
+    "mongodb": "^6.16.0"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.1",
     "@types/node": "^22.15.29",
-    "@types/node-fetch": "^2.6.12",
     "eslint": "^9.28.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-import": "^2.31.0",
