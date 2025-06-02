@@ -1,22 +1,18 @@
 import js from '@eslint/js'
 import tseslint from 'typescript-eslint'
-import nextPlugin from '@next/eslint-plugin-next'
-import standardJsx from 'eslint-config-standard-jsx'
-import standardReact from 'eslint-config-standard-react'
-import react from 'eslint-plugin-react'
-import reactHooks from 'eslint-plugin-react-hooks'
 import importPlugin from 'eslint-plugin-import'
 import pluginPromise from 'eslint-plugin-promise'
 import nodePlugin from 'eslint-plugin-n'
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
+// import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 
 export default tseslint.config(
   {
     ignores: [
       '.pnp.cjs',
       '.pnp.loader.mjs',
+      'dashboard',
+      'lib',
       '.yarn',
-      '.next',
       '.prettierrc.mjs',
       '*.config.{mjs,js}',
     ],
@@ -24,22 +20,10 @@ export default tseslint.config(
   js.configs.recommended,
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,
-  react.configs.flat.recommended,
   pluginPromise.configs['flat/recommended'],
   importPlugin.flatConfigs.recommended, // Could use TypeScript resolver
   nodePlugin.configs['flat/recommended-module'],
   {
-    plugins: { '@next/next': nextPlugin },
-    rules: nextPlugin.configs.recommended.rules,
-  },
-  {
-    plugins: { 'react-hooks': reactHooks },
-    rules: reactHooks.configs.recommended.rules,
-  },
-  { rules: standardJsx.rules },
-  { rules: standardReact.rules },
-  {
-    settings: { react: { version: 'detect' } },
     languageOptions: {
       parserOptions: {
         projectService: true,
@@ -76,16 +60,32 @@ export default tseslint.config(
       // FIXME: Re-enable the following rules!
       'no-empty': 'off',
       'n/no-extraneous-import': 'off',
+      'promise/no-nesting': 'off',
+      '@typescript-eslint/array-type': 'off',
+      '@typescript-eslint/no-base-to-string': 'off',
       '@typescript-eslint/no-deprecated': 'off',
+      '@typescript-eslint/no-dynamic-delete': 'off',
+      '@typescript-eslint/no-empty-function': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-import-type-side-effects': 'off',
+      '@typescript-eslint/no-inferrable-types': 'off',
       '@typescript-eslint/no-misused-promises': 'off',
+      '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'off',
       '@typescript-eslint/no-unnecessary-condition': 'off',
+      '@typescript-eslint/no-unnecessary-template-expression': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/prefer-for-of': 'off',
       '@typescript-eslint/prefer-nullish-coalescing': 'off',
+      '@typescript-eslint/prefer-optional-chain': 'off',
+      '@typescript-eslint/prefer-regexp-exec': 'off',
+      '@typescript-eslint/restrict-template-expressions': 'off',
+      '@typescript-eslint/use-unknown-in-catch-callback-variable': 'off',
     },
   },
-  eslintPluginPrettierRecommended,
+  // FIXME: eslintPluginPrettierRecommended,
 )

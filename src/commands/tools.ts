@@ -132,7 +132,6 @@ export const handleEval: Command = {
       if (toEval.endsWith('`')) toEval = toEval.substring(0, toEval.length - 1)
       if (toEval.endsWith('``')) toEval = toEval.substring(0, toEval.length - 2)
       // Evaluate!
-      // eslint-disable-next-line no-eval
       const res = inspect(await Promise.resolve(eval(toEval)), false, 0)
       // const res = eval(`(async () => { const a = ${toEval}; return a })()`)
       message.addReaction('✅').catch(() => {}) // Ignore error.

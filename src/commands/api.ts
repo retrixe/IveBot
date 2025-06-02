@@ -566,7 +566,7 @@ interface Weather {
   clouds: { all: number }
   rain: { '3h': number }
   snow: { '3h': number }
-} /* eslint-enable camelcase */
+}
 export const handleWeather: Command = {
   name: 'weather',
   aliases: ['wt'],
