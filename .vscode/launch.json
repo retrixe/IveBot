@@ -32,7 +32,7 @@
       "request": "launch",
       "name": "Launch IveBot",
       "runtimeArgs": [
-        "--inspect", "--loader", "ts-node/esm", "${workspaceFolder}/src/index.ts"
+        "--inspect", "${workspaceFolder}/src/index.ts"
       ]
     },
     {
@@ -40,7 +40,7 @@
       "request": "launch",
       "name": "Launch IveBot (Integrated Terminal)",
       "runtimeArgs": [
-        "--inspect", "--loader", "ts-node/esm", "${workspaceFolder}/src/index.ts"
+        "--inspect", "${workspaceFolder}/src/index.ts"
       ],
       "console": "integratedTerminal"
     }

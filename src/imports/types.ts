@@ -1,7 +1,7 @@
 import type { AdvancedMessageContent, Client, CommandInteraction, ApplicationCommandOptions, Message } from '@projectdysnomia/dysnomia'
-import type CommandParser from '../client.js'
+import type CommandParser from '../client.ts'
 import type { Db } from 'mongodb'
-import type { TriviaSession } from '../commands/trivia.js'
+import type { TriviaSession } from '../commands/trivia.ts'
 
 export interface DB {
   gunfight: Record<string, {

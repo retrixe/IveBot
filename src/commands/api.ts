@@ -1,13 +1,13 @@
 // All the types!
-import type { Command } from '../imports/types.js'
+import type { Command } from '../imports/types.ts'
 // All the tools!
 import fetch from 'node-fetch'
 import moment from 'moment'
 import Fuse from 'fuse.js'
 import { Constants, type InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
-import { zeroWidthSpace, getInsult, fetchLimited, getIdFromMention } from '../imports/tools.js'
+import { zeroWidthSpace, getInsult, fetchLimited, getIdFromMention } from '../imports/tools.ts'
 // Get the NASA API token.
-import { NASAtoken, fixerAPIkey, weatherAPIkey, oxfordAPI, cvAPIkey } from '../config.js'
+import { NASAtoken, fixerAPIkey, weatherAPIkey, oxfordAPI, cvAPIkey } from '../config.ts'
 import fs from 'fs'
 
 interface countriesInfo {

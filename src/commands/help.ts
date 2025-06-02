@@ -1,8 +1,8 @@
-import { zeroWidthSpace, getInsult } from '../imports/tools.js'
-import type { Command as IveBotCommand } from '../imports/types.js'
-import type { Command } from '../client.js'
-import type CommandParser from '../client.js'
-import { rootURL } from '../config.js'
+import { zeroWidthSpace, getInsult } from '../imports/tools.ts'
+import type { Command as IveBotCommand } from '../imports/types.ts'
+import type { Command } from '../client.ts'
+import type CommandParser from '../client.ts'
+import { rootURL } from '../config.ts'
 import { type Client, Constants, type InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
 
 const generalHelp = {

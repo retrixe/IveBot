@@ -33,4 +33,4 @@ export const {
   token
 } = config
 
-export default Config
+export default config

@@ -1,6 +1,6 @@
 import type { Message, GuildTextableChannel, TextableChannel, User, EmbedOptions, Client } from '@projectdysnomia/dysnomia'
-import type { Command, DB } from '../imports/types.js'
-import { getInsult } from '../imports/tools.js'
+import type { Command, DB } from '../imports/types.ts'
+import { getInsult } from '../imports/tools.ts'
 import fs from 'fs'
 
 async function parseTriviaList (fileName: string): Promise<Map<string, string[]>> {

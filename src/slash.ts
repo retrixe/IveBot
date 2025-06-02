@@ -17,9 +17,9 @@ import type {
   Context,
   CommandResponse,
   IveBotSlashGeneratorFunction
-} from './imports/types.js'
-import { getInsult } from './imports/tools.js'
-import type CommandParser from './client.js'
+} from './imports/types.ts'
+import { getInsult } from './imports/tools.ts'
+import type CommandParser from './client.ts'
 import { type Db } from 'mongodb'
 
 function isEquivalent (a: Record<string, boolean>, b: Record<string, boolean>): boolean {

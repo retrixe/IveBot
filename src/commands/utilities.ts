@@ -7,11 +7,11 @@ import {
   type Guild,
   type InteractionDataOptionsString
 } from '@projectdysnomia/dysnomia'
-import { type Command } from '../imports/types.js'
+import { type Command } from '../imports/types.ts'
 // All the needs!
-import { getIdFromMention, getInsult, getUser, getChannel } from '../imports/tools.js'
+import { getIdFromMention, getInsult, getUser, getChannel } from '../imports/tools.ts'
 import ms from 'ms'
-import { host, testPilots } from '../config.js'
+import { host, testPilots } from '../config.ts'
 import moment from 'moment'
 import { evaluate } from 'mathjs'
 

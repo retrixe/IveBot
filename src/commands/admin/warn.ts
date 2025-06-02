@@ -1,8 +1,8 @@
 import moment from 'moment'
 import { ObjectId } from 'mongodb'
-import { type Command } from '../../imports/types.js'
-import { getUser, getInsult } from '../../imports/tools.js'
-import { checkRolePosition } from '../../imports/permissions.js'
+import { type Command } from '../../imports/types.ts'
+import { getUser, getInsult } from '../../imports/tools.ts'
+import { checkRolePosition } from '../../imports/permissions.ts'
 
 export const handleWarn: Command = {
   name: 'warn',

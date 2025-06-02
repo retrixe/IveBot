@@ -1,8 +1,8 @@
 import type { Message, MessageContent, Client, GuildTextableChannel } from '@projectdysnomia/dysnomia'
-import type { DB, Command as IveBotCommand, IveBotCommandGenerator, Context, CommandResponse } from './imports/types.js'
+import type { DB, Command as IveBotCommand, IveBotCommandGenerator, Context, CommandResponse } from './imports/types.ts'
 import type { Db } from 'mongodb'
-import { getInsult } from './imports/tools.js'
-import botCallback from './events.js'
+import { getInsult } from './imports/tools.ts'
+import botCallback from './events.ts'
 
 function isEquivalent (a: Record<string, boolean>, b: Record<string, boolean>): boolean {
   // Create arrays of property names

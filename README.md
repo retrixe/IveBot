@@ -2,7 +2,7 @@
 
 The bot that created the iPhone X. It's strictly private. You may run it locally, but it's not a useful bot to others and tailored for a specific need.
 
-**Requires Node.js 12.x or higher.**
+**Requires Node.js 24.x or higher.**
 
 It includes many different and useful commands, from games to tools, utilities, fun commands, moderation and even a `/ai` command which generates text responses to inputs. It also uses Next.js to provide a web dashboard as part of the bot itself.
 

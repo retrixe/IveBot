@@ -1,6 +1,6 @@
 import { Constants, type InteractionDataOptionsString, type TextChannel } from '@projectdysnomia/dysnomia'
-import { type Command } from '../imports/types.js'
-import { openaiAPIkey } from '../config.js'
+import { type Command } from '../imports/types.ts'
+import { openaiAPIkey } from '../config.ts'
 import fetch from 'node-fetch'
 
 export const handleAi: Command = {

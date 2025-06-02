@@ -1,5 +1,5 @@
-import { type Command } from '../../imports/types.js'
-import { getInsult, getIdFromMention, fetchLimited } from '../../imports/tools.js'
+import { type Command } from '../../imports/types.ts'
+import { getInsult, getIdFromMention, fetchLimited } from '../../imports/tools.ts'
 
 export const handleAddemoji: Command = {
   name: 'addEmoji',

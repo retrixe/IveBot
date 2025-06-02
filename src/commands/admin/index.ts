@@ -1,13 +1,13 @@
-import { type Command } from '../../imports/types.js'
-import { getInsult, getUser } from '../../imports/tools.js'
-import { checkRolePosition } from '../../imports/permissions.js'
+import { type Command } from '../../imports/types.ts'
+import { getInsult, getUser } from '../../imports/tools.ts'
+import { checkRolePosition } from '../../imports/permissions.ts'
 import type { Message, GuildTextableChannel } from '@projectdysnomia/dysnomia'
-export { handleAddemoji, handleDeleteemoji, handleEditemoji, handleEmojiimage } from './emoji.js'
-export { handleWarn, handleWarnings, handleClearwarns, handleRemovewarn } from './warn.js'
-export { handleGiverole, handleTakerole, handleNotify } from './roles.js'
-export { handleDeletechannel, handleEditchannel } from './channels.js'
-export { handleMute, handleUnmute } from './mute.js'
-export { handleBan, handleUnban } from './ban.js'
+export { handleAddemoji, handleDeleteemoji, handleEditemoji, handleEmojiimage } from './emoji.ts'
+export { handleWarn, handleWarnings, handleClearwarns, handleRemovewarn } from './warn.ts'
+export { handleGiverole, handleTakerole, handleNotify } from './roles.ts'
+export { handleDeletechannel, handleEditchannel } from './channels.ts'
+export { handleMute, handleUnmute } from './mute.ts'
+export { handleBan, handleUnban } from './ban.ts'
 
 const parseSilentDelete = (args: string[]): { args: string[], silent: boolean, delete: boolean } => {
   const data = { args, silent: false, delete: false }

@@ -4,17 +4,18 @@ import { Client, CommandInteraction } from '@projectdysnomia/dysnomia'
 import { MongoClient } from 'mongodb'
 // Import fs.
 import { readdir, stat } from 'fs/promises'
+import { join } from 'path'
 import { inspect } from 'util'
 import http from 'http'
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto'
 // Import types.
-import type { DB, Command } from './imports/types.js'
+import type { DB, Command } from './imports/types.ts'
 // Import the bot.
-import SlashParser from './slash.js'
-import CommandParser from './client.js'
-import { guildMemberAdd, guildMemberRemove, guildDelete, guildBanAdd } from './events.js'
+import SlashParser from './slash.ts'
+import CommandParser from './client.ts'
+import { guildMemberAdd, guildMemberRemove, guildDelete, guildBanAdd } from './events.ts'
 // Get the token needed.
-import { token, mongoURL, jwtSecret } from './config.js'
+import { token, mongoURL, jwtSecret } from './config.ts'
 
 // If production is explicitly specified via flag..
 if (process.argv[2] === '--production') process.env.NODE_ENV = 'production'
@@ -74,15 +75,18 @@ client.on('interactionCreate', interaction => {
   }
 })
 // Register all commands in src/commands onto the CommandParser.
-const toRead = dev ? './src/commands/' : './lib/commands/'
+const toRead = join(import.meta.dirname, 'commands')
 const commandFiles = await readdir(toRead)
 // This only supports two levels of files, one including files inside commands, and one in..
 // a subfolder.
 commandFiles.push(dev ? 'admin/index.ts' : 'admin/index.js')
 for (const commandFile of commandFiles) {
   // If it's a file..
-  if ((await stat(toRead + commandFile)).isFile() && (commandFile.endsWith('.ts') || commandFile.endsWith('.js'))) {
-    const commands: Record<string, Command> = await import('./commands/' + commandFile.replace('.ts', '.js'))
+  if (
+    (await stat(join(toRead, commandFile))).isFile() &&
+    (commandFile.endsWith('.ts') || commandFile.endsWith('.js'))
+  ) {
+    const commands: Record<string, Command> = await import('./commands/' + commandFile)
     // ..and there are commands..
     if (Object.keys(commands).length === 0) continue
     // ..register the commands.

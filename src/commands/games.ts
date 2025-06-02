@@ -1,6 +1,6 @@
 import { Constants } from '@projectdysnomia/dysnomia'
 import type { InteractionDataOptionsInteger, InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
-import { type Command } from '../imports/types.js'
+import { type Command } from '../imports/types.ts'
 
 // Zalgo characters.
 const characters = [
