@@ -1,5 +1,10 @@
 // Tokens and stuff.
-import { Client, CommandInteraction } from '@projectdysnomia/dysnomia'
+import {
+  Client,
+  CommandInteraction,
+  DiscordHTTPError,
+  DiscordRESTError,
+} from '@projectdysnomia/dysnomia'
 // Get MongoDB.
 import { MongoClient } from 'mongodb'
 // Import fs.
@@ -110,13 +115,23 @@ setInterval(() => {
         // TODO: What if no perms?
         if (task.type === 'unmute') {
           client.removeGuildMemberRole(task.guild, task.user, task.target, 'Muted for fixed duration.')
-            .catch(e => e.res.statusCode !== 404 && console.error(e))
+            .catch((e: unknown) => {
+              if (
+                (e instanceof DiscordRESTError || e instanceof DiscordHTTPError) &&
+                e.res.statusCode !== 404
+              ) console.error(e)
+            })
         } else if (task.type === 'reminder') {
           client.createMessage(task.target, task.message)
-            .catch(e => e.res.statusCode !== 404 && console.error(e))
+            .catch((e: unknown) => {
+              if (
+                (e instanceof DiscordRESTError || e instanceof DiscordHTTPError) &&
+                e.res.statusCode !== 404
+              ) console.error(e)
+            })
         }
         db.collection('tasks').deleteOne({ _id: task._id })
-          .catch(error => console.error('Failed to remove task from database.', error))
+          .catch((error: unknown) => console.error('Failed to remove task from database.', error))
       }, task.time - Date.now()))
     }
   }).catch(console.error)
@@ -131,9 +146,12 @@ client.on('ready', () => {
     type: 1,
     url: 'https://twitch.tv/sorrybutyoudontdeservewatchingthisgameunlessyouhaveamacipadoriphone'
   })
-  slashParser.registerAllCommands()
+  slashParser
+    .registerAllCommands()
     .then(() => console.log('Successfully registered all Discord slash commands!'))
-    .catch(err => console.error('An error occurred when registering Discord slash commands.', err))
+    .catch((err: unknown) => {
+      console.error('An error occurred when registering Discord slash commands.', err)
+    })
 })
 
 // Disconnection from Discord by error will trigger the following.

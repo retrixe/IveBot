@@ -1,6 +1,6 @@
 import moment from 'moment'
 import { ObjectId } from 'mongodb'
-import { type Command } from '../../imports/types.ts'
+import type { Command } from '../../imports/types.ts'
 import { getUser, getInsult } from '../../imports/tools.ts'
 import { checkRolePosition } from '../../imports/permissions.ts'
 

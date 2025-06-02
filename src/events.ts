@@ -1,7 +1,7 @@
 // We need types.
-import { type DB } from './imports/types.ts'
+import type { DB } from './imports/types.ts'
 import type { Member, Message, Client, User, Guild, GuildTextableChannel } from '@projectdysnomia/dysnomia'
-import { type Db } from 'mongodb'
+import type { Db } from 'mongodb'
 
 // Database reading function.
 import { getServerSettings } from './imports/tools.ts'

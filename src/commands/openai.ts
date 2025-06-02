@@ -1,5 +1,5 @@
 import { Constants, type InteractionDataOptionsString, type TextChannel } from '@projectdysnomia/dysnomia'
-import { type Command } from '../imports/types.ts'
+import type { Command } from '../imports/types.ts'
 import { openaiAPIkey } from '../config.ts'
 
 export const handleAi: Command = {
@@ -43,7 +43,7 @@ export const handleAi: Command = {
     }
     let temperature = model === 'text-davinci-003' ? 0.9 : 0
     if (query.includes('--temp')) {
-      const temp = query.match(/--temp ([0-9.]+)/)
+      const temp = /--temp ([0-9.]+)/.exec(query)
       if (temp) {
         temperature = parseFloat(temp[1])
         query = query.replace(temp[0], '')

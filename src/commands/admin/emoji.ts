@@ -1,4 +1,4 @@
-import { type Command } from '../../imports/types.ts'
+import type { Command } from '../../imports/types.ts'
 import { getInsult, getIdFromMention, fetchLimited } from '../../imports/tools.ts'
 
 export const handleAddemoji: Command = {
@@ -150,7 +150,7 @@ export const handleEmojiimage: Command = {
     // If emoji doesn't exist.
     if (!emoji || ![17, 18].includes(emoji.length)) return { content: `Invalid custom emoji, you ${getInsult()}.`, error: true }
     // Get image extension.
-    const ext = args[0].split(':')[0] === '<a' || (found && found.animated) ? 'gif' : 'png'
+    const ext = args[0].split(':')[0] === '<a' || found?.animated ? 'gif' : 'png'
     // Return emoji.
     return {
       content: '<:tom:402567029963489281> **| Emoji image:**',

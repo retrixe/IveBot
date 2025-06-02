@@ -1,9 +1,9 @@
 // Get types.
-import { type Member } from '@projectdysnomia/dysnomia'
+import type { Member } from '@projectdysnomia/dysnomia'
 
 // Export function.
 export function checkRolePosition (
-  member: Member, considerOwnership: boolean = true, considerMutedRole: boolean = true
+  member: Member, considerOwnership = true, considerMutedRole = true
 ): number {
   // If owner, return.
   if (member.guild.ownerID === member.id && considerOwnership) return 9999

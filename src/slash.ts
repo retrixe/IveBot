@@ -20,7 +20,7 @@ import type {
 } from './imports/types.ts'
 import { getInsult } from './imports/tools.ts'
 import type CommandParser from './client.ts'
-import { type Db } from 'mongodb'
+import type { Db } from 'mongodb'
 
 function isEquivalent (a: Record<string, boolean>, b: Record<string, boolean>): boolean {
   // Create arrays of property names
@@ -28,8 +28,7 @@ function isEquivalent (a: Record<string, boolean>, b: Record<string, boolean>): 
   const bProps = Object.getOwnPropertyNames(b)
   // If number of properties is different, objects are not equivalent
   if (aProps.length !== bProps.length) return false
-  for (let i = 0; i < aProps.length; i++) {
-    const propName = aProps[i]
+  for (const propName of aProps) {
     // If values of same property are not equal, objects are not equivalent
     if (a[propName] !== b[propName]) return false
   }
@@ -279,18 +278,18 @@ export default class SlashParser {
     if (!interaction.user) return
 
     const keys = Object.keys(this.commands)
-    for (let i = 0; i < keys.length; i++) {
-      if (interaction.data.name === keys[i].toLowerCase() ||
-        this.commands[keys[i]].aliases?.includes(interaction.data.name)) {
+    for (const key of keys) {
+      if (interaction.data.name === key.toLowerCase() ||
+        this.commands[key].aliases?.includes(interaction.data.name)) {
         // Execute command.
         try {
           const executeFirst = process.hrtime() // Initial high-precision time.
-          await this.executeCommand(this.commands[keys[i]], interaction)
+          await this.executeCommand(this.commands[key], interaction)
           const executeSecond = process.hrtime(executeFirst) // Time difference.
-          this.saveAnalytics(executeSecond, keys[i]) // Send analytics.
+          this.saveAnalytics(executeSecond, key) // Send analytics.
         } catch (e) {
           // On error, we tell the user of an unknown error and log it for our reference.
-          await interaction.createMessage(this.commands[keys[i]].errorMessage)
+          await interaction.createMessage(this.commands[key].errorMessage)
           console.error(e)
         }
         return

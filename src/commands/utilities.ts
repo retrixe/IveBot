@@ -1,13 +1,13 @@
 // All the types!
 import { Constants } from '@projectdysnomia/dysnomia'
 import type Dysnomia from '@projectdysnomia/dysnomia'
-import {
-  type Message,
-  type GuildTextableChannel,
-  type Guild,
-  type InteractionDataOptionsString
+import type {
+  Message,
+  GuildTextableChannel,
+  Guild,
+  InteractionDataOptionsString
 } from '@projectdysnomia/dysnomia'
-import { type Command } from '../imports/types.ts'
+import type { Command } from '../imports/types.ts'
 // All the needs!
 import { getIdFromMention, getInsult, getUser, getChannel } from '../imports/tools.ts'
 import ms from 'ms'
@@ -138,7 +138,7 @@ export const handleUserinfo: Command = {
       embeds: [{
         author: { name: 'User info', icon_url: user.avatarURL },
         title: `${user.username}#${user.discriminator}` + (user.bot ? ' (Bot account)' : ''),
-        description: user.mention + (member && member.pending ? ' (pending guild screening)' : ''),
+        description: user.mention + (member?.pending ? ' (pending guild screening)' : ''),
         thumbnail: { url: user.dynamicAvatarURL('png', 2048) },
         color,
         fields: [
@@ -305,7 +305,7 @@ export const handleSay: Command = {
     const possibleChannel = getIdFromMention(args[0])
     if (
       message.channelMentions[0] === possibleChannel ||
-      (message.member && message.member.guild.channels.has(possibleChannel))
+      message.member?.guild.channels.has(possibleChannel)
     ) {
       if (message.member && !message.member.guild.channels.get(possibleChannel)
         .permissionsOf(message.member.id).has('sendMessages')
@@ -316,7 +316,7 @@ export const handleSay: Command = {
         await client.createMessage(message.channelMentions[0], {
           content: args.join(' '),
           allowedMentions: {
-            everyone: message.member && message.member.permissions.has('mentionEveryone'),
+            everyone: message.member?.permissions.has('mentionEveryone'),
             users: true,
             roles: message.member && (
               message.member.permissions.has('mentionEveryone') ||
@@ -332,7 +332,7 @@ export const handleSay: Command = {
     return {
       content: args.join(' '),
       allowedMentions: {
-        everyone: message.member && message.member.permissions.has('mentionEveryone'),
+        everyone: message.member?.permissions.has('mentionEveryone'),
         users: true,
         roles: message.member && (
           message.member.permissions.has('mentionEveryone') ||
@@ -361,7 +361,7 @@ export const handleType: Command = {
     const possibleChannel = getIdFromMention(args[0])
     if (
       message.channelMentions[0] === possibleChannel ||
-      (message.member && message.member.guild.channels.has(possibleChannel))
+      message.member?.guild.channels.has(possibleChannel)
     ) {
       if (message.member && !message.member.guild.channels.get(possibleChannel)
         .permissionsOf(message.member.id).has('sendMessages')
@@ -376,7 +376,7 @@ export const handleType: Command = {
         await client.createMessage(message.channelMentions[0], {
           content: args.join(' '),
           allowedMentions: {
-            everyone: message.member && message.member.permissions.has('mentionEveryone'),
+            everyone: message.member?.permissions.has('mentionEveryone'),
             users: true,
             roles: message.member && (
               message.member.permissions.has('mentionEveryone') ||
@@ -396,7 +396,7 @@ export const handleType: Command = {
     return {
       content: args.join(' '),
       allowedMentions: {
-        everyone: message.member && message.member.permissions.has('mentionEveryone'),
+        everyone: message.member?.permissions.has('mentionEveryone'),
         users: true,
         roles: message.member && (
           message.member.permissions.has('mentionEveryone') ||
@@ -516,7 +516,7 @@ export const handleAvatar: Command = {
     let user: Message['author'] = getUser(message, args.join(' ')) || message.author
     if (!user && message.mentions.length !== 0) user = message.mentions[0]
     const member = message.member.guild.members.get(user.id)
-    const format = user.avatar && user.avatar.startsWith('a_') ? 'gif' : 'png'
+    const format = user.avatar?.startsWith('a_') ? 'gif' : 'png'
     return {
       content: '**Avatar:**',
       embeds: [{
@@ -651,7 +651,7 @@ export const handleEdit: Command = {
     const possibleChannel = getIdFromMention(args[0])
     if (
       message.channelMentions[0] === possibleChannel ||
-      (message.member && message.member.guild.channels.has(possibleChannel))
+      message.member?.guild.channels.has(possibleChannel)
     ) {
       // if (message.member && !message.member.guild.channels.get(possibleChannel)
       //   .permissionsOf(message.member.id).has('sendMessages')
@@ -686,7 +686,7 @@ export const handleEditLastSay: Command = {
     const possibleChannel = getIdFromMention(args[0])
     if (
       message.channelMentions[0] === possibleChannel ||
-      (message.member && message.member.guild.channels.has(possibleChannel))
+      message.member?.guild.channels.has(possibleChannel)
     ) {
       if (message.member && !message.member.guild.channels.get(possibleChannel)
         .permissionsOf(message.member.id).has('sendMessages')

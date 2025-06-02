@@ -12,9 +12,7 @@ function isEquivalent (a: Record<string, boolean>, b: Record<string, boolean>): 
   // If number of properties is different, objects are not equivalent
   if (aProps.length !== bProps.length) return false
 
-  for (let i = 0; i < aProps.length; i++) {
-    const propName = aProps[i]
-
+  for (const propName of aProps) {
     // If values of same property are not equal, objects are not equivalent
     if (a[propName] !== b[propName]) return false
   }
@@ -232,15 +230,15 @@ export default class CommandParser {
     try { if (message.author.bot) return } catch (e) { return }
     // Check for the command in this.commands.
     const keys = Object.keys(this.commands)
-    for (let i = 0; i < keys.length; i++) {
-      if (commandExec === keys[i].toLowerCase() ||
-        this.commands[keys[i]].aliases?.includes(commandExec)) {
+    for (const key of keys) {
+      if (commandExec === key.toLowerCase() ||
+        this.commands[key].aliases?.includes(commandExec)) {
         // Execute command.
         try {
           const executeFirst = process.hrtime() // Initial high-precision time.
-          const error = await this.executeCommand(this.commands[keys[i]], message)
+          const error = await this.executeCommand(this.commands[key], message)
           const executeSecond = process.hrtime(executeFirst) // Time difference.
-          this.saveAnalytics(executeSecond, keys[i]) // Send analytics.
+          this.saveAnalytics(executeSecond, key) // Send analytics.
           // We mark the command as evaluated and schedule a removal of the ID in 30 seconds.
           if (!error) {
             this.evaluatedMessages.push(message.id)
@@ -250,7 +248,7 @@ export default class CommandParser {
           } // TODO: else add it to erroredMessage, and edit that message on re-eval.
         } catch (e) {
           // On error, we tell the user of an unknown error and log it for our reference.
-          await message.channel.createMessage(this.commands[keys[i]].errorMessage)
+          await message.channel.createMessage(this.commands[key].errorMessage)
           console.error(e)
         }
         return
@@ -273,15 +271,15 @@ export default class CommandParser {
     try { if (message.author.bot) return } catch (e) { return }
     // Check for the command in this.commands.
     const keys = Object.keys(this.commands)
-    for (let i = 0; i < keys.length; i++) {
-      if (commandExec === keys[i].toLowerCase() ||
-        this.commands[keys[i]].aliases?.includes(commandExec)) {
+    for (const key of keys) {
+      if (commandExec === key.toLowerCase() ||
+        this.commands[key].aliases?.includes(commandExec)) {
         // Execute command.
         try {
           const executeFirst = process.hrtime() // Initial high precision time.
-          const error = await this.executeCommand(this.commands[keys[i]], message)
+          const error = await this.executeCommand(this.commands[key], message)
           const executeSecond = process.hrtime(executeFirst) // Time difference.
-          this.saveAnalytics(executeSecond, keys[i]) // Send analytics.
+          this.saveAnalytics(executeSecond, key) // Send analytics.
           if (!error) {
             // We mark the command as evaluated and schedule a removal of the ID in 30 seconds.
             this.evaluatedMessages.push(message.id)
@@ -291,7 +289,7 @@ export default class CommandParser {
           }
         } catch (e) {
           // On error, we tell the user of an unknown error and log it for our reference.
-          await message.channel.createMessage(this.commands[keys[i]].errorMessage)
+          await message.channel.createMessage(this.commands[key].errorMessage)
           console.error(e)
         }
         return

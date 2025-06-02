@@ -1,4 +1,4 @@
-import { type Command } from '../../imports/types.ts'
+import type { Command } from '../../imports/types.ts'
 import { getInsult, getUser } from '../../imports/tools.ts'
 import { checkRolePosition } from '../../imports/permissions.ts'
 import type { Message, GuildTextableChannel } from '@projectdysnomia/dysnomia'

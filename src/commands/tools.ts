@@ -1,4 +1,4 @@
-import { type Command } from '../imports/types.ts'
+import type { Command } from '../imports/types.ts'
 import { execSync } from 'child_process'
 import moment from 'moment'
 import { host, testPilots } from '../config.ts'

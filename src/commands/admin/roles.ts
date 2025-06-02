@@ -1,4 +1,4 @@
-import { type Command } from '../../imports/types.ts'
+import type { Command } from '../../imports/types.ts'
 import { checkRolePosition } from '../../imports/permissions.ts'
 import { getInsult, getUser, getServerSettings } from '../../imports/tools.ts'
 

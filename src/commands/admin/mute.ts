@@ -1,4 +1,4 @@
-import { type Command } from '../../imports/types.ts'
+import type { Command } from '../../imports/types.ts'
 import { checkRolePosition } from '../../imports/permissions.ts'
 import { getInsult, getUser } from '../../imports/tools.ts'
 import { Constants } from '@projectdysnomia/dysnomia'
@@ -151,7 +151,7 @@ export const handleUnmute: Command = {
     for (const role of roles) {
       if (rolesOfServer.get(role).name === 'Muted') {
         // Remove the mute persist.
-        if (tempDB.mute[guildID] && tempDB.mute[guildID].includes(user.id)) {
+        if (tempDB.mute[guildID]?.includes(user.id)) {
           tempDB.mute[guildID].splice(tempDB.mute[guildID].findIndex((i) => i === user.id), 1)
         }
         // Take the role.

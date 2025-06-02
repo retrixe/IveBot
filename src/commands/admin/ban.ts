@@ -1,5 +1,5 @@
-import { type User } from '@projectdysnomia/dysnomia'
-import { type Command } from '../../imports/types.ts'
+import type { User } from '@projectdysnomia/dysnomia'
+import type { Command } from '../../imports/types.ts'
 import { checkRolePosition } from '../../imports/permissions.ts'
 import { getInsult, getUser } from '../../imports/tools.ts'
 

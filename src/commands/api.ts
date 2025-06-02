@@ -671,9 +671,10 @@ export const handleDefine: Command = {
         `https://od-api.oxforddictionaries.com/api/v2/lemmas/en/${args.join(' ')}`, { headers }
       )).json() as OxfordApiResponse
       // If the word doesn't exist in the Oxford Dictionary..
-      if (r.error === 'No entries were found for a given inflected word' || (
-        r.error && r.error.startsWith('No lemma was found')
-      )) {
+      if (
+        r.error === 'No entries were found for a given inflected word' ||
+        r.error?.startsWith('No lemma was found')
+      ) {
         return { content: 'Did you enter a valid word? 👾', error: true }
       }
       try {
@@ -691,9 +692,9 @@ export const handleDefine: Command = {
           if (fields.length < 24) fields.push(object)
           else if (fields.length === 24) fields.push({ name: '...too many definitions.', value: zeroWidthSpace })
         }
-        for (let i = 0; i < results.length; i++) {
+        for (const result of results) {
           // Our super filter to remove what we don't need.
-          const categories: Categories = results[i].lexicalEntries
+          const categories: Categories = result.lexicalEntries
           categories.forEach(
             // The function run on each category.
             category => {

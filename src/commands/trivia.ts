@@ -145,13 +145,13 @@ export class TriviaSession {
     let hasGuessed = false
 
     // TODO: fuse.js for better pattern matching.
-    for (let i = 0; i < this.currentQuestion[1].length; i++) {
-      const answer = this.currentQuestion[1][i].toLowerCase()
+    for (const rawAnswer of this.currentQuestion[1]) {
+      const answer = rawAnswer.toLowerCase()
       const guess = message.content.toLowerCase()
       if (!answer.includes(' ')) { // Strict answer checking for one word answers
         const guessWords = guess.split(' ')
-        for (let j = 0; j < guessWords.length; j++) {
-          if (guessWords[j] === answer) {
+        for (const guessWord of guessWords) {
+          if (guessWord === answer) {
             hasGuessed = true
           }
         }
