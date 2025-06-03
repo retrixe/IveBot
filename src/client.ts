@@ -128,7 +128,7 @@ export default class CommandParser {
   client: Client
   tempDB: DB
   db: Db
-  evaluatedMessages: string[]
+  evaluatedMessages: Set<string>
   analytics: Record<string, { totalUse: number; averageExecTime: number[] }>
 
   constructor(client: Client, tempDB: DB, db: Db) {
@@ -137,7 +137,7 @@ export default class CommandParser {
     this.tempDB = tempDB
     this.db = db
     this.analytics = {}
-    this.evaluatedMessages = []
+    this.evaluatedMessages = new Set<string>()
     this.onMessage = this.onMessage.bind(this)
     this.onMessageUpdate = this.onMessageUpdate.bind(this)
     setInterval(() => {
@@ -281,12 +281,9 @@ export default class CommandParser {
           this.saveAnalytics(executeSecond, key) // Send analytics.
           // We mark the command as evaluated and schedule a removal of the ID in 30 seconds.
           if (!error) {
-            this.evaluatedMessages.push(message.id)
+            this.evaluatedMessages.add(message.id)
             setTimeout(() => {
-              this.evaluatedMessages.splice(
-                this.evaluatedMessages.findIndex(i => i === message.id),
-                1,
-              )
+              this.evaluatedMessages.delete(message.id)
             }, 30000)
           } // TODO: else add it to erroredMessage, and edit that message on re-eval.
         } catch (e) {
@@ -305,7 +302,7 @@ export default class CommandParser {
     // We won't bother with a lot of messages..
     if (message.content && !message.content.startsWith('/')) return
     else if (!message.editedTimestamp) return
-    else if (this.evaluatedMessages.includes(message.id)) return
+    else if (this.evaluatedMessages.has(message.id)) return
     else if (Date.now() - message.timestamp > 30000) return
     else if (message.editedTimestamp - message.timestamp > 30000) return
     // Proceed to evaluate.
@@ -328,12 +325,9 @@ export default class CommandParser {
           this.saveAnalytics(executeSecond, key) // Send analytics.
           if (!error) {
             // We mark the command as evaluated and schedule a removal of the ID in 30 seconds.
-            this.evaluatedMessages.push(message.id)
+            this.evaluatedMessages.add(message.id)
             setTimeout(() => {
-              this.evaluatedMessages.splice(
-                this.evaluatedMessages.findIndex(i => i === message.id),
-                1,
-              )
+              this.evaluatedMessages.delete(message.id)
             }, 30000)
           }
         } catch (e) {

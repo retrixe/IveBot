@@ -145,7 +145,6 @@ export default class SlashParser {
   client: Client
   tempDB: DB
   db: Db
-  evaluatedMessages: string[]
   analytics: Record<string, { totalUse: number; averageExecTime: number[] }>
 
   constructor(client: Client, tempDB: DB, db: Db, commandParser: CommandParser) {
