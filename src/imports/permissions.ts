@@ -24,3 +24,9 @@ export function checkRolePosition(
   }
   return highestRolePosition
 }
+
+export function formatPermissionName(name: string): string {
+  return (name.substr(0, 1).toUpperCase() + name.substr(1))
+    .replace(/[A-Z]+/g, s => ' ' + s)
+    .replace('TTSMessages', 'TTS Messages')
+}

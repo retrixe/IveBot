@@ -7,7 +7,7 @@ import type {
   Client,
 } from '@projectdysnomia/dysnomia'
 import type { Command, DB } from '../imports/types.ts'
-import { getInsult } from '../imports/tools.ts'
+import { getInsult, getMemberColor } from '../imports/tools.ts'
 import fs from 'fs'
 
 async function parseTriviaList(fileName: string): Promise<Map<string, string[]>> {
@@ -84,14 +84,7 @@ export class TriviaSession {
       })
     }
     const member = this.message.member.guild.members.get(this.client.user.id)
-    const color = member
-      ? (
-          member.roles
-            .map(i => member.guild.roles.get(i))
-            .sort((a, b) => (a.position > b.position ? -1 : 1))
-            .find(i => i.color !== 0) || { color: 0 }
-        ).color
-      : 0
+    const color = member ? getMemberColor(member) : 0
     const embed: EmbedOptions = {
       title: 'Scores',
       color,
@@ -273,14 +266,7 @@ export const handleTrivia: Command = {
     } else if (args.length === 1 && args[0] === 'list') {
       const lists = await fs.promises.readdir('./src/data/triviaLists/')
       const member = message.member.guild.members.get(client.user.id)
-      const color = member
-        ? (
-            member.roles
-              .map(i => member.guild.roles.get(i))
-              .sort((a, b) => (a.position > b.position ? -1 : 1))
-              .find(i => i.color !== 0) || { color: 0 }
-          ).color
-        : 0
+      const color = member ? getMemberColor(member) : 0
       return {
         content: '❔ **Available trivia topics:**',
         embeds: [

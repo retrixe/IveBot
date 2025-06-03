@@ -2,7 +2,7 @@ import http, { type RequestOptions } from 'http'
 import https from 'https'
 import { URL } from 'url'
 import type { Db, Document } from 'mongodb'
-import type { GuildChannel, Message, User } from '@projectdysnomia/dysnomia'
+import type { GuildChannel, Member, Message, User } from '@projectdysnomia/dysnomia'
 
 export const getIdFromMention = (mention: string): string => {
   const f = mention
@@ -63,6 +63,12 @@ export const getChannel = (message: Message, arg: string): GuildChannel | undefi
   }
 }
 
+export const getMemberColor = (member: Member) =>
+  member.roles
+    .map(i => member.guild.roles.get(i))
+    .sort((a, b) => (a.position > b.position ? -1 : 1))
+    .find(i => i.color !== 0)?.color ?? 0
+
 // Fresh insults. They come and go, I suppose.
 export const getInsult = (plural = false): string => {
   const insults = [
@@ -120,4 +126,21 @@ export const fetchLimited = async (
     })
     req.on('error', reject)
   })
+}
+
+export function isEquivalent(a: Record<string, unknown>, b: Record<string, unknown>): boolean {
+  // Create arrays of property names
+  const aProps = Object.getOwnPropertyNames(a)
+  const bProps = Object.getOwnPropertyNames(b)
+
+  // If number of properties is different, objects are not equivalent
+  if (aProps.length !== bProps.length) return false
+
+  for (const propName of aProps) {
+    // If values of same property are not equal, objects are not equivalent
+    if (a[propName] !== b[propName]) return false
+  }
+
+  // If we made it this far, objects are considered equivalent
+  return true
 }

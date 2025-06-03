@@ -1,3 +1,4 @@
+import { formatPermissionName } from '../imports/permissions.ts'
 import { zeroWidthSpace, getInsult } from '../imports/tools.ts'
 import type { Command as IveBotCommand } from '../imports/types.ts'
 import type { Command } from '../client.ts'
@@ -89,13 +90,8 @@ const generateDocs = (command: Command): string => {
   if (command.requirements) {
     const permissions = command.requirements.permissions
       ? `Needs the permissions: ${Object.keys(command.requirements.permissions)
-          .map(perm =>
-            (perm.substr(0, 1).toUpperCase() + perm.substr(1))
-              .replace(/[A-Z]+/g, s => ' ' + s)
-              .trim(),
-          )
-          .join(', ')
-          .replace('TTSMessages', 'TTS Messages')} | `
+          .map(formatPermissionName)
+          .join(', ')} | `
       : ''
     const roleNames = command.requirements.roleNames
       ? `Needs the roles: ${command.requirements.roleNames.join(', ')} | `

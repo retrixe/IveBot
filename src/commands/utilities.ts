@@ -9,7 +9,14 @@ import type {
 } from '@projectdysnomia/dysnomia'
 import type { Command } from '../imports/types.ts'
 // All the needs!
-import { getIdFromMention, getInsult, getUser, getChannel } from '../imports/tools.ts'
+import { formatPermissionName } from '../imports/permissions.ts'
+import {
+  getIdFromMention,
+  getInsult,
+  getUser,
+  getChannel,
+  getMemberColor,
+} from '../imports/tools.ts'
 import ms from 'ms'
 import { host, testPilots } from '../config.ts'
 import moment from 'moment'
@@ -137,14 +144,7 @@ export const handleUserinfo: Command = {
     // Display information.
     const member = message.member.guild.members.get(user.id)
     // TODO: Add publicFlags, game, premiumSince, custom-status. Support per-server pfp, about me, banner.
-    const color = member
-      ? (
-          member.roles
-            .map(i => member.guild.roles.get(i))
-            .sort((a, b) => (a.position > b.position ? -1 : 1))
-            .find(i => i.color !== 0) || { color: 0 }
-        ).color
-      : 0
+    const color = member ? getMemberColor(member) : 0
     return {
       content: `👥 **Userinfo on ${user.username}:**`,
       embeds: [
@@ -219,14 +219,7 @@ export const handlePermissions: Command = {
       return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // Display permission info.
     const member = message.member.guild.members.get(user.id)
-    const color = member
-      ? (
-          member.roles
-            .map(i => member.guild.roles.get(i))
-            .sort((a, b) => (a.position > b.position ? -1 : 1))
-            .find(i => i.color !== 0) || { color: 0 }
-        ).color
-      : 0
+    const color = member ? getMemberColor(member) : 0
     const permissions = member.permissions
     const permissionKeys = Object.keys(permissions.json) as Array<keyof Constants['Permissions']>
     const channelPerm = (message.channel as GuildTextableChannel).permissionsOf(user.id)
@@ -250,42 +243,22 @@ export const handlePermissions: Command = {
                     ? 'Administrator! (use `/perms --ignore-admin` to show perms regardless)'
                     : permissionKeys
                         .filter(perm => permissions.has(perm))
-                        .map(perm =>
-                          (perm.substr(0, 1).toUpperCase() + perm.substr(1)).replace(
-                            /[A-Z]+/g,
-                            s => ' ' + s,
-                          ),
-                        )
-                        .join(', ')
-                        .replace('TTSMessages', 'TTS Messages'),
+                        .map(formatPermissionName)
+                        .join(', '),
             },
             !(message.member.guild.ownerID === user.id || permissions.has('administrator')) ||
             ignoreAdmin
               ? {
                   name: 'Channel Permissions',
-                  value: (
+                  value:
                     permissionKeys
                       .filter(perm => !permissions.has(perm) && channelPerm.has(perm))
-                      .map(perm =>
-                        (perm.substr(0, 1).toUpperCase() + perm.substr(1)).replace(
-                          /[A-Z]+/g,
-                          s => ' ' + s,
-                        ),
-                      )
+                      .map(formatPermissionName)
                       .join(', ') +
                     permissionKeys
                       .filter(perm => permissions.has(perm) && !channelPerm.has(perm))
-                      .map(
-                        perm =>
-                          '**!(' +
-                          (perm.substr(0, 1).toUpperCase() + perm.substr(1)).replace(
-                            /[^(][A-Z]+/g,
-                            s => s.substr(0, 1) + ' ' + s.substr(1),
-                          ) +
-                          ')**',
-                      )
-                      .join(', ')
-                  ).replace('TTSMessages', 'TTS Messages'),
+                      .map(perm => `**!(${formatPermissionName(perm)})**`)
+                      .join(', '),
                 }
               : { name: '', value: '' },
           ].filter(e => !!e.value),
