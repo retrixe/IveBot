@@ -3,7 +3,7 @@ import tseslint from 'typescript-eslint'
 import importPlugin from 'eslint-plugin-import'
 import pluginPromise from 'eslint-plugin-promise'
 import nodePlugin from 'eslint-plugin-n'
-// import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 
 export default tseslint.config(
   {
@@ -77,5 +77,5 @@ export default tseslint.config(
       '@typescript-eslint/restrict-template-expressions': 'off',
     },
   },
-  // FIXME: eslintPluginPrettierRecommended,
+  eslintPluginPrettierRecommended,
 )

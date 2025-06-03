@@ -68,14 +68,15 @@ export const handleOcr: Command = {
     if (useHastebin) args.shift()
     // Get the image and convert it to Base64.
     try {
-      let url = (args.length > 0)
-        ? args.join('%20')
-        : message.attachments?.find(attachment => !!attachment)?.url
+      let url =
+        args.length > 0
+          ? args.join('%20')
+          : message.attachments?.find(attachment => !!attachment)?.url
       if (message.messageReference) {
-        const mess = message.referencedMessage || await client.getMessage(
-          message.messageReference.channelID,
-          message.messageReference.messageID
-        )
+        const reference = message.messageReference
+        const mess =
+          message.referencedMessage ||
+          (await client.getMessage(reference.channelID, reference.messageID))
         url = /^https?:\/\/\S+$/.test(mess.content)
           ? mess.content
           : mess.attachments?.find(attachment => !!attachment)?.url
@@ -99,14 +100,19 @@ export const handleOcr: Command = {
       // Now send the request.
       const res = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${cvAPIkey}`, {
         body: JSON.stringify({
-          requests: [{
-            image: { content: image }, features: [{ type: 'TEXT_DETECTION' }]
-          }]
+          requests: [
+            {
+              image: { content: image },
+              features: [{ type: 'TEXT_DETECTION' }],
+            },
+          ],
         }),
-        method: 'POST'
+        method: 'POST',
       })
       // Parse the response.
-      const result = await res.json() as { responses: Array<{ fullTextAnnotation: { text: string } }> }
+      const result = (await res.json()) as {
+        responses: Array<{ fullTextAnnotation: { text: string } }>
+      }
       // If no text was found.
       if (!result.responses[0].fullTextAnnotation)
         return 'I was unable to get any results for the image.'
@@ -120,9 +126,10 @@ export const handleOcr: Command = {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({
-              name: 'IveBot /ocr result', files: [{ content: { format: 'text', value: text } }]
-            })
-          }).then(async e => (await e.json()) as { result: { id: string, deletion_key: string } })
+              name: 'IveBot /ocr result',
+              files: [{ content: { format: 'text', value: text } }],
+            }),
+          }).then(async e => (await e.json()) as { result: { id: string; deletion_key: string } })
           hastebin = result.id
           deletionKey = result.deletion_key
         }
@@ -135,23 +142,29 @@ export const handleOcr: Command = {
           ? `🤔 **Text recognition result uploaded to paste.gg${!useHastebin ? ' due to length' : ''}:**
 https://paste.gg/p/anonymous/${hastebin} (use this key to delete: \`${deletionKey}\`)`
           : `🤔 **Text recognition result:**\n${text}`,
-        embeds: [{
-          color: 0x666666,
-          author: {
-            name: `${message.author.username}#${message.author.discriminator}'s Image`,
-            icon_url: message.author.avatarURL
+        embeds: [
+          {
+            color: 0x666666,
+            author: {
+              name: `${message.author.username}#${message.author.discriminator}'s Image`,
+              icon_url: message.author.avatarURL,
+            },
+            footer: {
+              text: 'Powered by Google Cloud Vision API',
+              icon_url:
+                'https://www.gstatic.com/devrel-devsite/prod/' +
+                'v2210deb8920cd4a55bd580441aa58e7853afc04b39a9d9ac4198e1cd7fbe04ef/cloud/images/' +
+                'favicons/onecloud/favicon.ico',
+            },
+            timestamp: new Date(message.timestamp).toISOString(),
           },
-          footer: {
-            text: 'Powered by Google Cloud Vision API',
-            icon_url: 'https://www.gstatic.com/devrel-devsite/prod/' +
-            'v2210deb8920cd4a55bd580441aa58e7853afc04b39a9d9ac4198e1cd7fbe04ef/cloud/images/' +
-            'favicons/onecloud/favicon.ico'
-          },
-          timestamp: new Date(message.timestamp).toISOString()
-        }]
+        ],
       }
-    } catch (e) { console.error(e); return `Invalid image URL, you ${getInsult()}.` }
-  }
+    } catch (e) {
+      console.error(e)
+      return `Invalid image URL, you ${getInsult()}.`
+    }
+  },
 }
 
 export const handleHastebin: Command = {
@@ -167,12 +180,18 @@ export const handleHastebin: Command = {
   generator: async (message, args, { client }) => {
     try {
       // Check if a message link was passed.
-      const regex = /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
-      let url = (args.length > 0) ? args.join('%20') : message.attachments?.find(attachment => !!attachment)?.url
+      const regex =
+        /https?:\/\/((canary|ptb|www).)?discord(app)?.com\/channels\/\d{17,18}\/\d{17,18}\/\d{17,18}/
+      let url =
+        args.length > 0
+          ? args.join('%20')
+          : message.attachments?.find(attachment => !!attachment)?.url
       if (regex.test(url)) {
         const split = url.split('/')
         const mess = await client.getMessage(split[split.length - 2], split.pop())
-        url = /^https?:\/\/\S+$/.test(mess.content) ? mess.content : mess.attachments?.find(attachment => !!attachment)?.url
+        url = /^https?:\/\/\S+$/.test(mess.content)
+          ? mess.content
+          : mess.attachments?.find(attachment => !!attachment)?.url
       }
       // Fetch text file.
       // TODO: Outdated..
@@ -218,7 +237,9 @@ export const handleCat: Command = {
   generator: async () => {
     try {
       // Fetch a cat and process it (this sounds funny to me idk why)
-      const { file } = await (await fetch('http://aws.random.cat/meow')).json() as { file: string }
+      const { file } = (await (await fetch('http://aws.random.cat/meow')).json()) as {
+        file: string
+      }
       // Send it.
       return { embeds: [{ image: { url: file }, color: 0x123456 }], content: '🐱' }
     } catch (e) {
@@ -295,16 +316,29 @@ export const handleApod: Command = {
   generator: async (message, args) => {
     // Check for date.
     const date = moment(args.join(' '), [
-      moment.ISO_8601, moment.RFC_2822, 'Do M YYYY', 'Do MM YYYY', 'Do MMM YYYY',
-      'Do MMMM YYYY', 'D M YYYY', 'D MM YYYY', 'D MMM YYYY', 'D MMMM YYYY'
+      moment.ISO_8601,
+      moment.RFC_2822,
+      'Do M YYYY',
+      'Do MM YYYY',
+      'Do MMM YYYY',
+      'Do MMMM YYYY',
+      'D M YYYY',
+      'D MM YYYY',
+      'D MMM YYYY',
+      'D MMMM YYYY',
     ])
     if (date.isValid()) {
       const dateStr = date.format('YYYY-MM-DD')
       // Fetch a picture or video.
       try {
-        const { media_type: mediaType, url, title, explanation } = await (await fetch(
-          `https://api.nasa.gov/planetary/apod?api_key=${NASAtoken}&date=${dateStr}`
-        )).json() as ApodResponse
+        const {
+          media_type: mediaType,
+          url,
+          title,
+          explanation,
+        } = (await (
+          await fetch(`https://api.nasa.gov/planetary/apod?api_key=${NASAtoken}&date=${dateStr}`)
+        ).json()) as ApodResponse
         return mediaType === 'video'
           ? `**${title}**\n${explanation}\n${url.split('embed/').join('watch?v=')}`
           : {
@@ -319,9 +353,15 @@ export const handleApod: Command = {
     }
     // Fetch a picture or video.
     try {
-      const { media_type: mediaType, url, hdurl, title, explanation } = await (await fetch(
-        `https://api.nasa.gov/planetary/apod?api_key=${NASAtoken}`
-      )).json() as ApodResponse
+      const {
+        media_type: mediaType,
+        url,
+        hdurl,
+        title,
+        explanation,
+      } = (await (
+        await fetch(`https://api.nasa.gov/planetary/apod?api_key=${NASAtoken}`)
+      ).json()) as ApodResponse
       return mediaType === 'video'
         ? `**${title}**\n${explanation}\n${url.split('embed/').join('watch?v=')}`
         : {
@@ -366,13 +406,15 @@ export const handleDog: Command = {
       // Fetch a random picture for a sub-breed.
     } else if (args[0] && args[1]) {
       try {
-        let { message } = await (await fetch(
-          `http://dog.ceo/api/breed/${args[0].toLowerCase()}/${args[1].toLowerCase()}/images/random`
-        )).json() as { message: string }
+        let { message } = (await (
+          await fetch(
+            `http://dog.ceo/api/breed/${args[0].toLowerCase()}/${args[1].toLowerCase()}/images/random`,
+          )
+        ).json()) as { message: string }
         if (message.includes('Breed not found')) {
-          ({ message } = await (await fetch(
-            `http://dog.ceo/api/breed/${args.join('').toLowerCase()}/images/random`
-          )).json() as { message: string })
+          ;({ message } = (await (
+            await fetch(`http://dog.ceo/api/breed/${args.join('').toLowerCase()}/images/random`)
+          ).json()) as { message: string })
         }
         if (!message || message.includes('Breed not found'))
           return { content: 'This breed/sub-breed does not exist!', error: true }
@@ -386,9 +428,9 @@ export const handleDog: Command = {
     } else if (args[0]) {
       // Fetch a random picture for a breed.
       try {
-        const { message } = await (await fetch(
-          `http://dog.ceo/api/breed/${args[0].toLowerCase()}/images/random`
-        )).json() as { message: string }
+        const { message } = (await (
+          await fetch(`http://dog.ceo/api/breed/${args[0].toLowerCase()}/images/random`)
+        ).json()) as { message: string }
         if (!message || message.includes('Breed not found')) return 'This breed does not exist!'
         return { embeds: [{ image: { url: message }, color: 0x654321 }], content: '🐕 ' + args[0] }
       } catch (err) {
@@ -397,7 +439,9 @@ export const handleDog: Command = {
     }
     // Fetch a random picture.
     try {
-      const { message } = await (await fetch('http://dog.ceo/api/breeds/image/random')).json() as { message: string }
+      const { message } = (await (
+        await fetch('http://dog.ceo/api/breeds/image/random')
+      ).json()) as { message: string }
       return { embeds: [{ image: { url: message }, color: 0x654321 }], content: '🐕' }
     } catch (err) {
       return `Something went wrong 👾 Error: ${err}`
@@ -431,12 +475,14 @@ export const handleUrban: Command = {
         }
         return {
           content: `**🍸 Definition of ${args.join(' ')}:**`,
-          embeds: [{
-            color: 0x555555,
-            description: response,
-            footer: { text: 'Do not trust Urban Dictionary.' },
-            title: args.join(' ')
-          }]
+          embeds: [
+            {
+              color: 0x555555,
+              description: response,
+              footer: { text: 'Do not trust Urban Dictionary.' },
+              title: args.join(' '),
+            },
+          ],
         }
         // Else, there will be an exception thrown.
       } catch (err) {
@@ -487,41 +533,56 @@ export const handleNamemc: Command = {
     try {
       // Fetch the UUID and name of the user and parse it to JSON.
       const member = message.member?.guild.members.get(getIdFromMention(args[0]))
-      const username = member ? (member.nick || member.username) : args[0]
-      const { id, name } = await (await fetch(
-        `https://api.mojang.com/users/profiles/minecraft/${username}`
-      )).json() as { id?: string, name?: string }
+      const username = member ? member.nick || member.username : args[0]
+      const { id, name } = (await (
+        await fetch(`https://api.mojang.com/users/profiles/minecraft/${username}`)
+      ).json()) as { id?: string; name?: string }
       if (!id || !name) {
-        return { content: 'Enter a valid Minecraft username (account must be premium)', error: true }
+        return {
+          content: 'Enter a valid Minecraft username (account must be premium)',
+          error: true,
+        }
       }
       // Fetch the previous names as well.
       try {
-        const names: Array<{ name: string, changedToAt?: number }> = [{
-          name: 'Currently, username history is not available. ' +
-            'See: https://help.minecraft.net/hc/en-us/articles/8969841895693-Username-History-API-Removal-FAQ-'
-        }]
+        const names: Array<{ name: string; changedToAt?: number }> = [
+          {
+            name:
+              'Currently, username history is not available. ' +
+              'See: https://help.minecraft.net/hc/en-us/articles/8969841895693-Username-History-API-Removal-FAQ-',
+          },
+        ]
         /* await (await fetch(
           `https://api.mojang.com/user/profiles/${id}/names`
         )).json() as Array<{ name: string, changedToAt?: number }> */
         return {
           content: `**Minecraft history and skin for ${name}:**`,
-          embeds: [{
-            color: 0x00AE86,
-            title: 'Skin and Name History',
-            fields: [...names.map(object => ({
-              name: object.name,
-              value: object.changedToAt
-                ? `Changed to this name on ${moment(object.changedToAt).format('dddd, MMMM Do YYYY, h:mm:ss A')}`
-                : zeroWidthSpace
-            })), { name: 'Skin', value: zeroWidthSpace }],
-            description: '**Name History**\n',
-            image: { url: `https://mc-heads.net/body/${id}`, height: 216, width: 90 },
-            footer: { text: 'Skin is recovered through https://mc-heads.net' }
-          }]
+          embeds: [
+            {
+              color: 0x00ae86,
+              title: 'Skin and Name History',
+              fields: [
+                ...names.map(object => ({
+                  name: object.name,
+                  value: object.changedToAt
+                    ? `Changed to this name on ${moment(object.changedToAt).format('dddd, MMMM Do YYYY, h:mm:ss A')}`
+                    : zeroWidthSpace,
+                })),
+                { name: 'Skin', value: zeroWidthSpace },
+              ],
+              description: '**Name History**\n',
+              image: { url: `https://mc-heads.net/body/${id}`, height: 216, width: 90 },
+              footer: { text: 'Skin is recovered through https://mc-heads.net' },
+            },
+          ],
         }
-      } catch (err) { return `Something went wrong 👾 Error: ${err}` }
-    } catch (e) { return { content: 'Enter a valid Minecraft username (account must be premium)', error: true } }
-  }
+      } catch (err) {
+        return `Something went wrong 👾 Error: ${err}`
+      }
+    } catch (e) {
+      return { content: 'Enter a valid Minecraft username (account must be premium)', error: true }
+    }
+  },
 }
 
 // Initialize cache.
@@ -539,9 +600,10 @@ export const handleCurrency: Command = {
   generator: async (message, args) => {
     // Check cache if old, and refresh accordingly.
     if (!currency || Date.now() - currency.timestamp > 3600000) {
-      currency = await ( // This just fetches the data and parses it to JSON.
+      // This just fetches the data and parses it to JSON.
+      currency = (await (
         await fetch(`http://data.fixer.io/api/latest?access_key=${fixerAPIkey}`)
-      ).json() as typeof currency
+      ).json()) as typeof currency
       currency.timestamp = Date.now() // To set the timestamp to the current time of the system.
       // to change syp value to blackmarket value
       const response = await fetch('https://sp-today.com/en/currency/us_dollar/city/damascus')
@@ -554,15 +616,20 @@ export const handleCurrency: Command = {
     if (args.length === 1 && args[0].toLowerCase() === 'list') {
       return {
         content: '**List of symbols:**',
-        embeds: [{
-          description: Object.keys(currency.rates).toString().split(',').join(', '),
-          color: 0x666666,
-          title: '💲 Currency symbols',
-          fields: [{
-            name: 'Tip', value: 'Symbols are usually (but NOT ALWAYS) the country 2 \
-letter code + the first letter of the currency name.'
-          }]
-        }]
+        embeds: [
+          {
+            description: Object.keys(currency.rates).toString().split(',').join(', '),
+            color: 0x666666,
+            title: '💲 Currency symbols',
+            fields: [
+              {
+                name: 'Tip',
+                value:
+                  'Symbols are usually (but NOT ALWAYS) the country 2 letter code + the first letter of the currency name.',
+              },
+            ],
+          },
+        ],
       }
     }
     // Calculate the currencies to conver from and to, as well as the amount.
@@ -622,63 +689,73 @@ export const handleWeather: Command = {
     if (fahrenheit)
       args.splice(args.includes('-f') ? args.indexOf('-f') : args.indexOf('--fahrenheit'), 1)
     // Get the response from our API.
-    const weather = await (await fetch(
-      `http://api.openweathermap.org/data/2.5/weather?q=${args.join(',')}&appid=${weatherAPIkey}${
-        fahrenheit ? '&units=imperial' : '&units=metric'
-      }`
-    )).json() as Weather
+    const weather = (await (
+      await fetch(
+        `http://api.openweathermap.org/data/2.5/weather?q=${args.join(',')}` +
+          `&appid=${weatherAPIkey}&units=${fahrenheit ? 'imperial' : 'metric'}`,
+      )
+    ).json()) as Weather
     const temp = fahrenheit ? '°F' : '°C'
     // If the place doesn't exist..
     if (weather.cod === '404') return { content: 'Enter a valid city >_<', error: true }
     // We generate the entire embed.
     return {
       content: `**🌇🌃🌁🌆 The weather for ${args.join(', ')}:**`,
-      embeds: [{
-        title: 'Weather at ' + args.join(', '),
-        color: 0x6D6BEA,
-        description: `**Description:** ${weather.weather[0].main} - ${weather.weather[0].description}`,
-        thumbnail: { url: `http://openweathermap.org/img/w/${weather.weather[0].icon}.png` },
-        footer: { text: 'Weather data from https://openweathermap.org' },
-        fields: [{
-          name: 'Co-ordinates 🗺',
-          value: `${Math.abs(weather.coord.lat)}${weather.coord.lat >= 0 ? '°N' : '°S'} /\
+      embeds: [
+        {
+          title: 'Weather at ' + args.join(', '),
+          color: 0x6d6bea,
+          description: `**Description:** ${weather.weather[0].main} - ${weather.weather[0].description}`,
+          thumbnail: { url: `http://openweathermap.org/img/w/${weather.weather[0].icon}.png` },
+          footer: { text: 'Weather data from https://openweathermap.org' },
+          fields: [
+            {
+              name: 'Co-ordinates 🗺',
+              value: `${Math.abs(weather.coord.lat)}${weather.coord.lat >= 0 ? '°N' : '°S'} /\
  ${Math.abs(weather.coord.lon)}${weather.coord.lon >= 0 ? '°E' : '°W'}
 **(Latitude/Longitude)**`,
-          inline: true
-        }, {
-          name: 'Temperature 🌡',
-          value: `
+              inline: true,
+            },
+            {
+              name: 'Temperature 🌡',
+              value: `
 ${weather.main.temp}${temp}/${weather.main.temp_max}${temp}/${weather.main.temp_min}${temp}
 **(avg/max/min)**`,
-          inline: true // Description goes here
-        }, {
-          name: 'Wind 🎐',
-          value: `${weather.wind.speed} m/s | ${weather.wind.deg}°
+              inline: true, // Description goes here
+            },
+            {
+              name: 'Wind 🎐',
+              value: `${weather.wind.speed} m/s | ${weather.wind.deg}°
 **(speed | direction)**`,
-          inline: true
-        }, { name: 'Pressure 🍃', value: `${weather.main.pressure} millibars`, inline: true },
-        { name: 'Humidity 💧', value: `${weather.main.humidity}%`, inline: true },
-        {
-          name: 'Cloud cover 🌥',
-          value: weather.clouds ? `${weather.clouds.all}% of sky` : 'N/A',
-          inline: true
+              inline: true,
+            },
+            { name: 'Pressure 🍃', value: `${weather.main.pressure} millibars`, inline: true },
+            { name: 'Humidity 💧', value: `${weather.main.humidity}%`, inline: true },
+            {
+              name: 'Cloud cover 🌥',
+              value: weather.clouds ? `${weather.clouds.all}% of sky` : 'N/A',
+              inline: true,
+            },
+            {
+              name: 'Visibility 🌫',
+              value: weather.visibility ? `${weather.visibility} meters` : 'N/A',
+              inline: true,
+            },
+            {
+              name: 'Rain, past 3h 🌧',
+              value: weather.rain ? `${weather.rain['3h']}mm` : 'N/A',
+              inline: true,
+            },
+            {
+              name: 'Snow, past 3h 🌨❄',
+              value: weather.snow ? `${weather.snow['3h']}mm` : 'N/A',
+              inline: true,
+            },
+          ],
         },
-        {
-          name: 'Visibility 🌫',
-          value: weather.visibility ? `${weather.visibility} meters` : 'N/A',
-          inline: true
-        }, {
-          name: 'Rain, past 3h 🌧',
-          value: weather.rain ? `${weather.rain['3h']}mm` : 'N/A',
-          inline: true
-        }, {
-          name: 'Snow, past 3h 🌨❄',
-          value: weather.snow ? `${weather.snow['3h']}mm` : 'N/A',
-          inline: true
-        }]
-      }]
+      ],
     }
-  }
+  },
 }
 
 interface OxfordApiResponse {
@@ -686,13 +763,13 @@ interface OxfordApiResponse {
   results: Array<{ lexicalEntries: Array<{ inflectionOf: Array<{ id: string }> }> }>
 }
 type Categories = Array<{
-  lexicalCategory: { id: string, text: string }
+  lexicalCategory: { id: string; text: string }
   entries: Array<{
     senses: Array<{
       definitions: string[]
       shortDefinitions?: string[]
       examples: Array<{ text: string }>
-      registers: Array<{ id: string, text: string }>
+      registers: Array<{ id: string; text: string }>
     }>
   }>
 }>
@@ -714,9 +791,11 @@ export const handleDefine: Command = {
     }
     // Search for the word, destructure for results, and then pass them on to our second request.
     try {
-      const r = await (await fetch(
-        `https://od-api.oxforddictionaries.com/api/v2/lemmas/en/${args.join(' ')}`, { headers }
-      )).json() as OxfordApiResponse
+      const r = (await (
+        await fetch(`https://od-api.oxforddictionaries.com/api/v2/lemmas/en/${args.join(' ')}`, {
+          headers,
+        })
+      ).json()) as OxfordApiResponse
       // If the word doesn't exist in the Oxford Dictionary..
       if (
         r.error === 'No entries were found for a given inflected word' ||
@@ -727,17 +806,21 @@ export const handleDefine: Command = {
       try {
         // Here we get the dictionary entries for the specified word.
         const word = r.results[0].lexicalEntries[0].inflectionOf[0].id
-        const { results } = await (await fetch(
-          `https://od-api.oxforddictionaries.com/api/v2/entries/en/${word}` +
-            '?strictMatch=false&fields=definitions%2Cexamples',
-          { headers }
-        )).json() as { results: Array<{ lexicalEntries: Categories, word: string }> }
+        const { results } = (await (
+          await fetch(
+            `https://od-api.oxforddictionaries.com/api/v2/entries/en/${word}` +
+              '?strictMatch=false&fields=definitions%2Cexamples',
+            { headers },
+          )
+        ).json()) as { results: Array<{ lexicalEntries: Categories; word: string }> }
         // Now we create an embed based on the 1st entry.
-        const fields: Array<{ name: string, value: string, inline?: boolean }> = []
+        const fields: Array<{ name: string; value: string; inline?: boolean }> = []
         // Function to check for maximum number of fields in an embed, then push.
-        const safePush = (object: { name: string, value: string }): void => {
-          if (fields.length < 24) fields.push(object)
-          else if (fields.length === 24) fields.push({ name: '...too many definitions.', value: zeroWidthSpace })
+        const safePush = (object: { name: string; value: string }): void => {
+          if (fields.length < 24) {
+            fields.push(object)
+          } else if (fields.length === 24)
+            fields.push({ name: '...too many definitions.', value: zeroWidthSpace })
         }
         for (const result of results) {
           // Our super filter to remove what we don't need.
@@ -746,49 +829,62 @@ export const handleDefine: Command = {
             // The function run on each category.
             category => {
               // If our field doesn't have the category name, we push the category name to it.
-              if (!fields.includes({
-                name: '**' + category.lexicalCategory.text + '**', value: zeroWidthSpace
-              })) {
+              if (
+                !fields.includes({
+                  name: '**' + category.lexicalCategory.text + '**',
+                  value: zeroWidthSpace,
+                })
+              ) {
                 // We don't push an empty field for the first element, else we do.
                 if (fields.length !== 0) safePush({ name: zeroWidthSpace, value: zeroWidthSpace })
-                safePush({ name: '**' + category.lexicalCategory.text + '**', value: zeroWidthSpace })
+                safePush({
+                  name: '**' + category.lexicalCategory.text + '**',
+                  value: zeroWidthSpace,
+                })
               }
               // Here we add every definition and example to the fields.
               let a = 1 // Index for the definition.
               category.entries.forEach(({ senses }) => {
                 // Iterate over every definition.
-                senses.forEach((sense) => {
+                senses.forEach(sense => {
                   // Check if there is a definition.
                   if (!sense.shortDefinitions && !sense.definitions) return
                   // Then safely push the definition to the array.
                   safePush({
-                    name: `**${a}.** ` + (sense.registers ? `(${sense.registers[0].text}) ` : '') + (
-                      (sense.shortDefinitions || sense.definitions)[0]
-                    ),
+                    name:
+                      `**${a}.** ` +
+                      (sense.registers ? `(${sense.registers[0].text}) ` : '') +
+                      (sense.shortDefinitions || sense.definitions)[0],
                     value: sense.examples?.[0].text
                       ? `e.g. ${sense.examples[0].text}`
-                      : 'No example is available.'
+                      : 'No example is available.',
                   })
                   // Add 1 to the index.
                   a += 1
                 })
               })
-            }
+            },
           )
         }
         return {
           content: `📕 **|** Definition of **${args.join(' ')}**:`,
-          embeds: [{
-            color: 0x7289DA,
-            type: 'rich',
-            title: results[0].word,
-            footer: { text: 'Powered by Oxford Dictionary \\o/' },
-            fields
-          }]
+          embeds: [
+            {
+              color: 0x7289da,
+              type: 'rich',
+              title: results[0].word,
+              footer: { text: 'Powered by Oxford Dictionary \\o/' },
+              fields,
+            },
+          ],
         }
-      } catch (err) { return `Something went wrong 👾 Error: ${err}` }
-    } catch (e) { return { content: 'Did you enter a valid word? 👾', error: true } }
-  }
+      } catch (err) {
+        return `Something went wrong 👾 Error: ${err}`
+      }
+    } catch (e) {
+      return { content: 'Did you enter a valid word? 👾', error: true }
+    }
+  },
 }
 
 const noimageposts = ['1037', '1608', '1663']
@@ -807,32 +903,55 @@ export const handleXkcd: Command = {
         // Fetch all posts and parse the HTML.
         const req = await fetch('https://xkcd.com/archive')
         if (!req.ok) return 'Failed to fetch list of xkcd comics!\nhttps://xkcd.com/1348'
-        const posts = (await req.text()).split('<br/>').map(e => ({
-          name: e.substring(0, e.length - 4).split('>').pop(),
-          id: e.substring(e.lastIndexOf('href="/') + 7).split('/"').shift()
-        })).slice(4)
+        const posts = (await req.text())
+          .split('<br/>')
+          .map(e => ({
+            name: e
+              .substring(0, e.length - 4)
+              .split('>')
+              .pop(),
+            id: e
+              .substring(e.lastIndexOf('href="/') + 7)
+              .split('/"')
+              .shift(),
+          }))
+          .slice(4)
         posts.splice(posts.length - 11, 11) // Slice and splice invalid elements.
         // Construct search result. Default threshold was 0.6, 0.4 is more precise.
         const fuse = new Fuse(posts, { keys: ['name', 'id'], threshold: 0.4 })
-        const res = fuse.search(args.slice(1).join(' '), { limit: 3 }).map(e => (
-          noimageposts.includes(e.item.id) ? { ...e.item, id: e.item.id + '(no image)' } : e.item
-        ))
-        if (res.length === 0) return { content: 'No results were found for your search criteria!', error: true }
+        const res = fuse
+          .search(args.slice(1).join(' '), { limit: 3 })
+          .map(e =>
+            noimageposts.includes(e.item.id) ? { ...e.item, id: e.item.id + '(no image)' } : e.item,
+          )
+        if (res.length === 0)
+          return { content: 'No results were found for your search criteria!', error: true }
         const res1 = 'https://xkcd.com/' + res[0].id
         const res2 = res[1] ? `\n2. <https://xkcd.com/${res[1].id}>` : ''
         const res3 = res[2] ? `\n3. <https://xkcd.com/${res[2].id}>` : ''
         return `**Top results:**\n1. ${res1}${res2}${res3}`
-      } catch (e) { console.error(e); return 'Failed to fetch list of xkcd comics!\nhttps://xkcd.com/1348' }
+      } catch (e) {
+        console.error(e)
+        return 'Failed to fetch list of xkcd comics!\nhttps://xkcd.com/1348'
+      }
     } else if (
-      args.length > 1 || (args.length === 1 && args[0] !== 'latest' && args[0] !== 'random')
-    ) return { content: 'Correct usage: /xkcd (latest|random|search) (search query if searching)', error: true }
+      args.length > 1 ||
+      (args.length === 1 && args[0] !== 'latest' && args[0] !== 'random')
+    )
+      return {
+        content: 'Correct usage: /xkcd (latest|random|search) (search query if searching)',
+        error: true,
+      }
     // Get the latest xkcd comic.
     try {
-      const { num } = await (await fetch('http://xkcd.com/info.0.json')).json() as { num: number }
-      if (args[0] === 'random') return `https://xkcd.com/${Math.floor(Math.random() * (num - 1)) + 1}`
+      const { num } = (await (await fetch('http://xkcd.com/info.0.json')).json()) as { num: number }
+      if (args[0] === 'random')
+        return `https://xkcd.com/${Math.floor(Math.random() * (num - 1)) + 1}`
       else return `https://xkcd.com/${num}`
-    } catch (e) { return 'Failed to fetch an xkcd comic!\nhttps://xkcd.com/1348' }
-  }
+    } catch (e) {
+      return 'Failed to fetch an xkcd comic!\nhttps://xkcd.com/1348'
+    }
+  },
 }
 
 export const handleHttpCat: Command = {

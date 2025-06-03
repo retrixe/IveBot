@@ -16,66 +16,64 @@ import { getServerSettings } from './imports/tools.ts'
 import { cvAPIkey } from './config.ts'
 
 // When a server gains a member, this function will be called.
-export const guildMemberAdd = (client: Client, db: Db, tempDB: DB) => async (
-  guild: Guild, member: Member
-) => {
-  // Mute persist.
-  try {
-    if (tempDB.mute[guild.id].includes(member.id)) {
-      const role = guild.roles.find((role) => role.name === 'Muted')
-      if (role) await member.addRole(role.id, 'Persisting mute.')
+export const guildMemberAdd =
+  (client: Client, db: Db, tempDB: DB) => async (guild: Guild, member: Member) => {
+    // Mute persist.
+    try {
+      if (tempDB.mute[guild.id].includes(member.id)) {
+        const role = guild.roles.find(role => role.name === 'Muted')
+        if (role) await member.addRole(role.id, 'Persisting mute.')
+      }
+    } catch (e) {}
+    // Get server settings.
+    const serverSettings = await getServerSettings(db, guild.id)
+    // If there's autorole enabled..
+    if (serverSettings.joinAutorole) {
+      // For each role..
+      serverSettings.joinAutorole.split('|').forEach(async (role: string) => {
+        try {
+          const roleName = role.startsWith('bot-') ? role.substr(4) : role
+          const roleObj = member.guild.roles.find(element => element.name === roleName)
+          if (!role || !roleObj) return
+          if (role.startsWith('bot-') && member.user.bot) await member.addRole(roleObj.id)
+          else if (!role.startsWith('bot-') && !member.user.bot) await member.addRole(roleObj.id)
+        } catch (e) {}
+      })
     }
-  } catch (e) {}
-  // Get server settings.
-  const serverSettings = await getServerSettings(db, guild.id)
-  // If there's autorole enabled..
-  if (serverSettings.joinAutorole) {
-    // For each role..
-    serverSettings.joinAutorole.split('|').forEach(async (role: string) => {
-      try {
-        const roleName = role.startsWith('bot-') ? role.substr(4) : role
-        const roleObj = member.guild.roles.find(element => element.name === roleName)
-        if (!role || !roleObj) return
-        if (role.startsWith('bot-') && member.user.bot) await member.addRole(roleObj.id)
-        else if (!role.startsWith('bot-') && !member.user.bot) await member.addRole(roleObj.id)
-      } catch (e) {}
-    })
+    // If join/leave messages is not configured/improperly configured..
+    if (!serverSettings.joinLeaveMessages) return
+    const { joinMessage, channel } = serverSettings.joinLeaveMessages
+    if (!channel || !joinMessage) return
+    // We send a message.
+    try {
+      const toSend = joinMessage
+        .replaceAll('{un}', member.user.username) // Replace the username.
+        .replaceAll('{m}', member.user.mention) // Replace the mention.
+        .replaceAll('{d}', member.user.discriminator) // Replace the discriminator.
+      await client.createMessage(channel, toSend)
+    } catch (e) {}
   }
-  // If join/leave messages is not configured/improperly configured..
-  if (!serverSettings.joinLeaveMessages) return
-  const { joinMessage, channel } = serverSettings.joinLeaveMessages
-  if (!channel || !joinMessage) return
-  // We send a message.
-  try {
-    const toSend = joinMessage
-      .split('{un}').join(member.user.username) // Replace the username.
-      .split('{m}').join(member.user.mention) // Replace the mention.
-      .split('{d}').join(member.user.discriminator) // Replace the discriminator.
-    await client.createMessage(channel, toSend)
-  } catch (e) {}
-}
 
 // When a server loses a member, this function will be called.
-export const guildMemberRemove = (client: Client, db: Db) => async (
-  guild: Guild, member: Member | { id: string, user: User }
-) => {
-  // Get server settings.
-  const serverSettings = await getServerSettings(db, guild.id)
-  // If join/leave messages is not configured/improperly configured..
-  if (!serverSettings.joinLeaveMessages) return
-  const { leaveMessage, channel, banMessage } = serverSettings.joinLeaveMessages
-  if (!channel || !leaveMessage) return
-  // If there is a ban message and the user is banned.
-  if (banMessage && (await guild.getBans()).find(i => i.user.id === member.user.id)) return
-  // We send a message.
-  try {
-    const toSend = leaveMessage
-      .split('{un}').join(member.user.username) // Replace the username.
-      .split('{m}').join(member.user.mention) // Replace the mention.
-      .split('{d}').join(member.user.discriminator) // Replace the discriminator.
-    await client.createMessage(channel, toSend)
-  } catch (e) {}
-}
+export const guildMemberRemove =
+  (client: Client, db: Db) => async (guild: Guild, member: Member | { id: string; user: User }) => {
+    // Get server settings.
+    const serverSettings = await getServerSettings(db, guild.id)
+    // If join/leave messages is not configured/improperly configured..
+    if (!serverSettings.joinLeaveMessages) return
+    const { leaveMessage, channel, banMessage } = serverSettings.joinLeaveMessages
+    if (!channel || !leaveMessage) return
+    // If there is a ban message and the user is banned.
+    if (banMessage && (await guild.getBans()).find(i => i.user.id === member.user.id)) return
+    // We send a message.
+    try {
+      const toSend = leaveMessage
+        .replaceAll('{un}', member.user.username) // Replace the username.
+        .replaceAll('{m}', member.user.mention) // Replace the mention.
+        .replaceAll('{d}', member.user.discriminator) // Replace the discriminator.
+      await client.createMessage(channel, toSend)
+    } catch (e) {}
+  }
 
 // When a server bans a member, this function will be called.
 export const guildBanAdd = (client: Client, db: Db) => async (guild: Guild, user: User) => {

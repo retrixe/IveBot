@@ -63,25 +63,35 @@ export const handleEditchannel: Command = {
       const name = opArr.shift()
       const value = opArr.join('-')
       // Validate each operation.
-      if (!operationTypes.includes(name)) { // Is it a valid operation?
+      if (!operationTypes.includes(name)) {
+        // Is it a valid operation?
         failedOps.push({ name: `❌ ${operation}`, value: 'Invalid operation.' })
-      } else if ( // Text channel only properties for voice channels?
-        ['rateLimitPerUser', 'nsfw', 'topic'].includes(name) && channel.type === 2
-      ) failedOps.push({ name: `❌ ${operation}`, value: 'This operation is text channel only.' })
-      else if (
-        ['bitrate', 'userLimit'].includes(name) && channel.type === 0
-      ) failedOps.push({ name: `❌ ${operation}`, value: 'This operation is voice channel only.' })
+      } else if (['rateLimitPerUser', 'nsfw', 'topic'].includes(name) && channel.type === 2)
+        // Text channel only properties for voice channels?
+        failedOps.push({ name: `❌ ${operation}`, value: 'This operation is text channel only.' })
+      else if (['bitrate', 'userLimit'].includes(name) && channel.type === 0)
+        failedOps.push({ name: `❌ ${operation}`, value: 'This operation is voice channel only.' })
       // Check for types.
       else if (name === 'rateLimitPerUser' && (isNaN(+value) || +value > 120 || +value < 0)) {
         failedOps.push({
-          name: `❌ ${operation}`, value: 'rateLimitPerUser must be a number between 0 and 120.'
+          name: `❌ ${operation}`,
+          value: 'rateLimitPerUser must be a number between 0 and 120.',
         })
       } else if (name === 'nsfw' && value !== 'true' && value !== 'false') {
-        failedOps.push({ name: `❌ ${operation}`, value: 'NSFW must be either true or false.' })
+        failedOps.push({
+          name: `❌ ${operation}`,
+          value: 'NSFW must be either true or false.',
+        })
       } else if (name === 'bitrate' && (isNaN(+value) || +value < 8 || +value > 384)) {
-        failedOps.push({ name: `❌ ${operation}`, value: 'bitrate must be a number between 8-384.' })
+        failedOps.push({
+          name: `❌ ${operation}`,
+          value: 'bitrate must be a number between 8-384.',
+        })
       } else if (name === 'userLimit' && (isNaN(+value) || +value > 99 || +value < 0)) {
-        failedOps.push({ name: `❌ ${operation}`, value: 'userLimit must be a number between 0-99.' })
+        failedOps.push({
+          name: `❌ ${operation}`,
+          value: 'userLimit must be a number between 0-99.',
+        })
         // Now we edit the channel.
       } else {
         try {

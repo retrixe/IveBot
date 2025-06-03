@@ -85,9 +85,12 @@ export class TriviaSession {
     }
     const member = this.message.member.guild.members.get(this.client.user.id)
     const color = member
-      ? (member.roles.map(i => member.guild.roles.get(i)).sort(
-          (a, b) => a.position > b.position ? -1 : 1
-        ).find(i => i.color !== 0) || { color: 0 }).color
+      ? (
+          member.roles
+            .map(i => member.guild.roles.get(i))
+            .sort((a, b) => (a.position > b.position ? -1 : 1))
+            .find(i => i.color !== 0) || { color: 0 }
+        ).color
       : 0
     const embed: EmbedOptions = {
       title: 'Scores',
@@ -119,15 +122,21 @@ export class TriviaSession {
       await this.endGame()
       return true
     }
-    this.currentQuestion = Array.from(this.questionList.entries())[Math.floor(Math.random() * this.questionList.size)]
+    this.currentQuestion = Array.from(this.questionList.entries())[
+      Math.floor(Math.random() * this.questionList.size)
+    ]
     this.questionList.delete(this.currentQuestion[0])
     this.count += 1
     this.timer = Date.now()
-    await this.channel.createMessage(`**Question number ${this.count}!**\n\n${this.currentQuestion[0]}`)
+    await this.channel.createMessage(
+      `**Question number ${this.count}!**\n\n${this.currentQuestion[0]}`,
+    )
 
     while (this.currentQuestion !== null && Date.now() - this.timer <= this.settings.timeLimit) {
       if (Date.now() - this.timeout >= this.settings.timeout) {
-        await this.channel.createMessage(`If you ${getInsult(true)} aren't going to play then I might as well stop.`)
+        await this.channel.createMessage(
+          `If you ${getInsult(true)} aren't going to play then I might as well stop.`,
+        )
         await this.endGame()
         return true
       }
@@ -265,9 +274,12 @@ export const handleTrivia: Command = {
       const lists = await fs.promises.readdir('./src/data/triviaLists/')
       const member = message.member.guild.members.get(client.user.id)
       const color = member
-        ? (member.roles.map(i => member.guild.roles.get(i)).sort(
-            (a, b) => a.position > b.position ? -1 : 1
-          ).find(i => i.color !== 0) || { color: 0 }).color
+        ? (
+            member.roles
+              .map(i => member.guild.roles.get(i))
+              .sort((a, b) => (a.position > b.position ? -1 : 1))
+              .find(i => i.color !== 0) || { color: 0 }
+          ).color
         : 0
       return {
         content: '❔ **Available trivia topics:**',

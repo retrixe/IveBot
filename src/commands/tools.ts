@@ -222,23 +222,26 @@ export const handleCreationtime: Command = {
       // Just parse it normally.
       let id = args[0]
       id = id.length < 17 && !isNaN(+id) ? id : getIdFromMention(args[0])
-      if ((id.length < 17) || isNaN(+id)) {
+      if (id.length < 17 || isNaN(+id)) {
         return { content: `Provide an valid ID or mention, you ${getInsult()}.`, error: true }
       }
-      return moment((new Base(id)).createdAt).format('YYYY/MM/DD, hh:mm:ss A')
+      return moment(new Base(id).createdAt).format('YYYY/MM/DD, hh:mm:ss A')
     } else {
-      const res = args.map(mention => {
-        // Parse each ID.
-        let id = args[0]
-        id = (id.length === 17 || id.length === 18) && !isNaN(+id) ? id : getIdFromMention(args[0])
-        if ((id.length !== 17 && id.length !== 18) || isNaN(+id)) {
-          return mention + ': invalid!'
-        }
-        return mention + ': ' + moment((new Base(id)).createdAt).format('YYYY/MM/DD, hh:mm:ss A')
-      }).join('\n')
+      const res = args
+        .map(mention => {
+          // Parse each ID.
+          let id = args[0]
+          id =
+            (id.length === 17 || id.length === 18) && !isNaN(+id) ? id : getIdFromMention(args[0])
+          if ((id.length !== 17 && id.length !== 18) || isNaN(+id)) {
+            return mention + ': invalid!'
+          }
+          return mention + ': ' + moment(new Base(id).createdAt).format('YYYY/MM/DD, hh:mm:ss A')
+        })
+        .join('\n')
       return {
         content: res,
-        allowedMentions: { users: false, roles: false, everyone: false }
+        allowedMentions: { users: false, roles: false, everyone: false },
       }
     }
   },

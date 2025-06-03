@@ -95,16 +95,23 @@ export class Command {
     const custom = this.requirements.custom ? this.requirements.custom(message) : false
     // If it's not a guild there are no permissions.
     if (message.channel.type !== 0) return userIDs || custom
-    const permissions = this.requirements.permissions && message.member
-      ? isEquivalent(Object.assign( // Assign the required permissions onto the member's permission.
-        message.member.permissions.json, this.requirements.permissions
-      ), message.member.permissions.json) // This should eval true if user has permissions.
-      : false
+    const permissions =
+      this.requirements.permissions &&
+      message.member &&
+      isEquivalent(
+        // Assign the required permissions onto the member's permission.
+        Object.assign(message.member.permissions.json, this.requirements.permissions),
+        message.member.permissions.json,
+      ) // This should eval true if user has permissions.
     // If any of these are true, it's a go.
     return userIDs || custom || permissions
   }
 
-  async execute (context: Context, message: Message, args: string[]): Promise<CommandResponse | undefined> {
+  async execute(
+    context: Context,
+    message: Message,
+    args: string[],
+  ): Promise<CommandResponse | undefined> {
     // Define 2 vars.
     let messageToSend: CommandResponse | undefined | Promise<CommandResponse> | Promise<undefined>
     // If it's a function, we call it first.
@@ -177,12 +184,21 @@ export default class CommandParser {
     const messageToSend = await command.execute(context, message, args)
     // We define a sent variable to keep track.
     let sent
-    if ( // No permission protection is here as well.
-      messageToSend && ((message.member &&
-      (message.channel as GuildTextableChannel)
-        .permissionsOf(this.client.user.id).has('sendMessages')) || // Channel can be a partial now.
-        message.channel.type === 1 || message.channel.type === 3 || !message.channel.type)
-    ) sent = await this.client.createMessage(message.channel.id, this.disableEveryone(messageToSend))
+    if (
+      // No permission protection is here as well.
+      messageToSend &&
+      ((message.member &&
+        (message.channel as GuildTextableChannel)
+          .permissionsOf(this.client.user.id)
+          .has('sendMessages')) || // Channel can be a partial now.
+        message.channel.type === 1 ||
+        message.channel.type === 3 ||
+        !message.channel.type)
+    )
+      sent = await this.client.createMessage(
+        message.channel.id,
+        this.disableEveryone(messageToSend),
+      )
     if (command.postGenerator) command.postGenerator(message, args, sent, context)
     return typeof messageToSend === 'object' ? messageToSend.error || false : false
   }
@@ -205,9 +221,9 @@ export default class CommandParser {
       commandInfo = this.analytics[name]
     }
     // Calculate the average time of execution taken.
-    const averageExecTime = commandInfo.averageExecTime.map((i: number, index: number) => (
-      ((i * commandInfo.totalUse) + timeTaken[index]) / (commandInfo.totalUse + 1)
-    ))
+    const averageExecTime = commandInfo.averageExecTime.map(
+      (i, index) => (i * commandInfo.totalUse + timeTaken[index]) / (commandInfo.totalUse + 1),
+    )
     // Update local cache with analytics.
     this.analytics[name].totalUse += 1
     this.analytics[name].averageExecTime = averageExecTime
@@ -225,15 +241,15 @@ export default class CommandParser {
       // Else, we update existing command data in the database.
       else {
         // Calculate the average execution time and update the database.
-        const averageExecTime = statistics.averageExecTime.map((i: number, index: number) => (
-          (
-            (i * statistics.totalUse) + (command.averageExecTime[index] * command.totalUse)
-          ) / (statistics.totalUse as number + command.totalUse)
-        ))
-        await analytics.updateOne({ name: commandName }, {
-          $inc: { totalUse: command.totalUse },
-          $set: { averageExecTime }
-        })
+        const averageExecTime = statistics.averageExecTime.map(
+          (i: number, index: number) =>
+            (i * statistics.totalUse + command.averageExecTime[index] * command.totalUse) /
+            ((statistics.totalUse as number) + command.totalUse),
+        )
+        await analytics.updateOne(
+          { name: commandName },
+          { $inc: { totalUse: command.totalUse }, $set: { averageExecTime } },
+        )
       }
       // Clear analytics for the command.
       command.totalUse = 0
@@ -267,7 +283,10 @@ export default class CommandParser {
           if (!error) {
             this.evaluatedMessages.push(message.id)
             setTimeout(() => {
-              this.evaluatedMessages.splice(this.evaluatedMessages.findIndex(i => i === message.id), 1)
+              this.evaluatedMessages.splice(
+                this.evaluatedMessages.findIndex(i => i === message.id),
+                1,
+              )
             }, 30000)
           } // TODO: else add it to erroredMessage, and edit that message on re-eval.
         } catch (e) {
@@ -311,7 +330,10 @@ export default class CommandParser {
             // We mark the command as evaluated and schedule a removal of the ID in 30 seconds.
             this.evaluatedMessages.push(message.id)
             setTimeout(() => {
-              this.evaluatedMessages.splice(this.evaluatedMessages.findIndex(i => i === message.id), 1)
+              this.evaluatedMessages.splice(
+                this.evaluatedMessages.findIndex(i => i === message.id),
+                1,
+              )
             }, 30000)
           }
         } catch (e) {

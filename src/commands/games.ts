@@ -212,10 +212,12 @@ export const handleRepeat: Command = {
     ],
   },
   slashGenerator: async interaction => {
-    const number = (interaction.data.options.find(opt => opt.name === 'number') as
-      InteractionDataOptionsInteger).value
-    const text = (interaction.data.options.find(opt => opt.name === 'text') as
-      InteractionDataOptionsString).value
+    const number = (
+      interaction.data.options.find(opt => opt.name === 'number') as InteractionDataOptionsInteger
+    ).value
+    const text = (
+      interaction.data.options.find(opt => opt.name === 'text') as InteractionDataOptionsString
+    ).value
     return await handleRepeat.commonGenerator(number, text)
   },
   generator: async (message, args) => {
@@ -226,7 +228,10 @@ export const handleRepeat: Command = {
   },
   commonGenerator: (number: number, text: string) => {
     if (number * text.length >= 2001) {
-      return { content: 'To prevent spam, your excessive message has not been repeated.', error: true }
+      return {
+        content: 'To prevent spam, your excessive message has not been repeated.',
+        error: true,
+      }
     } else if (text === '_' || text === '*' || text === '~') {
       return { content: 'This is known to lag users and is disabled.', error: true }
     }
@@ -263,10 +268,12 @@ export const handleRandom: Command = {
     ],
   },
   slashGenerator: interaction => {
-    const start = (interaction.data.options.find(option => option.name === 'start') as
-      InteractionDataOptionsInteger)?.value
-    const end = (interaction.data.options.find(option => option.name === 'end') as
-      InteractionDataOptionsInteger)?.value
+    const start = (
+      interaction.data.options.find(({ name }) => name === 'start') as InteractionDataOptionsInteger
+    )?.value
+    const end = (
+      interaction.data.options.find(({ name }) => name === 'end') as InteractionDataOptionsInteger
+    )?.value
     if (typeof start === 'number' && typeof end === 'number') {
       return `The number.. is.. ${Math.floor(Math.random() * (end - start)) + start}`
     } else if (typeof end === 'number') {
@@ -286,7 +293,10 @@ export const handleRandom: Command = {
       const number2 = +args[1]
       return `The number.. is.. ${Math.floor(Math.random() * (number2 - number1)) + number1}`
     } else if (args.length >= 1) {
-      return { content: 'Correct usage: /random (optional start number) (optional end number)', error: true }
+      return {
+        content: 'Correct usage: /random (optional start number) (optional end number)',
+        error: true,
+      }
     }
     return `The number.. is.. ${Math.floor(Math.random() * 10)}`
   },

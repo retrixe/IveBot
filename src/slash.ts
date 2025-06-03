@@ -113,20 +113,28 @@ export class SlashCommand {
     // TODO: const custom = this.requirements.custom ? this.requirements.custom(interaction) : false
     // If it's not a guild there are no permissions.
     if (!interaction.guildID) return userIDs // || custom
-    const permissions = this.requirements.permissions && interaction.member
-      ? isEquivalent(Object.assign( // Assign the required permissions onto the member's permission.
-        interaction.member.permissions.json, this.requirements.permissions
-      ), interaction.member.permissions.json) // This should eval true if user has permissions.
-      : false
+    const permissions =
+      this.requirements.permissions && interaction.member
+        ? isEquivalent(
+            // Assign the required permissions onto the member's permission.
+            Object.assign(interaction.member.permissions.json, this.requirements.permissions),
+            interaction.member.permissions.json,
+          ) // This should eval true if user has permissions.
+        : false
     // If any of these are true, it's a go.
     return userIDs /* || custom */ || permissions
   }
 
-  async execute (context: Context, interaction: CommandInteraction): Promise<CommandResponse | undefined> {
-    const generator = this.slashGenerator === true || typeof this.generator !== 'function'
-      ? this.generator as () => CommandResponse
-      : this.slashGenerator
-    const messageToSend = typeof generator === 'function' ? generator(interaction, context) : generator
+  async execute(
+    context: Context,
+    interaction: CommandInteraction,
+  ): Promise<CommandResponse | undefined> {
+    const generator =
+      this.slashGenerator === true || typeof this.generator !== 'function'
+        ? (this.generator as () => CommandResponse)
+        : this.slashGenerator
+    const messageToSend =
+      typeof generator === 'function' ? generator(interaction, context) : generator
     return await messageToSend
   }
 }
@@ -208,7 +216,7 @@ export default class SlashParser {
         throw new Error(`Discord did not correctly validate interaction! (${command.name})`)
       } // No sub command validation, write when you add sub commands.
     }
-    const requiredOptions = command.options.filter(opt => (opt as ApplicationCommandOptionsWithValue).required)
+    const requiredOptions = command.options.filter(opt => opt.required)
     if (!requiredOptions.every(option => found.includes(option.name))) {
       throw new Error(`Discord did not correctly validate interaction! (${command.name})`)
     }
@@ -225,9 +233,10 @@ export default class SlashParser {
     if (messageToSend) {
       await interaction.createMessage({
         ...this.disableEveryone(messageToSend),
-        flags: (typeof messageToSend === 'object' && messageToSend.error) || command.deleteCommand
-          ? Constants.MessageFlags.EPHEMERAL
-          : 0
+        flags:
+          (typeof messageToSend === 'object' && messageToSend.error) || command.deleteCommand
+            ? Constants.MessageFlags.EPHEMERAL
+            : 0,
       })
     }
     // TODO: if (command.postGenerator) command.postGenerator(message, args, sent, context)
@@ -251,9 +260,9 @@ export default class SlashParser {
       commandInfo = this.analytics[name]
     }
     // Calculate the average time of execution taken.
-    const averageExecTime = commandInfo.averageExecTime.map((i: number, index: number) => (
-      ((i * commandInfo.totalUse) + timeTaken[index]) / (commandInfo.totalUse + 1)
-    ))
+    const averageExecTime = commandInfo.averageExecTime.map(
+      (i, index) => (i * commandInfo.totalUse + timeTaken[index]) / (commandInfo.totalUse + 1),
+    )
     // Update local cache with analytics.
     this.analytics[name].totalUse += 1
     this.analytics[name].averageExecTime = averageExecTime
@@ -271,15 +280,15 @@ export default class SlashParser {
       // Else, we update existing command data in the database.
       else {
         // Calculate the average execution time and update the database.
-        const averageExecTime = statistics.averageExecTime.map((i: number, index: number) => (
-          (
-            (i * statistics.totalUse) + (command.averageExecTime[index] * command.totalUse)
-          ) / (statistics.totalUse as number + command.totalUse)
-        ))
-        await analytics.updateOne({ name: commandName }, {
-          $inc: { totalUse: command.totalUse },
-          $set: { averageExecTime }
-        })
+        const averageExecTime = statistics.averageExecTime.map(
+          (i: number, index: number) =>
+            (i * statistics.totalUse + command.averageExecTime[index] * command.totalUse) /
+            ((statistics.totalUse as number) + command.totalUse),
+        )
+        await analytics.updateOne(
+          { name: commandName },
+          { $inc: { totalUse: command.totalUse }, $set: { averageExecTime } },
+        )
       }
       // Clear analytics for the command.
       command.totalUse = 0
@@ -292,8 +301,10 @@ export default class SlashParser {
 
     const keys = Object.keys(this.commands)
     for (const key of keys) {
-      if (interaction.data.name === key.toLowerCase() ||
-        this.commands[key].aliases?.includes(interaction.data.name)) {
+      if (
+        interaction.data.name === key.toLowerCase() ||
+        this.commands[key].aliases?.includes(interaction.data.name)
+      ) {
         // Execute command.
         try {
           const executeFirst = process.hrtime() // Initial high-precision time.

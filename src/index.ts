@@ -117,32 +117,44 @@ for (const commandFile of commandFiles) {
 
 // Register setInterval to fulfill delayed tasks.
 setInterval(() => {
-  db.collection('tasks').find({ time: { $lte: Date.now() + 60000 } }).toArray().then(tasks => {
-    if (tasks?.length) {
-      tasks.forEach(task => setTimeout(() => {
-        // TODO: What if no perms?
-        if (task.type === 'unmute') {
-          client.removeGuildMemberRole(task.guild, task.user, task.target, 'Muted for fixed duration.')
-            .catch((e: unknown) => {
+  db.collection('tasks')
+    .find({ time: { $lte: Date.now() + 60000 } })
+    .toArray()
+    .then(tasks => {
+      tasks?.forEach(task =>
+        setTimeout(() => {
+          // TODO: What if no perms?
+          if (task.type === 'unmute') {
+            client
+              .removeGuildMemberRole(
+                task.guild,
+                task.user,
+                task.target,
+                'Muted for fixed duration.',
+              )
+              .catch((e: unknown) => {
+                if (
+                  (e instanceof DiscordRESTError || e instanceof DiscordHTTPError) &&
+                  e.res.statusCode !== 404
+                )
+                  console.error(e)
+              })
+          } else if (task.type === 'reminder') {
+            client.createMessage(task.target, task.message).catch((e: unknown) => {
               if (
                 (e instanceof DiscordRESTError || e instanceof DiscordHTTPError) &&
                 e.res.statusCode !== 404
-              ) console.error(e)
+              )
+                console.error(e)
             })
-        } else if (task.type === 'reminder') {
-          client.createMessage(task.target, task.message)
-            .catch((e: unknown) => {
-              if (
-                (e instanceof DiscordRESTError || e instanceof DiscordHTTPError) &&
-                e.res.statusCode !== 404
-              ) console.error(e)
-            })
-        }
-        db.collection('tasks').deleteOne({ _id: task._id })
-          .catch((error: unknown) => console.error('Failed to remove task from database.', error))
-      }, task.time - Date.now()))
-    }
-  }).catch(console.error)
+          }
+          db.collection('tasks')
+            .deleteOne({ _id: task._id })
+            .catch((error: unknown) => console.error('Failed to remove task from database.', error))
+        }, task.time - Date.now()),
+      )
+    })
+    .catch(console.error)
 }, 60000)
 
 // On connecting..
@@ -178,14 +190,15 @@ if (jwtSecret) {
     textChannels: Array<{ id: string; name: string }>
   }
   const key = createHash('sha256').update(jwtSecret).digest()
-  const headers = (body: NodeJS.ArrayBufferView | string): {
-    'Content-Length': number
-    'Content-Type': string
-  } => ({ 'Content-Length': Buffer.byteLength(body), 'Content-Type': 'application/json' })
-  const port = process.env.IVEBOT_API_PORT && !isNaN(+process.env.IVEBOT_API_PORT)
-    ? +process.env.IVEBOT_API_PORT
-    : 7331
-  const server = http.createServer((req, res) => {
+  const headers = (body: NodeJS.ArrayBufferView | string) => ({
+    'Content-Length': Buffer.byteLength(body),
+    'Content-Type': 'application/json',
+  })
+  const port =
+    process.env.IVEBOT_API_PORT && !isNaN(+process.env.IVEBOT_API_PORT)
+      ? +process.env.IVEBOT_API_PORT
+      : 7331
+  const listener: http.RequestListener = (req, res) => {
     if (req.method !== 'POST' || req.url !== '/private') return
     let buffer = Buffer.from([])
     req.on('data', chunk => {
@@ -193,14 +206,16 @@ if (jwtSecret) {
       if (buffer.byteLength > 1024 * 8) req.destroy() // 8 kB limit
     })
     req.on('end', () => {
-      (async () => {
+      ;(async () => {
         try {
           const decipher = createDecipheriv('aes-256-ctr', key, buffer.slice(0, 16))
           const data = Buffer.concat([decipher.update(buffer.slice(16)), decipher.final()])
           const valid: DiscordServerResponse[] = []
-          const parsed: { id: string, host: boolean, guilds: string[] } = JSON.parse(data.toString('utf8'))
+          const parsed: { id: string; host: boolean; guilds: string[] } = JSON.parse(
+            data.toString('utf8'),
+          )
           if (typeof parsed.id !== 'string' || !Array.isArray(parsed.guilds)) throw new Error()
-          await Promise.all(parsed.guilds.map(async id => {
+          const requests = parsed.guilds.map(async id => {
             if (typeof id !== 'string' || id.length <= 16) return
             const guild = client.guilds.get(id)
             if (!guild) return
@@ -210,7 +225,7 @@ if (jwtSecret) {
                 perm: true,
                 textChannels: guild.channels
                   .filter(c => c.type === 0 || c.type === 5)
-                  .map(c => ({ id: c.id, name: c.name }))
+                  .map(c => ({ id: c.id, name: c.name })),
               })
             }
             let member = guild.members.get(parsed.id)
@@ -222,10 +237,17 @@ if (jwtSecret) {
             }
             if (member) {
               const perm = guild.permissionsOf(member).has('manageGuild')
-              const textChannels = perm ? guild.channels.filter(c => c.type === 0 || c.type === 5) : []
-              valid.push({ id, perm, textChannels: textChannels.map(c => ({ id: c.id, name: c.name })) })
+              const textChannels = perm
+                ? guild.channels.filter(c => c.type === 0 || c.type === 5)
+                : []
+              valid.push({
+                id,
+                perm,
+                textChannels: textChannels.map(c => ({ id: c.id, name: c.name })),
+              })
             }
-          }))
+          })
+          await Promise.all(requests)
           randomBytes(16, (err, iv) => {
             if (err) {
               const error = '{"error":"Internal Server Error!"}'
@@ -242,5 +264,8 @@ if (jwtSecret) {
         }
       })().catch(console.error)
     })
-  }).listen(port, () => console.log('Listening for IveBot dashboard requests on', server.address()))
+  }
+  const server = http
+    .createServer(listener)
+    .listen(port, () => console.log('Listening for IveBot dashboard requests on', server.address()))
 }

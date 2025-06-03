@@ -14,7 +14,10 @@ export const handleAddemoji: Command = {
   },
   generator: async (message, args, { client }) => {
     // Get the URL.
-    const url = args.length > 1 ? args.splice(1).join('%20') : message.attachments?.find(attachment => !!attachment)?.url
+    const url =
+      args.length > 1
+        ? args.splice(1).join('%20')
+        : message.attachments?.find(attachment => !!attachment)?.url
     // This can check the first bits of the Buffer.
     const check = (header: number[], buf: Buffer): boolean => {
       for (let i = 0; i < header.length; i++) {
@@ -83,17 +86,21 @@ export const handleDeleteemoji: Command = {
     usage: '/deleteEmoji <custom emoji by ID/mention/name>',
     example: '/deleteEmoji <:tom:402567029963489281>',
     guildOnly: true,
-    requirements: { permissions: { manageEmojisAndStickers: true } }
+    requirements: { permissions: { manageEmojisAndStickers: true } },
   },
   generator: async (message, args, { client }) => {
     // Check bot permissions.
-    if (!message.member.guild.members.get(client.user.id).permissions.has('manageEmojisAndStickers')) {
-      return { content: `I don't even have permissions to do that, you ${getInsult()}.`, error: true }
-    }
+    if (
+      !message.member.guild.members.get(client.user.id).permissions.has('manageEmojisAndStickers')
+    )
+      return {
+        content: `I don't even have permissions to do that, you ${getInsult()}.`,
+        error: true,
+      }
     // Try deleting it, else throw an error.
     try {
       const emoji = message.member.guild.emojis.find(
-        i => (i.name === args[0] || i.id === args[0] || i.id === getIdFromMention(args[0]))
+        i => i.name === args[0] || i.id === args[0] || i.id === getIdFromMention(args[0]),
       )
       // If emoji doesn't exist.
       if (!emoji) return { content: `Invalid emoji, you ${getInsult()}.`, error: true }
@@ -102,7 +109,7 @@ export const handleDeleteemoji: Command = {
     } catch (e) {
       return 'Emoji could not be deleted.'
     }
-  }
+  },
 }
 
 export const handleEditemoji: Command = {
@@ -120,9 +127,13 @@ export const handleEditemoji: Command = {
     // Check if enough arguments were provided.
     if (args.length !== 2) return 'Correct usage: /editEmoji <emoji by ID/mention/name> <new name>'
     // Check bot permissions.
-    if (!message.member.guild.members.get(client.user.id).permissions.has('manageEmojisAndStickers')) {
-      return { content: `I don't even have permissions to do that, you ${getInsult()}.`, error: true }
-    }
+    if (
+      !message.member.guild.members.get(client.user.id).permissions.has('manageEmojisAndStickers')
+    )
+      return {
+        content: `I don't even have permissions to do that, you ${getInsult()}.`,
+        error: true,
+      }
     // Try editing it, else throw an error.
     try {
       const emoji = message.member.guild.emojis.find(

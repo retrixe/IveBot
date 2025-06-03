@@ -9,7 +9,9 @@ export { handleDeletechannel, handleEditchannel } from './channels.ts'
 export { handleMute, handleUnmute } from './mute.ts'
 export { handleBan, handleUnban } from './ban.ts'
 
-const parseSilentDelete = (args: string[]): { args: string[], silent: boolean, delete: boolean } => {
+const parseSilentDelete = (
+  args: string[],
+): { args: string[]; silent: boolean; delete: boolean } => {
   const data = { args, silent: false, delete: false }
   if ([0, 1].includes(data.args.indexOf('--silent')) || [0, 1].includes(data.args.indexOf('-s'))) {
     data.silent = true
@@ -33,17 +35,20 @@ export const handlePurge: Command = {
     deleteCommand: true,
     requirements: {
       permissions: { manageMessages: true },
-      custom: (message) => (
+      custom: message =>
         (message.channel as GuildTextableChannel)
-          .permissionsOf(message.author.id).has('manageMessages')
-      )
-    }
+          .permissionsOf(message.author.id)
+          .has('manageMessages'),
+    },
   },
   generator: async (message, args, { client }) => {
     // Check if usage is correct.
-    if (
-      isNaN(+args[0]) || args.length !== 1 || +args[0] <= 0 || +args[0] > 100
-    ) { return { content: 'Correct usage: /purge <number greater than 0 and less than 100>', error: true } }
+    if (isNaN(+args[0]) || args.length !== 1 || +args[0] <= 0 || +args[0] > 100) {
+      return {
+        content: 'Correct usage: /purge <number greater than 0 and less than 100>',
+        error: true,
+      }
+    }
     // Check bot for permissions.
     const permission = (message.channel as GuildTextableChannel).permissionsOf(client.user.id)
     if (!permission.has('manageMessages')) {
@@ -53,14 +58,28 @@ export const handlePurge: Command = {
     let messages: Message[]
     // Get the list of messages.
     try {
-      messages = await client.getMessages(message.channel.id, { limit: +args.shift(), before: message.id })
-    } catch (e) { return 'Could not retrieve messages.' }
+      messages = await client.getMessages(message.channel.id, {
+        limit: +args.shift(),
+        before: message.id,
+      })
+    } catch (e) {
+      return 'Could not retrieve messages.'
+    }
     // Delete the messages.
     try {
       const reason = args.join(' ') || 'Purge'
-      await client.deleteMessages(message.channel.id, messages.map(i => i.id), reason)
-    } catch (e) { return { content: 'Could not delete messages. Are the messages older than 2 weeks?', error: true } }
-  }
+      await client.deleteMessages(
+        message.channel.id,
+        messages.map(i => i.id),
+        reason,
+      )
+    } catch (e) {
+      return {
+        content: 'Could not delete messages. Are the messages older than 2 weeks?',
+        error: true,
+      }
+    }
+  },
 }
 
 export const handleKick: Command = {
@@ -71,12 +90,13 @@ export const handleKick: Command = {
     usage: '/kick <user by ID/username/mention> (--silent|-s) (--delete|-d) (reason)',
     guildOnly: true,
     example: '/kick voldemort you is suck',
-    requirements: { permissions: { kickMembers: true } }
+    requirements: { permissions: { kickMembers: true } },
   },
   generator: async (message, args, { client }) => {
     // Find the user ID.
     const user = getUser(message, args.shift())
-    if (!user) return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
+    if (!user)
+      return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
     // If the user cannot kick the person..
     if (
       checkRolePosition(message.member.guild.members.get(user.id)) >=
@@ -92,15 +112,18 @@ export const handleKick: Command = {
       (checkRolePosition(message.member.guild.members.get(user.id)) >=
         checkRolePosition(message.member.guild.members.get(client.user.id)) ||
         !message.member.guild.members.get(client.user.id).permissions.has('banMembers'))
-    ) return { content: `I cannot kick this person, you ${getInsult()}.`, error: true }
+    )
+      return { content: `I cannot kick this person, you ${getInsult()}.`, error: true }
     // Notify the user.
     let dm: Message
     if (!f.silent) {
       try {
-        dm = await (await client.getDMChannel(user.id)).createMessage(
+        dm = await (
+          await client.getDMChannel(user.id)
+        ).createMessage(
           f.args.length !== 0
             ? `You have been kicked from ${message.member.guild.name} for ${f.args.join(' ')}.`
-            : `You have been kicked from ${message.member.guild.name}.`
+            : `You have been kicked from ${message.member.guild.name}.`,
         )
       } catch (e) {}
     }
@@ -112,14 +135,16 @@ export const handleKick: Command = {
     }
     // WeChill
     if (message.member.guild.id === '402423671551164416') {
-      await client.createMessage('402437089557217290', f.args.length !== 0
-        ? `**${user.username}#${user.discriminator}** has been kicked for **${f.args.join(' ')}**.`
-        : `**${user.username}#${user.discriminator}** has been kicked for not staying chill >:L `
+      await client.createMessage(
+        '402437089557217290',
+        f.args.length !== 0
+          ? `**${user.username}#${user.discriminator}** has been kicked for **${f.args.join(' ')}**.`
+          : `**${user.username}#${user.discriminator}** has been kicked for not staying chill >:L `,
       )
     }
     if (f.delete) message.delete('Deleted kick command.').catch(() => {}) // Ignore error.
     if (!f.silent) return `**${user.username}#${user.discriminator}** has been kicked. **rip.**`
-  }
+  },
 }
 
 export const handleSlowmode: Command = {
@@ -133,19 +158,19 @@ export const handleSlowmode: Command = {
     example: '/slowmode off',
     requirements: {
       permissions: { manageChannels: true },
-      custom: (message) => (
-        (message.channel as GuildTextableChannel)
-          .permissionsOf(message.author.id).has('manageChannels') ||
-        (message.channel as GuildTextableChannel)
-          .permissionsOf(message.author.id).has('manageMessages')
-      )
-    }
+      custom: message => {
+        const permissions = (message.channel as GuildTextableChannel).permissionsOf(
+          message.author.id,
+        )
+        return permissions.has('manageChannels') || permissions.has('manageMessages')
+      },
+    },
   },
   generator: async (message, args, { client }) => {
     const t = +args[0]
-    if (
-      (isNaN(t) && args[0] !== 'off') || !args[0] || t < 0 || t > 120 || args.length > 1
-    ) { return 'Correct usage: /slowmode <number in seconds, max: 120 or off>' }
+    if ((isNaN(t) && args[0] !== 'off') || !args[0] || t < 0 || t > 120 || args.length > 1) {
+      return 'Correct usage: /slowmode <number in seconds, max: 120 or off>'
+    }
     // Check bot for permissions.
     const permission = (message.channel as GuildTextableChannel).permissionsOf(client.user.id)
     if (!permission.has('manageMessages') && !permission.has('manageChannels')) {

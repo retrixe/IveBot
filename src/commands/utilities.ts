@@ -128,7 +128,9 @@ export const handleUserinfo: Command = {
     const toGet = args.length === 0 ? message.author.id : args.shift()
     let user = getUser(message, toGet)
     if (!user && message.author.id === host && [18, 17].includes(toGet.length) && !isNaN(+toGet)) {
-      try { user = await client.getRESTUser(toGet) } catch (e) { }
+      try {
+        user = await client.getRESTUser(toGet)
+      } catch (e) {}
     }
     if (!user)
       return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }
@@ -136,48 +138,58 @@ export const handleUserinfo: Command = {
     const member = message.member.guild.members.get(user.id)
     // TODO: Add publicFlags, game, premiumSince, custom-status. Support per-server pfp, about me, banner.
     const color = member
-      ? (member.roles.map(i => member.guild.roles.get(i)).sort(
-          (a, b) => a.position > b.position ? -1 : 1
-        ).find(i => i.color !== 0) || { color: 0 }).color
+      ? (
+          member.roles
+            .map(i => member.guild.roles.get(i))
+            .sort((a, b) => (a.position > b.position ? -1 : 1))
+            .find(i => i.color !== 0) || { color: 0 }
+        ).color
       : 0
     return {
       content: `👥 **Userinfo on ${user.username}:**`,
-      embeds: [{
-        author: { name: 'User info', icon_url: user.avatarURL },
-        title: `${user.username}#${user.discriminator}` + (user.bot ? ' (Bot account)' : ''),
-        description: user.mention + (member?.pending ? ' (pending guild screening)' : ''),
-        thumbnail: { url: user.dynamicAvatarURL('png', 2048) },
-        color,
-        fields: [
-          { name: 'Status', value: member?.status ?? 'N/A', inline: true },
-          // { name: 'Join Position }
-          {
-            name: 'Joined server at',
-            value: member ? moment(member.joinedAt).format('DD/MM/YYYY, hh:mm:ss A') : 'N/A',
-            inline: true
-          },
-          {
-            name: 'Registered at',
-            value: moment(user.createdAt).format('DD/MM/YYYY, hh:mm:ss A'),
-            inline: true
-          },
-          // Game...
-          // Badges...
-          // Boosting since..
-          {
-            name: `Roles (${member ? member.roles.length : 'N/A'})`,
-            value: member
-              ? member.roles.map(i => member.guild.roles.get(i)).sort(
-                (a, b) => a.position > b.position ? -1 : 1
-              ).map(i => `<@&${i.id}>`).join(' ')
-              : 'N/A'
-          },
-          { name: 'Permissions', value: member ? 'Run `/perms <user>` to get their permissions!' : 'N/A' }
-        ],
-        footer: { text: 'User ID: ' + user.id }
-      }]
+      embeds: [
+        {
+          author: { name: 'User info', icon_url: user.avatarURL },
+          title: `${user.username}#${user.discriminator}` + (user.bot ? ' (Bot account)' : ''),
+          description: user.mention + (member?.pending ? ' (pending guild screening)' : ''),
+          thumbnail: { url: user.dynamicAvatarURL('png', 2048) },
+          color,
+          fields: [
+            { name: 'Status', value: member?.status ?? 'N/A', inline: true },
+            // { name: 'Join Position }
+            {
+              name: 'Joined server at',
+              value: member ? moment(member.joinedAt).format('DD/MM/YYYY, hh:mm:ss A') : 'N/A',
+              inline: true,
+            },
+            {
+              name: 'Registered at',
+              value: moment(user.createdAt).format('DD/MM/YYYY, hh:mm:ss A'),
+              inline: true,
+            },
+            // Game...
+            // Badges...
+            // Boosting since..
+            {
+              name: `Roles (${member ? member.roles.length : 'N/A'})`,
+              value: member
+                ? member.roles
+                    .map(i => member.guild.roles.get(i))
+                    .sort((a, b) => (a.position > b.position ? -1 : 1))
+                    .map(i => `<@&${i.id}>`)
+                    .join(' ')
+                : 'N/A',
+            },
+            {
+              name: 'Permissions',
+              value: member ? 'Run `/perms <user>` to get their permissions!' : 'N/A',
+            },
+          ],
+          footer: { text: 'User ID: ' + user.id },
+        },
+      ],
     }
-  }
+  },
 }
 
 export const handlePermissions: Command = {
@@ -208,57 +220,80 @@ export const handlePermissions: Command = {
     // Display permission info.
     const member = message.member.guild.members.get(user.id)
     const color = member
-      ? (member.roles.map(i => member.guild.roles.get(i)).sort(
-          (a, b) => a.position > b.position ? -1 : 1
-        ).find(i => i.color !== 0) || { color: 0 }).color
+      ? (
+          member.roles
+            .map(i => member.guild.roles.get(i))
+            .sort((a, b) => (a.position > b.position ? -1 : 1))
+            .find(i => i.color !== 0) || { color: 0 }
+        ).color
       : 0
     const permissions = member.permissions
     const permissionKeys = Object.keys(permissions.json) as Array<keyof Constants['Permissions']>
     const channelPerm = (message.channel as GuildTextableChannel).permissionsOf(user.id)
     return {
       content: `✅ **Permissions of ${user.username}:**`,
-      embeds: [{
-        author: {
-          name: `${user.username}#${user.discriminator}'s permissions`,
-          icon_url: user.avatarURL
-        },
-        description: user.mention,
-        color,
-        fields: [
-          {
-            name: 'Guild Permissions',
-            value: message.member.guild.ownerID === user.id && !ignoreAdmin
-              ? 'Owner! (use `/perms --ignore-admin` to show perms regardless)'
-              : permissions.has('administrator') && !ignoreAdmin
-                ? 'Administrator! (use `/perms --ignore-admin` to show perms regardless)'
-                : permissionKeys
-                  .filter(perm => permissions.has(perm))
-                  .map(perm => (perm.substr(0, 1).toUpperCase() + perm.substr(1))
-                    .replace(/[A-Z]+/g, s => ' ' + s))
-                  .join(', ').replace('TTSMessages', 'TTS Messages')
+      embeds: [
+        {
+          author: {
+            name: `${user.username}#${user.discriminator}'s permissions`,
+            icon_url: user.avatarURL,
           },
-          !(message.member.guild.ownerID === user.id || permissions.has('administrator')) || ignoreAdmin
-            ? {
-                name: 'Channel Permissions',
-                value: (
-                  permissionKeys
-                    .filter(perm => !permissions.has(perm) && channelPerm.has(perm))
-                    .map(perm => (perm.substr(0, 1).toUpperCase() + perm.substr(1))
-                      .replace(/[A-Z]+/g, s => ' ' + s))
-                    .join(', ') +
-                permissionKeys
-                  .filter(perm => permissions.has(perm) && !channelPerm.has(perm))
-                  .map(perm => '**!(' + (perm.substr(0, 1).toUpperCase() + perm.substr(1))
-                    .replace(/[^(][A-Z]+/g, s => s.substr(0, 1) + ' ' + s.substr(1)) + ')**')
-                  .join(', ')
-                ).replace('TTSMessages', 'TTS Messages')
-              }
-            : { name: '', value: '' }
-        ].filter(e => !!e.value),
-        footer: { text: 'User ID: ' + user.id }
-      }]
+          description: user.mention,
+          color,
+          fields: [
+            {
+              name: 'Guild Permissions',
+              value:
+                message.member.guild.ownerID === user.id && !ignoreAdmin
+                  ? 'Owner! (use `/perms --ignore-admin` to show perms regardless)'
+                  : permissions.has('administrator') && !ignoreAdmin
+                    ? 'Administrator! (use `/perms --ignore-admin` to show perms regardless)'
+                    : permissionKeys
+                        .filter(perm => permissions.has(perm))
+                        .map(perm =>
+                          (perm.substr(0, 1).toUpperCase() + perm.substr(1)).replace(
+                            /[A-Z]+/g,
+                            s => ' ' + s,
+                          ),
+                        )
+                        .join(', ')
+                        .replace('TTSMessages', 'TTS Messages'),
+            },
+            !(message.member.guild.ownerID === user.id || permissions.has('administrator')) ||
+            ignoreAdmin
+              ? {
+                  name: 'Channel Permissions',
+                  value: (
+                    permissionKeys
+                      .filter(perm => !permissions.has(perm) && channelPerm.has(perm))
+                      .map(perm =>
+                        (perm.substr(0, 1).toUpperCase() + perm.substr(1)).replace(
+                          /[A-Z]+/g,
+                          s => ' ' + s,
+                        ),
+                      )
+                      .join(', ') +
+                    permissionKeys
+                      .filter(perm => permissions.has(perm) && !channelPerm.has(perm))
+                      .map(
+                        perm =>
+                          '**!(' +
+                          (perm.substr(0, 1).toUpperCase() + perm.substr(1)).replace(
+                            /[^(][A-Z]+/g,
+                            s => s.substr(0, 1) + ' ' + s.substr(1),
+                          ) +
+                          ')**',
+                      )
+                      .join(', ')
+                  ).replace('TTSMessages', 'TTS Messages'),
+                }
+              : { name: '', value: '' },
+          ].filter(e => !!e.value),
+          footer: { text: 'User ID: ' + user.id },
+        },
+      ],
     }
-  }
+  },
 }
 
 export const handleRequest: Command = {
@@ -281,11 +316,15 @@ export const handleRequest: Command = {
   },
   generator: async ({ author }, args, { client, tempDB }) => {
     // Check for cooldown.
-    if (!testPilots.includes(author.id) &&
-      host !== author.id && tempDB.cooldowns.request.has(author.id)
-    ) return 'This command is cooling down right now. Try again later.'
-    await client.createMessage((await client.getDMChannel(host)).id,
-      `${author.username}#${author.discriminator} with ID ${author.id}: ${args.join(' ')}`
+    if (
+      !testPilots.includes(author.id) &&
+      host !== author.id &&
+      tempDB.cooldowns.request.has(author.id)
+    )
+      return 'This command is cooling down right now. Try again later.'
+    await client.createMessage(
+      (await client.getDMChannel(host)).id,
+      `${author.username}#${author.discriminator} with ID ${author.id}: ${args.join(' ')}`,
     )
     // Add cooldown.
     if (!testPilots.includes(author.id) && host !== author.id) {
@@ -320,9 +359,17 @@ export const handleSay: Command = {
       message.channelMentions[0] === possibleChannel ||
       message.member?.guild.channels.has(possibleChannel)
     ) {
-      if (message.member && !message.member.guild.channels.get(possibleChannel)
-        .permissionsOf(message.member.id).has('sendMessages')
-      ) return { content: `**You don't have enough permissions for that, you ${getInsult()}.**`, error: true }
+      if (
+        message.member &&
+        !message.member.guild.channels
+          .get(possibleChannel)
+          .permissionsOf(message.member.id)
+          .has('sendMessages')
+      )
+        return {
+          content: `**You don't have enough permissions for that, you ${getInsult()}.**`,
+          error: true,
+        }
       args.shift()
       if (args.join(' ') === 'pls adim me') args = ['no']
       tempDB.say[message.channelMentions[0]] = (
@@ -331,11 +378,11 @@ export const handleSay: Command = {
           allowedMentions: {
             everyone: message.member?.permissions.has('mentionEveryone'),
             users: true,
-            roles: message.member && (
-              message.member.permissions.has('mentionEveryone') ||
-              message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)
-            )
-          }
+            roles:
+              message.member &&
+              (message.member.permissions.has('mentionEveryone') ||
+                message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)),
+          },
         })
       ).id
       return
@@ -347,13 +394,13 @@ export const handleSay: Command = {
       allowedMentions: {
         everyone: message.member?.permissions.has('mentionEveryone'),
         users: true,
-        roles: message.member && (
-          message.member.permissions.has('mentionEveryone') ||
-          message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)
-        )
-      }
+        roles:
+          message.member &&
+          (message.member.permissions.has('mentionEveryone') ||
+            message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)),
+      },
     }
-  }
+  },
 }
 
 export const handleType: Command = {
@@ -364,7 +411,7 @@ export const handleType: Command = {
     fullDescription: 'Type something. Test pilots and admins/mods only.',
     usage: '/type (channel) <text>',
     example: '/type #general heyo',
-    deleteCommand: true
+    deleteCommand: true,
   },
   postGenerator: (message, args, sent, { tempDB }) => {
     if (sent) tempDB.say[sent.channel.id] = sent.id
@@ -376,14 +423,22 @@ export const handleType: Command = {
       message.channelMentions[0] === possibleChannel ||
       message.member?.guild.channels.has(possibleChannel)
     ) {
-      if (message.member && !message.member.guild.channels.get(possibleChannel)
-        .permissionsOf(message.member.id).has('sendMessages')
-      ) return { content: `**You don't have enough permissions for that, you ${getInsult()}.**`, error: true }
+      if (
+        message.member &&
+        !message.member.guild.channels
+          .get(possibleChannel)
+          .permissionsOf(message.member.id)
+          .has('sendMessages')
+      )
+        return {
+          content: `**You don't have enough permissions for that, you ${getInsult()}.**`,
+          error: true,
+        }
       args.shift()
       if (args.join(' ') === 'pls adim me') args = ['no']
       await client.sendChannelTyping(message.channelMentions[0])
       await (async ms => await new Promise(resolve => setTimeout(resolve, ms)))(
-        args.join(' ').length * 120 > 8000 ? 8000 : args.join(' ').length * 120
+        args.join(' ').length * 120 > 8000 ? 8000 : args.join(' ').length * 120,
       )
       tempDB.say[message.channelMentions[0]] = (
         await client.createMessage(message.channelMentions[0], {
@@ -391,11 +446,11 @@ export const handleType: Command = {
           allowedMentions: {
             everyone: message.member?.permissions.has('mentionEveryone'),
             users: true,
-            roles: message.member && (
-              message.member.permissions.has('mentionEveryone') ||
-              message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)
-            )
-          }
+            roles:
+              message.member &&
+              (message.member.permissions.has('mentionEveryone') ||
+                message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)),
+          },
         })
       ).id
       return
@@ -411,13 +466,13 @@ export const handleType: Command = {
       allowedMentions: {
         everyone: message.member?.permissions.has('mentionEveryone'),
         users: true,
-        roles: message.member && (
-          message.member.permissions.has('mentionEveryone') ||
-          message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)
-        )
-      }
+        roles:
+          message.member &&
+          (message.member.permissions.has('mentionEveryone') ||
+            message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)),
+      },
     }
-  }
+  },
 }
 
 export const handleRemindme: Command = {
@@ -442,9 +497,13 @@ export const handleRemindme: Command = {
       channel = true
     }
     if (args.length < 2 || !ms(args[0])) {
-      return { content: 'Correct usage: /remindme <time in 1d|1h|1m|1s> (--channel|-c) <description>', error: true }
+      return {
+        content: 'Correct usage: /remindme <time in 1d|1h|1m|1s> (--channel|-c) <description>',
+        error: true,
+      }
     }
-    if (ms(args[0]) > 61 * 1000) { // Greater than 61 seconds and it's relegated to the database.
+    if (ms(args[0]) > 61 * 1000) {
+      // Greater than 61 seconds and it's relegated to the database.
       try {
         const res = await db.collection('tasks').insertOne({
           type: 'reminder',
@@ -502,19 +561,21 @@ export const handleReminderlist: Command = {
     const format = 'dddd, MMMM Do YYYY, h:mm:ss A' // Date format.
     return {
       content: `⏰ **Reminders for ${user.username}#${user.discriminator}:**`,
-      embeds: [{
-        color: 0x00AE86,
-        type: 'rich',
-        title: 'Reminders',
-        // This function generates the fields.
-        fields: reminders.map((reminder, index) => ({
-          name: `Reminder ${index + 1}`,
-          // TODO: Switch to Discord timestamps for reminders.
-          value: `**Due time:** ${moment(reminder.time).format(format)}
+      embeds: [
+        {
+          color: 0x00ae86,
+          type: 'rich',
+          title: 'Reminders',
+          // This function generates the fields.
+          fields: reminders.map((reminder, index) => ({
+            name: `Reminder ${index + 1}`,
+            // TODO: Switch to Discord timestamps for reminders.
+            value: `**Due time:** ${moment(reminder.time).format(format)}
 **Channel:** <#${reminder.target}>
-**Message:** ${reminder.message.substring(1, reminder.message.lastIndexOf('\n')).trim()}`
-        }))
-      }]
+**Message:** ${reminder.message.substring(1, reminder.message.lastIndexOf('\n')).trim()}`,
+          })),
+        },
+      ],
     }
   },
 }
@@ -572,8 +633,10 @@ export const handleLeave: Command = {
           .then(() => tempDB.leave.delete(message.author.id))
           .catch(() => tempDB.leave.delete(message.author.id))
       }, 30000)
-      return 'Are you sure you want to leave the server? ' +
+      return (
+        'Are you sure you want to leave the server? ' +
         'You will require an invite link to join back. Type /leave to confirm.'
+      )
     } else {
       tempDB.leave.delete(message.author.id)
       try {
@@ -639,10 +702,12 @@ export const handleChangevoiceregion: Command = {
     ],
   },
   slashGenerator: async (interaction, { client }) => {
-    const channelOpt = interaction.data.options.find(option => option.name === 'channel') as
-      Dysnomia.InteractionDataOptionsChannel
-    const regionOpt = interaction.data.options.find(option => option.name === 'region') as
-      InteractionDataOptionsString
+    const channelOpt = interaction.data.options.find(
+      option => option.name === 'channel',
+    ) as Dysnomia.InteractionDataOptionsChannel
+    const regionOpt = interaction.data.options.find(
+      option => option.name === 'region',
+    ) as InteractionDataOptionsString
     const ch = client.guilds.get(interaction.guildID).channels.get(channelOpt.value)
     if (!ch || ch.type !== 2) return { content: 'This voice channel does not exist!', error: true }
     return await handleChangevoiceregion.commonGenerator(ch, regionOpt.value || 'auto', client)
@@ -680,7 +745,7 @@ export const handleEdit: Command = {
     fullDescription: 'Edits a single message. Owner only command.',
     usage: '/edit (channel) <message ID> <new text>',
     example: '/edit #general 123456789012345678 hi',
-    deleteCommand: true
+    deleteCommand: true,
   },
   generator: async (message, args, { client }) => {
     // Should it be edited in another channel?
@@ -728,13 +793,27 @@ export const handleEditLastSay: Command = {
       message.channelMentions[0] === possibleChannel ||
       message.member?.guild.channels.has(possibleChannel)
     ) {
-      if (message.member && !message.member.guild.channels.get(possibleChannel)
-        .permissionsOf(message.member.id).has('sendMessages')
-      ) return { content: `**You don't have enough permissions for that, you ${getInsult()}.**`, error: true }
+      if (
+        message.member &&
+        !message.member.guild.channels
+          .get(possibleChannel)
+          .permissionsOf(message.member.id)
+          .has('sendMessages')
+      )
+        return {
+          content: `**You don't have enough permissions for that, you ${getInsult()}.**`,
+          error: true,
+        }
       // Edit the message.
       try {
-        await client.editMessage(possibleChannel, tempDB.say[possibleChannel], args.slice(1).join(' '))
-      } catch (e) { return { content: 'Nothing to edit.', error: true } }
+        await client.editMessage(
+          possibleChannel,
+          tempDB.say[possibleChannel],
+          args.slice(1).join(' '),
+        )
+      } catch (e) {
+        return { content: 'Nothing to edit.', error: true }
+      }
       return
     }
     // Edit the message.
@@ -776,17 +855,24 @@ export const handleSuppressEmbed: Command = {
       if (regex.test(args[0])) {
         const split = args[0].split('/')
         const channel = message.member.guild.channels.get(split[5]) as GuildTextableChannel
-        if (!channel || channel.type !== 0) return { content: `That's not a real channel, you ${getInsult()}.`, error: true }
-        msg = channel.messages.get(split[6]) || await channel.getMessage(split[6])
+        if (!channel || channel.type !== 0)
+          return { content: `That's not a real channel, you ${getInsult()}.`, error: true }
+        msg = channel.messages.get(split[6]) || (await channel.getMessage(split[6]))
       } else {
-        msg = message.channel.messages.get(args[0]) || await message.channel.getMessage(args[0])
+        msg = message.channel.messages.get(args[0]) || (await message.channel.getMessage(args[0]))
       }
     } else if (args.length === 2) {
-      const channel = message.member.guild.channels.get(getIdFromMention(args[0])) as GuildTextableChannel
+      const channel = message.member.guild.channels.get(
+        getIdFromMention(args[0]),
+      ) as GuildTextableChannel
       if (channel && channel.type === 0) {
-        msg = channel.messages.get(args[1]) || await channel.getMessage(args[1])
+        msg = channel.messages.get(args[1]) || (await channel.getMessage(args[1]))
       } else return { content: `That's not a real channel, you ${getInsult()}.`, error: true }
-    } else return { content: 'Correct usage: /suppress (channel) <message ID/link/reply to a message>', error: true }
+    } else
+      return {
+        content: 'Correct usage: /suppress (channel) <message ID/link/reply to a message>',
+        error: true,
+      }
 
     if (msg) {
       await msg.edit({ flags: msg.flags ^ Constants.MessageFlags.SUPPRESS_EMBEDS })
@@ -814,9 +900,10 @@ More info here: https://mathjs.org/docs/expressions/syntax.html`,
       },
     ],
   },
-  slashGenerator: async interaction => await handleCalculate.commonGenerator(
-    (interaction.data.options[0] as InteractionDataOptionsString).value
-  ),
+  slashGenerator: async interaction =>
+    await handleCalculate.commonGenerator(
+      (interaction.data.options[0] as InteractionDataOptionsString).value,
+    ),
   generator: async (message, args) => await handleCalculate.commonGenerator(args.join(' ')),
   commonGenerator: (expression: string) => {
     try {
@@ -850,9 +937,10 @@ export const handleTemperature: Command = {
       },
     ],
   },
-  slashGenerator: async interaction => await handleTemperature.commonGenerator(
-    (interaction.data.options[0] as InteractionDataOptionsString).value
-  ),
+  slashGenerator: async interaction =>
+    await handleTemperature.commonGenerator(
+      (interaction.data.options[0] as InteractionDataOptionsString).value,
+    ),
   generator: async (message, args) => await handleTemperature.commonGenerator(args[0]),
   commonGenerator: (temp: string) => {
     const regex = /^(-?\d+.?\d*) ?°? ?([CFK])$/i
@@ -866,7 +954,9 @@ export const handleTemperature: Command = {
     } else if (unit === 'f') {
       return result + `\n**${fToC(value)}°C** (Celsius)` + `\n**${cToK(fToC(value))}K** (Kelvin)`
     } else {
-      return result + `\n**${kToC(value)}°C** (Celsius)` + `\n**${cToF(kToC(value))}°F** (Fahrenheit)`
+      return (
+        result + `\n**${kToC(value)}°C** (Celsius)` + `\n**${cToF(kToC(value))}°F** (Fahrenheit)`
+      )
     }
   },
 }
