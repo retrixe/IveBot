@@ -7,7 +7,7 @@ import type {
 } from '@projectdysnomia/dysnomia'
 import type CommandParser from '../client.ts'
 import type { Db } from 'mongodb'
-import type { TriviaSession } from '../commands/trivia.ts'
+import type { TriviaSession } from '../commands/games/trivia.ts'
 
 export interface Gunfight {
   randomWord: string

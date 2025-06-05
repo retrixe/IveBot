@@ -6,8 +6,8 @@ import type {
   EmbedOptions,
   Client,
 } from '@projectdysnomia/dysnomia'
-import type { Command, DB } from '../imports/types.ts'
-import { getInsult, getMemberColor } from '../imports/tools.ts'
+import type { Command, DB } from '../../imports/types.ts'
+import { getInsult, getMemberColor } from '../../imports/tools.ts'
 import fs from 'fs'
 
 async function parseTriviaList(fileName: string): Promise<Map<string, string[]>> {
