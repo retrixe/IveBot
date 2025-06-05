@@ -25,33 +25,35 @@ const generalHelp = {
 \`/trivia\` - Start a trivia game on a topic of your choice.
 \`/8ball\` - Random answers to random questions.
 \`/repeat\` - Repeat a string.
-\`/distort\` - Pretty distorted text.`.trimStart(),
+\`/distort\` - Pretty distorted text.
+\`/zalgo\` \`/dezalgo\` - The zalgo demon's writing.`.trimStart(),
     },
     {
       name: '**Random searches.**',
       value: `
 \`/urban\` - Get an Urban Dictionary definition ;)
+\`/define\` - Define a word in the Oxford Dictionary.
 \`/cat\` and \`/dog\` - Random cats and dogs from <https://random.cat> and <https://dog.ceo>
 \`/robohash\` - Take some text, make it a robot/monster/head/cat.
-\`/zalgo\` \`/dezalgo\` - The zalgo demon's writing.
 \`/namemc\` - A Minecraft user's previous usernames and skin.
 \`/astronomy-picture-of-the-day\` or \`/apod\`
 \`/currency\` - Currency conversion (\`/help currency\`)
 \`/xkcd\` - Get the latest or a random xkcd comic.
 \`/httpcat\` - Cats for HTTP status codes.
-\`/google\` - Let me Google that for you.`.trimStart(),
+\`/google\` - Let me Google that for you.
+\`/weather\` - It's really cloudy here..
+\`/hastebin\` - Upload a file to hasteb.in to view on phone.
+\`/ocr\` - Get text from an image.`.trimStart(),
     },
     {
       name: '**Utilities.**',
+      // give/takerole are technically admin commands, but special cased because of public roles.
       value: `
 TP \`/request\` - Request a specific feature.
-\`/token\` - Links your Discord to IveBot Web (use in DM only)
-\`/weather\` - It's really cloudy here..
 \`/say\` | \`/type\` - Say something, even in another channel.
 \`/editLastSay\` - Even if it was another channel.
 \`/remindme\` | \`/reminderlist\` - Reminders.
 \`/leave\` - Makes you leave the server.
-\`/ocr\` - Get text from an image.
 \`/avatar\` - Avatar of a user.
 \`/userinfo\` - User info.
 \`/serverinfo\` - Server info 🤔
@@ -59,8 +61,6 @@ TP \`/request\` - Request a specific feature.
 \`/about\`, \`/ping\`, \`/uptime\` and \`/version\` - About the running instance of IveBot.
 \`/emojiImage\` - Image of an emoji.
 \`/giverole\` and \`/takerole\` - Edit roles.
-\`/notify\` - Ping a role that cannot be pinged.
-\`/hastebin\` - Upload a file to hasteb.in to view on phone.
 \`/calculate\` - Calculate an expression.
 \`/temperature\` - Convert between temperature units.
 \`/suppressEmbed\` - Suppress or unsuppress embeds in a message.`.trimStart(),
@@ -75,7 +75,8 @@ TP \`/request\` - Request a specific feature.
 \`/changevoiceregion\` and \`/listvoiceregions\`
 \`/perms\` - Displays a particular member's permissions.
 \`/purge\` - Bulk delete a set of messages.
-\`/slowmode\` - When you must slow down chat.`.trimStart(),
+\`/slowmode\` - When you must slow down chat.
+\`/notify\` - Ping a role that cannot be pinged.`.trimStart(),
     },
     {
       name: zeroWidthSpace,

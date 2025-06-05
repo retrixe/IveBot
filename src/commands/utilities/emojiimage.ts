@@ -1,5 +1,5 @@
-import type { Command } from '../../../imports/types.ts'
-import { getInsult, getIdFromMention } from '../../../imports/tools.ts'
+import type { Command } from '../../imports/types.ts'
+import { getInsult, getIdFromMention } from '../../imports/tools.ts'
 
 export const handleEmojiimage: Command = {
   name: 'emojiImage',
