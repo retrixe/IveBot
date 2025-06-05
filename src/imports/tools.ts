@@ -4,6 +4,23 @@ import { URL } from 'url'
 import type { Db, Document } from 'mongodb'
 import type { GuildChannel, Member, Message, User } from '@projectdysnomia/dysnomia'
 
+// Fresh insults. They come and go, I suppose.
+export const getInsult = (plural = false): string => {
+  const insults = [
+    'pathetic lifeform',
+    'ungrateful bastard',
+    'idiotic slimeball',
+    'worthless ass',
+    'dumb dolt',
+    'one pronged fork',
+    'withered oak',
+    'two pump chump',
+    'oompa loompa',
+  ]
+  const insult = insults[Math.floor(Math.random() * insults.length)]
+  return plural ? insult.replace('ass', 'asse') + 's' : insult
+}
+
 export const getIdFromMention = (mention: string): string => {
   const f = mention
     .substring(2, mention.length - 1)
@@ -69,21 +86,19 @@ export const getMemberColor = (member: Member) =>
     .sort((a, b) => (a.position > b.position ? -1 : 1))
     .find(i => i.color !== 0)?.color ?? 0
 
-// Fresh insults. They come and go, I suppose.
-export const getInsult = (plural = false): string => {
-  const insults = [
-    'pathetic lifeform',
-    'ungrateful bastard',
-    'idiotic slimeball',
-    'worthless ass',
-    'dumb dolt',
-    'one pronged fork',
-    'withered oak',
-    'two pump chump',
-    'oompa loompa',
-  ]
-  const insult = insults[Math.floor(Math.random() * insults.length)]
-  return plural ? insult.replace('ass', 'asse') + 's' : insult
+export const parseSilentDelete = (
+  args: string[],
+): { args: string[]; silent: boolean; delete: boolean } => {
+  const data = { args, silent: false, delete: false }
+  if ([0, 1].includes(data.args.indexOf('--silent')) || [0, 1].includes(data.args.indexOf('-s'))) {
+    data.silent = true
+    data.args.splice(data.args.indexOf('--silent'), 1)
+  }
+  if ([0, 1].includes(data.args.indexOf('--delete')) || [0, 1].includes(data.args.indexOf('-d'))) {
+    data.delete = true
+    data.args.splice(data.args.indexOf('--delete'), 1)
+  }
+  return data
 }
 
 export const fetchLimited = async (

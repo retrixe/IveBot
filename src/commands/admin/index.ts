@@ -1,5 +1,5 @@
 import type { Command } from '../../imports/types.ts'
-import { getInsult, getUser } from '../../imports/tools.ts'
+import { getInsult, getUser, parseSilentDelete } from '../../imports/tools.ts'
 import { checkRolePosition } from '../../imports/permissions.ts'
 import type { Message, GuildTextableChannel } from '@projectdysnomia/dysnomia'
 export { handleAddemoji, handleDeleteemoji, handleEditemoji, handleEmojiimage } from './emoji.ts'
@@ -8,21 +8,6 @@ export { handleGiverole, handleTakerole, handleNotify } from './roles.ts'
 export { handleDeletechannel, handleEditchannel } from './channels.ts'
 export { handleMute, handleUnmute } from './mute.ts'
 export { handleBan, handleUnban } from './ban.ts'
-
-const parseSilentDelete = (
-  args: string[],
-): { args: string[]; silent: boolean; delete: boolean } => {
-  const data = { args, silent: false, delete: false }
-  if ([0, 1].includes(data.args.indexOf('--silent')) || [0, 1].includes(data.args.indexOf('-s'))) {
-    data.silent = true
-    data.args.splice(data.args.indexOf('--silent'), 1)
-  }
-  if ([0, 1].includes(data.args.indexOf('--delete')) || [0, 1].includes(data.args.indexOf('-d'))) {
-    data.delete = true
-    data.args.splice(data.args.indexOf('--delete'), 1)
-  }
-  return data
-}
 
 export const handlePurge: Command = {
   name: 'purge',
