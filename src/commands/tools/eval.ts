@@ -11,6 +11,7 @@ export const handleEval: Command = {
     example: "/eval ```js\nconsole.log('ji')\n```",
     requirements: { userIDs: [host] },
   },
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   generator: async (message, args, { client, tempDB, db, commandParser }) => {
     try {
       let toEval = args.join(' ')

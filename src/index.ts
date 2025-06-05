@@ -233,7 +233,7 @@ if (jwtSecret) {
               try {
                 member = await client.getRESTGuildMember(id, parsed.id)
                 guild.members.add(member) // Cache the member for faster lookups.
-              } catch (e) {} // TODO: Unable to retrieve member for the guild. Hm?
+              } catch {} // TODO: Unable to retrieve member for the guild. Hm?
             }
             if (member) {
               const perm = guild.permissionsOf(member).has('manageGuild')
@@ -258,7 +258,7 @@ if (jwtSecret) {
             const aesData = Buffer.concat([iv, cipher.update(data), cipher.final()])
             return res.writeHead(200, headers(aesData)).end(aesData)
           })
-        } catch (e) {
+        } catch {
           const error = '{"error":"Invalid body!"}'
           return res.writeHead(400, headers(error)).end(error)
         }

@@ -21,7 +21,7 @@ export const handlePing: Command = {
     if (args.length === 1 && testPilots.includes(message.author.id)) {
       try {
         return execSync('ping -c 1 ' + args[0], { encoding: 'utf8' }).split('\n')[1]
-      } catch (e) {
+      } catch {
         return { content: 'Looks like pinging the website failed.', error: true }
       }
     }

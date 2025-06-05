@@ -128,7 +128,7 @@ export const handleDefine: Command = {
       } catch (err) {
         return `Something went wrong 👾 Error: ${err}`
       }
-    } catch (e) {
+    } catch {
       return { content: 'Did you enter a valid word? 👾', error: true }
     }
   },

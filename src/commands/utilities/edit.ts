@@ -27,7 +27,7 @@ export const handleEdit: Command = {
       const messageID = args.slice(1).shift()
       try {
         await client.editMessage(possibleChannel, messageID, args.slice(1).join(' '))
-      } catch (e) {
+      } catch {
         return { content: 'Nothing to edit.', error: true }
       }
       return
@@ -36,7 +36,7 @@ export const handleEdit: Command = {
     const messageID = args.shift()
     try {
       await client.editMessage(message.channel.id, messageID, args.join(' '))
-    } catch (e) {
+    } catch {
       return { content: 'Nothing to edit.', error: true }
     }
   },

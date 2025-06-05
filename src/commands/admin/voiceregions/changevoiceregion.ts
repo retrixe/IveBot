@@ -46,7 +46,7 @@ export const handleChangevoiceregion: Command = {
     ) as InteractionDataOptionsString
     const ch = client.guilds.get(interaction.guildID).channels.get(channelOpt.value)
     if (!ch || ch.type !== 2) return { content: 'This voice channel does not exist!', error: true }
-    return await handleChangevoiceregion.commonGenerator(ch, regionOpt.value || 'auto', client)
+    return await handleChangevoiceregion.commonGenerator(ch, regionOpt.value || 'auto')
   },
   generator: async (message, args, { client }) => {
     if (!message.member.guild.members.get(client.user.id).permissions.has('manageGuild')) {
@@ -55,19 +55,15 @@ export const handleChangevoiceregion: Command = {
     const rtcRegion = args.pop()
     const ch = getChannel(message, args.join(' '))
     if (!ch || ch.type !== 2) return { content: 'This voice channel does not exist!', error: true }
-    return await handleChangevoiceregion.commonGenerator(ch, rtcRegion, client)
+    return await handleChangevoiceregion.commonGenerator(ch, rtcRegion)
   },
-  commonGenerator: async (
-    channel: Dysnomia.VoiceChannel,
-    region: string,
-    client: Dysnomia.Client,
-  ) => {
+  commonGenerator: async (channel: Dysnomia.VoiceChannel, region: string) => {
     try {
       const { rtcRegion } = await channel.edit({
         rtcRegion: region === 'automatic' || region === 'auto' ? null : region,
       })
       return 'Voice region changed to ' + (rtcRegion || 'auto') + ' \\o/'
-    } catch (e) {
+    } catch {
       return 'Invalid voice region.'
     }
   },

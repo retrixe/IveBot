@@ -54,7 +54,7 @@ export const handleMute: Command = {
       try {
         role = await client.createRole(message.member.guild.id, { name: 'Muted', color: 0x444444 })
         hasPerms = true
-      } catch (e) {
+      } catch {
         return 'I could not find a Muted role and cannot create a new one.'
       }
     }
@@ -78,7 +78,7 @@ export const handleMute: Command = {
             )
           }),
         )
-      } catch (e) {
+      } catch {
         return 'I cannot set permissions for the Muted role.'
       }
     }
@@ -91,7 +91,7 @@ export const handleMute: Command = {
     // Mute person.
     try {
       await client.addGuildMemberRole(message.member.guild.id, user.id, role.id, args.join(' '))
-    } catch (e) {
+    } catch {
       return 'Could not mute that person.'
     }
     // Persist the mute.
@@ -102,7 +102,7 @@ export const handleMute: Command = {
       let time = 0
       try {
         time = ms(args[0]) || 0
-      } catch (e) {}
+      } catch {}
       if (time && time >= 2073600000) return { content: 'Mute limit is 24 days.', error: true }
       const mute = await db
         .collection('tasks')
@@ -125,7 +125,7 @@ export const handleMute: Command = {
             { $set: { time: time + Date.now() } },
           )
       }
-    } catch (e) {
+    } catch {
       return 'Failed to add mute timer! However, user has been muted.'
     }
     // Persist in cache.

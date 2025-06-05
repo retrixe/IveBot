@@ -64,7 +64,7 @@ export const handleXkcd: Command = {
       if (args[0] === 'random')
         return `https://xkcd.com/${Math.floor(Math.random() * (num - 1)) + 1}`
       else return `https://xkcd.com/${num}`
-    } catch (e) {
+    } catch {
       return 'Failed to fetch an xkcd comic!\nhttps://xkcd.com/1348'
     }
   },

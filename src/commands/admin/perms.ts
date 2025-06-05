@@ -22,12 +22,12 @@ export const handlePermissions: Command = {
     const ignoreAdmin = args.includes('--ignore-admin')
     if (ignoreAdmin) args.splice(args.indexOf('--ignore-admin'), 1)
     // Find the user ID.
-    const toGet = args.length === 0 ? message.author.id : args.shift()
+    const toGet = args.shift() ?? message.author.id
     let user = getUser(message, toGet)
     if (!user && message.author.id === host && [18, 17].includes(toGet.length) && !isNaN(+toGet)) {
       try {
         user = await client.getRESTUser(toGet)
-      } catch (e) {}
+      } catch {}
     }
     if (!user)
       return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }

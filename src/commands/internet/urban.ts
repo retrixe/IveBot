@@ -16,7 +16,7 @@ export const handleUrban: Command = {
       // Fetch the definition and parse it to JSON.
       const { list } = (await (
         await fetch(`http://api.urbandictionary.com/v0/define?term=${args.join(' ')}`)
-      ).json()) as { list: Array<{ definition: string }> }
+      ).json()) as { list: { definition: string }[] }
       try {
         let response: string = list[0].definition.trim()
         if (response.length > 1900) {
@@ -37,7 +37,7 @@ export const handleUrban: Command = {
           ],
         }
         // Else, there will be an exception thrown.
-      } catch (err) {
+      } catch {
         return { content: 'No definition was found.', error: true }
       }
     } catch (e) {

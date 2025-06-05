@@ -30,7 +30,7 @@ export const handleNamemc: Command = {
       }
       // Fetch the previous names as well.
       try {
-        const names: Array<{ name: string; changedToAt?: number }> = [
+        const names: { name: string; changedToAt?: number }[] = [
           {
             name:
               'Currently, username history is not available. ' +
@@ -64,7 +64,7 @@ export const handleNamemc: Command = {
       } catch (err) {
         return `Something went wrong 👾 Error: ${err}`
       }
-    } catch (e) {
+    } catch {
       return { content: 'Enter a valid Minecraft username (account must be premium)', error: true }
     }
   },

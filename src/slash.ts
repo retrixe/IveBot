@@ -8,7 +8,6 @@ import type {
   CommandInteraction,
   ApplicationCommand,
   ApplicationCommandOptions,
-  ApplicationCommandOptionsWithValue,
 } from '@projectdysnomia/dysnomia'
 import type {
   DB,

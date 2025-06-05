@@ -64,7 +64,7 @@ export const handleOcr: Command = {
       })
       // Parse the response.
       const result = (await res.json()) as {
-        responses: Array<{ fullTextAnnotation: { text: string } }>
+        responses: { fullTextAnnotation: { text: string } }[]
       }
       // If no text was found.
       if (!result.responses[0].fullTextAnnotation)
@@ -86,7 +86,7 @@ export const handleOcr: Command = {
           hastebin = result.id
           deletionKey = result.deletion_key
         }
-      } catch (e) {
+      } catch {
         return `Failed to upload long OCR result to paste.gg! (${text.length} characters long)`
       }
       // Return our answer.

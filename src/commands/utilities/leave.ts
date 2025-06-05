@@ -29,7 +29,7 @@ export const handleLeave: Command = {
       tempDB.leave.delete(message.author.id)
       try {
         await client.kickGuildMember(message.member.guild.id, message.author.id, 'Used /leave.')
-      } catch (e) {
+      } catch {
         return 'You will have to manually leave the server or transfer ownership before leaving.'
       }
       return `${message.author.username}#${message.author.discriminator} has left the server.`

@@ -54,7 +54,7 @@ export const handleHastebin: Command = {
       return id
         ? `**paste.gg URL:**\nhttps://paste.gg/p/anonymous/${id}\nDeletion key: ${deletionKey}`
         : 'Failed to upload text to paste.gg!'
-    } catch (e) {
+    } catch {
       return `Invalid text file, you ${getInsult()}.`
     }
   },

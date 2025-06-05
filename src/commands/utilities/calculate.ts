@@ -32,7 +32,7 @@ More info here: https://mathjs.org/docs/expressions/syntax.html`,
   commonGenerator: (expression: string) => {
     try {
       return `${evaluate(expression.split(',').join('.').split('÷').join('/').toLowerCase())}`.trim()
-    } catch (e) {
+    } catch {
       return { content: 'Invalid expression >_<', error: true }
     }
   },

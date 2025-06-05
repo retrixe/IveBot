@@ -68,7 +68,7 @@ export const handleTakerole: Command = {
         role.id,
         'Take role command called.',
       )
-    } catch (e) {
+    } catch {
       return user.id === message.author.id // Ternary statement.
         ? 'Could not take the role from you.'
         : 'Could not take role from the user.'

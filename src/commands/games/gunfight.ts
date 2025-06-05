@@ -78,7 +78,7 @@ export const handleAccept: Command = {
     hidden: true,
     argsRequired: false,
   },
-  generator: (message, args, { client, tempDB }) => {
+  generator: (message, args, { tempDB }) => {
     // Find the gunfight, if exists.
     const gunfightToAccept = Object.keys(tempDB.gunfight).find(
       gunfight =>

@@ -43,7 +43,7 @@ export const handleRemindme: Command = {
           } ${args.slice(1).join(' ')}\nReminder set ${args[0]} ago.`,
         })
         if (!res.acknowledged) return 'Failed to add a reminder to the database!'
-      } catch (e) {
+      } catch {
         return 'Failed to add a reminder to the database!' + (channel ? '' : ' Can I DM you?')
       }
     } else {

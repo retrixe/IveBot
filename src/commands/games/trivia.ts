@@ -31,7 +31,7 @@ export class TriviaSession {
     botPlays: boolean
     revealAnswer: boolean
   }
-  currentQuestion: [string, string[]]
+  currentQuestion: [string, string[]] | null = null
   channel: TextableChannel
   author: User
   message: Message
@@ -167,6 +167,7 @@ export class TriviaSession {
       await new Promise(resolve => setTimeout(resolve, 1000))
       if (!this.stopped) await this.newQuestion()
     }
+    return false
   }
 
   async checkAnswer(message: Message): Promise<boolean> {
@@ -202,7 +203,9 @@ export class TriviaSession {
         this.scores[message.author.id] += 1
       }
       await this.channel.createMessage(`You got it ${message.author.username}! **+1** to you!`)
+      return true
     }
+    return false
   }
 }
 
@@ -295,7 +298,7 @@ export const handleTrivia: Command = {
         let triviaList
         try {
           triviaList = await parseTriviaList(args[0])
-        } catch (err) {
+        } catch {
           return "That trivia list doesn't exist."
         }
         const t = new TriviaSession(

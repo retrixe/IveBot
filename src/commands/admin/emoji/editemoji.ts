@@ -35,7 +35,7 @@ export const handleEditemoji: Command = {
       if (newEmoji.animated) mention = `<a:${newEmoji.name}:${newEmoji.id}>`
       else mention = `<:${newEmoji.name}:${newEmoji.id}>`
       return `Emoji successfully edited \\o/ ${mention}`
-    } catch (e) {
+    } catch {
       return 'Emoji could not be edited.'
     }
   },

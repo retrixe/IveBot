@@ -34,7 +34,7 @@ export const handleSlowmode: Command = {
     // Set slowmode.
     try {
       await client.editChannel(message.channel.id, { rateLimitPerUser: isNaN(t) ? 0 : t })
-    } catch (e) {
+    } catch {
       return 'I cannot use slowmode >_<'
     }
     return `Successfully set slowmode to ${isNaN(t) || t === 0 ? 'off' : `${t} seconds`} 👌`

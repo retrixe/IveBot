@@ -22,7 +22,7 @@ export const handleUserinfo: Command = {
     if (!user && message.author.id === host && [18, 17].includes(toGet.length) && !isNaN(+toGet)) {
       try {
         user = await client.getRESTUser(toGet)
-      } catch (e) {}
+      } catch {}
     }
     if (!user)
       return { content: `Specify a valid member of this guild, ${getInsult()}.`, error: true }

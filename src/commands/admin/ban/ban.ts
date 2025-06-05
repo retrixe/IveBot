@@ -25,7 +25,7 @@ export const handleBan: Command = {
     } else if (!user && [18, 17].includes(userSpecified.length) && !isNaN(+userSpecified)) {
       try {
         user = await client.getRESTUser(userSpecified)
-      } catch (e) {
+      } catch {
         return { content: 'I cannot find that user.', error: true }
       }
     }
@@ -58,13 +58,13 @@ export const handleBan: Command = {
             : `You have been banned from ${message.member.guild.name}.`,
         )
       }
-    } catch (e) {}
+    } catch {}
     try {
       await client.banGuildMember(message.member.guild.id, user.id, {
         deleteMessageSeconds: 0,
         reason: args.join(' '),
       })
-    } catch (e) {
+    } catch {
       if (dm) await dm.delete().catch(() => {})
       return 'That person could not be banned.'
     }

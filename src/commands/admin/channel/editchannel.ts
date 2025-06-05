@@ -23,7 +23,7 @@ export const handleDeletechannel: Command = {
     // Delete it.
     try {
       await channel.delete(args.join(' '))
-    } catch (e) {
+    } catch {
       return 'I was unable to delete that channel >_<'
     }
     // Confirm the delete.

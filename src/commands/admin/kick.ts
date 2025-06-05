@@ -46,11 +46,11 @@ export const handleKick: Command = {
             ? `You have been kicked from ${message.member.guild.name} for ${f.args.join(' ')}.`
             : `You have been kicked from ${message.member.guild.name}.`,
         )
-      } catch (e) {}
+      } catch {}
     }
     try {
       await client.kickGuildMember(message.member.guild.id, user.id, args.join(' '))
-    } catch (e) {
+    } catch {
       if (dm) await dm.delete().catch(() => {})
       return 'I am unable to kick that user.'
     }

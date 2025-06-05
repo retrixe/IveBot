@@ -24,7 +24,7 @@ export const guildMemberAdd =
         const role = guild.roles.find(role => role.name === 'Muted')
         if (role) await member.addRole(role.id, 'Persisting mute.')
       }
-    } catch (e) {}
+    } catch {}
     // Get server settings.
     const serverSettings = await getServerSettings(db, guild.id)
     // If there's autorole enabled..
@@ -37,7 +37,7 @@ export const guildMemberAdd =
           if (!role || !roleObj) return
           if (role.startsWith('bot-') && member.user.bot) await member.addRole(roleObj.id)
           else if (!role.startsWith('bot-') && !member.user.bot) await member.addRole(roleObj.id)
-        } catch (e) {}
+        } catch {}
       })
     }
     // If join/leave messages is not configured/improperly configured..
@@ -51,7 +51,7 @@ export const guildMemberAdd =
         .replaceAll('{m}', member.user.mention) // Replace the mention.
         .replaceAll('{d}', member.user.discriminator) // Replace the discriminator.
       await client.createMessage(channel, toSend)
-    } catch (e) {}
+    } catch {}
   }
 
 // When a server loses a member, this function will be called.
@@ -72,7 +72,7 @@ export const guildMemberRemove =
         .replaceAll('{m}', member.user.mention) // Replace the mention.
         .replaceAll('{d}', member.user.discriminator) // Replace the discriminator.
       await client.createMessage(channel, toSend)
-    } catch (e) {}
+    } catch {}
   }
 
 // When a server bans a member, this function will be called.
@@ -90,7 +90,7 @@ export const guildBanAdd = (client: Client, db: Db) => async (guild: Guild, user
       .replaceAll('{m}', user.mention) // Replace the mention.
       .replaceAll('{d}', user.discriminator) // Replace the discriminator.
     await client.createMessage(channel, toSend)
-  } catch (e) {}
+  } catch {}
 }
 
 // When the bot leaves a server, this function will be called.
@@ -105,7 +105,7 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db): Pro
     // If there are no permissions do not do anything.
     const selfChannelPerms = (message.channel as GuildTextableChannel).permissionsOf(client.user.id)
     if (!selfChannelPerms.has('sendMessages')) return
-  } catch (e) {}
+  } catch {}
   // Content of message and sendResponse.
   const sendResponse = async (content: string): Promise<Message> =>
     await message.channel.createMessage(content)
@@ -163,6 +163,6 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db): Pro
       await message.channel.createMessage({
         content: `**Text recognition result:**\n${result.responses[0].fullTextAnnotation.text}`,
       })
-    } catch (e) {}
+    } catch {}
   }
 }

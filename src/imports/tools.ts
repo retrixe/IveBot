@@ -111,7 +111,7 @@ export const fetchLimited = async (
     const contentLength =
       (await fetch(url, { method: 'HEAD' })).headers.get('content-length') || '-1'
     if (!isNaN(+contentLength) && +contentLength > byteLimit) return false
-  } catch (e) {} // Understandable that this may fail.
+  } catch {} // Understandable that this may fail.
   // Create a Promise which resolves on stream finish.
   return await new Promise((resolve, reject) => {
     let size = 0

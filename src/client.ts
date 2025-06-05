@@ -87,7 +87,7 @@ export class Command {
         message.member.permissions.json,
       ) // This should eval true if user has permissions.
     // If any of these are true, it's a go.
-    return userIDs || custom || permissions
+    return !!(userIDs || custom || permissions)
   }
 
   async execute(
@@ -96,7 +96,7 @@ export class Command {
     args: string[],
   ): Promise<CommandResponse | undefined> {
     // Define 2 vars.
-    let messageToSend: CommandResponse | undefined | Promise<CommandResponse> | Promise<undefined>
+    let messageToSend: CommandResponse | undefined | Promise<CommandResponse | undefined>
     // If it's a function, we call it first.
     if (typeof this.generator === 'function') messageToSend = this.generator(message, args, context)
     else messageToSend = this.generator
@@ -162,7 +162,7 @@ export default class CommandParser {
     // Delete the message if needed.
     try {
       if (command.deleteCommand) await message.delete('Automatically deleted by IveBot.')
-    } catch (e) {}
+    } catch {}
     // We get the exact content to send.
     const messageToSend = await command.execute(context, message, args)
     // We define a sent variable to keep track.
@@ -245,11 +245,11 @@ export default class CommandParser {
       await botCallback(message, this.client, this.tempDB, this.db)
       return // Don't process it if it's not a command.
     }
-    const commandExec = message.content.split(' ')[0].substr(1).toLowerCase()
+    const commandExec = message.content.split(' ')[0].substring(1).toLowerCase()
     // Webhook and bot protection.
     try {
       if (message.author.bot) return
-    } catch (e) {
+    } catch {
       return
     }
     // Check for the command in this.commands.
@@ -281,7 +281,7 @@ export default class CommandParser {
   }
 
   // For evaluating messages which weren't evaluated.
-  async onMessageUpdate(message: Message, oldMessage?: Message): Promise<void> {
+  async onMessageUpdate(message: Message): Promise<void> {
     // We won't bother with a lot of messages..
     if (message.content && !message.content.startsWith('/')) return
     else if (!message.editedTimestamp) return
@@ -289,11 +289,11 @@ export default class CommandParser {
     else if (Date.now() - message.timestamp > 30000) return
     else if (message.editedTimestamp - message.timestamp > 30000) return
     // Proceed to evaluate.
-    const commandExec = message.content.split(' ')[0].substr(1).toLowerCase()
+    const commandExec = message.content.split(' ')[0].substring(1).toLowerCase()
     // Webhook and bot protection.
     try {
       if (message.author.bot) return
-    } catch (e) {
+    } catch {
       return
     }
     // Check for the command in this.commands.

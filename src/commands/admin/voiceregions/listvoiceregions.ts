@@ -1,8 +1,6 @@
 // All the types!
 import type Dysnomia from '@projectdysnomia/dysnomia'
 import type { Command } from '../../../imports/types.ts'
-// All the needs!
-import { getChannel } from '../../../imports/tools.ts'
 
 export const handleListvoiceregions: Command = {
   name: 'listvoiceregions',

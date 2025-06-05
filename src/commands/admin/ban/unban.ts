@@ -27,13 +27,13 @@ export const handleUnban: Command = {
     } else {
       try {
         user = await client.getRESTUser(userSpecified)
-      } catch (e) {}
+      } catch {}
     }
     if (!user) return { content: 'I cannot find that user.', error: true }
     // Now we unban the person.
     try {
       await client.unbanGuildMember(message.member.guild.id, user.id, args.join(' '))
-    } catch (e) {
+    } catch {
       return 'That user could not be unbanned.'
     }
     return `**${user.username}#${user.discriminator}** has been unbanned.`

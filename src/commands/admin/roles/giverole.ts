@@ -68,7 +68,7 @@ export const handleGiverole: Command = {
         role.id,
         'Give role command called.',
       )
-    } catch (e) {
+    } catch {
       return user.id === message.author.id // Ternary statement.
         ? 'Could not give you the role.'
         : 'Could not give role to user.'

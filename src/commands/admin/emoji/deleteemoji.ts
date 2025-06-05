@@ -30,7 +30,7 @@ export const handleDeleteemoji: Command = {
       if (!emoji) return { content: `Invalid emoji, you ${getInsult()}.`, error: true }
       await message.member.guild.deleteEmoji(emoji.id)
       return 'Emoji successfully deleted \\o/'
-    } catch (e) {
+    } catch {
       return 'Emoji could not be deleted.'
     }
   },

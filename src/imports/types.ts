@@ -39,12 +39,12 @@ export type IveBotCommandGeneratorFunction = (
   msg: Message,
   args: string[],
   ctx: Context,
-) => undefined | Promise<undefined> | CommandResponse | Promise<CommandResponse>
+) => undefined | CommandResponse | Promise<CommandResponse | undefined>
 
 export type IveBotSlashGeneratorFunction = (
   interaction: CommandInteraction,
   ctx: Context,
-) => undefined | Promise<undefined> | CommandResponse | Promise<CommandResponse>
+) => undefined | CommandResponse | Promise<CommandResponse | undefined>
 
 export type IveBotCommandGenerator =
   | IveBotCommandGeneratorFunction

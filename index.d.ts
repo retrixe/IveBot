@@ -3,7 +3,8 @@ declare module 'json5' {
 }
 
 declare module 'ms' {
-  export default (toParse: string, options?: { long: boolean }): number => number
+  const ms: (toParse: string, options?: { long: boolean }) => number
+  export default ms
 }
 declare module 'mathjs' {
   export const evaluate: (expression: string) => number

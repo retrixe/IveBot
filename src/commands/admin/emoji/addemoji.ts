@@ -1,5 +1,5 @@
 import type { Command } from '../../../imports/types.ts'
-import { getInsult, getIdFromMention, fetchLimited } from '../../../imports/tools.ts'
+import { getInsult, fetchLimited } from '../../../imports/tools.ts'
 
 export const handleAddemoji: Command = {
   name: 'addEmoji',
@@ -30,7 +30,7 @@ export const handleAddemoji: Command = {
     try {
       // image = Buffer.from(await (await fetch(url)).arrayBuffer())
       image = await fetchLimited(url, 0.25)
-    } catch (e) {
+    } catch {
       return { content: `Invalid image URL, you ${getInsult()}`, error: true }
     }
     // If emoji larger than 384 KB (in case)
@@ -65,7 +65,7 @@ After checking image format as JPG, resize, View Image and use the URL to the im
       if (emoji.animated) mention = `<a:${emoji.name}:${emoji.id}>`
       else mention = `<:${emoji.name}:${emoji.id}>`
       return `Emoji successfully added \\o/ (${mention})`
-    } catch (e) {
+    } catch {
       return {
         content: `Emoji could not be added. Is the emoji larger than 256 kB?
 I recommend using <https://picresize.com/> if the emoji is JPG and too large.

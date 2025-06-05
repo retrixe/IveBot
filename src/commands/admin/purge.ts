@@ -40,7 +40,7 @@ export const handlePurge: Command = {
         limit: +args.shift(),
         before: message.id,
       })
-    } catch (e) {
+    } catch {
       return 'Could not retrieve messages.'
     }
     // Delete the messages.
@@ -51,7 +51,7 @@ export const handlePurge: Command = {
         messages.map(i => i.id),
         reason,
       )
-    } catch (e) {
+    } catch {
       return {
         content: 'Could not delete messages. Are the messages older than 2 weeks?',
         error: true,
