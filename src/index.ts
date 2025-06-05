@@ -25,7 +25,7 @@ import { token, mongoURL, jwtSecret } from './config.ts'
 // If production is explicitly specified via flag..
 if (process.argv[2] === '--production') process.env.NODE_ENV = 'production'
 // Check for development environment.
-const dev = process.env.NODE_ENV !== 'production'
+// const dev = process.env.NODE_ENV !== 'production'
 
 // Create a client to connect to Discord API Gateway.
 const client = new Client(`Bot ${token === 'dotenv' ? process.env.IVEBOT_TOKEN : token}`, {
@@ -92,7 +92,7 @@ const toRead = join(import.meta.dirname, 'commands')
 const commandFiles = await readdir(toRead)
 // This only supports two levels of files, one including files inside commands, and one in..
 // a subfolder.
-commandFiles.push(dev ? 'admin/index.ts' : 'admin/index.js')
+// commandFiles.push(dev ? 'admin/index.ts' : 'admin/index.js')
 for (const commandFile of commandFiles) {
   // If it's a file..
   if (
