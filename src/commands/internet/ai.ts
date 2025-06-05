@@ -3,8 +3,8 @@ import {
   type InteractionDataOptionsString,
   type TextChannel,
 } from '@projectdysnomia/dysnomia'
-import type { Command } from '../imports/types.ts'
-import { openaiAPIkey } from '../config.ts'
+import type { Command } from '../../imports/types.ts'
+import { openaiAPIkey } from '../../config.ts'
 
 export const handleAi: Command = {
   name: 'ai',
