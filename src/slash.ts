@@ -16,6 +16,7 @@ import type {
   Context,
   CommandResponse,
   IveBotSlashGeneratorFunction,
+  CommandAnalytics,
 } from './imports/types.ts'
 import { getInsult, isEquivalent } from './imports/tools.ts'
 import type CommandParser from './client.ts'
@@ -134,7 +135,7 @@ export default class SlashParser {
   client: Client
   tempDB: DB
   db: Db
-  analytics: Record<string, { totalUse: number; averageExecTime: number[] }>
+  analytics: Record<string, Omit<CommandAnalytics, 'name'>>
 
   constructor(client: Client, tempDB: DB, db: Db, commandParser: CommandParser) {
     this.commands = {}
@@ -262,7 +263,7 @@ export default class SlashParser {
     for (const commandName in this.analytics) {
       const command = this.analytics[commandName]
       // Get the data for the selected command.
-      const statistics = await analytics.findOne({ name: commandName })
+      const statistics = await analytics.findOne<CommandAnalytics>({ name: commandName })
       // If the command was not stored, we store our analytics directly.
       if (!statistics) await analytics.insertOne({ name: commandName, ...command })
       // Else, we update existing command data in the database.
@@ -271,7 +272,7 @@ export default class SlashParser {
         const averageExecTime = statistics.averageExecTime.map(
           (i: number, index: number) =>
             (i * statistics.totalUse + command.averageExecTime[index] * command.totalUse) /
-            ((statistics.totalUse as number) + command.totalUse),
+            (statistics.totalUse + command.totalUse),
         )
         await analytics.updateOne(
           { name: commandName },

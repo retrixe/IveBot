@@ -10,6 +10,7 @@ import type {
   IveBotCommandGenerator,
   Context,
   CommandResponse,
+  CommandAnalytics,
 } from './imports/types.ts'
 import type { Db } from 'mongodb'
 import { getInsult, isEquivalent } from './imports/tools.ts'
@@ -112,7 +113,7 @@ export default class CommandParser {
   tempDB: DB
   db: Db
   evaluatedMessages: Set<string>
-  analytics: Record<string, { totalUse: number; averageExecTime: number[] }>
+  analytics: Record<string, Omit<CommandAnalytics, 'name'>>
 
   constructor(client: Client, tempDB: DB, db: Db) {
     this.commands = {}
@@ -162,7 +163,9 @@ export default class CommandParser {
     // Delete the message if needed.
     try {
       if (command.deleteCommand) await message.delete('Automatically deleted by IveBot.')
-    } catch {}
+    } catch {
+      /* Ignore errors */
+    }
     // We get the exact content to send.
     const messageToSend = await command.execute(context, message, args)
     // We define a sent variable to keep track.
@@ -218,7 +221,7 @@ export default class CommandParser {
     for (const commandName in this.analytics) {
       const command = this.analytics[commandName]
       // Get the data for the selected command.
-      const statistics = await analytics.findOne({ name: commandName })
+      const statistics = await analytics.findOne<CommandAnalytics>({ name: commandName })
       // If the command was not stored, we store our analytics directly.
       if (!statistics) await analytics.insertOne({ name: commandName, ...command })
       // Else, we update existing command data in the database.
@@ -227,7 +230,7 @@ export default class CommandParser {
         const averageExecTime = statistics.averageExecTime.map(
           (i: number, index: number) =>
             (i * statistics.totalUse + command.averageExecTime[index] * command.totalUse) /
-            ((statistics.totalUse as number) + command.totalUse),
+            (statistics.totalUse + command.totalUse),
         )
         await analytics.updateOne(
           { name: commandName },

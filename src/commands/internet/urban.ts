@@ -1,4 +1,5 @@
 // All the types!
+import { formatError } from '../../imports/tools.ts'
 import type { Command } from '../../imports/types.ts'
 
 export const handleUrban: Command = {
@@ -41,7 +42,7 @@ export const handleUrban: Command = {
         return { content: 'No definition was found.', error: true }
       }
     } catch (e) {
-      return `Something went wrong 👾 Error: ${e}`
+      return `Something went wrong 👾 Error: ${formatError(e)}`
     }
   },
 }

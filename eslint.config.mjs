@@ -54,21 +54,7 @@ export default tseslint.config(
       ],
       'promise/always-return': ['error', { ignoreLastCallback: true }],
       'n/no-missing-import': 'off',
-      // FIXME: Re-enable the following rules!
-      'no-empty': 'off',
-      'n/no-extraneous-import': 'off',
-      '@typescript-eslint/no-empty-function': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unsafe-argument': 'off',
-      '@typescript-eslint/no-unsafe-assignment': 'off',
-      '@typescript-eslint/no-unsafe-call': 'off',
-      '@typescript-eslint/no-unsafe-member-access': 'off',
-      '@typescript-eslint/no-unsafe-return': 'off',
-      '@typescript-eslint/restrict-template-expressions': 'off',
-      // Low hanging fruit rules to enable
-      '@typescript-eslint/no-base-to-string': 'off',
-      '@typescript-eslint/no-dynamic-delete': 'off',
-      // The following need `strictNullChecks` enabled
+      // FIXME: The following rules need `strictNullChecks` enabled...
       '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'off',
       '@typescript-eslint/no-unnecessary-condition': 'off',
       '@typescript-eslint/prefer-nullish-coalescing': 'off',

@@ -1,5 +1,5 @@
 import moment from 'moment'
-import type { Command } from '../../../imports/types.ts'
+import type { Command, Warning } from '../../../imports/types.ts'
 import { getUser, getInsult } from '../../../imports/tools.ts'
 
 export const handleWarnings: Command = {
@@ -31,7 +31,7 @@ export const handleWarnings: Command = {
     // Get a list of warnings.
     const warns = await db
       .collection('warnings')
-      .find({ warnedId: user.id, serverId: message.member.guild.id })
+      .find<Warning>({ warnedId: user.id, serverId: message.member.guild.id })
       .toArray()
     // If the person has no warnings..
     if (warns.length === 0) return '**No** warnings found.'
@@ -52,7 +52,7 @@ export const handleWarnings: Command = {
             return {
               name: `Warning ${index + 1}`,
               value: `**| Moderator:** ${mod} **| Reason:** ${warning.reason}
-**| ID:** ${warning._id} **| Date:** ${moment(warning.date).format(format)}`,
+**| ID:** ${warning._id.toString()} **| Date:** ${moment(warning.date).format(format)}`,
             }
           }),
         },

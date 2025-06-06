@@ -27,7 +27,9 @@ export const handleUnban: Command = {
     } else {
       try {
         user = await client.getRESTUser(userSpecified)
-      } catch {}
+      } catch {
+        /* Ignore errors */
+      }
     }
     if (!user) return { content: 'I cannot find that user.', error: true }
     // Now we unban the person.

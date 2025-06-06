@@ -1,4 +1,5 @@
 // All the types!
+import { formatError } from '../../imports/tools.ts'
 import type { Command } from '../../imports/types.ts'
 
 export const handleDog: Command = {
@@ -28,7 +29,7 @@ export const handleDog: Command = {
           return `**List of sub-breeds:** ${message[args[1]].join(', ')}`
         }
       } catch (err) {
-        return `Something went wrong 👾 Error: ${err}`
+        return `Something went wrong 👾 Error: ${formatError(err)}`
       }
       // Fetch a random picture for a sub-breed.
     } else if (args[0] && args[1]) {
@@ -50,7 +51,7 @@ export const handleDog: Command = {
           content: `🐕 ${args[0]} ${args[1]}`,
         }
       } catch (err) {
-        return `Something went wrong 👾 Error: ${err}`
+        return `Something went wrong 👾 Error: ${formatError(err)}`
       }
     } else if (args[0]) {
       // Fetch a random picture for a breed.
@@ -61,7 +62,7 @@ export const handleDog: Command = {
         if (!message || message.includes('Breed not found')) return 'This breed does not exist!'
         return { embeds: [{ image: { url: message }, color: 0x654321 }], content: '🐕 ' + args[0] }
       } catch (err) {
-        return `Something went wrong 👾 Error: ${err}`
+        return `Something went wrong 👾 Error: ${formatError(err)}`
       }
     }
     // Fetch a random picture.
@@ -71,7 +72,7 @@ export const handleDog: Command = {
       ).json()) as { message: string }
       return { embeds: [{ image: { url: message }, color: 0x654321 }], content: '🐕' }
     } catch (err) {
-      return `Something went wrong 👾 Error: ${err}`
+      return `Something went wrong 👾 Error: ${formatError(err)}`
     }
   },
 }

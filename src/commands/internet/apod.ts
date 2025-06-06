@@ -4,6 +4,7 @@ import type { Command } from '../../imports/types.ts'
 import moment from 'moment'
 // Get the NASA API token.
 import { NASAtoken } from '../../config.ts'
+import { formatError } from '../../imports/tools.ts'
 
 interface ApodResponse {
   url: string
@@ -56,7 +57,7 @@ export const handleApod: Command = {
               embeds: [{ image: { url }, color: 0x2361be }],
             }
       } catch (err) {
-        return `Something went wrong 👾 Error: ${err}`
+        return `Something went wrong 👾 Error: ${formatError(err)}`
       }
     } else if (args.length > 0) {
       return { content: 'Invalid date.', error: true }
@@ -79,7 +80,7 @@ export const handleApod: Command = {
             embeds: [{ image: { url: hdurl }, color: 0x2361be }],
           }
     } catch (err) {
-      return `Something went wrong 👾 Error: ${err}`
+      return `Something went wrong 👾 Error: ${formatError(err)}`
     }
   },
 }

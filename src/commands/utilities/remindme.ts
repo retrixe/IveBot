@@ -54,7 +54,9 @@ export const handleRemindme: Command = {
             ? `${message.author.mention} ${args.slice(1).join(' ')}`
             : args.slice(1).join(' ')
           await textChannel.createMessage(`⏰ ${firstLine}\nReminder set ${args[0]} ago.`)
-        })().catch(() => {})
+        })().catch(() => {
+          /* Ignore error */
+        })
       }, ms(args[0]))
     }
     return `You will be reminded in ${args[0]} through a ${channel ? 'mention' : 'DM'}.`

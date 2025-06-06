@@ -14,7 +14,7 @@ import { inspect } from 'util'
 import http from 'http'
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto'
 // Import types.
-import type { DB, Command } from './imports/types.ts'
+import type { DB, Command, Task } from './imports/types.ts'
 // Import the bot.
 import SlashParser from './slash.ts'
 import CommandParser from './client.ts'
@@ -65,10 +65,11 @@ await mongoClient.connect()
 console.log('Bot connected successfully to MongoDB.')
 const db = mongoClient.db('ivebot')
 const bubbleWrap =
-  <F extends (...args: any[]) => any>(func: F) =>
-  (...args: Parameters<F>) => {
-    func(...args).catch((e: Error) => console.error('An error was bubbled!', e))
-  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  <F extends (...args: any[]) => Promise<any>>(func: F) =>
+    (...args: Parameters<F>) => {
+      func(...args).catch((e: unknown) => console.error('An error was bubbled!', e))
+    }
 // When a server loses a member, it will callback.
 client.on('guildMemberAdd', bubbleWrap(guildMemberAdd(client, db, tempDB)))
 client.on('guildMemberRemove', bubbleWrap(guildMemberRemove(client, db)))
@@ -99,7 +100,7 @@ for (const commandFile of commandFiles) {
     (await stat(join(toRead, commandFile))).isFile() &&
     (commandFile.endsWith('.ts') || commandFile.endsWith('.js'))
   ) {
-    const commands: Record<string, Command> = await import('./commands/' + commandFile)
+    const commands = (await import('./commands/' + commandFile)) as Record<string, Command>
     // ..and there are commands..
     if (Object.keys(commands).length === 0) continue
     // ..register the commands.
@@ -120,7 +121,7 @@ setInterval(
   bubbleWrap(async () => {
     const tasks = await db
       .collection('tasks')
-      .find({ time: { $lte: Date.now() + 60000 } })
+      .find<Task>({ time: { $lte: Date.now() + 60000 } })
       .toArray()
 
     tasks?.forEach(task =>
@@ -208,9 +209,11 @@ if (jwtSecret) {
           const decipher = createDecipheriv('aes-256-ctr', key, buffer.subarray(0, 16))
           const data = Buffer.concat([decipher.update(buffer.subarray(16)), decipher.final()])
           const valid: DiscordServerResponse[] = []
-          const parsed: { id: string; host: boolean; guilds: string[] } = JSON.parse(
-            data.toString('utf8'),
-          )
+          const parsed = JSON.parse(data.toString('utf8')) as {
+            id: string
+            host: boolean
+            guilds: string[]
+          }
           if (typeof parsed.id !== 'string' || !Array.isArray(parsed.guilds)) throw new Error()
           const requests = parsed.guilds.map(async id => {
             if (typeof id !== 'string' || id.length <= 16) return
@@ -230,7 +233,9 @@ if (jwtSecret) {
               try {
                 member = await client.getRESTGuildMember(id, parsed.id)
                 guild.members.add(member) // Cache the member for faster lookups.
-              } catch {} // TODO: Unable to retrieve member for the guild. Hm?
+              } catch {
+                // TODO: Unable to retrieve member for the guild. Hm?
+              }
             }
             if (member) {
               const perm = guild.permissionsOf(member).has('manageGuild')

@@ -46,12 +46,17 @@ export const handleKick: Command = {
             ? `You have been kicked from ${message.member.guild.name} for ${f.args.join(' ')}.`
             : `You have been kicked from ${message.member.guild.name}.`,
         )
-      } catch {}
+      } catch {
+        /* Ignore errors */
+      }
     }
     try {
       await client.kickGuildMember(message.member.guild.id, user.id, args.join(' '))
     } catch {
-      if (dm) await dm.delete().catch(() => {})
+      if (dm)
+        await dm.delete().catch(() => {
+          /* Ignore errors */
+        })
       return 'I am unable to kick that user.'
     }
     // WeChill
@@ -63,7 +68,10 @@ export const handleKick: Command = {
           : `**${user.username}#${user.discriminator}** has been kicked for not staying chill >:L `,
       )
     }
-    if (f.delete) message.delete('Deleted kick command.').catch(() => {}) // Ignore error.
+    if (f.delete)
+      message.delete('Deleted kick command.').catch(() => {
+        /* Ignore errors */
+      })
     if (!f.silent) return `**${user.username}#${user.discriminator}** has been kicked. **rip.**`
   },
 }

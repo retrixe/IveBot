@@ -1,5 +1,5 @@
 import type { Command } from '../../../imports/types.ts'
-import { getChannel, getInsult } from '../../../imports/tools.ts'
+import { formatError, getChannel, getInsult } from '../../../imports/tools.ts'
 
 export const handleDeletechannel: Command = {
   name: 'deleteChannel',
@@ -102,7 +102,7 @@ export const handleEditchannel: Command = {
           else if (name === 'bitrate') await channel.edit({ bitrate: +value * 1000 })
           else if (name === 'userLimit') await channel.edit({ userLimit: +value })
         } catch (e) {
-          failedOps.push({ name: `❌ ${operation}`, value: e.toString() })
+          failedOps.push({ name: `❌ ${operation}`, value: formatError(e) })
         }
       }
     }

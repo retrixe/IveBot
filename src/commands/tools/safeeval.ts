@@ -2,6 +2,7 @@ import type { Command } from '../../imports/types.ts'
 import { testPilots } from '../../config.ts'
 import { runInNewContext } from 'vm'
 import { inspect } from 'util'
+import { formatError } from '../../imports/tools.ts'
 
 export const handleSafeeval: Command = {
   name: 'safeEval',
@@ -25,6 +26,7 @@ getContent/getCleanContent(messageID), createMessage(content), getReactions(mess
       if (toEval.endsWith('`')) toEval = toEval.substring(0, toEval.length - 1)
       if (toEval.endsWith('``')) toEval = toEval.substring(0, toEval.length - 2)
       // Evaluate!
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const result = runInNewContext(toEval.split('```').join(''), {
         createMessage: async (co: string) => {
           return (await context.client.createMessage(message.channel.id, co)).content
@@ -36,12 +38,16 @@ getContent/getCleanContent(messageID), createMessage(content), getReactions(mess
         getReactions: async (id: string) => (await message.channel.getMessage(id)).reactions,
       })
       const res = inspect(await Promise.resolve(result), false, 0)
-      message.addReaction('✅').catch(() => {}) // Ignore error.
+      message.addReaction('✅').catch(() => {
+        /* Ignore error */
+      })
       const token = (context.client as unknown as { _token: string })._token
       return res !== 'undefined' ? `\`\`\`${res.replace(token, '')}\`\`\`` : undefined
     } catch (e) {
-      message.addReaction('❌').catch(() => {}) // Ignore error.
-      return { content: `**Error:**\n${e}`, error: true }
+      message.addReaction('❌').catch(() => {
+        /* Ignore error */
+      })
+      return { content: `**Error:**\n${formatError(e)}`, error: true }
     }
   },
 }

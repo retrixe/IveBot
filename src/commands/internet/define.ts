@@ -1,7 +1,7 @@
 // All the types!
 import type { Command } from '../../imports/types.ts'
 // All the tools!
-import { zeroWidthSpace } from '../../imports/tools.ts'
+import { formatError, zeroWidthSpace } from '../../imports/tools.ts'
 // Get the NASA API token.
 import { oxfordAPI } from '../../config.ts'
 
@@ -126,7 +126,7 @@ export const handleDefine: Command = {
           ],
         }
       } catch (err) {
-        return `Something went wrong 👾 Error: ${err}`
+        return `Something went wrong 👾 Error: ${formatError(err)}`
       }
     } catch {
       return { content: 'Did you enter a valid word? 👾', error: true }

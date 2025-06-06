@@ -58,14 +58,19 @@ export const handleBan: Command = {
             : `You have been banned from ${message.member.guild.name}.`,
         )
       }
-    } catch {}
+    } catch {
+      /* Ignore error */
+    }
     try {
       await client.banGuildMember(message.member.guild.id, user.id, {
         deleteMessageSeconds: 0,
         reason: args.join(' '),
       })
     } catch {
-      if (dm) await dm.delete().catch(() => {})
+      if (dm)
+        await dm.delete().catch(() => {
+          /* Ignore error */
+        })
       return 'That person could not be banned.'
     }
     // WeChill
@@ -77,7 +82,10 @@ export const handleBan: Command = {
           : `**${user.username}#${user.discriminator}** has been banned for not staying chill >:L `,
       )
     }
-    if (f.delete) message.delete().catch(() => {}) // Ignore error.
+    if (f.delete)
+      message.delete().catch(() => {
+        /* Ignore error */
+      })
     if (!f.silent) return `**${user.username}#${user.discriminator}** has been banned. **rip.**`
   },
 }

@@ -1,5 +1,5 @@
 import type { Command } from '../../../imports/types.ts'
-import { getUser, getInsult } from '../../../imports/tools.ts'
+import { getUser, getInsult, formatError } from '../../../imports/tools.ts'
 import { checkRolePosition } from '../../../imports/permissions.ts'
 
 export const handleClearwarns: Command = {
@@ -37,7 +37,7 @@ export const handleClearwarns: Command = {
         serverId: message.member.guild.id,
       })
     } catch (err) {
-      return `Something went wrong 👾 Error: ${err}`
+      return `Something went wrong 👾 Error: ${formatError(err)}`
     }
     // Return response.
     return `Warnings of **${user.username}#${user.discriminator}** have been **cleared**.`

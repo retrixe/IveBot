@@ -41,7 +41,9 @@ export const handleWarn: Command = {
         (await client.getDMChannel(user.id)).id,
         `You have been warned in ${message.member.guild.name} for: ${args.join(' ')}.`,
       )
-      .catch(() => {}) // Ignore error.
+      .catch(() => {
+        /* Ignore error */
+      })
     // WeChill
     if (message.member.guild.id === '402423671551164416') {
       client
@@ -58,7 +60,9 @@ export const handleWarn: Command = {
             },
           ],
         })
-        .catch(() => {}) // Ignore error.
+        .catch(() => {
+          /* Ignore error */
+        })
     }
     return `**${user.username}#${user.discriminator}** has been warned. **lol.**`
   },

@@ -1,8 +1,9 @@
 import http, { type RequestOptions } from 'http'
 import https from 'https'
 import { URL } from 'url'
-import type { Db, Document } from 'mongodb'
+import type { Db } from 'mongodb'
 import type { GuildChannel, Member, Message, User } from '@projectdysnomia/dysnomia'
+import type { ServerSettings } from './types.ts'
 
 // Fresh insults. They come and go, I suppose.
 export const getInsult = (plural = false): string => {
@@ -30,13 +31,13 @@ export const getIdFromMention = (mention: string): string => {
   return f[f.length - 1]
 }
 
-export const getServerSettings = async (db: Db, id: string): Promise<Document> => {
+export const getServerSettings = async (db: Db, id: string): Promise<ServerSettings> => {
   // Get serverSettings through query.
-  let serverSettings = await db.collection('servers').find({ id }).toArray()
+  let serverSettings = await db.collection('servers').find<ServerSettings>({ id }).toArray()
   if (serverSettings.length === 0) {
     // Initialize server settings.
     await db.collection('servers').insertOne({ id })
-    serverSettings = await db.collection('servers').find({ id }).toArray()
+    serverSettings = await db.collection('servers').find<ServerSettings>({ id }).toArray()
   }
   return serverSettings[0]
 }
@@ -111,7 +112,9 @@ export const fetchLimited = async (
     const contentLength =
       (await fetch(url, { method: 'HEAD' })).headers.get('content-length') || '-1'
     if (!isNaN(+contentLength) && +contentLength > byteLimit) return false
-  } catch {} // Understandable that this may fail.
+  } catch {
+    /* Understandable that this may fail. */
+  }
   // Create a Promise which resolves on stream finish.
   return await new Promise((resolve, reject) => {
     let size = 0
@@ -124,10 +127,10 @@ export const fetchLimited = async (
         req.destroy()
         resolve(false)
       }
-      res.on('data', chunk => {
+      res.on('data', (chunk: Buffer) => {
         if (!Buffer.isBuffer(chunk)) chunk = Buffer.from(chunk)
         data.push(chunk)
-        size += (chunk as Buffer).length
+        size += chunk.length
         if (size > byteLimit) {
           req.destroy()
           resolve(false)
@@ -159,3 +162,7 @@ export function isEquivalent(a: Record<string, unknown>, b: Record<string, unkno
   // If we made it this far, objects are considered equivalent
   return true
 }
+
+export const formatError = (error: unknown): string =>
+  // eslint-disable-next-line @typescript-eslint/no-base-to-string
+  error instanceof Error ? error.message : error ? error?.toString() : 'Unknown error!'

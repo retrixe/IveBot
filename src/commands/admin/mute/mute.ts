@@ -102,7 +102,9 @@ export const handleMute: Command = {
       let time = 0
       try {
         time = ms(args[0]) || 0
-      } catch {}
+      } catch {
+        /* Ignore errors */
+      }
       if (time && time >= 2073600000) return { content: 'Mute limit is 24 days.', error: true }
       const mute = await db
         .collection('tasks')

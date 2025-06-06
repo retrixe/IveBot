@@ -24,21 +24,26 @@ export const guildMemberAdd =
         const role = guild.roles.find(role => role.name === 'Muted')
         if (role) await member.addRole(role.id, 'Persisting mute.')
       }
-    } catch {}
+    } catch {
+      /* Ignore errors */
+    }
     // Get server settings.
     const serverSettings = await getServerSettings(db, guild.id)
     // If there's autorole enabled..
     if (serverSettings.joinAutorole) {
       // For each role..
-      serverSettings.joinAutorole.split('|').forEach(async (role: string) => {
+      const operations = serverSettings.joinAutorole.split('|').map(async (role: string) => {
         try {
           const roleName = role.startsWith('bot-') ? role.substring(4) : role
           const roleObj = member.guild.roles.find(element => element.name === roleName)
           if (!role || !roleObj) return
           if (role.startsWith('bot-') && member.user.bot) await member.addRole(roleObj.id)
           else if (!role.startsWith('bot-') && !member.user.bot) await member.addRole(roleObj.id)
-        } catch {}
+        } catch {
+          /* Ignore errors */
+        }
       })
+      await Promise.allSettled(operations)
     }
     // If join/leave messages is not configured/improperly configured..
     if (!serverSettings.joinLeaveMessages) return
@@ -51,7 +56,9 @@ export const guildMemberAdd =
         .replaceAll('{m}', member.user.mention) // Replace the mention.
         .replaceAll('{d}', member.user.discriminator) // Replace the discriminator.
       await client.createMessage(channel, toSend)
-    } catch {}
+    } catch {
+      /* Ignore errors */
+    }
   }
 
 // When a server loses a member, this function will be called.
@@ -72,7 +79,9 @@ export const guildMemberRemove =
         .replaceAll('{m}', member.user.mention) // Replace the mention.
         .replaceAll('{d}', member.user.discriminator) // Replace the discriminator.
       await client.createMessage(channel, toSend)
-    } catch {}
+    } catch {
+      /* Ignore errors */
+    }
   }
 
 // When a server bans a member, this function will be called.
@@ -90,7 +99,9 @@ export const guildBanAdd = (client: Client, db: Db) => async (guild: Guild, user
       .replaceAll('{m}', user.mention) // Replace the mention.
       .replaceAll('{d}', user.discriminator) // Replace the discriminator.
     await client.createMessage(channel, toSend)
-  } catch {}
+  } catch {
+    /* Ignore errors */
+  }
 }
 
 // When the bot leaves a server, this function will be called.
@@ -105,7 +116,9 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db): Pro
     // If there are no permissions do not do anything.
     const selfChannelPerms = (message.channel as GuildTextableChannel).permissionsOf(client.user.id)
     if (!selfChannelPerms.has('sendMessages')) return
-  } catch {}
+  } catch {
+    /* Ignore errors */
+  }
   // Content of message and sendResponse.
   const sendResponse = async (content: string): Promise<Message> =>
     await message.channel.createMessage(content)
@@ -163,6 +176,8 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db): Pro
       await message.channel.createMessage({
         content: `**Text recognition result:**\n${result.responses[0].fullTextAnnotation.text}`,
       })
-    } catch {}
+    } catch {
+      /* Ignore errors */
+    }
   }
 }

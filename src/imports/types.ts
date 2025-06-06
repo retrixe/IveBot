@@ -6,7 +6,7 @@ import type {
   Message,
 } from '@projectdysnomia/dysnomia'
 import type CommandParser from '../client.ts'
-import type { Db } from 'mongodb'
+import type { Db, ObjectId } from 'mongodb'
 import type { TriviaSession } from '../commands/games/trivia.ts'
 
 export interface Gunfight {
@@ -58,6 +58,7 @@ export interface Command {
   generator: IveBotCommandGenerator
   postGenerator?: (message: Message, args: string[], sent?: Message, ctx?: Context) => void
   slashGenerator?: true | IveBotSlashGeneratorFunction
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   commonGenerator?: (...args: any[]) => CommandResponse | Promise<CommandResponse>
 }
 
@@ -82,4 +83,53 @@ export interface CommandOptions {
     permissions?: Record<string, boolean>
     roleIDs?: string[]
   }
+}
+
+// MongoDB entities
+export interface CommandAnalytics {
+  name: string
+  totalUse: number
+  averageExecTime: number[]
+}
+
+export interface BaseTask {
+  _id: ObjectId
+  time: number
+  type: string
+}
+
+export interface ReminderTask extends BaseTask {
+  type: 'reminder'
+  target: string
+  message: string
+}
+
+export interface UnmuteTask extends BaseTask {
+  type: 'unmute'
+  guild: string
+  user: string
+  target: string
+}
+
+export type Task = ReminderTask | UnmuteTask
+
+export interface ServerSettings {
+  publicRoles?: string
+  joinAutorole?: string
+  ocrOnSend?: boolean
+  joinLeaveMessages?: {
+    channel?: string
+    banMessage?: string
+    joinMessage?: string
+    leaveMessage?: string
+  }
+}
+
+export interface Warning {
+  _id: ObjectId
+  serverId: string
+  warnedId: string
+  warnerId: string
+  reason: string
+  date: Date
 }

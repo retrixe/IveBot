@@ -2,7 +2,7 @@
 import type { Command } from '../../imports/types.ts'
 // All the tools!
 import moment from 'moment'
-import { zeroWidthSpace, getIdFromMention } from '../../imports/tools.ts'
+import { zeroWidthSpace, getIdFromMention, formatError } from '../../imports/tools.ts'
 
 export const handleNamemc: Command = {
   name: 'namemc',
@@ -62,7 +62,7 @@ export const handleNamemc: Command = {
           ],
         }
       } catch (err) {
-        return `Something went wrong 👾 Error: ${err}`
+        return `Something went wrong 👾 Error: ${formatError(err)}`
       }
     } catch {
       return { content: 'Enter a valid Minecraft username (account must be premium)', error: true }

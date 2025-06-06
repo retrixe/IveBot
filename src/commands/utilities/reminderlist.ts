@@ -1,5 +1,5 @@
 // All the types!
-import type { Command } from '../../imports/types.ts'
+import type { Command, ReminderTask } from '../../imports/types.ts'
 // All the needs!
 import { getInsult, getUser } from '../../imports/tools.ts'
 import { host } from '../../config.ts'
@@ -26,7 +26,10 @@ export const handleReminderlist: Command = {
     else if (!user) user = message.author
     // Get a list of reminders.
     const id = user.id
-    const reminders = await db.collection('tasks').find({ type: 'reminder', user: id }).toArray()
+    const reminders = await db
+      .collection('tasks')
+      .find<ReminderTask>({ type: 'reminder', user: id })
+      .toArray()
     // If the person has no reminders..
     if (reminders.length === 0) return '**No** reminders found.'
     // Generate the response.

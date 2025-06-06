@@ -3,9 +3,9 @@ import { execSync } from 'child_process'
 import { testPilots } from '../../config.ts'
 import { readFile } from 'fs/promises'
 
-const { version }: { version: string } = JSON.parse(
-  await readFile('package.json', { encoding: 'utf8' }),
-)
+const { version } = JSON.parse(await readFile('package.json', { encoding: 'utf8' })) as {
+  version: string
+}
 
 export const handlePing: Command = {
   name: 'ping',

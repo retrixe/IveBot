@@ -16,7 +16,7 @@ interface Config {
   token: string
 }
 
-const config: Config = json5.parse(await readFile('config.json5', { encoding: 'utf8' }))
+const config = json5.parse(await readFile('config.json5', { encoding: 'utf8' })) as Config
 
 export const {
   weatherAPIkey,

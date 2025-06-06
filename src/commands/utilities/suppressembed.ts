@@ -56,7 +56,9 @@ export const handleSuppressEmbed: Command = {
 
     if (msg) {
       await msg.edit({ flags: msg.flags ^ Constants.MessageFlags.SUPPRESS_EMBEDS })
-      message.addReaction('✅').catch(() => {}) // Ignore error.
+      message.addReaction('✅').catch(() => {
+        /* Ignore error */
+      })
     } else return { content: `That's not a real message, you ${getInsult()}.`, error: true }
   },
 }

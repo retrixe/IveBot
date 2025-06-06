@@ -1,6 +1,7 @@
 import type { Command } from '../../imports/types.ts'
 import { host } from '../../config.ts'
 import { inspect } from 'util'
+import { formatError } from '../../imports/tools.ts'
 
 export const handleEval: Command = {
   name: 'eval',
@@ -24,13 +25,17 @@ export const handleEval: Command = {
       // Evaluate!
       const res = inspect(await Promise.resolve(eval(toEval)), false, 0)
       // const res = eval(`(async () => { const a = ${toEval}; return a })()`)
-      message.addReaction('✅').catch(() => {}) // Ignore error.
+      message.addReaction('✅').catch(() => {
+        /* Ignore error */
+      })
       const token = (client as unknown as { _token: string })._token
       return res !== 'undefined' ? `\`\`\`${res}\`\`\``.replace(token, 'censored') : undefined
     } catch (e) {
       const channel = await client.getDMChannel(host)
-      message.addReaction('❌').catch(() => {}) // Ignore error.
-      await channel.createMessage(`**Error:**\n${e}`)
+      message.addReaction('❌').catch(() => {
+        /* Ignore error */
+      })
+      await channel.createMessage(`**Error:**\n${formatError(e)}`)
     }
   },
 }

@@ -1,6 +1,7 @@
 import type { Command } from '../../imports/types.ts'
 import { execSync } from 'child_process'
 import { host } from '../../config.ts'
+import { formatError } from '../../imports/tools.ts'
 
 export const handleRemoteexec: Command = {
   name: 'remoteexec',
@@ -17,7 +18,7 @@ export const handleRemoteexec: Command = {
     try {
       return execSync(args.join(' '), { encoding: 'utf8' })
     } catch (e) {
-      return e.toString()
+      return formatError(e)
     }
   },
 }

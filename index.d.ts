@@ -1,5 +1,5 @@
 declare module 'json5' {
-  export const parse: (text: string, reviver?: (this: any, key: string, value: any) => any) => any
+  export const parse: (text: string) => unknown
 }
 
 declare module 'ms' {
