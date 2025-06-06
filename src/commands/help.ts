@@ -1,14 +1,10 @@
 import { formatPermissionName } from '../imports/permissions.ts'
 import { zeroWidthSpace, getInsult } from '../imports/tools.ts'
-import type { Command as IveBotCommand } from '../imports/types.ts'
+import type { SlashCommand } from '../imports/types.ts'
 import type { Command } from '../client.ts'
 import type CommandParser from '../client.ts'
 import { rootURL } from '../config.ts'
-import {
-  type Client,
-  Constants,
-  type InteractionDataOptionsString,
-} from '@projectdysnomia/dysnomia'
+import { type Client, Constants } from '@projectdysnomia/dysnomia'
 
 const generalHelp = {
   description: `**Jony Ive can do many commands 📡**
@@ -166,7 +162,7 @@ const generator = async (
   }
 }
 
-export const handleHelp: IveBotCommand = {
+export const handleHelp: SlashCommand<{ command?: string }> = {
   name: 'help',
   aliases: ['halp', 'hulp', 'gethelp', 'commands'],
   opts: {
@@ -185,13 +181,8 @@ export const handleHelp: IveBotCommand = {
       },
     ],
   },
-  slashGenerator: async ({ user, data: { options } }, { client, commandParser }) =>
-    await generator(
-      user.id,
-      (options[0] as InteractionDataOptionsString)?.value ?? '',
-      client,
-      commandParser,
-    ),
+  slashGenerator: async ({ user }, { command }, { client, commandParser }) =>
+    await generator(user.id, command ?? '', client, commandParser),
   generator: async (message, args, { client, commandParser }) =>
     await generator(message.author.id, args.join(' '), client, commandParser),
 }

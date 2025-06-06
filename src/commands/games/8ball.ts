@@ -1,7 +1,7 @@
 import { Constants } from '@projectdysnomia/dysnomia'
-import type { Command } from '../../imports/types.ts'
+import type { SlashCommand } from '../../imports/types.ts'
 
-export const handle8ball: Command = {
+export const handle8ball: SlashCommand<{ question: string }> = {
   name: '8ball',
   opts: {
     description: 'Random answers to random questions.',

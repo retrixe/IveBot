@@ -1,8 +1,7 @@
 import { Constants } from '@projectdysnomia/dysnomia'
-import type { InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
-import type { Command } from '../../imports/types.ts'
+import type { SlashCommand } from '../../imports/types.ts'
 
-export const handleReverse: Command = {
+export const handleReverse: SlashCommand<{ text: string }> = {
   name: 'reverse',
   aliases: ['rev'],
   opts: {
@@ -19,10 +18,6 @@ export const handleReverse: Command = {
       },
     ],
   },
-  slashGenerator: interaction =>
-    (interaction.data.options[0] as InteractionDataOptionsString).value
-      .split('')
-      .reverse()
-      .join(''),
+  slashGenerator: (interaction, { text }) => text.split('').reverse().join(''),
   generator: (message, args) => args.join(' ').split('').reverse().join(''),
 }

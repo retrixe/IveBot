@@ -1,7 +1,7 @@
-import type { Command } from '../../imports/types.ts'
+import type { SlashCommand } from '../../imports/types.ts'
 import moment from 'moment'
 import { getIdFromMention, getInsult } from '../../imports/tools.ts'
-import { Base, Constants, type InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
+import { Base, Constants } from '@projectdysnomia/dysnomia'
 
 const generator = (args: string[]) => {
   if (args.length === 1) {
@@ -31,7 +31,7 @@ const generator = (args: string[]) => {
   }
 }
 
-export const handleCreationtime: Command = {
+export const handleCreationtime: SlashCommand<{ entities: string }> = {
   name: 'creationtime',
   aliases: ['ct', 'creation', 'createdat', 'when'],
   opts: {
@@ -48,9 +48,9 @@ export const handleCreationtime: Command = {
       },
     ],
   },
-  slashGenerator: ({ data: { options } }) =>
+  slashGenerator: (interaction, options) =>
     generator(
-      (options[0] as InteractionDataOptionsString).value
+      options.entities
         .trim()
         .split(' ')
         .filter(arg => !!arg),

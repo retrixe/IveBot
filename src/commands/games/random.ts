@@ -1,8 +1,7 @@
 import { Constants } from '@projectdysnomia/dysnomia'
-import type { InteractionDataOptionsInteger } from '@projectdysnomia/dysnomia'
-import type { Command } from '../../imports/types.ts'
+import type { SlashCommand } from '../../imports/types.ts'
 
-export const handleRandom: Command = {
+export const handleRandom: SlashCommand<{ start?: number; end?: number }> = {
   name: 'random',
   aliases: ['rand'],
   opts: {
@@ -26,13 +25,7 @@ export const handleRandom: Command = {
       },
     ],
   },
-  slashGenerator: interaction => {
-    const start = (
-      interaction.data.options.find(({ name }) => name === 'start') as InteractionDataOptionsInteger
-    )?.value
-    const end = (
-      interaction.data.options.find(({ name }) => name === 'end') as InteractionDataOptionsInteger
-    )?.value
+  slashGenerator: (interaction, { start, end }) => {
     if (typeof start === 'number' && typeof end === 'number') {
       return `The number.. is.. ${Math.floor(Math.random() * (end - start)) + start}`
     } else if (typeof end === 'number') {

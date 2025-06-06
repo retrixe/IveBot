@@ -1,7 +1,7 @@
 // All the types!
 import { Constants } from '@projectdysnomia/dysnomia'
-import type { Guild, InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
-import type { Command } from '../../imports/types.ts'
+import type { Guild } from '@projectdysnomia/dysnomia'
+import type { SlashCommand } from '../../imports/types.ts'
 // All the needs!
 import { getInsult } from '../../imports/tools.ts'
 import moment from 'moment'
@@ -73,7 +73,7 @@ const generator = (guild: Guild) => {
   }
 }
 
-export const handleServerinfo: Command = {
+export const handleServerinfo: SlashCommand<{ server?: string }> = {
   name: 'serverinfo',
   aliases: ['serveri', 'guildinfo', 'si'],
   opts: {
@@ -92,10 +92,9 @@ export const handleServerinfo: Command = {
     ],
   },
 
-  slashGenerator: (interaction, { client }) => {
-    const serverOpt = (interaction.data.options[0] as InteractionDataOptionsString)?.value
-    let guild = client.guilds.get(serverOpt || interaction.guild?.id)
-    if (serverOpt && guild && !guild.members.has(interaction.user.id)) guild = undefined
+  slashGenerator: (interaction, { server }, { client }) => {
+    let guild = client.guilds.get(server || interaction.guild?.id)
+    if (server && guild && !guild.members.has(interaction.user.id)) guild = undefined
     return generator(guild)
   },
   generator: (message, args, { client }) => {

@@ -41,8 +41,9 @@ export type IveBotCommandGeneratorFunction = (
   ctx: Context,
 ) => undefined | CommandResponse | Promise<CommandResponse | undefined>
 
-export type IveBotSlashGeneratorFunction = (
+export type IveBotSlashGeneratorFunction<T extends Record<string, unknown>> = (
   interaction: CommandInteraction,
+  options: T,
   ctx: Context,
 ) => undefined | CommandResponse | Promise<CommandResponse | undefined>
 
@@ -57,7 +58,11 @@ export interface Command {
   name: string
   generator: IveBotCommandGenerator
   postGenerator?: (message: Message, args: string[], sent?: Message, ctx?: Context) => void
-  slashGenerator?: true | IveBotSlashGeneratorFunction
+}
+
+export interface SlashCommand<T extends Record<string, unknown> = Record<string, never>>
+  extends Command {
+  slashGenerator?: true | IveBotSlashGeneratorFunction<T>
 }
 
 export interface CommandOptions {

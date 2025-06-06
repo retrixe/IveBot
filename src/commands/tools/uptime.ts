@@ -1,7 +1,7 @@
-import type { Command } from '../../imports/types.ts'
+import type { SlashCommand } from '../../imports/types.ts'
 import moment from 'moment'
 
-export const handleUptime: Command = {
+export const handleUptime: SlashCommand = {
   name: 'uptime',
   opts: {
     description: 'How long was IveBot on?',

@@ -1,8 +1,7 @@
 import { Constants } from '@projectdysnomia/dysnomia'
-import type { InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
-import type { Command } from '../../imports/types.ts'
+import type { SlashCommand } from '../../imports/types.ts'
 
-export const handleChoose: Command = {
+export const handleChoose: SlashCommand<{ choices: string }> = {
   name: 'choose',
   aliases: ['cho'],
   opts: {
@@ -20,8 +19,8 @@ export const handleChoose: Command = {
       },
     ],
   },
-  slashGenerator: interaction => {
-    const choices = (interaction.data.options[0] as InteractionDataOptionsString).value.split('|')
+  slashGenerator: (interaction, options) => {
+    const choices = options.choices.split('|')
     return `I choose: ${choices[Math.floor(Math.random() * choices.length)]}`
   },
   generator: (message, args) => {

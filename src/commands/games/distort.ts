@@ -1,8 +1,7 @@
 import { Constants } from '@projectdysnomia/dysnomia'
-import type { InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
-import type { Command } from '../../imports/types.ts'
+import type { SlashCommand } from '../../imports/types.ts'
 
-export const handleDistort: Command = {
+export const handleDistort: SlashCommand<{ text: string }> = {
   name: 'distort',
   opts: {
     description: 'Pretty distorted text.',
@@ -18,10 +17,10 @@ export const handleDistort: Command = {
       },
     ],
   },
-  slashGenerator: interaction =>
-    (interaction.data.options[0] as InteractionDataOptionsString).value
+  slashGenerator: (interaction, options) =>
+    options.text
       .split(' ')
-      .map((i: string) => i.split('').join('*') + (i.length % 2 === 0 ? '*' : ''))
+      .map(i => i.split('').join('*') + (i.length % 2 === 0 ? '*' : ''))
       .join(' '),
   generator: (message, args) =>
     args.map(i => i.split('').join('*') + (i.length % 2 === 0 ? '*' : '')).join(' '),

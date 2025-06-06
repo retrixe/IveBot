@@ -1,9 +1,5 @@
 import { Constants } from '@projectdysnomia/dysnomia'
-import type {
-  InteractionDataOptionsInteger,
-  InteractionDataOptionsString,
-} from '@projectdysnomia/dysnomia'
-import type { Command } from '../../imports/types.ts'
+import type { SlashCommand } from '../../imports/types.ts'
 
 const generator = (number: number, text: string) => {
   if (number * text.length >= 2001) {
@@ -21,7 +17,7 @@ const generator = (number: number, text: string) => {
   return generatedMessage
 }
 
-export const handleRepeat: Command = {
+export const handleRepeat: SlashCommand<{ number: number; text: string }> = {
   name: 'repeat',
   aliases: ['rep'],
   opts: {
@@ -44,13 +40,7 @@ export const handleRepeat: Command = {
       },
     ],
   },
-  slashGenerator: interaction => {
-    const number = (
-      interaction.data.options.find(opt => opt.name === 'number') as InteractionDataOptionsInteger
-    ).value
-    const text = (
-      interaction.data.options.find(opt => opt.name === 'text') as InteractionDataOptionsString
-    ).value
+  slashGenerator: (interaction, { number, text }) => {
     return generator(number, text)
   },
   generator: (message, args) => {

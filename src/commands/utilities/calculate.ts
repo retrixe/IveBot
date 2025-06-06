@@ -1,7 +1,6 @@
 // All the types!
 import { Constants } from '@projectdysnomia/dysnomia'
-import type { InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
-import type { Command } from '../../imports/types.ts'
+import type { SlashCommand } from '../../imports/types.ts'
 // All the needs!
 import { evaluate } from 'mathjs'
 
@@ -13,7 +12,7 @@ const generator = (expression: string) => {
   }
 }
 
-export const handleCalculate: Command = {
+export const handleCalculate: SlashCommand<{ expression: string }> = {
   name: 'calculate',
   aliases: ['calc', 'cal'],
   opts: {
@@ -32,7 +31,6 @@ More info here: https://mathjs.org/docs/expressions/syntax.html`,
       },
     ],
   },
-  slashGenerator: interaction =>
-    generator((interaction.data.options[0] as InteractionDataOptionsString).value),
+  slashGenerator: (interaction, { expression }) => generator(expression),
   generator: (message, args) => generator(args.join(' ')),
 }

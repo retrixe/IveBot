@@ -1,8 +1,7 @@
 // All the types!
 import { Constants } from '@projectdysnomia/dysnomia'
 import type Dysnomia from '@projectdysnomia/dysnomia'
-import type { InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
-import type { Command } from '../../../imports/types.ts'
+import type { SlashCommand } from '../../../imports/types.ts'
 // All the needs!
 import { getChannel } from '../../../imports/tools.ts'
 
@@ -17,7 +16,7 @@ const generator = async (channel: Dysnomia.VoiceChannel, region: string) => {
   }
 }
 
-export const handleChangevoiceregion: Command = {
+export const handleChangevoiceregion: SlashCommand<{ channel: string; region: string }> = {
   name: 'changevoiceregion',
   aliases: ['csr', 'cvr'],
   opts: {
@@ -48,16 +47,10 @@ export const handleChangevoiceregion: Command = {
       },
     ],
   },
-  slashGenerator: async (interaction, { client }) => {
-    const channelOpt = interaction.data.options.find(
-      option => option.name === 'channel',
-    ) as Dysnomia.InteractionDataOptionsChannel
-    const regionOpt = interaction.data.options.find(
-      option => option.name === 'region',
-    ) as InteractionDataOptionsString
-    const ch = client.guilds.get(interaction.guild?.id).channels.get(channelOpt.value)
+  slashGenerator: async (interaction, { channel, region }, { client }) => {
+    const ch = client.guilds.get(interaction.guild?.id).channels.get(channel)
     if (!ch || ch.type !== 2) return { content: 'This voice channel does not exist!', error: true }
-    return await generator(ch, regionOpt.value || 'auto')
+    return await generator(ch, region || 'auto')
   },
   generator: async (message, args, { client }) => {
     if (!message.member.guild.members.get(client.user.id).permissions.has('manageGuild')) {

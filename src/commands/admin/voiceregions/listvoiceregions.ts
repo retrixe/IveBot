@@ -1,13 +1,13 @@
 // All the types!
 import type Dysnomia from '@projectdysnomia/dysnomia'
-import type { Command } from '../../../imports/types.ts'
+import type { SlashCommand } from '../../../imports/types.ts'
 
 const generator = async (guild: string, client: Dysnomia.Client) =>
   'Available voice regions for this server: `' +
   (await client.getVoiceRegions(guild)).map(value => value.id).join('`, `') +
   '`'
 
-export const handleListvoiceregions: Command = {
+export const handleListvoiceregions: SlashCommand = {
   name: 'listvoiceregions',
   aliases: ['lsr', 'lvr'],
   opts: {
@@ -18,7 +18,7 @@ export const handleListvoiceregions: Command = {
     guildOnly: true,
     argsRequired: false,
   },
-  slashGenerator: async ({ guild: { id: guildID } }, { client }) =>
+  slashGenerator: async ({ guild: { id: guildID } }, options, { client }) =>
     await generator(guildID, client),
   generator: async (message, args, { client }) => await generator(message.guildID, client),
 }

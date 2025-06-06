@@ -1,9 +1,5 @@
-import {
-  Constants,
-  type InteractionDataOptionsString,
-  type TextChannel,
-} from '@projectdysnomia/dysnomia'
-import type { Command } from '../../imports/types.ts'
+import { Constants, type TextChannel } from '@projectdysnomia/dysnomia'
+import type { SlashCommand } from '../../imports/types.ts'
 import { openaiAPIkey } from '../../config.ts'
 
 const generator = async (query: string, userID: string, guildID?: string, reply?: string) => {
@@ -52,7 +48,7 @@ const generator = async (query: string, userID: string, guildID?: string, reply?
   }
 }
 
-export const handleAi: Command = {
+export const handleAi: SlashCommand<{ query: string }> = {
   name: 'ai',
   aliases: ['openai'],
   opts: {
@@ -76,10 +72,10 @@ export const handleAi: Command = {
       (message.channel as TextChannel).guild?.id,
       message.id,
     ),
-  slashGenerator: async interaction => {
+  slashGenerator: async (interaction, { query }) => {
     await interaction.defer()
     return await generator(
-      (interaction.data.options[0] as InteractionDataOptionsString).value,
+      query,
       interaction.user?.id,
       (interaction.channel as TextChannel).guild?.id,
     )

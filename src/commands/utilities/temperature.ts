@@ -1,7 +1,6 @@
 // All the types!
 import { Constants } from '@projectdysnomia/dysnomia'
-import type { InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
-import type { Command } from '../../imports/types.ts'
+import type { SlashCommand } from '../../imports/types.ts'
 
 const cToF = (c: number): number => +((c * 9) / 5 + 32).toFixed(2)
 const cToK = (c: number): number => +(c + 273.15).toFixed(2)
@@ -24,7 +23,7 @@ const generator = (temp: string) => {
   }
 }
 
-export const handleTemperature: Command = {
+export const handleTemperature: SlashCommand<{ temperature: string }> = {
   name: 'temperature',
   aliases: ['temp'],
   opts: {
@@ -42,7 +41,6 @@ export const handleTemperature: Command = {
       },
     ],
   },
-  slashGenerator: interaction =>
-    generator((interaction.data.options[0] as InteractionDataOptionsString).value),
+  slashGenerator: (interaction, options) => generator(options.temperature),
   generator: (message, args) => generator(args[0]),
 }

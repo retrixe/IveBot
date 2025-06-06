@@ -1,8 +1,8 @@
 // All the types!
 import { formatError } from '../../imports/tools.ts'
-import type { Command } from '../../imports/types.ts'
+import type { SlashCommand } from '../../imports/types.ts'
 
-export const handleCat: Command = {
+export const handleCat: SlashCommand = {
   name: 'cat',
   opts: {
     description: 'Random cat from <https://random.cat>',

@@ -11,7 +11,7 @@ import type {
 } from '@projectdysnomia/dysnomia'
 import type {
   DB,
-  Command,
+  SlashCommand as IveBotSlashCommand,
   IveBotCommandGenerator,
   Context,
   CommandResponse,
@@ -22,12 +22,12 @@ import { getInsult, isEquivalent } from './imports/tools.ts'
 import type CommandParser from './client.ts'
 import type { Db } from 'mongodb'
 
-export class SlashCommand {
+export class SlashCommand<T extends Record<string, unknown> = Record<string, unknown>> {
   name: string
   aliases?: string[]
   options: ApplicationCommandOptions[]
   generator: IveBotCommandGenerator
-  slashGenerator: true | IveBotSlashGeneratorFunction
+  slashGenerator?: true | IveBotSlashGeneratorFunction<T>
   postGenerator?: (message: Message, args: string[], sent?: Message, ctx?: Context) => void
   argsRequired: boolean
   caseInsensitive: boolean
@@ -49,7 +49,7 @@ export class SlashCommand {
     roleIDs?: string[]
   }
 
-  constructor(command: Command) {
+  constructor(command: IveBotSlashCommand<T>) {
     // Key functions.
     this.name = command.name
     this.aliases = command.aliases
@@ -123,8 +123,24 @@ export class SlashCommand {
       this.slashGenerator === true || typeof this.generator !== 'function'
         ? (this.generator as () => CommandResponse)
         : this.slashGenerator
+    const options =
+      interaction.data.options?.reduce<Record<string, unknown>>((acc, option) => {
+        if (
+          option.type === Constants.ApplicationCommandOptionTypes.STRING ||
+          option.type === Constants.ApplicationCommandOptionTypes.MENTIONABLE ||
+          option.type === Constants.ApplicationCommandOptionTypes.USER ||
+          option.type === Constants.ApplicationCommandOptionTypes.ROLE ||
+          option.type === Constants.ApplicationCommandOptionTypes.CHANNEL ||
+          option.type === Constants.ApplicationCommandOptionTypes.INTEGER ||
+          option.type === Constants.ApplicationCommandOptionTypes.NUMBER ||
+          option.type === Constants.ApplicationCommandOptionTypes.BOOLEAN
+        ) {
+          acc[option.name] = option.value
+        }
+        return acc
+      }, {}) ?? {}
     const messageToSend =
-      typeof generator === 'function' ? generator(interaction, context) : generator
+      typeof generator === 'function' ? generator(interaction, options as T, context) : generator
     return await messageToSend
   }
 }
@@ -150,7 +166,7 @@ export default class SlashParser {
     }, 30000)
   }
 
-  registerCommand = (command: Command): void => {
+  registerCommand = (command: IveBotSlashCommand<Record<string, unknown>>): void => {
     this.commands[command.name] = new SlashCommand(command)
   }
 
@@ -178,7 +194,7 @@ export default class SlashParser {
     }
     // Validate that the arguments match schema to prevent further errors down the line.
     const found: string[] = []
-    for (const option of interaction.data.options) {
+    for (const option of interaction.data.options ?? []) {
       found.push(option.name)
       const optionInfo = command.options.find(arg => arg.name === option.name)
       if (!optionInfo) {

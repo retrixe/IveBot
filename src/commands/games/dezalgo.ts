@@ -1,6 +1,5 @@
 import { Constants } from '@projectdysnomia/dysnomia'
-import type { InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
-import type { Command } from '../../imports/types.ts'
+import type { SlashCommand } from '../../imports/types.ts'
 import { characters } from './zalgo.ts'
 
 const generator = (text: string) => {
@@ -11,7 +10,7 @@ const generator = (text: string) => {
   return newMessage
 }
 
-export const handleDezalgo: Command = {
+export const handleDezalgo: SlashCommand<{ text: string }> = {
   name: 'dezalgo',
   aliases: ['dzgo'],
   opts: {
@@ -28,7 +27,6 @@ export const handleDezalgo: Command = {
       },
     ],
   },
-  slashGenerator: interaction =>
-    generator((interaction.data.options[0] as InteractionDataOptionsString).value),
+  slashGenerator: (interaction, options) => generator(options.text),
   generator: (message, args) => generator(args.join(' ')),
 }

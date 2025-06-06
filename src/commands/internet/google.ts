@@ -1,9 +1,9 @@
 // All the types!
-import type { Command } from '../../imports/types.ts'
+import type { SlashCommand } from '../../imports/types.ts'
 // All the tools!
-import { Constants, type InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
+import { Constants } from '@projectdysnomia/dysnomia'
 
-export const handleGoogle: Command = {
+export const handleGoogle: SlashCommand<{ query: string }> = {
   name: 'google',
   aliases: ['g', 'lmgtfy'],
   opts: {
@@ -22,8 +22,6 @@ export const handleGoogle: Command = {
   },
   generator: (message, args) =>
     `https://lmgtfy.com/?q=${encodeURIComponent(args.join(' ')).replace(/%20/g, '+')}`,
-  slashGenerator: interaction =>
-    `https://lmgtfy.com/?q=${encodeURIComponent(
-      (interaction.data.options[0] as InteractionDataOptionsString).value,
-    ).replace(/%20/g, '+')}`,
+  slashGenerator: (interaction, options) =>
+    `https://lmgtfy.com/?q=${encodeURIComponent(options.query).replace(/%20/g, '+')}`,
 }

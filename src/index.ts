@@ -109,7 +109,7 @@ for (const commandFile of commandFiles) {
       if (commandName === 'TriviaSession') return
       const command = commands[commandName]
       commandParser.registerCommand(command)
-      if (typeof command.generator !== 'function' || command.slashGenerator) {
+      if (typeof command.generator !== 'function' || 'slashGenerator' in command) {
         slashParser.registerCommand(command)
       }
     })

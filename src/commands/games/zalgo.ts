@@ -1,6 +1,5 @@
 import { Constants } from '@projectdysnomia/dysnomia'
-import type { InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
-import type { Command } from '../../imports/types.ts'
+import type { SlashCommand } from '../../imports/types.ts'
 
 // Zalgo characters.
 // prettier-ignore
@@ -36,7 +35,7 @@ const generator = (text: string) => {
   return newMessage.length >= 2000 ? text : newMessage
 }
 
-export const handleZalgo: Command = {
+export const handleZalgo: SlashCommand<{ text: string }> = {
   name: 'zalgo',
   aliases: ['zgo'],
   opts: {
@@ -54,6 +53,5 @@ export const handleZalgo: Command = {
     ],
   },
   generator: (message, args) => generator(args.join(' ')),
-  slashGenerator: interaction =>
-    generator((interaction.data.options[0] as InteractionDataOptionsString).value),
+  slashGenerator: (interaction, { text }) => generator(text),
 }
