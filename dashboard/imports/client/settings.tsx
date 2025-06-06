@@ -15,7 +15,7 @@ import {
   TextField,
 } from '@mui/material'
 import { gql, useMutation } from '@apollo/client'
-import type { JoinLeaveMessages, ServerInfo, ServerSettings } from './graphqlTypes'
+import type { JoinLeaveMessages, ServerInfo, ServerSettings } from '../graphqlTypes'
 
 const EDIT_SERVER_SETTINGS = gql`
   mutation EditServerSettings($id: String!, $newSettings: EditServerSettingsInput!) {

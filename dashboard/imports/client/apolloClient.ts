@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { ApolloClient, HttpLink, InMemoryCache, type NormalizedCacheObject } from '@apollo/client'
 import isEqual from 'lodash/isEqual'
 import merge from 'deepmerge'
-import config from '../config.json'
+import { rootUrl } from '../config'
 
 export const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__'
 
@@ -12,7 +12,7 @@ function createApolloClient(): ApolloClient<NormalizedCacheObject> {
   return new ApolloClient({
     ssrMode: typeof window === 'undefined',
     link: new HttpLink({
-      uri: config.rootUrl + '/api/graphql', // Server URL (must be absolute)
+      uri: rootUrl + '/api/graphql', // Server URL (must be absolute)
       credentials: 'same-origin', // Additional fetch() options like `credentials` or `headers`
     }),
     cache: new InMemoryCache(),

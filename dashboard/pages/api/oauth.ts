@@ -1,7 +1,6 @@
 import { sign } from 'jsonwebtoken'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import config from '../../config.json'
-const { rootUrl, clientId, clientSecret, jwtSecret } = config
+import { clientId, clientSecret, jwtSecret, rootUrl } from '../../imports/config'
 
 const scope = ['identify', 'guilds'].join(' ')
 const secure =

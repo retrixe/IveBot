@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Link from 'next/link'
 import type { GetStaticProps } from 'next'
-import config from '../imports/server/config'
+import config from '../imports/config'
 
 const ErrorPage = (props: { rootUrl: string }): React.JSX.Element => {
   const router = useRouter()

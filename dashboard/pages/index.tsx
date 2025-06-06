@@ -3,7 +3,7 @@ import { AppBar, Toolbar, Button, Typography, SvgIcon, IconButton } from '@mui/m
 import Head from 'next/head'
 import Link from 'next/link'
 import type { GetStaticProps } from 'next'
-import config from '../imports/server/config'
+import config from '../imports/config'
 
 const GitHubLogo = (): React.JSX.Element => (
   <SvgIcon>

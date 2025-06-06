@@ -3,10 +3,10 @@ import { AppBar, Toolbar, Button, Typography, LinearProgress } from '@mui/materi
 import { useQuery, gql } from '@apollo/client'
 import Head from 'next/head'
 import Link from 'next/link'
-import Dashboard from '../imports/dashboard'
+import Dashboard from '../imports/client/dashboard'
 import type { DiscordUser, ServerInfo } from '../imports/graphqlTypes'
 import type { GetStaticProps } from 'next'
-import config from '../imports/server/config'
+import config from '../imports/config'
 
 const GET_USER_DATA = gql`
   query GetUserData {

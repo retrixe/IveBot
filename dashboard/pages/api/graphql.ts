@@ -2,7 +2,7 @@ import { ApolloServer } from '@apollo/server'
 import { startServerAndCreateNextHandler } from '@as-integrations/next'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { gql } from 'graphql-tag'
-import resolvers from '../../imports/resolvers'
+import resolvers from '../../imports/server/resolvers'
 
 const typeDefs = gql`
   """

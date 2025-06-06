@@ -17,7 +17,7 @@ import {
 } from '@mui/material'
 import ArrowBack from '@mui/icons-material/ArrowBack'
 import { useLazyQuery, gql } from '@apollo/client'
-import type { ServerInfo, DiscordUser, ServerSettings } from './graphqlTypes'
+import type { ServerInfo, DiscordUser, ServerSettings } from '../graphqlTypes'
 import Settings from './settings'
 
 const Root = styled('div')(({ theme }) => ({
@@ -25,7 +25,7 @@ const Root = styled('div')(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     flexDirection: 'column',
   },
-}))
+})) as React.FC<React.HTMLAttributes<HTMLDivElement>>
 
 const Banner = styled('div')(({ theme }) => ({
   padding: 8,
@@ -37,14 +37,14 @@ const Banner = styled('div')(({ theme }) => ({
   [theme.breakpoints.only('md')]: { width: '30%' },
   [theme.breakpoints.only('lg')]: { width: '25%' },
   [theme.breakpoints.only('xl')]: { width: '20%' },
-}))
+})) as React.FC<React.HTMLAttributes<HTMLDivElement>>
 
 const AvatarImage = styled('img')(({ theme }) => ({
   borderRadius: '50%',
   marginBottom: '1em',
   [theme.breakpoints.down('sm')]: { maxWidth: 256 },
   [theme.breakpoints.up('md')]: { width: '100%' },
-}))
+})) as React.FC<React.ImgHTMLAttributes<HTMLImageElement>>
 
 const GET_SERVER_SETTINGS = gql`
   query GetServerSettings($id: String!) {

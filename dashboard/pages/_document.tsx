@@ -2,7 +2,7 @@ import React from 'react'
 import Document, { Html, Head, Main, NextScript } from 'next/document'
 import createEmotionServer from '@emotion/server/create-instance'
 import createCache from '@emotion/cache'
-import theme from '../imports/theme'
+import theme from '../imports/client/theme'
 import type { MyAppProps } from './_app'
 
 const ico =

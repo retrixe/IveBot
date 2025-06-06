@@ -1,7 +1,6 @@
 import { type JwtPayload, verify } from 'jsonwebtoken'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import config from '../../config.json'
-const { rootUrl, clientId, clientSecret, jwtSecret } = config
+import { clientId, clientSecret, jwtSecret, rootUrl } from '../../imports/config'
 
 const secure =
   rootUrl.startsWith('https') && process.env.NODE_ENV !== 'development' ? '; Secure' : ''

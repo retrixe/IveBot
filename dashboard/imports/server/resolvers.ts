@@ -5,9 +5,17 @@ import { MongoClient, type Document } from 'mongodb'
 import { type JwtPayload, verify, sign, TokenExpiredError } from 'jsonwebtoken'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { randomBytes, createCipheriv, createDecipheriv, createHash } from 'crypto'
-import config from '../config.json'
-import type { ServerSettings } from './graphqlTypes'
-const { host, rootUrl, mongoUrl, jwtSecret, clientId, clientSecret, botToken, botApiUrl } = config
+import {
+  host,
+  rootUrl,
+  mongoUrl,
+  jwtSecret,
+  clientId,
+  clientSecret,
+  botToken,
+  botApiUrl,
+} from '../config'
+import type { ServerSettings } from '../graphqlTypes'
 
 // Create a MongoDB instance.
 const mongodb = new MongoClient(mongoUrl === 'dotenv' ? (process.env.MONGO_URL ?? '') : mongoUrl)

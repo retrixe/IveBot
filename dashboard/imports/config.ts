@@ -1,4 +1,7 @@
-import config from '../../config.json'
+import config from '../config.json'
+
+export const { botApiUrl, botToken, clientId, clientSecret, jwtSecret, mongoUrl, host, rootUrl } =
+  config
 
 export default config as {
   botApiUrl: string
