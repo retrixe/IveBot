@@ -4,21 +4,16 @@ import type { AppProps } from 'next/app'
 import { ApolloProvider } from '@apollo/client'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
-import { CacheProvider, type EmotionCache } from '@emotion/react'
-import createCache from '@emotion/cache'
+import { AppCacheProvider } from '@mui/material-nextjs/v15-pagesRouter'
 import { useApollo } from '../imports/client/apolloClient'
 import theme from '../imports/client/theme'
 
-// Client-side cache, shared for the whole session of the user in the browser.
-const clientSideEmotionCache = createCache({ key: 'css' })
-
-export interface MyAppProps extends AppProps {
-  emotionCache?: EmotionCache
+interface MyAppProps extends AppProps {
   pageProps: Record<string, unknown>
 }
 
 export default function MyApp(props: MyAppProps): React.JSX.Element {
-  const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
+  const { Component, pageProps } = props
 
   React.useEffect(() => {
     // Remove the server-side injected CSS.
@@ -27,7 +22,7 @@ export default function MyApp(props: MyAppProps): React.JSX.Element {
   }, [])
 
   return (
-    <CacheProvider value={emotionCache}>
+    <AppCacheProvider {...props}>
       <Head>
         <title>IveBot</title>
         <meta name='viewport' content='initial-scale=1, width=device-width' />
@@ -39,6 +34,6 @@ export default function MyApp(props: MyAppProps): React.JSX.Element {
           <Component {...pageProps} />
         </ApolloProvider>
       </ThemeProvider>
-    </CacheProvider>
+    </AppCacheProvider>
   )
 }
