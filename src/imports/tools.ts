@@ -2,7 +2,7 @@ import http, { type RequestOptions } from 'http'
 import https from 'https'
 import { URL } from 'url'
 import type { Db } from 'mongodb'
-import type { GuildChannel, Member, Message, User } from '@projectdysnomia/dysnomia'
+import type { AnyGuildChannel, Member, Message, User } from '@projectdysnomia/dysnomia'
 import type { ServerSettings } from './types.ts'
 
 // Fresh insults. They come and go, I suppose.
@@ -69,7 +69,7 @@ export const getUser = (message: Message, arg: string): User | undefined => {
   if (nickname) return nickname.user
 }
 
-export const getChannel = (message: Message, arg: string): GuildChannel | undefined => {
+export const getChannel = (message: Message, arg: string): AnyGuildChannel | undefined => {
   if (!arg || typeof arg !== 'string' || !message.member) return
   const mentions = message.channelMentions
   const guild = message.member.guild

@@ -8,6 +8,22 @@ const cToK = (c: number): number => +(c + 273.15).toFixed(2)
 const fToC = (f: number): number => +(((f - 32) * 5) / 9).toFixed(2)
 const kToC = (k: number): number => +(k - 273.15).toFixed(2)
 
+const generator = (temp: string) => {
+  const regex = /^(-?\d+.?\d*) ?°? ?([CFK])$/i
+  const match = regex.exec(temp)
+  if (!match) return { content: 'Specify a temperature ending in C, F or K.', error: true }
+  const value = +match[1]
+  const unit = match[2].toLowerCase()
+  const result = `**${value}°${unit.toUpperCase()}** is:`
+  if (unit === 'c') {
+    return result + `\n**${cToF(value)}°F** (Fahrenheit)` + `\n**${cToK(value)}K** (Kelvin)`
+  } else if (unit === 'f') {
+    return result + `\n**${fToC(value)}°C** (Celsius)` + `\n**${cToK(fToC(value))}K** (Kelvin)`
+  } else {
+    return result + `\n**${kToC(value)}°C** (Celsius)` + `\n**${cToF(kToC(value))}°F** (Fahrenheit)`
+  }
+}
+
 export const handleTemperature: Command = {
   name: 'temperature',
   aliases: ['temp'],
@@ -26,26 +42,7 @@ export const handleTemperature: Command = {
       },
     ],
   },
-  slashGenerator: async interaction =>
-    await handleTemperature.commonGenerator(
-      (interaction.data.options[0] as InteractionDataOptionsString).value,
-    ),
-  generator: async (message, args) => await handleTemperature.commonGenerator(args[0]),
-  commonGenerator: (temp: string) => {
-    const regex = /^(-?\d+.?\d*) ?°? ?([CFK])$/i
-    const match = regex.exec(temp)
-    if (!match) return { content: 'Specify a temperature ending in C, F or K.', error: true }
-    const value = +match[1]
-    const unit = match[2].toLowerCase()
-    const result = `**${value}°${unit.toUpperCase()}** is:`
-    if (unit === 'c') {
-      return result + `\n**${cToF(value)}°F** (Fahrenheit)` + `\n**${cToK(value)}K** (Kelvin)`
-    } else if (unit === 'f') {
-      return result + `\n**${fToC(value)}°C** (Celsius)` + `\n**${cToK(fToC(value))}K** (Kelvin)`
-    } else {
-      return (
-        result + `\n**${kToC(value)}°C** (Celsius)` + `\n**${cToF(kToC(value))}°F** (Fahrenheit)`
-      )
-    }
-  },
+  slashGenerator: interaction =>
+    generator((interaction.data.options[0] as InteractionDataOptionsString).value),
+  generator: (message, args) => generator(args[0]),
 }

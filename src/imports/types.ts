@@ -58,8 +58,6 @@ export interface Command {
   generator: IveBotCommandGenerator
   postGenerator?: (message: Message, args: string[], sent?: Message, ctx?: Context) => void
   slashGenerator?: true | IveBotSlashGeneratorFunction
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  commonGenerator?: (...args: any[]) => CommandResponse | Promise<CommandResponse>
 }
 
 export interface CommandOptions {

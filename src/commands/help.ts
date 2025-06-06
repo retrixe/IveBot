@@ -126,6 +126,46 @@ Arguments in () are optional :P
   `
 }
 
+const generator = async (
+  author: string,
+  command: string,
+  client: Client,
+  parser: CommandParser,
+) => {
+  const commands = parser.commands
+  command = command.replace(/\//g, '').toLowerCase()
+  const check = (commandObj: Command): boolean =>
+    // First checks for name, 2nd for aliases.
+    commandObj.name.toLowerCase() === command || !!commandObj.aliases?.includes(command)
+  // Check if requested for a specific command.
+  const foundCommand = Object.values(commands).find(check)
+  if (foundCommand) {
+    return generateDocs(foundCommand)
+  } else if (command) {
+    return { content: 'Incorrect parameters. Run /help for general help.', error: true }
+  }
+  // Default help.
+  try {
+    const channel = await client.getDMChannel(author)
+    await channel.createMessage({
+      content: `**IveBot's dashboard**: ${rootURL || 'https://ivebot.now.sh'}/
+(Manage Server required to manage a server)`,
+      embeds: [
+        {
+          color: 0x00ae86,
+          // type: 'rich',
+          title: 'Help',
+          ...generalHelp,
+          footer: { text: 'For help on a specific command or aliases, run /help <command>.' },
+        },
+      ],
+    })
+    return 'newbie, help has been direct messaged to you ✅'
+  } catch {
+    return { content: `I cannot DM you the help for newbies, you ${getInsult()} ❌`, error: true }
+  }
+}
+
 export const handleHelp: IveBotCommand = {
   name: 'help',
   aliases: ['halp', 'hulp', 'gethelp', 'commands'],
@@ -146,51 +186,12 @@ export const handleHelp: IveBotCommand = {
     ],
   },
   slashGenerator: async ({ user, data: { options } }, { client, commandParser }) =>
-    await handleHelp.commonGenerator(
+    await generator(
       user.id,
       (options[0] as InteractionDataOptionsString)?.value ?? '',
       client,
       commandParser,
     ),
   generator: async (message, args, { client, commandParser }) =>
-    await handleHelp.commonGenerator(message.author.id, args.join(' '), client, commandParser),
-  commonGenerator: async (
-    author: string,
-    command: string,
-    client: Client,
-    parser: CommandParser,
-  ) => {
-    const commands = parser.commands
-    command = command.replace(/\//g, '').toLowerCase()
-    const check = (name: string): boolean =>
-      // First checks for name, 2nd for aliases.
-      commands[name].name.toLowerCase() === command || commands[name].aliases?.includes(command)
-    // Check if requested for a specific command.
-    const commandName = Object.keys(commands).find(check)
-    if (commandName) {
-      return generateDocs(commands[commandName])
-    } else if (command) {
-      return { content: 'Incorrect parameters. Run /help for general help.', error: true }
-    }
-    // Default help.
-    try {
-      const channel = await client.getDMChannel(author)
-      await channel.createMessage({
-        content: `**IveBot's dashboard**: ${rootURL || 'https://ivebot.now.sh'}/
-(Manage Server required to manage a server)`,
-        embeds: [
-          {
-            color: 0x00ae86,
-            // type: 'rich',
-            title: 'Help',
-            ...generalHelp,
-            footer: { text: 'For help on a specific command or aliases, run /help <command>.' },
-          },
-        ],
-      })
-      return 'newbie, help has been direct messaged to you ✅'
-    } catch {
-      return { content: `I cannot DM you the help for newbies, you ${getInsult()} ❌`, error: true }
-    }
-  },
+    await generator(message.author.id, args.join(' '), client, commandParser),
 }

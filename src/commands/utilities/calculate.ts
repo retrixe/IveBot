@@ -5,6 +5,14 @@ import type { Command } from '../../imports/types.ts'
 // All the needs!
 import { evaluate } from 'mathjs'
 
+const generator = (expression: string) => {
+  try {
+    return `${evaluate(expression.split(',').join('.').split('÷').join('/').toLowerCase())}`.trim()
+  } catch {
+    return { content: 'Invalid expression >_<', error: true }
+  }
+}
+
 export const handleCalculate: Command = {
   name: 'calculate',
   aliases: ['calc', 'cal'],
@@ -24,16 +32,7 @@ More info here: https://mathjs.org/docs/expressions/syntax.html`,
       },
     ],
   },
-  slashGenerator: async interaction =>
-    await handleCalculate.commonGenerator(
-      (interaction.data.options[0] as InteractionDataOptionsString).value,
-    ),
-  generator: async (message, args) => await handleCalculate.commonGenerator(args.join(' ')),
-  commonGenerator: (expression: string) => {
-    try {
-      return `${evaluate(expression.split(',').join('.').split('÷').join('/').toLowerCase())}`.trim()
-    } catch {
-      return { content: 'Invalid expression >_<', error: true }
-    }
-  },
+  slashGenerator: interaction =>
+    generator((interaction.data.options[0] as InteractionDataOptionsString).value),
+  generator: (message, args) => generator(args.join(' ')),
 }

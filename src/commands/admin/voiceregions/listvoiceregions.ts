@@ -2,6 +2,11 @@
 import type Dysnomia from '@projectdysnomia/dysnomia'
 import type { Command } from '../../../imports/types.ts'
 
+const generator = async (guild: string, client: Dysnomia.Client) =>
+  'Available voice regions for this server: `' +
+  (await client.getVoiceRegions(guild)).map(value => value.id).join('`, `') +
+  '`'
+
 export const handleListvoiceregions: Command = {
   name: 'listvoiceregions',
   aliases: ['lsr', 'lvr'],
@@ -14,11 +19,6 @@ export const handleListvoiceregions: Command = {
     argsRequired: false,
   },
   slashGenerator: async ({ guild: { id: guildID } }, { client }) =>
-    await handleListvoiceregions.commonGenerator(guildID, client),
-  generator: async (message, args, { client }) =>
-    await handleListvoiceregions.commonGenerator(message.guildID, client),
-  commonGenerator: async (guild: string, client: Dysnomia.Client) =>
-    'Available voice regions for this server: `' +
-    (await client.getVoiceRegions(guild)).map(value => value.id).join('`, `') +
-    '`',
+    await generator(guildID, client),
+  generator: async (message, args, { client }) => await generator(message.guildID, client),
 }

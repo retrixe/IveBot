@@ -1,4 +1,3 @@
-import type { User } from '@projectdysnomia/dysnomia'
 import type { Command } from '../../../imports/types.ts'
 import { checkRolePosition } from '../../../imports/permissions.ts'
 import { getInsult, getUser, parseSilentDelete } from '../../../imports/tools.ts'
@@ -17,7 +16,7 @@ export const handleBan: Command = {
   generator: async (message, args, { client }) => {
     // Find the user ID.
     const userSpecified = args.shift()
-    let user: User = getUser(message, userSpecified)
+    let user = getUser(message, userSpecified)
     if (!user && client.users.find(i => i.username === userSpecified)) {
       user = client.users.find(i => i.username === userSpecified)
     } else if (!user && client.users.get(userSpecified)) {

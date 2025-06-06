@@ -1,4 +1,3 @@
-import type { User } from '@projectdysnomia/dysnomia'
 import type { Command } from '../../../imports/types.ts'
 import { getInsult } from '../../../imports/tools.ts'
 
@@ -19,7 +18,7 @@ export const handleUnban: Command = {
     }
     // Find the user ID.
     const userSpecified = args.shift()
-    let user: User
+    let user = client.users.find(i => i.username === userSpecified)
     if (client.users.find(i => i.username === userSpecified)) {
       user = client.users.find(i => i.username === userSpecified)
     } else if (client.users.get(userSpecified)) {

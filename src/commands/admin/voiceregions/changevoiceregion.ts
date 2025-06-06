@@ -6,6 +6,17 @@ import type { Command } from '../../../imports/types.ts'
 // All the needs!
 import { getChannel } from '../../../imports/tools.ts'
 
+const generator = async (channel: Dysnomia.VoiceChannel, region: string) => {
+  try {
+    const { rtcRegion } = await channel.edit({
+      rtcRegion: region === 'automatic' || region === 'auto' ? null : region,
+    })
+    return 'Voice region changed to ' + (rtcRegion || 'auto') + ' \\o/'
+  } catch {
+    return 'Invalid voice region.'
+  }
+}
+
 export const handleChangevoiceregion: Command = {
   name: 'changevoiceregion',
   aliases: ['csr', 'cvr'],
@@ -46,7 +57,7 @@ export const handleChangevoiceregion: Command = {
     ) as InteractionDataOptionsString
     const ch = client.guilds.get(interaction.guild?.id).channels.get(channelOpt.value)
     if (!ch || ch.type !== 2) return { content: 'This voice channel does not exist!', error: true }
-    return await handleChangevoiceregion.commonGenerator(ch, regionOpt.value || 'auto')
+    return await generator(ch, regionOpt.value || 'auto')
   },
   generator: async (message, args, { client }) => {
     if (!message.member.guild.members.get(client.user.id).permissions.has('manageGuild')) {
@@ -55,16 +66,6 @@ export const handleChangevoiceregion: Command = {
     const rtcRegion = args.pop()
     const ch = getChannel(message, args.join(' '))
     if (!ch || ch.type !== 2) return { content: 'This voice channel does not exist!', error: true }
-    return await handleChangevoiceregion.commonGenerator(ch, rtcRegion)
-  },
-  commonGenerator: async (channel: Dysnomia.VoiceChannel, region: string) => {
-    try {
-      const { rtcRegion } = await channel.edit({
-        rtcRegion: region === 'automatic' || region === 'auto' ? null : region,
-      })
-      return 'Voice region changed to ' + (rtcRegion || 'auto') + ' \\o/'
-    } catch {
-      return 'Invalid voice region.'
-    }
+    return await generator(ch, rtcRegion)
   },
 }

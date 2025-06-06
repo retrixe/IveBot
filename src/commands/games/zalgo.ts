@@ -24,6 +24,18 @@ export const characters = [
   '\u0356', '\u0359', '\u035a', '\u0323'
 ]
 
+const generator = (text: string) => {
+  const textToZalgo = text.split('')
+  let newMessage = ''
+  textToZalgo.forEach(element => {
+    newMessage += element
+    for (let i = 0; i < Math.floor(Math.random() * 5) + 1; i++) {
+      newMessage += characters[Math.floor(Math.random() * characters.length)]
+    }
+  })
+  return newMessage.length >= 2000 ? text : newMessage
+}
+
 export const handleZalgo: Command = {
   name: 'zalgo',
   aliases: ['zgo'],
@@ -41,51 +53,7 @@ export const handleZalgo: Command = {
       },
     ],
   },
-  generator: async (message, args) => await handleZalgo.commonGenerator(args.join(' ')),
-  slashGenerator: async interaction =>
-    await handleZalgo.commonGenerator(
-      (interaction.data.options[0] as InteractionDataOptionsString).value,
-    ),
-  commonGenerator: (text: string) => {
-    const textToZalgo = text.split('')
-    let newMessage = ''
-    textToZalgo.forEach(element => {
-      newMessage += element
-      for (let i = 0; i < Math.floor(Math.random() * 5) + 1; i++) {
-        newMessage += characters[Math.floor(Math.random() * characters.length)]
-      }
-    })
-    return newMessage.length >= 2000 ? text : newMessage
-  },
-}
-
-export const handleDezalgo: Command = {
-  name: 'dezalgo',
-  aliases: ['dzgo'],
-  opts: {
-    description: "The zalgo demon's writing.",
-    fullDescription: "Read the zalgo demon's writing.",
-    usage: '/dezalgo <text>',
-    example: '/dezalgo ḥ̛̓e̖l̽͞҉lͦͅoͥ',
-    options: [
-      {
-        name: 'text',
-        description: "The zalgo demon's handwriting to be converted to regular text.",
-        required: true,
-        type: Constants.ApplicationCommandOptionTypes.STRING,
-      },
-    ],
-  },
-  slashGenerator: async interaction =>
-    await handleDezalgo.commonGenerator(
-      (interaction.data.options[0] as InteractionDataOptionsString).value,
-    ),
-  generator: async (message, args) => await handleDezalgo.commonGenerator(args.join(' ')),
-  commonGenerator: (text: string) => {
-    let newMessage = ''
-    text.split('').forEach(element => {
-      if (!characters.includes(element)) newMessage += element
-    })
-    return newMessage
-  },
+  generator: (message, args) => generator(args.join(' ')),
+  slashGenerator: interaction =>
+    generator((interaction.data.options[0] as InteractionDataOptionsString).value),
 }

@@ -18,6 +18,9 @@ export const handleAddemoji: Command = {
       args.length > 1
         ? args.splice(1).join('%20')
         : message.attachments?.find(attachment => !!attachment)?.url
+    if (!url) {
+      return { content: `Provide an image for the emoji, you ${getInsult()}.`, error: true }
+    }
     // This can check the first bits of the Buffer.
     const check = (header: number[], buf: Buffer): boolean => {
       for (let i = 0; i < header.length; i++) {

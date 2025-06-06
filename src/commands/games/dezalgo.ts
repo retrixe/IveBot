@@ -3,6 +3,14 @@ import type { InteractionDataOptionsString } from '@projectdysnomia/dysnomia'
 import type { Command } from '../../imports/types.ts'
 import { characters } from './zalgo.ts'
 
+const generator = (text: string) => {
+  let newMessage = ''
+  text.split('').forEach(element => {
+    if (!characters.includes(element)) newMessage += element
+  })
+  return newMessage
+}
+
 export const handleDezalgo: Command = {
   name: 'dezalgo',
   aliases: ['dzgo'],
@@ -20,16 +28,7 @@ export const handleDezalgo: Command = {
       },
     ],
   },
-  slashGenerator: async interaction =>
-    await handleDezalgo.commonGenerator(
-      (interaction.data.options[0] as InteractionDataOptionsString).value,
-    ),
-  generator: async (message, args) => await handleDezalgo.commonGenerator(args.join(' ')),
-  commonGenerator: (text: string) => {
-    let newMessage = ''
-    text.split('').forEach(element => {
-      if (!characters.includes(element)) newMessage += element
-    })
-    return newMessage
-  },
+  slashGenerator: interaction =>
+    generator((interaction.data.options[0] as InteractionDataOptionsString).value),
+  generator: (message, args) => generator(args.join(' ')),
 }
