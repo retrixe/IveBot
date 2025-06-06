@@ -57,7 +57,7 @@ export const handleEditchannel: Command = {
     const ops: string[] = args.join(' ').split('|')
     // Now iterate over each operation and execute them.
     const operationTypes = ['name', 'topic', 'rateLimitPerUser', 'nsfw', 'bitrate', 'userLimit']
-    const failedOps: Array<{ name: string; value: string }> = []
+    const failedOps: { name: string; value: string }[] = []
     for (const operation of ops) {
       const opArr = operation.split('-')
       const name = opArr.shift()

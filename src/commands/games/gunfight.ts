@@ -1,4 +1,5 @@
 // All the types!
+import type { Message } from '@projectdysnomia/dysnomia'
 import type { Command } from '../../imports/types.ts'
 // All the tools!
 import { getUser } from '../../imports/tools.ts'
@@ -82,7 +83,7 @@ export const handleAccept: Command = {
     // Find the gunfight, if exists.
     const gunfightToAccept = Object.keys(tempDB.gunfight).find(
       gunfight =>
-        gunfight.substr(gunfight.indexOf('-') + 1) === message.author.id &&
+        gunfight.substring(gunfight.indexOf('-') + 1) === message.author.id &&
         !tempDB.gunfight[gunfight].accepted &&
         message.channel.id === tempDB.gunfight[gunfight].channelID,
     )
@@ -107,22 +108,19 @@ export const handleAccept: Command = {
         .createMessage('Say ' + tempDB.gunfight[gunfightToAccept].randomWord + '!')
         .then(() => {
           tempDB.gunfight[gunfightToAccept].wordSaid = true
-          setTimeout(() => {
-            if (
-              tempDB.gunfight[gunfightToAccept] &&
-              tempDB.gunfight[gunfightToAccept].timestamp === timestamp &&
-              tempDB.gunfight[gunfightToAccept].channelID === message.channel.id
-            ) {
-              message.channel
-                .createMessage('Neither of you said the word so you both lose..')
-                .then(() => {
-                  delete tempDB.gunfight[gunfightToAccept]
-                })
-                .catch(() => {
-                  delete tempDB.gunfight[gunfightToAccept]
-                })
-            }
-          }, 30000)
+          return new Promise(resolve => setTimeout(resolve, 30000)) // Wait 30 seconds...
+        })
+        .then((): Promise<Message> => {
+          if (
+            tempDB.gunfight[gunfightToAccept] &&
+            tempDB.gunfight[gunfightToAccept].timestamp === timestamp &&
+            tempDB.gunfight[gunfightToAccept].channelID === message.channel.id
+          ) {
+            return message.channel.createMessage('Neither of you said the word so you both lose..')
+          } else return
+        })
+        .then(() => {
+          delete tempDB.gunfight[gunfightToAccept]
         })
         .catch(() => {
           delete tempDB.gunfight[gunfightToAccept]

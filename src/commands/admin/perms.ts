@@ -35,7 +35,7 @@ export const handlePermissions: Command = {
     const member = message.member.guild.members.get(user.id)
     const color = member ? getMemberColor(member) : 0
     const permissions = member.permissions
-    const permissionKeys = Object.keys(permissions.json) as Array<keyof Constants['Permissions']>
+    const permissionKeys = Object.keys(permissions.json) as (keyof Constants['Permissions'])[]
     const channelPerm = (message.channel as GuildTextableChannel).permissionsOf(user.id)
     return {
       content: `✅ **Permissions of ${user.username}:**`,

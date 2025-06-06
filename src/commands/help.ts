@@ -114,14 +114,14 @@ const generateDocs = (command: Command): string => {
 **Usage:** ${command.usage}
 **Aliases:** ${command.aliases.map(i => '/' + i).join(', ')}
 **Description:** ${command.fullDescription}
-**Example:** ${command.example}${requirements.substr(0, requirements.length - 3)}
+**Example:** ${command.example}${requirements.substring(0, requirements.length - 3)}
 Arguments in () are optional :P
     `
   }
   return `
 **Usage:** ${command.usage}
 **Description:** ${command.fullDescription}
-**Example:** ${command.example}${requirements.substr(0, requirements.length - 3)}
+**Example:** ${command.example}${requirements.substring(0, requirements.length - 3)}
 Arguments in () are optional :P
   `
 }

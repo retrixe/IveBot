@@ -7,11 +7,11 @@ import { weatherAPIkey } from '../../config.ts'
 interface Weather {
   cod: string
   coord: { lon: number; lat: number }
-  weather: Array<{
+  weather: {
     main: string
     description: string
     icon: string
-  }>
+  }[]
   main: { temp: number; temp_min: number; temp_max: number; humidity: number; pressure: number }
   visibility: number
   wind: { speed: number; deg: number }

@@ -121,7 +121,7 @@ export const fetchLimited = async (
     const req = get(parsedUrl, opts, res => {
       const contentLength = res.headers['content-length'] || '-1'
       if (!isNaN(+contentLength) && +contentLength > byteLimit) {
-        req.abort()
+        req.destroy()
         resolve(false)
       }
       res.on('data', chunk => {
@@ -129,7 +129,7 @@ export const fetchLimited = async (
         data.push(chunk)
         size += (chunk as Buffer).length
         if (size > byteLimit) {
-          req.abort()
+          req.destroy()
           resolve(false)
         }
       })

@@ -11,7 +11,7 @@
   },
   "scripts": {
     "dev": "NODE_OPTIONS='--inspect' next",
-    "lint": "graphql-schema-linter && tsc && eslint .",
+    "lint": "graphql-schema-linter && tsc && eslint --cache --cache-strategy content --cache-location .next/ .",
     "build": "next build",
     "start": "next start"
   },

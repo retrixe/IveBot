@@ -116,46 +116,43 @@ for (const commandFile of commandFiles) {
 }
 
 // Register setInterval to fulfill delayed tasks.
-setInterval(() => {
-  db.collection('tasks')
-    .find({ time: { $lte: Date.now() + 60000 } })
-    .toArray()
-    .then(tasks => {
-      tasks?.forEach(task =>
-        setTimeout(() => {
-          // TODO: What if no perms?
-          if (task.type === 'unmute') {
-            client
-              .removeGuildMemberRole(
-                task.guild,
-                task.user,
-                task.target,
-                'Muted for fixed duration.',
-              )
-              .catch((e: unknown) => {
-                if (
-                  (e instanceof DiscordRESTError || e instanceof DiscordHTTPError) &&
-                  e.res.statusCode !== 404
-                )
-                  console.error(e)
-              })
-          } else if (task.type === 'reminder') {
-            client.createMessage(task.target, task.message).catch((e: unknown) => {
+setInterval(
+  bubbleWrap(async () => {
+    const tasks = await db
+      .collection('tasks')
+      .find({ time: { $lte: Date.now() + 60000 } })
+      .toArray()
+
+    tasks?.forEach(task =>
+      setTimeout(() => {
+        // TODO: What if no perms?
+        if (task.type === 'unmute') {
+          client
+            .removeGuildMemberRole(task.guild, task.user, task.target, 'Muted for fixed duration.')
+            .catch((e: unknown) => {
               if (
                 (e instanceof DiscordRESTError || e instanceof DiscordHTTPError) &&
                 e.res.statusCode !== 404
               )
                 console.error(e)
             })
-          }
-          db.collection('tasks')
-            .deleteOne({ _id: task._id })
-            .catch((error: unknown) => console.error('Failed to remove task from database.', error))
-        }, task.time - Date.now()),
-      )
-    })
-    .catch(console.error)
-}, 60000)
+        } else if (task.type === 'reminder') {
+          client.createMessage(task.target, task.message).catch((e: unknown) => {
+            if (
+              (e instanceof DiscordRESTError || e instanceof DiscordHTTPError) &&
+              e.res.statusCode !== 404
+            )
+              console.error(e)
+          })
+        }
+        db.collection('tasks')
+          .deleteOne({ _id: task._id })
+          .catch((error: unknown) => console.error('Failed to remove task from database.', error))
+      }, task.time - Date.now()),
+    )
+  }),
+  60000,
+)
 
 // On connecting..
 client.on('ready', () => {
@@ -187,7 +184,7 @@ if (jwtSecret) {
   interface DiscordServerResponse {
     id: string
     perm: boolean
-    textChannels: Array<{ id: string; name: string }>
+    textChannels: { id: string; name: string }[]
   }
   const key = createHash('sha256').update(jwtSecret).digest()
   const headers = (body: NodeJS.ArrayBufferView | string) => ({
@@ -208,8 +205,8 @@ if (jwtSecret) {
     req.on('end', () => {
       ;(async () => {
         try {
-          const decipher = createDecipheriv('aes-256-ctr', key, buffer.slice(0, 16))
-          const data = Buffer.concat([decipher.update(buffer.slice(16)), decipher.final()])
+          const decipher = createDecipheriv('aes-256-ctr', key, buffer.subarray(0, 16))
+          const data = Buffer.concat([decipher.update(buffer.subarray(16)), decipher.final()])
           const valid: DiscordServerResponse[] = []
           const parsed: { id: string; host: boolean; guilds: string[] } = JSON.parse(
             data.toString('utf8'),

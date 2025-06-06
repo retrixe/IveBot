@@ -95,9 +95,13 @@ export class SlashCommand {
     const userIDs = this.requirements.userIDs // If it doesn't exist it's a pass.
       ? this.requirements.userIDs.includes(interaction.user.id)
       : false // Next line calls custom if it exists.
-    // TODO: const custom = this.requirements.custom ? this.requirements.custom(interaction) : false
+    // TODO
+    if (this.requirements.custom) {
+      throw new Error('Custom requirements are not implemented yet!')
+    }
+    // const custom = this.requirements.custom ? this.requirements.custom(interaction) : false
     // If it's not a guild there are no permissions.
-    if (!interaction.guildID) return userIDs // || custom
+    if (!interaction.guild) return userIDs // || custom
     const permissions =
       this.requirements.permissions && interaction.member
         ? isEquivalent(
@@ -151,13 +155,13 @@ export default class SlashParser {
 
   async executeCommand(command: SlashCommand, interaction: CommandInteraction): Promise<void> {
     // Guild and DM only.
-    if (command.guildOnly && !interaction.guildID) {
+    if (command.guildOnly && !interaction.guild) {
       await interaction.createMessage({
         content: 'This command can only be executed from a Discord guild.',
         flags: Constants.MessageFlags.EPHEMERAL,
       })
       return
-    } else if (command.dmOnly && interaction.guildID) {
+    } else if (command.dmOnly && interaction.guild) {
       await interaction.createMessage({
         content: 'This command can only be executed in direct messages.',
         flags: Constants.MessageFlags.EPHEMERAL,

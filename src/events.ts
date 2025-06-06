@@ -32,7 +32,7 @@ export const guildMemberAdd =
       // For each role..
       serverSettings.joinAutorole.split('|').forEach(async (role: string) => {
         try {
-          const roleName = role.startsWith('bot-') ? role.substr(4) : role
+          const roleName = role.startsWith('bot-') ? role.substring(4) : role
           const roleObj = member.guild.roles.find(element => element.name === roleName)
           if (!role || !roleObj) return
           if (role.startsWith('bot-') && member.user.bot) await member.addRole(roleObj.id)
@@ -155,7 +155,7 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db): Pro
       })
       // Parse the response.
       const result = (await res.json()) as {
-        responses: Array<{ fullTextAnnotation: { text: string } }>
+        responses: { fullTextAnnotation: { text: string } }[]
       }
       // If no text was found.
       if (!result.responses[0].fullTextAnnotation) return

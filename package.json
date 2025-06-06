@@ -8,7 +8,7 @@
   "repository": "https://github.com/retrixe/IveBot.git",
   "scripts": {
     "prepare": "husky install",
-    "lint": "eslint . && tsc --noEmit && cd dashboard && yarn lint",
+    "lint": "eslint --cache --cache-strategy content --cache-location .eslintcache/ . && tsc --noEmit && cd dashboard && yarn lint",
     "start": "node --enable-source-maps lib/index.js --production",
     "build": "tsc",
     "dev": "node --watch src/index.ts",

@@ -7,19 +7,19 @@ import { oxfordAPI } from '../../config.ts'
 
 interface OxfordApiResponse {
   error?: string
-  results: Array<{ lexicalEntries: Array<{ inflectionOf: Array<{ id: string }> }> }>
+  results: { lexicalEntries: { inflectionOf: { id: string }[] }[] }[]
 }
-type Categories = Array<{
+type Categories = {
   lexicalCategory: { id: string; text: string }
-  entries: Array<{
-    senses: Array<{
+  entries: {
+    senses: {
       definitions: string[]
       shortDefinitions?: string[]
-      examples: Array<{ text: string }>
-      registers: Array<{ id: string; text: string }>
-    }>
-  }>
-}>
+      examples: { text: string }[]
+      registers: { id: string; text: string }[]
+    }[]
+  }[]
+}[]
 export const handleDefine: Command = {
   name: 'define',
   aliases: ['def'],
@@ -59,9 +59,9 @@ export const handleDefine: Command = {
               '?strictMatch=false&fields=definitions%2Cexamples',
             { headers },
           )
-        ).json()) as { results: Array<{ lexicalEntries: Categories; word: string }> }
+        ).json()) as { results: { lexicalEntries: Categories; word: string }[] }
         // Now we create an embed based on the 1st entry.
-        const fields: Array<{ name: string; value: string; inline?: boolean }> = []
+        const fields: { name: string; value: string; inline?: boolean }[] = []
         // Function to check for maximum number of fields in an embed, then push.
         const safePush = (object: { name: string; value: string }): void => {
           if (fields.length < 24) {

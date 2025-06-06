@@ -74,7 +74,7 @@ export const handleAi: Command = {
         user: userID,
       }),
     })
-    const response = (await request.json()) as { choices: Array<{ text: string }> }
+    const response = (await request.json()) as { choices: { text: string }[] }
     if (response.choices.length === 0) {
       return 'OpenAI servers returned no response (likely rate-limited). Try again later?'
     }

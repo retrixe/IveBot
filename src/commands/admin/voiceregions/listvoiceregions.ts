@@ -13,7 +13,7 @@ export const handleListvoiceregions: Command = {
     guildOnly: true,
     argsRequired: false,
   },
-  slashGenerator: async ({ guildID }, { client }) =>
+  slashGenerator: async ({ guild: { id: guildID } }, { client }) =>
     await handleListvoiceregions.commonGenerator(guildID, client),
   generator: async (message, args, { client }) =>
     await handleListvoiceregions.commonGenerator(message.guildID, client),

@@ -44,7 +44,7 @@ export const handleChangevoiceregion: Command = {
     const regionOpt = interaction.data.options.find(
       option => option.name === 'region',
     ) as InteractionDataOptionsString
-    const ch = client.guilds.get(interaction.guildID).channels.get(channelOpt.value)
+    const ch = client.guilds.get(interaction.guild?.id).channels.get(channelOpt.value)
     if (!ch || ch.type !== 2) return { content: 'This voice channel does not exist!', error: true }
     return await handleChangevoiceregion.commonGenerator(ch, regionOpt.value || 'auto')
   },

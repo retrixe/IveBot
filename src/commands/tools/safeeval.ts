@@ -31,13 +31,14 @@ getContent/getCleanContent(messageID), createMessage(content), getReactions(mess
         },
         content: message.content,
         getContent: async (id: string) => (await message.channel.getMessage(id)).content,
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
         getCleanContent: async (id: string) => (await message.channel.getMessage(id)).cleanContent,
         getReactions: async (id: string) => (await message.channel.getMessage(id)).reactions,
       })
       const res = inspect(await Promise.resolve(result), false, 0)
       message.addReaction('✅').catch(() => {}) // Ignore error.
       const token = (context.client as unknown as { _token: string })._token
-      return res !== 'undefined' ? `${'```'}${res.replace(token, '')}${'```'}` : undefined
+      return res !== 'undefined' ? `\`\`\`${res.replace(token, '')}\`\`\`` : undefined
     } catch (e) {
       message.addReaction('❌').catch(() => {}) // Ignore error.
       return { content: `**Error:**\n${e}`, error: true }

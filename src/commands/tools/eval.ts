@@ -26,7 +26,7 @@ export const handleEval: Command = {
       // const res = eval(`(async () => { const a = ${toEval}; return a })()`)
       message.addReaction('✅').catch(() => {}) // Ignore error.
       const token = (client as unknown as { _token: string })._token
-      return res !== 'undefined' ? `${'```'}${res}${'```'}`.replace(token, 'censored') : undefined
+      return res !== 'undefined' ? `\`\`\`${res}\`\`\``.replace(token, 'censored') : undefined
     } catch (e) {
       const channel = await client.getDMChannel(host)
       message.addReaction('❌').catch(() => {}) // Ignore error.

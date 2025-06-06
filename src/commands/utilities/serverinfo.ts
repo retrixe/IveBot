@@ -27,7 +27,7 @@ export const handleServerinfo: Command = {
 
   slashGenerator: async (interaction, { client }) => {
     const serverOpt = (interaction.data.options[0] as InteractionDataOptionsString)?.value
-    let guild = client.guilds.get(serverOpt || interaction.guildID)
+    let guild = client.guilds.get(serverOpt || interaction.guild?.id)
     if (serverOpt && guild && !guild.members.has(interaction.user.id)) guild = undefined
     return await handleServerinfo.commonGenerator(guild)
   },
