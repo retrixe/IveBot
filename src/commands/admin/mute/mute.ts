@@ -129,8 +129,7 @@ export const handleMute: Command = {
       return 'Failed to add mute timer! However, user has been muted.'
     }
     // Persist in cache.
-    if (!tempDB.mute[guildID]) tempDB.mute[guildID] = [user.id]
-    else if (!tempDB.mute[guildID].includes(user.id)) tempDB.mute[guildID].push(user.id)
+    tempDB.mute.add(`${guildID}-${user.id}`)
     /*
     try {
       if (ms(args[0]) && ms(args[0]) >= 2073600000) return 'Mute limit is 24 days.'

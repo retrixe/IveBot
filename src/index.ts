@@ -49,11 +49,11 @@ const client = new Client(`Bot ${token === 'dotenv' ? process.env.IVEBOT_TOKEN :
 
 // Create a cache to handle certain stuff.
 const tempDB: DB = {
-  gunfight: {},
-  say: {},
-  trivia: {},
+  gunfight: new Map(),
+  say: new Map(),
+  trivia: new Map(),
   leave: new Set(),
-  mute: {},
+  mute: new Set(),
   cooldowns: { request: new Set() },
 }
 

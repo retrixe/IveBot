@@ -34,34 +34,31 @@ export const handleGunfight: Command = {
 
     // Do not challenge someone already in a gunfight.
     // Possible gunfights.
-    const possibleGunfight = Object.keys(tempDB.gunfight).find(gunfight =>
-      gunfight.split('-').includes(user.id),
-    )
+    const possibleGunfight = tempDB.gunfight
+      .keys()
+      .find(gunfight => gunfight.split('-').includes(user.id))
     if (possibleGunfight) return { content: 'This user is already in a fight!', error: true }
     // Push to database.
     const timestamp = Date.now()
-    tempDB.gunfight[message.author.id + '-' + user.id] = {
+    const gunfightID = message.author.id + '-' + user.id
+    tempDB.gunfight.set(gunfightID, {
       timestamp,
       accepted: false,
       randomWord: '',
       channelID: message.channel.id,
       wordSaid: false,
-    }
+    })
     // The following will delete the gunfight if unaccepted within 30 seconds.
     setTimeout(() => {
       // Find the gunfight we pushed.
-      const gunfightPushed = tempDB.gunfight[message.author.id + '-' + user.id]
+      const gunfightPushed = tempDB.gunfight.get(gunfightID)
       // Remove the object and send a response.
       if (gunfightPushed && !gunfightPushed.accepted && gunfightPushed.timestamp === timestamp) {
         const mention = message.author.mention
         message.channel
           .createMessage(`${mention}, your challenge to ${user.mention} has been cancelled.`)
-          .then(() => {
-            delete tempDB.gunfight[message.author.id + '-' + user.id]
-          })
-          .catch(() => {
-            delete tempDB.gunfight[message.author.id + '-' + user.id]
-          })
+          .then(() => tempDB.gunfight.delete(gunfightID))
+          .catch(() => tempDB.gunfight.delete(gunfightID))
       }
     }, 30000)
     return `${user.mention}, say /accept to accept the challenge.`
@@ -81,50 +78,46 @@ export const handleAccept: Command = {
   },
   generator: (message, args, { tempDB }) => {
     // Find the gunfight, if exists.
-    const gunfightToAccept = Object.keys(tempDB.gunfight).find(
-      gunfight =>
-        gunfight.substring(gunfight.indexOf('-') + 1) === message.author.id &&
-        !tempDB.gunfight[gunfight].accepted &&
-        message.channel.id === tempDB.gunfight[gunfight].channelID,
-    )
+    const gunfightToAccept = tempDB.gunfight
+      .entries()
+      .find(
+        ([gunfightID, data]) =>
+          gunfightID.substring(gunfightID.indexOf('-') + 1) === message.author.id &&
+          !data.accepted &&
+          message.channel.id === data.channelID,
+      )
     if (gunfightToAccept === undefined) return // Insert checks.
     // Accept only if person is not in another gunfight.
     if (
-      Object.keys(tempDB.gunfight).filter(gunfight =>
-        gunfight.split('-').includes(message.author.id),
-      ).length > 1
+      tempDB.gunfight
+        .entries()
+        .filter(([id, data]) => id.split('-').includes(message.author.id) && data.accepted)
+        .reduce(acc => acc + 1, 0) > 0
     ) {
       return { content: 'You are already in a gunfight!', error: true }
     }
     // Accept the challenge.
     const words = ['fire', 'water', 'gun', 'dot']
-    tempDB.gunfight[gunfightToAccept].accepted = true
-    tempDB.gunfight[gunfightToAccept].randomWord = words[Math.floor(Math.random() * words.length)]
-    const timestamp = tempDB.gunfight[gunfightToAccept].timestamp
+    gunfightToAccept[1].accepted = true
+    gunfightToAccept[1].randomWord = words[Math.floor(Math.random() * words.length)]
+    const timestamp = gunfightToAccept[1].timestamp
     // Let's wait for random amount under 20s and call a random word.
     const interval = Math.floor(Math.random() * 20000 + 1000)
     setTimeout(() => {
       message.channel
-        .createMessage('Say ' + tempDB.gunfight[gunfightToAccept].randomWord + '!')
+        .createMessage('Say ' + gunfightToAccept[1].randomWord + '!')
         .then(() => {
-          tempDB.gunfight[gunfightToAccept].wordSaid = true
+          gunfightToAccept[1].wordSaid = true
           return new Promise(resolve => setTimeout(resolve, 30000)) // Wait 30 seconds...
         })
         .then((): Promise<Message> => {
-          if (
-            tempDB.gunfight[gunfightToAccept] &&
-            tempDB.gunfight[gunfightToAccept].timestamp === timestamp &&
-            tempDB.gunfight[gunfightToAccept].channelID === message.channel.id
-          ) {
+          const gunfight = tempDB.gunfight.get(gunfightToAccept[0])
+          if (gunfight?.timestamp === timestamp && gunfight.channelID === message.channel.id) {
             return message.channel.createMessage('Neither of you said the word so you both lose..')
           } else return
         })
-        .then(() => {
-          delete tempDB.gunfight[gunfightToAccept]
-        })
-        .catch(() => {
-          delete tempDB.gunfight[gunfightToAccept]
-        })
+        .then(() => tempDB.gunfight.delete(gunfightToAccept[0]))
+        .catch(() => tempDB.gunfight.delete(gunfightToAccept[0]))
     }, interval)
     return 'Within 20 seconds, you will be asked to say a random word.'
   },

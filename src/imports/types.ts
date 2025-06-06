@@ -18,10 +18,10 @@ export interface Gunfight {
 }
 
 export interface DB {
-  gunfight: Record<string, Gunfight>
-  say: Record<string, string> // Channels.
-  trivia: Record<string, TriviaSession>
-  mute: Record<string, string[]> // Servers with userIDs contained.
+  gunfight: Map<string, Gunfight>
+  say: Map<string, string> // Channels.
+  trivia: Map<string, TriviaSession>
+  mute: Set<string> // Server + userID
   cooldowns: { request: Set<string> }
   leave: Set<string>
 }

@@ -100,7 +100,7 @@ export class TriviaSession {
 
   async endGame(): Promise<void> {
     this.stopped = true
-    delete this.tempDB.trivia[this.channel.id]
+    this.tempDB.trivia.delete(this.channel.id)
     if (Object.keys(this.scores).length > 0) await this.channel.createMessage(this.getScores(true))
   }
 
@@ -260,7 +260,7 @@ export const handleTrivia: Command = {
     }
 
     if (args.length === 1 && ['scores', 'score', 'leaderboard'].includes(args[0])) {
-      const session = tempDB.trivia[message.channel.id]
+      const session = tempDB.trivia.get(message.channel.id)
       if (session) {
         return session.getScores()
       } else {
@@ -277,7 +277,7 @@ export const handleTrivia: Command = {
         ],
       }
     } else if (args.length === 1 && (args[0] === 'stop' || args[0] === 'end')) {
-      const session = tempDB.trivia[message.channel.id]
+      const session = tempDB.trivia.get(message.channel.id)
       const channel = message.channel as GuildTextableChannel
       if (session) {
         if (
@@ -293,7 +293,7 @@ export const handleTrivia: Command = {
         return 'There is no trivia session ongoing in this channel.'
       }
     } else {
-      const session = tempDB.trivia[message.channel.id]
+      const session = tempDB.trivia.get(message.channel.id)
       if (!session) {
         let triviaList
         try {
@@ -311,7 +311,7 @@ export const handleTrivia: Command = {
           tempDB,
           client,
         )
-        tempDB.trivia[message.channel.id] = t
+        tempDB.trivia.set(message.channel.id, t)
         await t.newQuestion()
       } else {
         return 'A trivia session is already ongoing in this channel.'

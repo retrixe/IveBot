@@ -15,7 +15,7 @@ export const handleSay: Command = {
     deleteCommand: true,
   },
   postGenerator: (message, args, sent, { tempDB }) => {
-    if (sent) tempDB.say[sent.channel.id] = sent.id
+    if (sent) tempDB.say.set(sent.channel.id, sent.id)
   },
   generator: async (message, args, { client, tempDB }) => {
     // Should it be sent in another channel?
@@ -37,19 +37,18 @@ export const handleSay: Command = {
         }
       args.shift()
       if (args.join(' ') === 'pls adim me') args = ['no']
-      tempDB.say[message.channelMentions[0]] = (
-        await client.createMessage(message.channelMentions[0], {
-          content: args.join(' '),
-          allowedMentions: {
-            everyone: message.member?.permissions.has('mentionEveryone'),
-            users: true,
-            roles:
-              message.member &&
-              (message.member.permissions.has('mentionEveryone') ||
-                message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)),
-          },
-        })
-      ).id
+      const sent = await client.createMessage(message.channelMentions[0], {
+        content: args.join(' '),
+        allowedMentions: {
+          everyone: message.member?.permissions.has('mentionEveryone'),
+          users: true,
+          roles:
+            message.member &&
+            (message.member.permissions.has('mentionEveryone') ||
+              message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)),
+        },
+      })
+      tempDB.say.set(message.channelMentions[0], sent.id)
       return
     }
     // Send the message.

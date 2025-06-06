@@ -15,7 +15,7 @@ export const handleType: Command = {
     deleteCommand: true,
   },
   postGenerator: (message, args, sent, { tempDB }) => {
-    if (sent) tempDB.say[sent.channel.id] = sent.id
+    if (sent) tempDB.say.set(sent.channel.id, sent.id)
   },
   generator: async (message, args, { tempDB, client }) => {
     // Should it be sent in another channel?
@@ -41,19 +41,18 @@ export const handleType: Command = {
       await (async ms => await new Promise(resolve => setTimeout(resolve, ms)))(
         args.join(' ').length * 120 > 8000 ? 8000 : args.join(' ').length * 120,
       )
-      tempDB.say[message.channelMentions[0]] = (
-        await client.createMessage(message.channelMentions[0], {
-          content: args.join(' '),
-          allowedMentions: {
-            everyone: message.member?.permissions.has('mentionEveryone'),
-            users: true,
-            roles:
-              message.member &&
-              (message.member.permissions.has('mentionEveryone') ||
-                message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)),
-          },
-        })
-      ).id
+      const sent = await client.createMessage(message.channelMentions[0], {
+        content: args.join(' '),
+        allowedMentions: {
+          everyone: message.member?.permissions.has('mentionEveryone'),
+          users: true,
+          roles:
+            message.member &&
+            (message.member.permissions.has('mentionEveryone') ||
+              message.member.guild.roles.filter(e => e.mentionable).map(e => e.id)),
+        },
+      })
+      tempDB.say.set(message.channelMentions[0], sent.id)
       return
     }
     // Send the message.

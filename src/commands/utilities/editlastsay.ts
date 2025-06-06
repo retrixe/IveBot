@@ -37,7 +37,7 @@ export const handleEditLastSay: Command = {
       try {
         await client.editMessage(
           possibleChannel,
-          tempDB.say[possibleChannel],
+          tempDB.say.get(possibleChannel),
           args.slice(1).join(' '),
         )
       } catch {
@@ -47,7 +47,11 @@ export const handleEditLastSay: Command = {
     }
     // Edit the message.
     try {
-      await client.editMessage(message.channel.id, tempDB.say[message.channel.id], args.join(' '))
+      await client.editMessage(
+        message.channel.id,
+        tempDB.say.get(message.channel.id),
+        args.join(' '),
+      )
     } catch {
       return { content: 'Nothing to edit.', error: true }
     }

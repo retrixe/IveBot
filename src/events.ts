@@ -20,7 +20,7 @@ export const guildMemberAdd =
   (client: Client, db: Db, tempDB: DB) => async (guild: Guild, member: Member) => {
     // Mute persist.
     try {
-      if (tempDB.mute[guild.id].includes(member.id)) {
+      if (tempDB.mute.has(`${guild.id}-${member.id}`)) {
         const role = guild.roles.find(role => role.name === 'Muted')
         if (role) await member.addRole(role.id, 'Persisting mute.')
       }
@@ -111,7 +111,7 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db): Pro
     await message.channel.createMessage(content)
   const command = message.content.toLowerCase()
   // Handle answers to trivia
-  const session = tempDB.trivia[message.channel.id]
+  const session = tempDB.trivia.get(message.channel.id)
   if (session) {
     await session.checkAnswer(message)
   }
@@ -126,13 +126,13 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db): Pro
   else if (command.startsWith('ayy')) await sendResponse('lmao')
   // Handle answers to gunfight.
   else if (['fire', 'water', 'gun', 'dot'].includes(command)) {
-    const key = Object.keys(tempDB.gunfight).find(
-      i => i.split('-')[0] === message.author.id || i.split('-')[1] === message.author.id,
-    )
-    if (!key) return
-    const gunfight = tempDB.gunfight[key]
-    if (!gunfight || !gunfight.wordSaid || gunfight.randomWord !== command) return
-    delete tempDB.gunfight[key]
+    const entry = tempDB.gunfight
+      .entries()
+      .find(([key]) => key.split('-').includes(message.author.id))
+    if (!entry) return
+    const [key, gunfight] = entry
+    if (!gunfight.wordSaid || gunfight.randomWord !== command) return
+    tempDB.gunfight.delete(key)
     await message.channel.createMessage(`${message.author.mention} won!`)
   }
 

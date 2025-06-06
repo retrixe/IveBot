@@ -32,12 +32,7 @@ export const handleUnmute: Command = {
     for (const role of roles) {
       if (rolesOfServer.get(role).name === 'Muted') {
         // Remove the mute persist.
-        if (tempDB.mute[guildID]?.includes(user.id)) {
-          tempDB.mute[guildID].splice(
-            tempDB.mute[guildID].findIndex(i => i === user.id),
-            1,
-          )
-        }
+        tempDB.mute.delete(`${guildID}-${user.id}`)
         // Take the role.
         await client.removeGuildMemberRole(message.member.guild.id, user.id, role, args.join(' '))
         return 'Unmuted.'
