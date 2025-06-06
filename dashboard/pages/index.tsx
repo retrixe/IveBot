@@ -2,8 +2,8 @@ import React from 'react'
 import { AppBar, Toolbar, Button, Typography, SvgIcon, IconButton } from '@mui/material'
 import Head from 'next/head'
 import Link from 'next/link'
-import { readFile } from 'fs/promises'
 import type { GetStaticProps } from 'next'
+import config from '../imports/server/config'
 
 const GitHubLogo = (): React.JSX.Element => (
   <SvgIcon>
@@ -68,9 +68,8 @@ class Index extends React.Component<{ rootUrl: string; clientId: string }, unkno
   }
 }
 
-export const getStaticProps: GetStaticProps = async () => {
-  const { rootUrl, clientId } = JSON.parse(await readFile('config.json', { encoding: 'utf8' }))
-  return { props: { rootUrl: rootUrl ?? '', clientId: clientId ?? '' } }
+export const getStaticProps: GetStaticProps = () => {
+  return { props: { rootUrl: config.rootUrl ?? '', clientId: config.clientId } }
 }
 
 export default Index

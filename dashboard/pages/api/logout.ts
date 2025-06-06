@@ -16,8 +16,12 @@ const getToken = async (req: NextApiRequest): Promise<string | undefined> => {
         err ? reject(err) : resolve(decoded),
       )
     })
-    return typeof decoded === 'string' ? undefined : decoded?.refreshToken
-  } catch {}
+    return typeof decoded !== 'string' && typeof decoded?.refreshToken === 'string'
+      ? decoded.refreshToken
+      : undefined
+  } catch {
+    return
+  }
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {

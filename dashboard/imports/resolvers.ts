@@ -1,15 +1,16 @@
-import { Client } from '@projectdysnomia/dysnomia'
+import { Client, DiscordHTTPError } from '@projectdysnomia/dysnomia'
 import { promisify } from 'util'
 import { GraphQLError } from 'graphql'
 import { MongoClient, type Document } from 'mongodb'
-import { type JwtPayload, verify, sign } from 'jsonwebtoken'
+import { type JwtPayload, verify, sign, TokenExpiredError } from 'jsonwebtoken'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { randomBytes, createCipheriv, createDecipheriv, createHash } from 'crypto'
 import config from '../config.json'
+import type { ServerSettings } from './graphqlTypes'
 const { host, rootUrl, mongoUrl, jwtSecret, clientId, clientSecret, botToken, botApiUrl } = config
 
 // Create a MongoDB instance.
-const mongodb = new MongoClient(mongoUrl === 'dotenv' ? process.env.MONGO_URL || '' : mongoUrl)
+const mongodb = new MongoClient(mongoUrl === 'dotenv' ? (process.env.MONGO_URL ?? '') : mongoUrl)
 mongodb.once('open', () => console.log('GraphQL server connected successfully to MongoDB.'))
 const db = mongodb.db('ivebot')
 
@@ -30,7 +31,7 @@ const getServerSettings = async (id: string): Promise<Document> => {
     // Initialize server settings.
     await db.collection('servers').insertOne({ id })
   }
-  return serverSettings || { id }
+  return serverSettings ?? { id }
 }
 
 const encryptionKey = createHash('sha256').update(jwtSecret).digest()
@@ -40,18 +41,25 @@ const encrypt = async (data: Buffer): Promise<Buffer> => {
   return Buffer.concat([iv, cipher.update(data), cipher.final()])
 }
 const decrypt = (data: Buffer): Buffer => {
-  const cipher = createDecipheriv('aes-256-ctr', encryptionKey, data.slice(0, 16))
-  return Buffer.concat([cipher.update(data.slice(16)), cipher.final()])
+  const cipher = createDecipheriv('aes-256-ctr', encryptionKey, data.subarray(0, 16))
+  return Buffer.concat([cipher.update(data.subarray(16)), cipher.final()])
 }
 interface TextChannel {
   id: string
   name: string
 }
+
+interface MutualPermissionGuild {
+  id: string
+  perm: boolean
+  textChannels: TextChannel[]
+}
+
 const getMutualPermissionGuilds = async (
   id: string,
   guilds: string[],
   host = false,
-): Promise<{ id: string; perm: boolean; textChannels: TextChannel[] }[]> => {
+): Promise<MutualPermissionGuild[]> => {
   if (botApiUrl) {
     let body: Buffer
     try {
@@ -68,7 +76,9 @@ const getMutualPermissionGuilds = async (
           extensions: { code: 'INTERNAL_SERVER_ERROR' },
         })
       }
-      return JSON.parse(decrypt(Buffer.from(await request.arrayBuffer())).toString('utf8'))
+      return JSON.parse(
+        decrypt(Buffer.from(await request.arrayBuffer())).toString('utf8'),
+      ) as MutualPermissionGuild[]
     } catch {
       throw new GraphQLError('Failed to make request to IveBot private API!', {
         extensions: { code: 'INTERNAL_SERVER_ERROR' },
@@ -89,8 +99,8 @@ const getMutualPermissionGuilds = async (
               ? fullGuild.channels.filter(c => c.type === 0).map(c => ({ id: c.id, name: c.name }))
               : [],
           })
-        } catch (e: any) {
-          if (e.name === 'DiscordHTTPError') {
+        } catch (e: unknown) {
+          if (e instanceof DiscordHTTPError) {
             throw new GraphQLError('Failed to make Discord request!', {
               extensions: { code: 'INTERNAL_SERVER_ERROR' },
             })
@@ -121,21 +131,25 @@ const authenticateRequest = async (req: NextApiRequest, res: NextApiResponse): P
     const decoded: string | JwtPayload | undefined = await new Promise((resolve, reject) => {
       verify(token, jwtSecret, {}, (err, decoded) => (err ? reject(err) : resolve(decoded)))
     })
-    if (typeof decoded === 'string' || !decoded?.accessToken) {
+    if (typeof decoded === 'string' || typeof decoded?.accessToken !== 'string') {
       throw new GraphQLError('Invalid JWT token in cookie!', {
         extensions: { code: 'UNAUTHENTICATED' },
       })
     }
     return decoded.accessToken
-  } catch (e: any) {
+  } catch (e: unknown) {
     // If expired, try refresh token to create a new one, else throw AuthenticationError.
-    if (e.name === 'TokenExpiredError') {
+    if (e instanceof TokenExpiredError) {
       const decoded: string | JwtPayload | undefined = await new Promise((resolve, reject) => {
         verify(token, jwtSecret, { ignoreExpiration: true }, (err, decoded) =>
           err ? reject(err) : resolve(decoded),
         )
       })
-      if (typeof decoded === 'string' || !decoded?.refreshToken || !decoded.scope) {
+      if (
+        typeof decoded === 'string' ||
+        typeof decoded?.refreshToken !== 'string' ||
+        typeof decoded.scope !== 'string'
+      ) {
         throw new GraphQLError('Invalid JWT token in cookie!', {
           extensions: { code: 'UNAUTHENTICATED' },
         })
@@ -151,11 +165,19 @@ const authenticateRequest = async (req: NextApiRequest, res: NextApiResponse): P
           access_token: accessToken,
           refresh_token: refreshToken,
           expires_in: expiresIn,
-        } = await fetch('https://discord.com/api/v8/oauth2/token', {
+        } = await fetch('https://discord.com/api/oauth2/token', {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           method: 'POST',
           body,
-        }).then(async res => await res.json())
+        }).then(async res => (await res.json()) as Record<string, unknown>)
+
+        if (
+          typeof accessToken !== 'string' ||
+          typeof refreshToken !== 'string' ||
+          typeof expiresIn !== 'number'
+        ) {
+          throw new Error('Failed to refresh access token!')
+        }
 
         const token = sign({ accessToken, refreshToken, scope: decoded.scope }, jwtSecret, {
           expiresIn,
@@ -191,7 +213,7 @@ export default {
       const self = await client.getSelf()
       const hasPerm = await checkUserGuildPerm(self.id, id, host === self.id)
       if (hasPerm) {
-        const serverSettings = await getServerSettings(id)
+        const serverSettings = (await getServerSettings(id)) as Partial<ServerSettings>
         // Insert default values for all properties.
         return {
           id,
@@ -199,7 +221,7 @@ export default {
           ...serverSettings,
           joinLeaveMessages: {
             ...defaultSettings.joinLeaveMessages,
-            ...(serverSettings.joinLeaveMessages || {}),
+            ...(serverSettings.joinLeaveMessages ?? {}),
           },
         }
       } else {
@@ -235,7 +257,7 @@ export default {
           return {
             id: guild.id,
             name: guild.name,
-            icon: guild.iconURL || 'no icon',
+            icon: guild.iconURL ?? 'no icon',
             channels: mutual.textChannels,
             perms: mutual.perm,
           }
@@ -280,8 +302,8 @@ export default {
               ...newSettings,
               joinLeaveMessages: {
                 ...defaultSettings.joinLeaveMessages,
-                ...(serverSettings.joinLeaveMessages || {}),
-                ...(newSettings.joinLeaveMessages || {}),
+                ...(serverSettings.joinLeaveMessages ?? {}),
+                ...(newSettings.joinLeaveMessages ?? {}),
               },
             },
           },

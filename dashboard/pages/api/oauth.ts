@@ -44,9 +44,13 @@ export default async (req: NextApiRequest, res: NextApiResponse): Promise<NextAp
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     method: 'POST',
     body,
-  }).then(async res => await res.json())
+  }).then(async res => (await res.json()) as Record<string, unknown>)
 
-  if (!accessToken || typeof accessToken !== 'string') {
+  if (
+    typeof accessToken !== 'string' ||
+    typeof refreshToken !== 'string' ||
+    typeof expiresIn !== 'number'
+  ) {
     return res.redirect(OAUTH_URI)
   }
 

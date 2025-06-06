@@ -3,6 +3,7 @@ import Document, { Html, Head, Main, NextScript } from 'next/document'
 import createEmotionServer from '@emotion/server/create-instance'
 import createCache from '@emotion/cache'
 import theme from '../imports/theme'
+import type { MyAppProps } from './_app'
 
 const ico =
   'https://cdn.discordapp.com/avatars/383591525944262656/7b826edf3e6dcb47dbbb1131aaf72710.jpg'
@@ -62,12 +63,13 @@ MyDocument.getInitialProps = async ctx => {
   // You can consider sharing the same emotion cache between all the SSR requests to speed up performance.
   // However, be aware that it can have global side effects.
   const cache = createCache({ key: 'css' })
-  const emotionServer = createEmotionServer(cache as any)
+  // @ts-expect-error -- I don't know what the deal is
+  const emotionServer = createEmotionServer(cache)
 
   ctx.renderPage = async () =>
     await originalRenderPage({
-      enhanceApp: (App: any) => {
-        const EnhancedApp = (props: any): React.JSX.Element => (
+      enhanceApp: App => {
+        const EnhancedApp = (props: MyAppProps): React.JSX.Element => (
           <App emotionCache={cache} {...props} />
         )
         return EnhancedApp

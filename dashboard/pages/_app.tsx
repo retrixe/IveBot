@@ -12,8 +12,9 @@ import theme from '../imports/theme'
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createCache({ key: 'css' })
 
-interface MyAppProps extends AppProps {
+export interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache
+  pageProps: Record<string, unknown>
 }
 
 export default function MyApp(props: MyAppProps): React.JSX.Element {

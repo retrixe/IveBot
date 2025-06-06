@@ -45,11 +45,24 @@ const Settings = (props: { data: ServerSettings; server: ServerInfo }): React.JS
   const setJoinLeaveMessages = (e: Partial<JoinLeaveMessages>): void =>
     setServerSettings(s => ({
       ...s,
-      joinLeaveMessages: { ...(s.joinLeaveMessages || {}), ...e },
+      joinLeaveMessages: { ...s.joinLeaveMessages, ...e },
     }))
   const setPublicRoles = (e: string): void => setServerSettings(s => ({ ...s, publicRoles: e }))
   const setJoinAutorole = (e: string): void => setServerSettings(s => ({ ...s, joinAutorole: e }))
   const toggleOcrOnSend = (): void => setServerSettings(s => ({ ...s, ocrOnSend: !s.ocrOnSend }))
+
+  const handleSave = () => {
+    const newSettings: Partial<ServerSettings> = {
+      ...serverSettings,
+      joinLeaveMessages: { ...serverSettings.joinLeaveMessages },
+    }
+    delete newSettings.id
+    delete newSettings.__typename
+    if (newSettings.joinLeaveMessages?.__typename) delete newSettings.joinLeaveMessages.__typename
+    editServerSettings({ variables: { id: props.server.id, newSettings } })
+      .then(() => setOriginalServerSettings(serverSettings))
+      .catch(console.error)
+  }
 
   return (
     <>
@@ -198,21 +211,7 @@ const Settings = (props: { data: ServerSettings; server: ServerInfo }): React.JS
       <Button size='small' onClick={() => setServerSettings(originalServerSettings)}>
         Cancel
       </Button>
-      <Button
-        size='small'
-        onClick={async () => {
-          const newSettings: Partial<ServerSettings> = {
-            ...serverSettings,
-            joinLeaveMessages: { ...serverSettings.joinLeaveMessages },
-          }
-          delete newSettings.id
-          delete newSettings.__typename
-          if (newSettings.joinLeaveMessages?.__typename)
-            delete newSettings.joinLeaveMessages.__typename
-          await editServerSettings({ variables: { id: props.server.id, newSettings } })
-          setOriginalServerSettings(serverSettings)
-        }}
-      >
+      <Button size='small' onClick={handleSave}>
         Save
       </Button>
       {loading && (

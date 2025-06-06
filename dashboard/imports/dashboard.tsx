@@ -17,7 +17,7 @@ import {
 } from '@mui/material'
 import ArrowBack from '@mui/icons-material/ArrowBack'
 import { useLazyQuery, gql } from '@apollo/client'
-import type { ServerInfo, DiscordUser } from './graphqlTypes'
+import type { ServerInfo, DiscordUser, ServerSettings } from './graphqlTypes'
 import Settings from './settings'
 
 const Root = styled('div')(({ theme }) => ({
@@ -69,11 +69,13 @@ const Dashboard = (props: {
   const largeDisplay = useMediaQuery(useTheme().breakpoints.up('lg'))
   const mobileDisplay = useMediaQuery(useTheme().breakpoints.down('xs'))
   const [selectedServer, setSelectedServer] = useState<ServerInfo | null>(null)
-  const [getServerSettings, { loading, data, error }] = useLazyQuery(GET_SERVER_SETTINGS)
+  const [getServerSettings, { loading, data, error }] = useLazyQuery<{
+    serverSettings: ServerSettings
+  }>(GET_SERVER_SETTINGS)
 
   const nameOfServer =
     selectedServer && selectedServer.name.length >= 20
-      ? selectedServer.name.substr(0, 20) + '...'
+      ? selectedServer.name.substring(0, 20) + '...'
       : selectedServer?.name
   const settings = selectedServer ? (
     <>

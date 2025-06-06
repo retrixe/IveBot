@@ -3,8 +3,8 @@ import { AppBar, Toolbar, Button, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Link from 'next/link'
-import { readFile } from 'fs/promises'
 import type { GetStaticProps } from 'next'
+import config from '../imports/server/config'
 
 const ErrorPage = (props: { rootUrl: string }): React.JSX.Element => {
   const router = useRouter()
@@ -45,9 +45,8 @@ const ErrorPage = (props: { rootUrl: string }): React.JSX.Element => {
   )
 }
 
-export const getStaticProps: GetStaticProps = async () => {
-  const { rootUrl } = JSON.parse(await readFile('config.json', { encoding: 'utf8' }))
-  return { props: { rootUrl: rootUrl ?? '' } }
+export const getStaticProps: GetStaticProps = () => {
+  return { props: { rootUrl: config.rootUrl ?? '' } }
 }
 
 export default ErrorPage

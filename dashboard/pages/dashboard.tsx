@@ -5,8 +5,8 @@ import Head from 'next/head'
 import Link from 'next/link'
 import Dashboard from '../imports/dashboard'
 import type { DiscordUser, ServerInfo } from '../imports/graphqlTypes'
-import { readFile } from 'fs/promises'
 import type { GetStaticProps } from 'next'
+import config from '../imports/server/config'
 
 const GET_USER_DATA = gql`
   query GetUserData {
@@ -37,9 +37,12 @@ const DashboardPage = (props: { rootUrl: string }): React.JSX.Element => {
   const loginWithOauth = (): void => {
     if (loggedOut) window.location.pathname = '/api/oauth'
   }
-  const logout = async (): Promise<void> => {
-    const res = await fetch('/api/logout', { method: 'POST' })
-    if (res.ok) window.location.reload()
+  const logout = () => {
+    fetch('/api/logout', { method: 'POST' })
+      .then(res => {
+        if (res.ok) window.location.reload()
+      })
+      .catch(console.error)
   }
 
   return (
@@ -93,9 +96,8 @@ const DashboardPage = (props: { rootUrl: string }): React.JSX.Element => {
   )
 }
 
-export const getStaticProps: GetStaticProps = async () => {
-  const { rootUrl } = JSON.parse(await readFile('config.json', { encoding: 'utf8' }))
-  return { props: { rootUrl: rootUrl ?? '' } }
+export const getStaticProps: GetStaticProps = () => {
+  return { props: { rootUrl: config.rootUrl ?? '' } }
 }
 
 export default DashboardPage
