@@ -3,7 +3,7 @@ import { zeroWidthSpace, getInsult } from '../imports/tools.ts'
 import type { SlashCommand } from '../imports/types.ts'
 import type { Command } from '../client.ts'
 import type CommandParser from '../client.ts'
-import { rootURL } from '../config.ts'
+import { dashboardUrl } from '../config.ts'
 import { type Client, Constants } from '@projectdysnomia/dysnomia'
 
 const generalHelp = {
@@ -144,7 +144,7 @@ const generator = async (
   try {
     const channel = await client.getDMChannel(author)
     await channel.createMessage({
-      content: `**IveBot's dashboard**: ${rootURL || 'https://ivebot.now.sh'}/
+      content: `**IveBot's dashboard**: ${dashboardUrl || 'https://ivebot.now.sh'}/
 (Manage Server required to manage a server)`,
       embeds: [
         {

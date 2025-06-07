@@ -3,7 +3,7 @@ import type { Command } from '../../imports/types.ts'
 // All the tools!
 import { getInsult, fetchLimited } from '../../imports/tools.ts'
 // Get the NASA API token.
-import { cvAPIkey } from '../../config.ts'
+import { gcloudApiKey } from '../../config.ts'
 
 export const handleOcr: Command = {
   name: 'ocr',
@@ -51,17 +51,20 @@ export const handleOcr: Command = {
       if (fetchedImage === false) return 'The file provided is larger than 16 MB!'
       const image = fetchedImage.toString('base64')
       // Now send the request.
-      const res = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${cvAPIkey}`, {
-        body: JSON.stringify({
-          requests: [
-            {
-              image: { content: image },
-              features: [{ type: 'TEXT_DETECTION' }],
-            },
-          ],
-        }),
-        method: 'POST',
-      })
+      const res = await fetch(
+        `https://vision.googleapis.com/v1/images:annotate?key=${gcloudApiKey}`,
+        {
+          body: JSON.stringify({
+            requests: [
+              {
+                image: { content: image },
+                features: [{ type: 'TEXT_DETECTION' }],
+              },
+            ],
+          }),
+          method: 'POST',
+        },
+      )
       // Parse the response.
       const result = (await res.json()) as {
         responses: { fullTextAnnotation: { text: string } }[]

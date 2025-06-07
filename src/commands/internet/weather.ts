@@ -1,7 +1,7 @@
 // All the types!
 import type { Command } from '../../imports/types.ts'
 // Get the NASA API token.
-import { weatherAPIkey } from '../../config.ts'
+import { weatherApiKey } from '../../config.ts'
 
 // Our weather and define types.
 interface Weather {
@@ -36,7 +36,7 @@ export const handleWeather: Command = {
     const weather = (await (
       await fetch(
         `http://api.openweathermap.org/data/2.5/weather?q=${args.join(',')}` +
-          `&appid=${weatherAPIkey}&units=${fahrenheit ? 'imperial' : 'metric'}`,
+          `&appid=${weatherApiKey}&units=${fahrenheit ? 'imperial' : 'metric'}`,
       )
     ).json()) as Weather
     const temp = fahrenheit ? '°F' : '°C'

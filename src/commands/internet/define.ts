@@ -3,7 +3,7 @@ import type { Command } from '../../imports/types.ts'
 // All the tools!
 import { formatError, zeroWidthSpace } from '../../imports/tools.ts'
 // Get the NASA API token.
-import { oxfordAPI } from '../../config.ts'
+import { oxfordApi } from '../../config.ts'
 
 interface OxfordApiResponse {
   error?: string
@@ -32,8 +32,8 @@ export const handleDefine: Command = {
   generator: async (message, args) => {
     // Setup request to find word.
     const headers = {
-      app_id: oxfordAPI.appId,
-      app_key: oxfordAPI.appKey,
+      app_id: oxfordApi.appId,
+      app_key: oxfordApi.appKey,
       Accept: 'application/json',
     }
     // Search for the word, destructure for results, and then pass them on to our second request.

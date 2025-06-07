@@ -87,19 +87,22 @@ Make a file named `config.json5` in the top-level directory. It should be someth
 ```json
 {
   "token": "<insert token here>",
+  "mongoUrl": "<the link to your MongoDB database instance>",
+  "host": "<your user ID to give you certain privileges like /remoteexec>",
   "testPilots": ["array of people who can use test pilot commands via user ID"],
-  "NASAtoken": "<to enable /astronomy-picture-of-the-day or /apod>",
-  "oxfordAPI": {
+  "dashboardUrl": "<optional, URL to the dashboard with http(s):// and no / at the end>",
+  "jwtSecret": "<optional, leave empty if not using dashboard: JWT secret from dashboard>",
+
+  // optional to enable various commands
+  "nasaApiKey": "<to enable /astronomy-picture-of-the-day or /apod>",
+  "oxfordApi": {
     "appKey": "<enables /define, use Oxford Dictionary API>",
     "appId": "<read above>"
   },
-  "host": "<your user ID to give you certain privileges like /remoteexec>",
-  "weatherAPIkey": "<an http://openweathermap.org API key to enable /weather>",
-  "fixerAPIkey": "<an http://fixer.io API key to enable /currency>",
-  "jwtSecret": "<optional, leave empty if not using dashboard: JWT secret from dashboard>",
-  "cvAPIkey": "<a http://cloud.google.com/vision API key for /ocr and text recognition>",
-  "mongoURL": "<the link to your MongoDB database instance>",
-  "rootURL": "<the root link to the dashboard with http(s):// and no / at the end>"
+  "weatherApiKey": "<an http://openweathermap.org API key to enable /weather>",
+  "fixerApiKey": "<an http://fixer.io API key to enable /currency>",
+  "gcloudApiKey": "<a http://cloud.google.com/vision API key for /ocr and text recognition>",
+  "openaiApiKey": "<an OpenAI API key to enable /ai command (experimental)>",
 }
 ```
 

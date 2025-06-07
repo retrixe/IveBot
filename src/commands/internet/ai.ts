@@ -1,6 +1,6 @@
 import { Constants, type TextChannel } from '@projectdysnomia/dysnomia'
 import type { SlashCommand } from '../../imports/types.ts'
-import { openaiAPIkey } from '../../config.ts'
+import { openaiApiKey } from '../../config.ts'
 
 const generator = async (query: string, userID: string, guildID?: string, reply?: string) => {
   // TODO: This should be configurable.
@@ -28,7 +28,7 @@ const generator = async (query: string, userID: string, guildID?: string, reply?
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${openaiAPIkey}`,
+      Authorization: `Bearer ${openaiApiKey}`,
     },
     body: JSON.stringify({
       model,

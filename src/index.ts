@@ -20,7 +20,7 @@ import SlashParser from './slash.ts'
 import CommandParser from './client.ts'
 import { guildMemberAdd, guildMemberRemove, guildDelete, guildBanAdd } from './events.ts'
 // Get the token needed.
-import { token, mongoURL, jwtSecret } from './config.ts'
+import { token, mongoUrl, jwtSecret } from './config.ts'
 
 // If production is explicitly specified via flag..
 if (process.argv[2] === '--production') process.env.NODE_ENV = 'production'
@@ -58,7 +58,7 @@ const tempDB: DB = {
 }
 
 // Create a MongoDB instance.
-const mongoClient = new MongoClient(mongoURL === 'dotenv' ? process.env.MONGO_URL || '' : mongoURL)
+const mongoClient = new MongoClient(mongoUrl === 'dotenv' ? process.env.MONGO_URL || '' : mongoUrl)
 
 // Connect and intiialise commands and events on the client.
 await mongoClient.connect()

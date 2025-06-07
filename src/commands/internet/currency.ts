@@ -1,7 +1,7 @@
 // All the types!
 import type { Command } from '../../imports/types.ts'
 // Get the NASA API token.
-import { fixerAPIkey } from '../../config.ts'
+import { fixerApiKey } from '../../config.ts'
 import fs from 'fs'
 
 interface countriesInfo {
@@ -64,7 +64,7 @@ export const handleCurrency: Command = {
     if (!currency || Date.now() - currency.timestamp > 3600000) {
       // This just fetches the data and parses it to JSON.
       currency = (await (
-        await fetch(`http://data.fixer.io/api/latest?access_key=${fixerAPIkey}`)
+        await fetch(`http://data.fixer.io/api/latest?access_key=${fixerApiKey}`)
       ).json()) as typeof currency
       currency.timestamp = Date.now() // To set the timestamp to the current time of the system.
       // to change syp value to blackmarket value

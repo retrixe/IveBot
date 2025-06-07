@@ -3,7 +3,7 @@ import type { Command } from '../../imports/types.ts'
 // All the tools!
 import moment from 'moment'
 // Get the NASA API token.
-import { NASAtoken } from '../../config.ts'
+import { nasaApiKey } from '../../config.ts'
 import { formatError } from '../../imports/tools.ts'
 
 interface ApodResponse {
@@ -48,7 +48,7 @@ export const handleApod: Command = {
           title,
           explanation,
         } = (await (
-          await fetch(`https://api.nasa.gov/planetary/apod?api_key=${NASAtoken}&date=${dateStr}`)
+          await fetch(`https://api.nasa.gov/planetary/apod?api_key=${nasaApiKey}&date=${dateStr}`)
         ).json()) as ApodResponse
         return mediaType === 'video'
           ? `**${title}**\n${explanation}\n${url.split('embed/').join('watch?v=')}`
@@ -71,7 +71,7 @@ export const handleApod: Command = {
         title,
         explanation,
       } = (await (
-        await fetch(`https://api.nasa.gov/planetary/apod?api_key=${NASAtoken}`)
+        await fetch(`https://api.nasa.gov/planetary/apod?api_key=${nasaApiKey}`)
       ).json()) as ApodResponse
       return mediaType === 'video'
         ? `**${title}**\n${explanation}\n${url.split('embed/').join('watch?v=')}`

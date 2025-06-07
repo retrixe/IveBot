@@ -13,7 +13,7 @@ import type { Db } from 'mongodb'
 // Database reading function.
 import { getServerSettings } from './imports/tools.ts'
 // Tokens and stuffs.
-import { cvAPIkey } from './config.ts'
+import { gcloudApiKey } from './config.ts'
 
 // When a server gains a member, this function will be called.
 export const guildMemberAdd =
@@ -160,12 +160,15 @@ export default async (message: Message, client: Client, tempDB: DB, db: Db): Pro
       const req = await fetch(attachment.url)
       const image = Buffer.from(await req.arrayBuffer()).toString('base64')
       // Now send the request.
-      const res = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${cvAPIkey}`, {
-        body: JSON.stringify({
-          requests: [{ image: { content: image }, features: [{ type: 'TEXT_DETECTION' }] }],
-        }),
-        method: 'POST',
-      })
+      const res = await fetch(
+        `https://vision.googleapis.com/v1/images:annotate?key=${gcloudApiKey}`,
+        {
+          body: JSON.stringify({
+            requests: [{ image: { content: image }, features: [{ type: 'TEXT_DETECTION' }] }],
+          }),
+          method: 'POST',
+        },
+      )
       // Parse the response.
       const result = (await res.json()) as {
         responses: { fullTextAnnotation: { text: string } }[]
