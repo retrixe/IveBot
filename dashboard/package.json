@@ -10,7 +10,7 @@
     "directory": "dashboard"
   },
   "scripts": {
-    "dev": "NODE_OPTIONS='--inspect' next",
+    "dev": "next",
     "lint": "graphql-schema-linter && tsc && eslint --cache --cache-strategy content --cache-location .next/ .",
     "build": "next build",
     "start": "next start"
