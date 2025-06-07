@@ -14,7 +14,7 @@ export default tseslint.config(
       'lib',
       '.yarn',
       '.prettierrc.mjs',
-      '*.config.{mjs,js}',
+      '*.config.{cjs,mjs,js}',
     ],
   },
   js.configs.recommended,
