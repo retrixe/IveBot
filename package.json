@@ -1,6 +1,6 @@
 {
   "name": "ivebot",
-  "version": "4.0-alpha.3",
+  "version": "4.0.0",
   "description": "The bot that created the iPhone X.",
   "main": "src/index.ts",
   "type": "module",
