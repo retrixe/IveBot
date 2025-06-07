@@ -7,7 +7,7 @@
   "private": true,
   "repository": "https://github.com/retrixe/IveBot.git",
   "scripts": {
-    "prepare": "husky install",
+    "postinstall": "husky",
     "lint": "tsc --noEmit && eslint --cache --cache-strategy content --cache-location .eslintcache/ .",
     "start": "node --enable-source-maps lib/index.js --production",
     "build": "tsc",
