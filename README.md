@@ -107,4 +107,6 @@ You can use comments in JSON5. If you're using a deployment service like Now whi
 
 ## Dashboard Configuration
 
-Since 4.0 onwards, the dashboard has been separated and needs to run separately. Refer to the README.md in the `dashboard/` folder.
+Since 4.0 onwards, the dashboard has been separated into its own independent project, and needs to be setup and run separately. Refer to the README.md in the `dashboard/` folder.
+
+IveBot uses the `yarn` package manager, and Yarn workspaces are used for the bot (`ivebot`) and the dashboard (`ivebot-dashboard`). Constraints are in place to ensure that the dependencies of the dashboard and bot remain in sync. This may cause issues if updating shared dependencies, so look at both lockfiles closely when updating a shared dependency.
